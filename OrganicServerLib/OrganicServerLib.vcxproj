@@ -72,11 +72,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>F:\glm;F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\include;F:\GLEW\glew-2.0.0\include;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\OrganicCoreLib;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\lib-vc2015;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\lib-vc2015;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>F:\glm;F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\include;F:\GLEW\glew-2.0.0\include;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\OrganicCoreLib;$(IncludePath)</IncludePath>
-    <LibraryPath>F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\lib-vc2015;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>F:\OpenGL_GLFW\glfw-3.2.1.bin.WIN64\lib-vc2015;C:\Users\Michael Ansinelli\Documents\Visual Studio 2017\Projects\OrganicCoreLib\x64\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -134,11 +134,23 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OSAmpField.h" />
+    <ClInclude Include="OSContouredTriangle.h" />
+    <ClInclude Include="OSContouredTriangleStrip.h" />
+    <ClInclude Include="OSContourLine.h" />
+    <ClInclude Include="OSContourPlan.h" />
+    <ClInclude Include="OSContourPoint.h" />
     <ClInclude Include="OSServer.h" />
+    <ClInclude Include="OSTrianglePoint.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="OSAmpField.cpp" />
+    <ClCompile Include="OSContouredTriangle.cpp" />
+    <ClCompile Include="OSContourLine.cpp" />
+    <ClCompile Include="OSContourPlan.cpp" />
+    <ClCompile Include="OSContourPoint.cpp" />
     <ClCompile Include="OSServer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
