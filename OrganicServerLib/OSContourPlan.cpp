@@ -52,14 +52,14 @@ void OSContourPlan::createFirstLayerTriangles()
 		//OSContourPoint* contourPointPointer = &PointMap[in_pointIndex];
 
 		// first triangle point
-		OSContourPoint* contourPointPointer = &firstLineRef->PointMap[x];
+		OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[x];
 		OSTrianglePoint pointOne;
 		pointOne.x = contourPointPointer->x;
 		pointOne.y = contourPointPointer->y;
 		pointOne.z = contourPointPointer->z;
 
 		//second triangle point
-		contourPointPointer = &firstLineRef->PointMap[x + 1];
+		contourPointPointer = &firstLineRef->smartContourPoint[x + 1];
 		OSTrianglePoint pointTwo;
 		pointTwo.x = contourPointPointer->x;
 		pointTwo.y = contourPointPointer->y;
@@ -78,13 +78,13 @@ void OSContourPlan::createFirstLayerTriangles()
 	// do the following for the last triangle only
 	int finalPointOne = numberOfPoints - 1;
 
-	OSContourPoint* contourPointPointer = &firstLineRef->PointMap[finalPointOne];
+	OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[finalPointOne];
 	OSTrianglePoint pointOne;
 	pointOne.x = contourPointPointer->x;
 	pointOne.y = contourPointPointer->y;
 	pointOne.z = contourPointPointer->z;
 
-	contourPointPointer = &firstLineRef->PointMap[0];
+	contourPointPointer = &firstLineRef->smartContourPoint[0];
 	OSTrianglePoint pointTwo;
 	pointTwo.x = contourPointPointer->x;
 	pointTwo.y = contourPointPointer->y;

@@ -15,12 +15,20 @@ public:
 
 	OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints);
 	OSContourLine();	// for adding into unordered_map
+	//OSContourLine(const OSContourLine& line_a);
 
 	
 	OSContourLine& operator=(OSContourLine&& line_a)
 	{
 		smartContourPoint = std::move(line_a.smartContourPoint);
-		//numberOfPoints = line_a.numberOfPoints;
+		OSAmpFieldMap = line_a.OSAmpFieldMap;
+		//PointMap = line_a.PointMap;
+		smartPointIndex = line_a.smartPointIndex;
+		baseDistance = line_a.baseDistance;
+		contourElevation = line_a.contourElevation;
+		OSAmpFieldCurrentIndex = line_a.OSAmpFieldCurrentIndex;
+		pointCurrentIndex = line_a.pointCurrentIndex;				
+		numberOfPoints = line_a.numberOfPoints;
 		return *this;
 	}
 	
@@ -29,12 +37,27 @@ public:
 	OSContourLine& operator=(const OSContourLine& line_a)
 	{
 		//smartContourPoint = std::move(line_a.smartContourPoint);
+		
+
+		OSAmpFieldMap = line_a.OSAmpFieldMap;
+		//PointMap = line_a.PointMap;
+		smartPointIndex = line_a.smartPointIndex;
+		baseDistance = line_a.baseDistance;
+		contourElevation = line_a.contourElevation;
+		OSAmpFieldCurrentIndex = line_a.OSAmpFieldCurrentIndex;
+		pointCurrentIndex = line_a.pointCurrentIndex;				// <---- error is here 
+		numberOfPoints = line_a.numberOfPoints;
+		smartContourPoint.reset(new OSContourPoint[numberOfPoints]);
+		for (int x = 0; x < numberOfPoints; x++)
+		{
+			smartContourPoint[x] = line_a.smartContourPoint[x];
+		}
 		return *this;
 	}
 	
 	
 	unordered_map<int, OSAmpField> OSAmpFieldMap;		// contains all amp fields for this contour line
-	unordered_map<int, OSContourPoint> PointMap;	// contains all points for the contour line
+	//unordered_map<int, OSContourPoint> PointMap;	// contains all points for the contour line
 	unique_ptr<OSContourPoint[]> smartContourPoint;	
 	int smartPointIndex = 0;					// keeps track of current index for inserting points
 	float baseDistance = 0.0f;					// the base distance between the center and outlying points

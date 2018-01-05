@@ -18,6 +18,8 @@ public:
 
 	void addContourPlan(string in_string, float in_x, float in_y, float in_z);
 	OSContourPlan* getContourPlan(string in_string);
+
+private:
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
 	
 };
