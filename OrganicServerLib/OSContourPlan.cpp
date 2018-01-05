@@ -5,9 +5,9 @@
 
 OSContourPlan::OSContourPlan(float in_x, float in_y, float in_z)
 {
-	//startPoint.x = in_x;
-	//startPoint.y = in_y;
-	//startPoint.z = in_z;
+	startPoint.x = in_x;
+	startPoint.y = in_y;
+	startPoint.z = in_z;
 }
 
 OSContourPlan::OSContourPlan(OSTrianglePoint in_Point)
@@ -20,15 +20,25 @@ OSContourPlan::OSContourPlan()
 	// for adding into unordered map
 }
 
-
-void OSContourPlan::addContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints)
+OSContourPlan::OSContourPlan(const OSContourPlan& plan_a)
 {
-	cout << "trolol 6" << endl;
+	startPoint = plan_a.startPoint;			// must match corresponding = operator
+}
+
+
+void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints)
+{
+	//cout << "trolol 6" << endl;
 	OSContourLine tempLine(in_baseDistance, in_contourElevation, in_numberOfPoints);
-	contourLineMap[contourLineCount] = tempLine;
-	//contourLineMap[contourLineCount].smartContourPoint.reset(new OSContourPoint[in_numberOfPoints]);
+	contourLineMap[line_id] = tempLine;
 	contourLineCount++;
-	cout << "super trolol" << endl;
+	//cout << "super trolol" << endl;
+}
+
+OSContourLine* OSContourPlan::getContourLine(int in_lineId)
+{
+	//return std::ref(contourLineMap[in_lineId]);
+	return  &contourLineMap[in_lineId];
 }
 
 void OSContourPlan::buildTriangleStrips(int layerDepth)
@@ -98,6 +108,8 @@ void OSContourPlan::createFirstLayerTriangles()
 	OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
 	triangleStripMap[0].triangleMap[finalPointOne] = triangleToAdd;
 	std::cout << "Triangle strip creation successful." << endl;
+
+	numberOfTriangleStrips++;	// increment number of triangle strips;
 }
 
 void OSContourPlan::amplifyContourLinePoints(int in_lineID)

@@ -65,7 +65,7 @@ void OSContourLine::amplifyAllPoints()
 		//cout << "Amplification result, point " << currentIndex << ": line length: " << contourPointIter->second.line_length << " | angle: " << pointAngle << endl;
 	}
 	*/
-	cout << "currentPointIndex is: " << pointCurrentIndex << endl;
+	//cout << "currentPointIndex is: " << pointCurrentIndex << endl;
 	for (int x = 0; x < pointCurrentIndex; x++)
 	{
 		//cout << "attempting to get" << endl;
@@ -94,7 +94,7 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 			//cout << "x is: " << Xvalue << endl;
 			//cout << "y is: " << contourElevation << endl;
 			//cout << "z is: " << Zvalue << endl;
-			cout << "Final distance line is: " << finalDistance << endl;
+			//cout << "Final distance line is: " << finalDistance << endl;
 			OSContourPoint pointToAdd(in_pointAngle, Xvalue, contourElevation, Zvalue);	// insert a point equal to the cosine'd x, the contour's elevation, and the sin'd z
 			//PointMap[pointCurrentIndex] = pointToAdd;
 			smartContourPoint[in_pointIndex] = pointToAdd;
@@ -118,7 +118,7 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 		contourPointPointer->x = Xvalue;
 		contourPointPointer->y = contourElevation;
 		contourPointPointer->z = Zvalue;
-		cout << "Final distance line is: (no amp field) " << finalDistance << endl;
+		//cout << "Final distance line is: (no amp field) " << finalDistance << endl;
 	}
 }
 
