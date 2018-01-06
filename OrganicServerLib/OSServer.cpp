@@ -51,17 +51,39 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle in_Triangle)
 	// firstly, determine the blueprint each point is in:
 	for (int x = 0; x < 3; x++)
 	{
+		
 		CursorPathTraceContainer x_container, y_container, z_container;
 		x_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle.trianglePoints[x].x);
 		y_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle.trianglePoints[x].y);
 		z_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle.trianglePoints[x].z);
+		
 		EnclaveKeyDef::EnclaveKey blueprintKey;
 		blueprintKey.x = x_container.CollectionCoord;
 		blueprintKey.y = y_container.CollectionCoord;
 		blueprintKey.z = z_container.CollectionCoord;
 		int doesBPExist = checkIfBlueprintExists(blueprintKey);
+		
+		if (doesBPExist == 0)
+		{
+			EnclaveCollectionBlueprint newBlueprint;
+			blueprintMap[blueprintKey] = newBlueprint;		// set up the blueprint
+			ECBCarvePointArray newArray;
+			carvePointArrayMap[blueprintKey] = newArray;	// set up the server's carvePointArray
+			//carvePointArrayMap[blueprintKey].totalPointsInArray = 0;	// set up the server's carvePointArray
+		}
+		
+		ECBCarvePointArray* carvePointArrayPtr = &carvePointArrayMap[blueprintKey];	 // grab a pointer
+		unsigned char carvePointX = (x_container.ChunkCoord * 4) + x_container.BlockCoord + 1;
+		unsigned char carvePointY = (y_container.ChunkCoord * 4) + y_container.BlockCoord + 1;
+		unsigned char carvePointZ = (z_container.ChunkCoord * 4) + z_container.BlockCoord + 1;
+		carvePointArrayPtr->addECBCarvePoint(carvePointX, carvePointY, carvePointZ, 1);				// last argument = 1, testing only
+
+
+		//carvePointArrayPtr->carvePointArray[]
+
 		//y_container = EnclaveCollections.GetCursorCoordTrace(origin_point.y);
 		//z_container = EnclaveCollections.GetCursorCoordTrace(origin_point.z);
+		
 	}
 }
 
