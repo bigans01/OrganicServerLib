@@ -81,7 +81,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 		unsigned char carvePointY = (y_container.ChunkCoord * 4) + y_container.BlockCoord;			// ""
 		unsigned char carvePointZ = (z_container.ChunkCoord * 4) + z_container.BlockCoord;			// ""
 		
-		carvePointArrayPtr->addECBCarvePoint(carvePointX, carvePointY, carvePointZ, unsigned char(1));				// last argument = 1, testing only
+		carvePointArrayPtr->addECBCarvePoint(carvePointX, carvePointY, carvePointZ, 1);				// last argument = 1, testing only
 		
 
 		//carvePointArrayPtr->carvePointArray[]
