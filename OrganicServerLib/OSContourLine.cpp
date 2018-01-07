@@ -72,6 +72,7 @@ void OSContourLine::amplifyAllPoints()
 		float pointAngle = smartContourPoint[x].point_angle;
 		amplifyPoint(x, pointAngle);
 	}
+	cout << "Point amplification complete....." << endl;
 }
 
 void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
@@ -90,6 +91,7 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 			float anglePiRads = OSAmpFieldIter->second.degreesToPiRads(in_pointAngle);
 			float Xvalue = finalDistance*(cos(anglePiRads));
 			float Zvalue = finalDistance*(sin(anglePiRads));
+
 			//cout << "Point is within amp field!" << std::endl;
 			//cout << "x is: " << Xvalue << endl;
 			//cout << "y is: " << contourElevation << endl;
@@ -113,6 +115,7 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 		float anglePiRads = tempField.degreesToPiRads(in_pointAngle);
 		float Xvalue = finalDistance*(cos(anglePiRads));
 		float Zvalue = finalDistance*(sin(anglePiRads));
+
 		OSContourPoint* contourPointPointer = &smartContourPoint[in_pointIndex];
 		contourPointPointer->line_length = finalDistance;
 		contourPointPointer->x = Xvalue;
