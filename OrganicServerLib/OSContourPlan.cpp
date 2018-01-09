@@ -41,13 +41,14 @@ OSContourLine* OSContourPlan::getContourLine(int in_lineId)
 	return  &contourLineMap[in_lineId];
 }
 
-void OSContourPlan::buildTriangleStrips(int layerDepth)
+void OSContourPlan::buildTriangleStrips2(int layerDepth)
 {
 	if (layerDepth == 0)
 	{
 		OSTrianglePoint thirdPointLocation = startPoint;	// set a temporary start point?
 		createFirstLayerTriangles();
 	}
+	
 }
 
 void OSContourPlan::createFirstLayerTriangles()
@@ -56,6 +57,7 @@ void OSContourPlan::createFirstLayerTriangles()
 	int numberOfPoints = firstLineRef->numberOfPoints;
 	int currentStartPoint = 0;
 
+	
 	// do the following for all but the last triangle; number of triangles = number of points
 	for (int x = 0; x < numberOfPoints - 1; x++)
 	{
@@ -110,6 +112,7 @@ void OSContourPlan::createFirstLayerTriangles()
 	std::cout << "Triangle strip creation successful." << endl;
 
 	numberOfTriangleStrips++;	// increment number of triangle strips;
+	
 }
 
 void OSContourPlan::amplifyContourLinePoints(int in_lineID)

@@ -7,6 +7,7 @@
 #include "OSContouredTriangleStrip.h"
 #include "OSTrianglePoint.h"
 
+// what the hell
 //class OSServer;
 class OSContourPlan
 {
@@ -33,7 +34,7 @@ public:
 	void addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints);	// adds a contour line, with the map ID of the line equal to contourLineCount
 	OSContourLine* getContourLine(int in_lineId);
 	void amplifyContourLinePoints(int in_lineID);
-	void buildTriangleStrips(int layerDepth);
+	void buildTriangleStrips2(int layerDepth);
 	void createFirstLayerTriangles();
 
 private:

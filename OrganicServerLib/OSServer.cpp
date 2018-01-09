@@ -31,7 +31,10 @@ void OSServer::executeContourPlan(string in_string)
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
+	
 	// iterate through each strip
+
+	/*
 	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
 	{
 		//cout << "Triangle strip ID: " << stripMapIterator->first << endl;
@@ -45,6 +48,12 @@ void OSServer::executeContourPlan(string in_string)
 			traceTriangleThroughBlueprints(currentTriangle);
 		}
 	}
+	*/
+
+	unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
+	OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+	traceTriangleThroughBlueprints(currentTriangle);
+
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
@@ -90,6 +99,9 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 		//z_container = EnclaveCollections.GetCursorCoordTrace(origin_point.z);
 		
 	}
+
+	// determine line lengths
+	in_Triangle->determineLineLengths();
 }
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
