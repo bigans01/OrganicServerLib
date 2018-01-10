@@ -102,6 +102,9 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 
 	// determine line lengths
 	in_Triangle->determineLineLengths();
+
+	in_Triangle->determineLineAngles();
+
 }
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)

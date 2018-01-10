@@ -4,6 +4,7 @@
 #include <iostream>
 #include "OrganicSystem.h"
 #include "OSContourPlan.h"
+#include "OSTrianglePoint.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "EnclaveKeyDef.h"
 #include "ECBCarvePointArray.h"

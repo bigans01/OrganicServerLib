@@ -3,6 +3,7 @@
 #include "EnclaveKeyDef.h"
 #include "OSTriangleLine.h"
 #include <unordered_map>
+#include <math.h>
 
 class OSContouredTriangle {
 public:
@@ -14,5 +15,6 @@ public:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> polygonPieceMap;			// stores the type of polygon piece, for each blueprint touched (intersected?) by this plan
 	OSContouredTriangle();
 	void addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType);
-	void determineLineLengths();
+	void determineLineLengths();		// gets the length of lines
+	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
 };

@@ -2,11 +2,12 @@
 #include <iostream>
 #include "OSContourLine.h"
 
-OSContourLine::OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints)
+OSContourLine::OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_trianglePoint)
 {
 	baseDistance = in_baseDistance;
 	contourElevation = in_contourElevation;
 	numberOfPoints = in_numberOfPoints;
+	centerPoint = in_trianglePoint;
 	addPoints();
 }
 
@@ -102,9 +103,9 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 			smartContourPoint[in_pointIndex] = pointToAdd;
 			OSContourPoint* contourPointPointer = &smartContourPoint[in_pointIndex];
 			contourPointPointer->line_length = finalDistance;
-			contourPointPointer->x = Xvalue;
-			contourPointPointer->y = contourElevation;
-			contourPointPointer->z = Zvalue;
+			contourPointPointer->x = Xvalue + centerPoint.x;
+			contourPointPointer->y = centerPoint.y;
+			contourPointPointer->z = Zvalue + centerPoint.z;
 			pointWithinField = 1;
 		}
 	}
@@ -118,9 +119,9 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 
 		OSContourPoint* contourPointPointer = &smartContourPoint[in_pointIndex];
 		contourPointPointer->line_length = finalDistance;
-		contourPointPointer->x = Xvalue;
-		contourPointPointer->y = contourElevation;
-		contourPointPointer->z = Zvalue;
+		contourPointPointer->x = Xvalue + centerPoint.x;
+		contourPointPointer->y = centerPoint.y;
+		contourPointPointer->z = Zvalue + centerPoint.z;
 		//cout << "Final distance line is: (no amp field) " << finalDistance << endl;
 	}
 }

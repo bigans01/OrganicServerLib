@@ -31,11 +31,12 @@ public:
 
 	
 
-	void addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints);	// adds a contour line, with the map ID of the line equal to contourLineCount
+	void addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_startPoint);	// adds a contour line, with the map ID of the line equal to contourLineCount
 	OSContourLine* getContourLine(int in_lineId);
 	void amplifyContourLinePoints(int in_lineID);
-	void buildTriangleStrips2(int layerDepth);
-	void createFirstLayerTriangles();
+	void buildTriangleStrips(int layerDepth);
+	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
+	OSTrianglePoint startPoint;						// the center x/y/z coord of the plan
 
 private:
 	friend class OSServer;
@@ -45,6 +46,6 @@ private:
 	int contourLineCount = 0;			// the number of contour lines in contourLineMap
 	int planMode = 0;					// 0 is default
 	int numberOfTriangleStrips = 0;
-	OSTrianglePoint startPoint;			// the center x/y/z coord of the plan
+	
 
 };

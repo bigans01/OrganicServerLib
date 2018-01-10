@@ -1,6 +1,7 @@
 #pragma once
 #include "OSAmpField.h"
 #include "OSContourPoint.h"
+#include "OSTrianglePoint.h"
 #include <mutex>
 #include <math.h>
 #include <unordered_map>
@@ -13,7 +14,7 @@ class OSContourLine
 {
 public:
 
-	OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints);
+	OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_trianglePoint);
 	OSContourLine();	// for adding into unordered_map
 	//OSContourLine(const OSContourLine& line_a);
 
@@ -28,6 +29,7 @@ public:
 		OSAmpFieldCurrentIndex = line_a.OSAmpFieldCurrentIndex;
 		pointCurrentIndex = line_a.pointCurrentIndex;				
 		numberOfPoints = line_a.numberOfPoints;
+		centerPoint = line_a.centerPoint;
 		return *this;
 	}
 	
@@ -45,6 +47,7 @@ public:
 		OSAmpFieldCurrentIndex = line_a.OSAmpFieldCurrentIndex;
 		pointCurrentIndex = line_a.pointCurrentIndex;				// <---- error is here 
 		numberOfPoints = line_a.numberOfPoints;
+		centerPoint = line_a.centerPoint;
 		smartContourPoint.reset(new OSContourPoint[numberOfPoints]);
 		for (int x = 0; x < numberOfPoints; x++)
 		{
@@ -56,6 +59,7 @@ public:
 	
 	unordered_map<int, OSAmpField> OSAmpFieldMap;		// contains all amp fields for this contour line
 	unique_ptr<OSContourPoint[]> smartContourPoint;	
+	OSTrianglePoint centerPoint;
 	int smartPointIndex = 0;					// keeps track of current index for inserting points
 	float baseDistance = 0.0f;					// the base distance between the center and outlying points
 	float contourElevation;						// the elevation, or "y" value for this contour line

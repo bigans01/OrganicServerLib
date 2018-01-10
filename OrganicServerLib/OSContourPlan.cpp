@@ -26,10 +26,10 @@ OSContourPlan::OSContourPlan(const OSContourPlan& plan_a)
 }
 
 
-void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints)
+void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_startPoint)
 {
 	//cout << "trolol 6" << endl;
-	OSContourLine tempLine(in_baseDistance, in_contourElevation, in_numberOfPoints);
+	OSContourLine tempLine(in_baseDistance, in_contourElevation, in_numberOfPoints, in_startPoint);
 	contourLineMap[line_id] = tempLine;
 	contourLineCount++;
 	//cout << "super trolol" << endl;
@@ -41,7 +41,7 @@ OSContourLine* OSContourPlan::getContourLine(int in_lineId)
 	return  &contourLineMap[in_lineId];
 }
 
-void OSContourPlan::buildTriangleStrips2(int layerDepth)
+void OSContourPlan::buildTriangleStrips(int layerDepth)
 {
 	if (layerDepth == 0)
 	{
@@ -54,6 +54,7 @@ void OSContourPlan::buildTriangleStrips2(int layerDepth)
 void OSContourPlan::createFirstLayerTriangles()
 {
 	OSContourLine* firstLineRef = &contourLineMap[0];	// get the very first contour line in the plan
+	OSTrianglePoint lineCenterPoint = firstLineRef->centerPoint;
 	int numberOfPoints = firstLineRef->numberOfPoints;
 	int currentStartPoint = 0;
 
@@ -79,7 +80,7 @@ void OSContourPlan::createFirstLayerTriangles()
 
 		//third triangle point
 		OSTrianglePoint pointThree;
-		pointThree.x = startPoint.x;
+		pointThree.x = startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
 		pointThree.y = startPoint.y;
 		pointThree.z = startPoint.z;
 
