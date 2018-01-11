@@ -2,6 +2,7 @@
 #include "OSAmpField.h"
 #include "OSContourPoint.h"
 #include "OSTrianglePoint.h"
+#include "ECBPolyPoint.h"
 #include <mutex>
 #include <math.h>
 #include <unordered_map>
@@ -14,7 +15,7 @@ class OSContourLine
 {
 public:
 
-	OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_trianglePoint);
+	OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_trianglePoint);
 	OSContourLine();	// for adding into unordered_map
 	//OSContourLine(const OSContourLine& line_a);
 
@@ -59,7 +60,7 @@ public:
 	
 	unordered_map<int, OSAmpField> OSAmpFieldMap;		// contains all amp fields for this contour line
 	unique_ptr<OSContourPoint[]> smartContourPoint;	
-	OSTrianglePoint centerPoint;
+	ECBPolyPoint centerPoint;
 	int smartPointIndex = 0;					// keeps track of current index for inserting points
 	float baseDistance = 0.0f;					// the base distance between the center and outlying points
 	float contourElevation;						// the elevation, or "y" value for this contour line

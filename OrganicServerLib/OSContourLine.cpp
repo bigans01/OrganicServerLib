@@ -2,7 +2,7 @@
 #include <iostream>
 #include "OSContourLine.h"
 
-OSContourLine::OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_trianglePoint)
+OSContourLine::OSContourLine(float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_trianglePoint)
 {
 	baseDistance = in_baseDistance;
 	contourElevation = in_contourElevation;

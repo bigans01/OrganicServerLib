@@ -6,6 +6,7 @@
 #include "OSContourLine.h"
 #include "OSContouredTriangleStrip.h"
 #include "OSTrianglePoint.h"
+#include "ECBPolyPoint.h"
 
 // what the hell
 //class OSServer;
@@ -31,12 +32,12 @@ public:
 
 	
 
-	void addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_startPoint);	// adds a contour line, with the map ID of the line equal to contourLineCount
+	void addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint);	// adds a contour line, with the map ID of the line equal to contourLineCount
 	OSContourLine* getContourLine(int in_lineId);
 	void amplifyContourLinePoints(int in_lineID);
 	void buildTriangleStrips(int layerDepth);
 	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
-	OSTrianglePoint startPoint;						// the center x/y/z coord of the plan
+	ECBPolyPoint startPoint;						// the center x/y/z coord of the plan
 
 private:
 	friend class OSServer;

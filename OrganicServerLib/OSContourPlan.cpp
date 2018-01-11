@@ -26,7 +26,7 @@ OSContourPlan::OSContourPlan(const OSContourPlan& plan_a)
 }
 
 
-void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, OSTrianglePoint in_startPoint)
+void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)
 {
 	//cout << "trolol 6" << endl;
 	OSContourLine tempLine(in_baseDistance, in_contourElevation, in_numberOfPoints, in_startPoint);
@@ -45,7 +45,7 @@ void OSContourPlan::buildTriangleStrips(int layerDepth)
 {
 	if (layerDepth == 0)
 	{
-		OSTrianglePoint thirdPointLocation = startPoint;	// set a temporary start point?
+		//OSTrianglePoint thirdPointLocation = startPoint;	// set a temporary start point?
 		createFirstLayerTriangles();
 	}
 	
@@ -54,7 +54,7 @@ void OSContourPlan::buildTriangleStrips(int layerDepth)
 void OSContourPlan::createFirstLayerTriangles()
 {
 	OSContourLine* firstLineRef = &contourLineMap[0];	// get the very first contour line in the plan
-	OSTrianglePoint lineCenterPoint = firstLineRef->centerPoint;
+	ECBPolyPoint lineCenterPoint = firstLineRef->centerPoint;
 	int numberOfPoints = firstLineRef->numberOfPoints;
 	int currentStartPoint = 0;
 
@@ -66,20 +66,20 @@ void OSContourPlan::createFirstLayerTriangles()
 
 		// first triangle point
 		OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[x];
-		OSTrianglePoint pointOne;
+		ECBPolyPoint pointOne;
 		pointOne.x = contourPointPointer->x;
 		pointOne.y = contourPointPointer->y;
 		pointOne.z = contourPointPointer->z;
 
 		//second triangle point
 		contourPointPointer = &firstLineRef->smartContourPoint[x + 1];
-		OSTrianglePoint pointTwo;
+		ECBPolyPoint pointTwo;
 		pointTwo.x = contourPointPointer->x;
 		pointTwo.y = contourPointPointer->y;
 		pointTwo.z = contourPointPointer->z;
 
 		//third triangle point
-		OSTrianglePoint pointThree;
+		ECBPolyPoint pointThree;
 		pointThree.x = startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
 		pointThree.y = startPoint.y;
 		pointThree.z = startPoint.z;
@@ -92,18 +92,18 @@ void OSContourPlan::createFirstLayerTriangles()
 	int finalPointOne = numberOfPoints - 1;
 
 	OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[finalPointOne];
-	OSTrianglePoint pointOne;
+	ECBPolyPoint pointOne;
 	pointOne.x = contourPointPointer->x;
 	pointOne.y = contourPointPointer->y;
 	pointOne.z = contourPointPointer->z;
 
 	contourPointPointer = &firstLineRef->smartContourPoint[0];
-	OSTrianglePoint pointTwo;
+	ECBPolyPoint pointTwo;
 	pointTwo.x = contourPointPointer->x;
 	pointTwo.y = contourPointPointer->y;
 	pointTwo.z = contourPointPointer->z;
 
-	OSTrianglePoint pointThree;
+	ECBPolyPoint pointThree;
 	pointThree.x = startPoint.x;
 	pointThree.y = startPoint.y;
 	pointThree.z = startPoint.z;

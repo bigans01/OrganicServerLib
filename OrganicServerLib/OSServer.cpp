@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "OSServer.h"
+#include "OrganicUtils.h"
 //#include "OSContourPlan.h"
 //#include "shitTest.h"
 
@@ -58,7 +59,8 @@ void OSServer::executeContourPlan(string in_string)
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 {
-	// firstly, determine the blueprint each point is in: (a type 0 "piece")
+	// firstly, determine the blueprint each point is in: (a type 0 "piece"); make sure to calculate blueprint borderValues for each point
+	//ECBBorderValues
 	for (int x = 0; x < 3; x++)
 	{
 		
@@ -76,9 +78,12 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 		if (doesBPExist == 0)
 		{
 			EnclaveCollectionBlueprint newBlueprint;
-			blueprintMap[blueprintKey] = newBlueprint;		// set up the blueprint
+			blueprintMap[blueprintKey] = newBlueprint;											// set up the blueprint
 			ECBCarvePointArray newArray;
-			carvePointArrayMap[blueprintKey] = newArray;	// set up the server's carvePointArray
+			carvePointArrayMap[blueprintKey] = newArray;										// set up the server's carvePointArray
+			ECBBorderValues newBorderValues = OrganicUtils::getBlueprintLimits(blueprintKey);	
+			in_Triangle->ecbBorderMap[blueprintKey] = newBorderValues;
+
 			//carvePointArrayMap[blueprintKey].totalPointsInArray = 0;	// set up the server's carvePointArray
 		}
 		
@@ -102,8 +107,13 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 
 	// determine line lengths
 	in_Triangle->determineLineLengths();
-
 	in_Triangle->determineLineAngles();
+
+	// trace each line through blueprint areas
+	for (int x = 0; x < 3; x++)
+	{
+
+	}
 
 }
 
