@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <iostream>
 #include "OSContouredTriangle.h"
+#include "OrganicUtils.h"
 #define PI 3.14159265f
 
 OSContouredTriangle::OSContouredTriangle(OSTrianglePoint in_point0, OSTrianglePoint in_point1, OSTrianglePoint in_point2)
@@ -77,6 +78,7 @@ void OSContouredTriangle::determineLineLengths()
 	std::cout << triangleLineRef_2->lineLength << std::endl;
 
 	std::cout << "line points::: " << std::endl; 
+	OrganicUtils::getBlueprintLimits();
 }
 
 void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType)
@@ -130,9 +132,9 @@ void OSContouredTriangle::determineLineAngles()
 				newPoint.z = line0->pointA.z;
 
 				// get distance between A and the new point
-				float x_pow = pow((newPoint.x - line0->pointA.x), 2.0f);
-				float y_pow = pow((newPoint.y - line0->pointA.y), 2.0f);
-				float z_pow = pow((newPoint.z - line0->pointA.z), 2.0f);
+				float x_pow = pow((newPoint.x - line0->pointB.x), 2.0f);
+				float y_pow = pow((newPoint.y - line0->pointB.y), 2.0f);
+				float z_pow = pow((newPoint.z - line0->pointB.z), 2.0f);
 				float newLineLength = sqrt(x_pow + y_pow + z_pow);
 				line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
 				std::cout << "B is greater, Angle is: " << line0->angleToYaxis << std::endl;
