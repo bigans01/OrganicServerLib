@@ -7,7 +7,10 @@
 #include "OSTrianglePoint.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "EnclaveKeyDef.h"
+#include "ECBBorderLineList.h"
 #include "ECBCarvePointArray.h"
+#include "ECBPolyPointTri.h"
+#include "EnclaveKeyTri.h"
 #include <unordered_map>
 #include <string>
 
@@ -31,6 +34,9 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle);
+	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle);
+	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle);
+	EnclaveKeyDef::EnclaveKey findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey in_Key, ECBBorderLineList in_borderLineList);
 	OrganicSystem* organicSystemPtr;
 };
 

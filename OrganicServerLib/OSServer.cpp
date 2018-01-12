@@ -59,22 +59,45 @@ void OSServer::executeContourPlan(string in_string)
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 {
-	// firstly, determine the blueprint each point is in: (a type 0 "piece"); make sure to calculate blueprint borderValues for each point
-	//ECBBorderValues
+	// STEP 1:  determine line lengths, angles
+	in_Triangle->determineLineLengths();
+	in_Triangle->determineLineAngles();
+
+	CursorPathTraceContainer testContainer = OrganicUtils::getPreciseCoordinate(-32.2f);		// testing only; make sure that going +32.0f into a blueprint means default behavior is to go into the next blueprint in that direction
+	cout << "container test: -----------" << endl;
+	cout << "collection" << testContainer.CollectionCoord << endl;
+	cout << "chunk" << testContainer.ChunkCoord << endl;
+	cout << "block" << testContainer.BlockCoord << endl;
+
+	EnclaveKeyTri currentTriKey;		// for usage with new function determineTriangleRelativityToECB
+	ECBPolyPointTri currentTriPoint;
+
+
+	// STEP 2: determine the blueprint each point is in: (a type 0 "piece");
 	for (int x = 0; x < 3; x++)
 	{
 		
 		CursorPathTraceContainer x_container, y_container, z_container;
-		x_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].x);		// get coords of the point at x (0, 1, 2)
-		y_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].y);
-		z_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].z);
+		//x_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].x);		// get coords of the point at x (0, 1, 2)
+		//y_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].y);
+		//z_container = organicSystemPtr->EnclaveCollections.GetCursorCoordTrace(in_Triangle->trianglePoints[x].z);
+
+		x_container = OrganicUtils::getPreciseCoordinate(in_Triangle->trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinate(in_Triangle->trianglePoints[x].y);
+		z_container = OrganicUtils::getPreciseCoordinate(in_Triangle->trianglePoints[x].z);
+
 		
 		EnclaveKeyDef::EnclaveKey blueprintKey;
 		blueprintKey.x = x_container.CollectionCoord;
 		blueprintKey.y = y_container.CollectionCoord;
 		blueprintKey.z = z_container.CollectionCoord;
+
+		currentTriPoint.triPoints[x] = in_Triangle->trianglePoints[x];		// add this point and its assumed precise blueprint key
+		currentTriKey.triKey[x] = blueprintKey;
+
+
+		/*
 		int doesBPExist = checkIfBlueprintExists(blueprintKey);
-		
 		if (doesBPExist == 0)
 		{
 			EnclaveCollectionBlueprint newBlueprint;
@@ -82,7 +105,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 			ECBCarvePointArray newArray;
 			carvePointArrayMap[blueprintKey] = newArray;										// set up the server's carvePointArray
 			ECBBorderValues newBorderValues = OrganicUtils::getBlueprintLimits(blueprintKey);	
-			in_Triangle->ecbBorderMap[blueprintKey] = newBorderValues;
+			in_Triangle->ecbBorderMap[blueprintKey] = newBorderValues;							// add the ECB border map
 
 			//carvePointArrayMap[blueprintKey].totalPointsInArray = 0;	// set up the server's carvePointArray
 		}
@@ -99,23 +122,176 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 		
 
 		//carvePointArrayPtr->carvePointArray[]
-
+		*/
 		//y_container = EnclaveCollections.GetCursorCoordTrace(origin_point.y);
 		//z_container = EnclaveCollections.GetCursorCoordTrace(origin_point.z);
 		
 	}
 
-	// determine line lengths
-	in_Triangle->determineLineLengths();
-	in_Triangle->determineLineAngles();
+	// STEP 3: perform calibration checks (currently using test triangle only)
+	OSContouredTriangle testTriangle;
+	ECBPolyPoint testPoint_0, testPoint_1, testPoint_2;
+	testPoint_0.x = 0.0f;
+	testPoint_0.y = 0.0f;
+	testPoint_0.z = 0.0f;
 
-	// trace each line through blueprint areas
+	testPoint_1.x = 10.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 0.0f;
+
+	testPoint_2.x = 5.0f;
+	testPoint_2.y = 0.0f;
+	testPoint_2.z = -10.0f;
+	testTriangle.trianglePoints[0] = testPoint_0;
+	testTriangle.trianglePoints[1] = testPoint_1;
+	testTriangle.trianglePoints[2] = testPoint_2;
+	testTriangle.determineLineLengths();
+	testTriangle.determineLineAngles();
 	for (int x = 0; x < 3; x++)
 	{
+		CursorPathTraceContainer x_container, y_container, z_container;
+		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
+		EnclaveKeyDef::EnclaveKey blueprintKey;
+		blueprintKey.x = x_container.CollectionCoord;
+		blueprintKey.y = y_container.CollectionCoord;
+		blueprintKey.z = z_container.CollectionCoord;
+
+		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
+		//currentTriKey.triKey[x] = blueprintKey;
+		testTriangle.pointKeys[x] = blueprintKey;
 	}
 
+
+	determineTriangleRelativityToECB(&testTriangle);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
+
 }
+
+void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle)
+{
+	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
+	int conditionMetFlag = 0;			// determines what condition has been met
+	for (int x = 0; x < 3; x++)
+	{
+		OSTriangleLine* linePtr = &in_Triangle->triangleLines[x];	// get reference to appropriate line
+		int x_match = 0;					// indicates B.x- A.x = 0
+		int y_match = 0;					// y
+		int z_match = 0;					// z
+		int conditionCount = 0;				// if this becomes 2, it is a Type 1 
+
+		//  x coord check
+		if ((linePtr->pointB.x - linePtr->pointA.x) == 0)	// if they are equal to exactly 0, increment
+		{
+			conditionCount++;
+			x_match = 1;
+		}
+
+		// y
+		if ((linePtr->pointB.y - linePtr->pointA.y) == 0)	// if they are equal to exactly 0, increment
+		{
+			conditionCount++;
+			y_match = 1;
+		}
+
+		// z
+		if ((linePtr->pointB.z - linePtr->pointA.z) == 0)	// if they are equal to exactly 0, increment
+		{
+			conditionCount++;
+			z_match = 1;
+		}
+		
+		if (conditionCount == 2)
+		{
+			cout << "TYPE 1 condition met. " << endl;
+			// other new stuff
+			if (y_match == 1 && z_match == 1)	// triangle pivots on x, perform checks
+			{
+				cout << "TYPE 1: pivots on X axis" << endl;
+				// get y values of all points...check to see if its perfectly flat.
+				if (
+					(in_Triangle->trianglePoints[0].y == in_Triangle->trianglePoints[1].y)
+					&&
+					(in_Triangle->trianglePoints[1].y == in_Triangle->trianglePoints[2].y)
+				   )
+				{
+					in_Triangle->isTriangleFlat = 1; // make sure to establish that its officially flat
+					cout << "TYPE 1: x-pivot is perfectly flat...no angle!! " << endl;
+				}
+
+			}
+			else if (x_match == 1 && y_match == 1)	// .... on y
+			{
+				cout << "TYPE 1: pivots on Z axis" << endl;
+				if (
+					(in_Triangle->trianglePoints[0].y == in_Triangle->trianglePoints[1].y)
+					&&
+					(in_Triangle->trianglePoints[1].y == in_Triangle->trianglePoints[2].y)
+					)
+				{
+					in_Triangle->isTriangleFlat = 1; // make sure to establish that its officially flat
+					cout << "TYPE 1: z-pivot is perfectly flat...no angle!! " << endl;
+				}
+			}
+			else // .... otherwise, it's z
+			
+			{
+				cout << "TYPE 1: pivots on Y axis" << endl;
+				// no y-flat checks need to be done (because this is default elevation mode)
+			}
+
+			conditionMetFlag = 1;	// indicates condition 1 was met
+			break;					// exit when 2 (condition 1 is met)
+		}
+	}
+
+	// step 2: check for Type 2 condition: at least one point is on a border of the currently designated blueprint
+	calibrateTrianglePointKeys(in_Triangle);
+}
+
+void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
+{
+	for (int x = 0; x < 3; x++)
+	{
+		OSTriangleLine currentLine = in_Triangle->triangleLines[x];											// get the line
+		EnclaveKeyDef::EnclaveKey currentKey = in_Triangle->pointKeys[x];									// get the key of the point
+		ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(currentKey);			// get the ecb border line list
+		EnclaveKeyDef::EnclaveKey trueKey = findTrueKey(currentLine, currentKey, currentBorderLineList);	// calculate the true key for the point
+	}
+}
+
+EnclaveKeyDef::EnclaveKey OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey in_Key, ECBBorderLineList in_borderLineList)
+{
+	EnclaveKeyDef::EnclaveKey calibratedKey;
+	ECBPolyPoint pointToCheck = in_Line.pointA;
+	// check for x on the West side
+	if (pointToCheck.x == (in_Key.x * 32))	// if x is equal to the exact west border
+	{
+		// first, check the border points
+
+		// is point equal to lower NW?
+		if (pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y	&&		pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)
+		{
+			cout << "Point is at lower NW..." << endl;
+		}
+		else if (pointToCheck.y == in_borderLineList.corner_LowerSW.cornerPoint.y	&&	pointToCheck.z == in_borderLineList.corner_LowerSW.cornerPoint.z)
+		{
+
+		}
+		else if (pointToCheck.y == in_borderLineList.corner_UpperSW.cornerPoint.y   &&  pointToCheck.z == in_borderLineList.corner_UpperSW.cornerPoint.z)
+		{
+
+		}
+		else if (pointToCheck.y == in_borderLineList.corner_UpperNW.cornerPoint.y	&&	pointToCheck.z == in_borderLineList.corner_UpperNW.cornerPoint.z)
+		{
+
+		}
+	}
+
+	return calibratedKey;
+}
+
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 {
