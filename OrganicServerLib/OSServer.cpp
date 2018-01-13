@@ -136,7 +136,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	testPoint_0.z = 0.0f;
 
 	testPoint_1.x = 10.0f;
-	testPoint_1.y = 0.0f;
+	testPoint_1.y = -1.0f;
 	testPoint_1.z = 0.0f;
 
 	testPoint_2.x = 5.0f;
@@ -255,18 +255,19 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
 	for (int x = 0; x < 3; x++)
 	{
 		OSTriangleLine currentLine = in_Triangle->triangleLines[x];											// get the line
-		EnclaveKeyDef::EnclaveKey currentKey = in_Triangle->pointKeys[x];									// get the key of the point
-		ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(currentKey);			// get the ecb border line list
-		EnclaveKeyDef::EnclaveKey trueKey = findTrueKey(currentLine, currentKey, currentBorderLineList);	// calculate the true key for the point
+		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &in_Triangle->pointKeys[x];									// get a pointer to the key of the point
+		EnclaveKeyDef::EnclaveKey currentKeyCopy = in_Triangle->pointKeys[x];									// get a copy to the key of the point
+		ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list
+		EnclaveKeyDef::EnclaveKey trueKey = findTrueKey(currentLine, currentKeyCopy, currentBorderLineList);	// calculate the true key for the point
 	}
 }
 
-EnclaveKeyDef::EnclaveKey OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey in_Key, ECBBorderLineList in_borderLineList)
+EnclaveKeyDef::EnclaveKey OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey in_KeyPtr, ECBBorderLineList in_borderLineList)
 {
 	EnclaveKeyDef::EnclaveKey calibratedKey;
 	ECBPolyPoint pointToCheck = in_Line.pointA;
 	// check for x on the West side
-	if (pointToCheck.x == (in_Key.x * 32))	// if x is equal to the exact west border
+	if (pointToCheck.x == (in_KeyPtr.x * 32))	// if x is equal to the exact west border
 	{
 		// first, check the border points
 
@@ -274,6 +275,18 @@ EnclaveKeyDef::EnclaveKey OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveK
 		if (pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y	&&		pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)
 		{
 			cout << "Point is at lower NW..." << endl;
+			//ECBPolyPoint passPoint = in_borderLineList.corner_LowerNW.cornerPoint;
+			//cout << "Pointed to key, pre-calc:" << endl;
+			//cout << "x: " << in_KeyPtr->x << endl;
+			//cout << "y: " << in_KeyPtr->y << endl;
+			//cout << "z: " << in_KeyPtr->z << endl;
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.corner_LowerNW.cornerAmpValues, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			//*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			//cout << "Pointed to key, post-calc:" << endl;
+			//cout << "x: " << in_KeyPtr->x << endl;
+			//cout << "y: " << in_KeyPtr->y << endl;
+			//cout << "z: " << in_KeyPtr->z << endl;
+
 		}
 		else if (pointToCheck.y == in_borderLineList.corner_LowerSW.cornerPoint.y	&&	pointToCheck.z == in_borderLineList.corner_LowerSW.cornerPoint.z)
 		{
