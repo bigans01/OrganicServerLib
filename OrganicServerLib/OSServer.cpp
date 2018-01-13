@@ -53,6 +53,7 @@ void OSServer::executeContourPlan(string in_string)
 
 	unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
 	OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+
 	traceTriangleThroughBlueprints(currentTriangle);
 
 }
@@ -140,7 +141,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 0.0f;
+	testPoint_2.y = 0.53f;
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -164,13 +165,16 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 		testTriangle.pointKeys[x] = blueprintKey;
 	}
 
-
+	auto bluestart = std::chrono::high_resolution_clock::now();
 	determineTriangleRelativityToECB(&testTriangle);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
-
+	auto blueend = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> blueelapsed = blueend - bluestart;
+	std::cout << "Elapsed time (Triangle calibration): " << blueelapsed.count() << std::endl;
 }
 
 void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle)
 {
+	//cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
 	int conditionMetFlag = 0;			// determines what condition has been met
 	for (int x = 0; x < 3; x++)
@@ -248,6 +252,8 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 
 	// step 2: check for Type 2 condition: at least one point is on a border of the currently designated blueprint
 	calibrateTrianglePointKeys(in_Triangle);
+
+	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 }
 
 void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
@@ -258,6 +264,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
 		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &in_Triangle->pointKeys[x];									// get a pointer to the key of the point
 		EnclaveKeyDef::EnclaveKey currentKeyCopy = in_Triangle->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
 		ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list
+		
 		findTrueKey(currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the point
 	}
 }
@@ -267,6 +274,7 @@ void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in
 	EnclaveKeyDef::EnclaveKey calibratedKey;
 	ECBPolyPoint pointToCheck = in_Line.pointA;
 	//  check for x on the West side |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	/*
 	if (pointToCheck.x == (in_KeyPtr->x * 32))	// if x is equal to the exact west border
 	{
 		// first, check the border points
@@ -342,7 +350,7 @@ void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in
 			}
 		}
 	}
-
+	*/
 	//  check for z on the North side |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
 
@@ -351,7 +359,7 @@ void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in
 	// First, cycle through all 8 corner points: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	if (pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x	&&		pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y	&&		pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)		// Lower NW
 	{
-		cout << "Point is at lower NW..." << endl;
+		//cout << "Point is at lower NW..." << endl;
 		//ECBPolyPoint passPoint = in_borderLineList.corner_LowerNW.cornerPoint;
 		EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.corner_LowerNW.cornerAmpValues, in_Line.pointA, in_Line.pointB);	// get the shifting key
 		*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
@@ -394,16 +402,203 @@ void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in
 	}
 	else
 	{
-		// Second, cycle through all lines
-		// start with x axis lines:
+		
+		// Second, cycle through all lines	||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+		// start with x axis lines:			
+
+		// Lower North line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		if ((pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)
+			&&
+			(pointToCheck.x > in_borderLineList.corner_LowerNW.cornerPoint.x	&&		pointToCheck.x < in_borderLineList.corner_LowerNE.cornerPoint.x)	// is x between the LowerNW and LowerNE corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Xaxis_lowerNorth, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// Lower South  line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.y == in_borderLineList.corner_LowerSW.cornerPoint.y)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerSW.cornerPoint.z)
+			&&
+			(pointToCheck.x > in_borderLineList.corner_LowerSW.cornerPoint.x	&&	pointToCheck.x < in_borderLineList.corner_LowerSE.cornerPoint.x)		// is x between the LowerSW and LowerSE corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Xaxis_lowerSouth, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// Upper South line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.y == in_borderLineList.corner_UpperSW.cornerPoint.y)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_UpperSW.cornerPoint.z)
+			&&
+			(pointToCheck.x > in_borderLineList.corner_UpperSW.cornerPoint.x	&& pointToCheck.x < in_borderLineList.corner_UpperSE.cornerPoint.x)			// is x between the UpperSW and UpperSE corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Xaxis_upperSouth, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// Upper North line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.y == in_borderLineList.corner_UpperNW.cornerPoint.y)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_UpperNW.cornerPoint.z)
+			&&
+			(pointToCheck.x > in_borderLineList.corner_UpperNW.cornerPoint.x	&& pointToCheck.x < in_borderLineList.corner_UpperNE.cornerPoint.x)			// is x between the UpperNW and UpperNE corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Xaxis_upperNorth, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+	    
+
+
+		// now do z lines:
+
+		// Lower West line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x)
+			&&
+			(pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y)
+			&&
+			(pointToCheck.z > in_borderLineList.corner_LowerNW.cornerPoint.z	&& pointToCheck.z < in_borderLineList.corner_LowerSW.cornerPoint.z)			// is z between the LowerNW and LowerSW corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Zaxis_lowerWest, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// Upper West line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.x == in_borderLineList.corner_UpperNW.cornerPoint.x)
+			&&
+			(pointToCheck.y == in_borderLineList.corner_UpperNW.cornerPoint.y)
+			&&
+			(pointToCheck.z > in_borderLineList.corner_UpperNW.cornerPoint.z	&& pointToCheck.z < in_borderLineList.corner_UpperSW.cornerPoint.z)			// is z between the UpperNW and UpperSW corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Zaxis_upperWest, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// Upper East line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.x == in_borderLineList.corner_UpperNE.cornerPoint.x)
+			&&
+			(pointToCheck.y == in_borderLineList.corner_UpperNE.cornerPoint.y)
+			&&
+			(pointToCheck.z > in_borderLineList.corner_UpperNE.cornerPoint.z	&& pointToCheck.z < in_borderLineList.corner_UpperSE.cornerPoint.z)			// is z between the UpperNW and UpperSW corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Zaxis_upperEast, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+
+		// Lower East line check-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerNE.cornerPoint.x)
+			&&
+			(pointToCheck.y == in_borderLineList.corner_LowerNE.cornerPoint.y)
+			&&
+			(pointToCheck.z > in_borderLineList.corner_LowerNE.cornerPoint.z	&& pointToCheck.z < in_borderLineList.corner_LowerSE.cornerPoint.z)			// is z between the UpperNW and UpperSW corners, but not equal to either of them?
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Zaxis_lowerEast, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+
+		// now do y lines:
+
+		// North East line
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerNE.cornerPoint.x)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerNE.cornerPoint.z)
+			&&
+			(pointToCheck.y > in_borderLineList.corner_LowerNE.cornerPoint.y	&& pointToCheck.y < in_borderLineList.corner_UpperNE.cornerPoint.y)
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Yaxis_northEast, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+
+		// South East line
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerSE.cornerPoint.x)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerSE.cornerPoint.z)
+			&&
+			(pointToCheck.y > in_borderLineList.corner_LowerSE.cornerPoint.y	&& pointToCheck.y < in_borderLineList.corner_UpperSE.cornerPoint.y)
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Yaxis_southEast, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// South West line
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerSW.cornerPoint.x)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerSW.cornerPoint.z)
+			&&
+			(pointToCheck.y > in_borderLineList.corner_LowerSW.cornerPoint.y	&& pointToCheck.y < in_borderLineList.corner_UpperSW.cornerPoint.y)
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Yaxis_southWest, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		// North West line
+		else if ((pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x)
+			&&
+			(pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)
+			&&
+			(pointToCheck.y > in_borderLineList.corner_LowerNW.cornerPoint.y	&& pointToCheck.y < in_borderLineList.corner_UpperNW.cornerPoint.y)
+			)
+		{
+			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Yaxis_northWest, in_Line.pointA, in_Line.pointB);	// get the shifting key
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+		}
+		else
+		{
+			// Third, cycle through all faces ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+			// West face check
+			if (pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.WestFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			// North face check
+			else if (pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.NorthFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			// East face check
+			else if (pointToCheck.x == in_borderLineList.corner_LowerNE.cornerPoint.x)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.EastFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			// South face check
+			else if (pointToCheck.z == in_borderLineList.corner_LowerSW.cornerPoint.z)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.SouthFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			// Top face check
+			else if (pointToCheck.y == in_borderLineList.corner_UpperNW.cornerPoint.y)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.TopFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			// Bottom face check
+			else if (pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y)
+			{
+				EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.BottomFace, in_Line.pointA, in_Line.pointB);	// get the shifting key
+				*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
+			}
+			
+		}
+		
 	}
 
 
-	cout << "Pointed to key, post-calc: " << endl;
-	cout << "x: " << in_KeyPtr->x << endl;
-	cout << "y: " << in_KeyPtr->y << endl;
-	cout << "z: " << in_KeyPtr->z << endl;
+	//cout << "Pointed to key, post-calc::: " << endl;
+	//cout << "x: " << in_KeyPtr->x << endl;
+	//cout << "y: " << in_KeyPtr->y << endl;
+	//cout << "z: " << in_KeyPtr->z << endl;
 
 	//return calibratedKey;
 }
