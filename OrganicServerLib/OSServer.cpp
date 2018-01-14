@@ -137,11 +137,11 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	testPoint_0.z = 0.0f;
 
 	testPoint_1.x = 54.0f;
-	testPoint_1.y = -1.0f;
+	testPoint_1.y = -1.3f;
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 0.53f;
+	testPoint_2.y = 1.0f;
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -169,7 +169,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	determineTriangleRelativityToECB(&testTriangle);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	auto blueend = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> blueelapsed = blueend - bluestart;
-	std::cout << "Elapsed time (Triangle calibration): " << blueelapsed.count() << std::endl;
+	std::cout << "Elapsed time (Triangle calibration)::: " << blueelapsed.count() << std::endl;
 }
 
 void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle)
@@ -177,18 +177,62 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	//cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
 	int conditionMetFlag = 0;			// determines what condition has been met
+
+	// used for this function only
+	struct lineMeta
+	{
+		int line_ID = 0;				// for the loop
+		OSTriangleLine* structLinePtr;	// ptr to the actual line
+		ECBPolyPoint thirdPoint;		// = to point B of next line in the sequence
+		int is_clamped = 0;				// is this line clamped?
+	};
+
+	lineMeta tempMeta[3];				// set up the struct
+
 	for (int x = 0; x < 3; x++)
 	{
+		tempMeta[x].line_ID = x;
+		tempMeta[x].structLinePtr = &in_Triangle->triangleLines[x];	
+		if (x < 2)
+		{
+			tempMeta[x].thirdPoint = in_Triangle->triangleLines[x + 1].pointB;		// store the next point in the sequence
+		}
+		else if (x == 2)
+		{
+			tempMeta[x].thirdPoint = in_Triangle->triangleLines[0].pointB;		// store the first point in the sequence
+		}
+
+
+
 		OSTriangleLine* linePtr = &in_Triangle->triangleLines[x];	// get reference to appropriate line
 		int x_match = 0;					// indicates B.x- A.x = 0
 		int y_match = 0;					// y
 		int z_match = 0;					// z
 		int conditionCount = 0;				// if this becomes 2, it is a Type 1 
 
+
 		//  x coord check
 		if ((linePtr->pointB.x - linePtr->pointA.x) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
+			cout << "X check: " << endl;
+			tempMeta[x].structLinePtr->clamped_to_x = 1;
+			if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) != 0)
+			{
+				cout << "X shift is not 0" << endl;
+				if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) > 0)
+				{
+					cout << "X difference is positive" << endl;
+					tempMeta[x].structLinePtr->clamped_to_x = 1;
+					tempMeta[x].structLinePtr->x_clamp_direction = 1;
+				}
+				else if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) < 0)
+				{
+					cout << "X difference is positive" << endl;
+					tempMeta[x].structLinePtr->clamped_to_x = 1;
+					tempMeta[x].structLinePtr->x_clamp_direction = -1;
+				}
+			}
 			x_match = 1;
 		}
 
@@ -196,6 +240,24 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 		if ((linePtr->pointB.y - linePtr->pointA.y) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
+			cout << "Y check: " << endl;
+			tempMeta[x].structLinePtr->clamped_to_y = 1;			// indicate the line is clamped to y
+			if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) != 0)
+			{
+				cout << "Y shift is not 0" << endl;
+				if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) > 0)
+				{
+					cout << "Y difference is positive" << endl;
+					tempMeta[x].structLinePtr->clamped_to_y = 1;				// signal this line is clamped to y
+					tempMeta[x].structLinePtr->y_clamp_direction = 1;			// positive slope = positive y
+				}
+				else if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) < 0)
+				{
+					cout << "Y difference is negative" << endl;
+					tempMeta[x].structLinePtr->clamped_to_y = 1;				
+					tempMeta[x].structLinePtr->y_clamp_direction = -1;			
+				}
+			}
 			y_match = 1;
 		}
 
@@ -203,9 +265,28 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 		if ((linePtr->pointB.z - linePtr->pointA.z) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
+			cout << "Z check: " << endl;
+			tempMeta[x].structLinePtr->clamped_to_z = 1;
+			if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) != 0)
+			{
+				cout << "Z shift is not 0" << endl;
+				if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) > 0)
+				{
+					cout << "Z difference is positive" << endl;
+					tempMeta[x].structLinePtr->clamped_to_z = 1;
+					tempMeta[x].structLinePtr->z_clamp_direction = 1;
+				}
+				else if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) < 0)
+				{
+					cout << "Z difference is negative" << endl;
+					tempMeta[x].structLinePtr->clamped_to_z = 1;
+					tempMeta[x].structLinePtr->z_clamp_direction = -1;
+				}
+			}
 			z_match = 1;
 		}
 		
+		/*
 		if (conditionCount == 2)
 		{
 			cout << "TYPE 1 condition met. " << endl;
@@ -248,7 +329,29 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 			conditionMetFlag = 1;	// indicates condition 1 was met
 			break;					// exit when 2 (condition 1 is met)
 		}
+		else if (conditionCount == 1)
+		{
+
+		*/
 	}
+
+	// Step 2: check if triangle is perfectly clamped to x, y, and/or z
+	if ((in_Triangle->triangleLines[0].clamped_to_x == 1) && (in_Triangle->triangleLines[1].clamped_to_x == 1) && (in_Triangle->triangleLines[2].clamped_to_x == 1))
+	{
+		cout << "triangle is perfectly clamped to x!" << endl;
+		in_Triangle->perfect_clamp_x = 1;
+	}
+	if ((in_Triangle->triangleLines[0].clamped_to_y == 1) && (in_Triangle->triangleLines[1].clamped_to_y == 1) && (in_Triangle->triangleLines[2].clamped_to_y == 1))
+	{
+		cout << "triangle is perfectly clamped to y!" << endl;
+		in_Triangle->perfect_clamp_y = 1;
+	}
+	if ((in_Triangle->triangleLines[0].clamped_to_z == 1) && (in_Triangle->triangleLines[1].clamped_to_z == 1) && (in_Triangle->triangleLines[2].clamped_to_z == 1))
+	{
+		cout << "triangle is perfectly clamped to z!" << endl;
+		in_Triangle->perfect_clamp_z = 1;
+	}
+
 
 	// step 2: check for Type 2 condition: at least one point is on a border of the currently designated blueprint
 	calibrateTrianglePointKeys(in_Triangle);
@@ -258,18 +361,33 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 
 void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
 {
+	EnclaveKeyDef::EnclaveKey currentKeyCopy;
+	ECBBorderLineList currentBorderLineList;
 	for (int x = 0; x < 3; x++)
 	{
 		OSTriangleLine currentLine = in_Triangle->triangleLines[x];											// get the line
 		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &in_Triangle->pointKeys[x];									// get a pointer to the key of the point
-		EnclaveKeyDef::EnclaveKey currentKeyCopy = in_Triangle->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
-		ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list
+		currentKeyCopy = in_Triangle->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
+		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list
 		
-		findTrueKey(currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the point
+		findTrueKey(in_Triangle, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the point
+	}
+
+	// check for perfect clamps; we can use the last iteration of currentKeyCopy for this
+	if (in_Triangle->perfect_clamp_x == 1)
+	{
+		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNE.cornerPoint.x)
+		{
+			for (int c = 0; c < 3; c++)
+			{
+				//in_Triangle->pointKeys[c].
+			}
+		}
 	}
 }
 
-void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList)
+void OSServer::findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList)
 {
 	EnclaveKeyDef::EnclaveKey calibratedKey;
 	ECBPolyPoint pointToCheck = in_Line.pointA;
@@ -594,11 +712,66 @@ void OSServer::findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in
 		
 	}
 
+	// check for influence from clamp flags in the line
+	if ((in_Line.clamped_to_x == 1) && (in_Triangle->perfect_clamp_x == 0))
+	{
+		cout << "x clamp entry" << endl;
+		if ((in_Line.x_clamp_direction == 1)	&&	(in_Line.pointA.x == in_borderLineList.corner_LowerNE.cornerPoint.x))	
+		{
+			cout << "positive entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.x = 1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+		else if ((in_Line.x_clamp_direction == -1) && (in_Line.pointA.x == in_borderLineList.corner_LowerNW.cornerPoint.x)) 
+		{
+			cout << "negative entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.x = -1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+	}
+	if ((in_Line.clamped_to_y == 1) && (in_Triangle->perfect_clamp_y == 0))
+	{
+		cout << "y clamp entry" << endl;
+		if ((in_Line.y_clamp_direction == 1) && (in_Line.pointA.y == in_borderLineList.corner_UpperNW.cornerPoint.y))		
+		{
+			cout << "positive entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.y = 1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+		else if ((in_Line.y_clamp_direction == -1) && (in_Line.pointA.y == in_borderLineList.corner_LowerNW.cornerPoint.y))	
+		{
+			cout << "negative entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.y = -1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+	}
+	if ((in_Line.clamped_to_z == 1) && (in_Triangle->perfect_clamp_z == 0))
+	{
+		cout << "z clamp entry" << endl;
+		if ((in_Line.z_clamp_direction == 1) && (in_Line.pointA.z == in_borderLineList.corner_UpperSW.cornerPoint.z))
+		{
+			cout << "positive entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.z = 1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+		else if ((in_Line.z_clamp_direction == 1) && (in_Line.pointA.z == in_borderLineList.corner_UpperNW.cornerPoint.z))
+		{
+			cout << "negative entry " << endl;
+			EnclaveKeyDef::EnclaveKey tempKey;
+			tempKey.z = -1;
+			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
+		}
+	}
 
-	//cout << "Pointed to key, post-calc::: " << endl;
-	//cout << "x: " << in_KeyPtr->x << endl;
-	//cout << "y: " << in_KeyPtr->y << endl;
-	//cout << "z: " << in_KeyPtr->z << endl;
+	cout << "Pointed to key, post-calc::: " << endl;
+	cout << "x: " << in_KeyPtr->x << endl;
+	cout << "y: " << in_KeyPtr->y << endl;
+	cout << "z: " << in_KeyPtr->z << endl;
 
 	//return calibratedKey;
 }

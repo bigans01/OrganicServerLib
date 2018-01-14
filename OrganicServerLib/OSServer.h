@@ -37,7 +37,7 @@ private:
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle);
 	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle);
-	void findTrueKey(OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
+	void findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	OrganicSystem* organicSystemPtr;
 };
 
