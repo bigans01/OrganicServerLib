@@ -142,11 +142,13 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OSPDir.h" />
     <ClInclude Include="OSAmpField.h" />
     <ClInclude Include="OSContouredTriangle.h" />
     <ClInclude Include="OSContouredTriangleStrip.h" />
     <ClInclude Include="OSContourLine.h" />
     <ClInclude Include="OSContourPlan.h" />
+    <ClInclude Include="OSContourPlanDirections.h" />
     <ClInclude Include="OSContourPoint.h" />
     <ClInclude Include="OSServer.h" />
     <ClInclude Include="OSTriangleLine.h" />

@@ -1,6 +1,13 @@
 #pragma once
+
+#ifndef OSTRIANGLELINE_H
+#define OSTRIANGLELINE_H
+
+
 #include "OSTrianglePoint.h"
 #include "ECBPolyPoint.h"
+
+
 
 class OSTriangleLine
 {
@@ -17,3 +24,5 @@ public:
 	float angleToYaxis = 0.0f;	// gets the angle in degrees, that this line will need when compared to y axis
 	float lineLength = 0.0f;
 };
+
+#endif

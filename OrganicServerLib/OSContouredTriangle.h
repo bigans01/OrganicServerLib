@@ -1,4 +1,8 @@
 #pragma once
+
+#ifndef OSCONTOUREDTRIANGLE_H
+#define OSCONTOUREDTRIANGLE_H
+
 #include "OSTrianglePoint.h"
 #include "EnclaveKeyDef.h"
 #include "OSTriangleLine.h"
@@ -24,3 +28,5 @@ public:
 	void determineLineLengths();		// gets the length of lines
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
 };
+
+#endif

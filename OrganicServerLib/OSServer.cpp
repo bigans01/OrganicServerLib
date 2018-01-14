@@ -16,11 +16,11 @@ OSServer::OSServer(int x)
 	organicSystemPtr = &Organic;
 }
 
-void OSServer::addContourPlan(string in_string, float in_x, float in_y, float in_z)
+void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
-	OSContourPlan tempPlan(in_x, in_y, in_z);
+	OSContourPlan tempPlan(in_Dir, in_x, in_y, in_z);
 	//contourPlanMap[in_string].planMode = 0;	// add a new plan			<<< ---- error is here (FIXED)
-	contourPlanMap[in_string] = tempPlan;
+	contourPlanMap[in_planName] = tempPlan;
 
 }
 
@@ -54,11 +54,11 @@ void OSServer::executeContourPlan(string in_string)
 	unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
 	OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
 
-	traceTriangleThroughBlueprints(currentTriangle);
+	traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 
 }
 
-void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
+void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
 	// STEP 1:  determine line lengths, angles
 	in_Triangle->determineLineLengths();
@@ -133,15 +133,15 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	OSContouredTriangle testTriangle;
 	ECBPolyPoint testPoint_0, testPoint_1, testPoint_2;
 	testPoint_0.x = 64.0f;
-	testPoint_0.y = 0.0f;
+	testPoint_0.y = 32.0f;
 	testPoint_0.z = 0.0f;
 
 	testPoint_1.x = 54.0f;
-	testPoint_1.y = -1.3f;
+	testPoint_1.y = 32.0f;		// previously: -1.3f
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 1.0f;
+	testPoint_2.y = 32.0f;		// previously: 1.0f
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -166,13 +166,18 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle)
 	}
 
 	auto bluestart = std::chrono::high_resolution_clock::now();
-	determineTriangleRelativityToECB(&testTriangle);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
+	determineTriangleRelativityToECB(&testTriangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	auto blueend = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> blueelapsed = blueend - bluestart;
 	std::cout << "Elapsed time (Triangle calibration)::: " << blueelapsed.count() << std::endl;
 }
 
-void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle)
+void OSServer::determineTriangleCentroid(OSContouredTriangle* in_Triangle)
+{
+
+}
+
+void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
 	//cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
@@ -335,7 +340,7 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 		*/
 	}
 
-	// Step 2: check if triangle is perfectly clamped to x, y, and/or z
+	// Step 2: check if triangle is perfectly clamped to x, y, or z
 	if ((in_Triangle->triangleLines[0].clamped_to_x == 1) && (in_Triangle->triangleLines[1].clamped_to_x == 1) && (in_Triangle->triangleLines[2].clamped_to_x == 1))
 	{
 		cout << "triangle is perfectly clamped to x!" << endl;
@@ -354,12 +359,12 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 
 
 	// step 2: check for Type 2 condition: at least one point is on a border of the currently designated blueprint
-	calibrateTrianglePointKeys(in_Triangle);
+	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 }
 
-void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
+void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
 	EnclaveKeyDef::EnclaveKey currentKeyCopy;
 	ECBBorderLineList currentBorderLineList;
@@ -376,12 +381,61 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle)
 	// check for perfect clamps; we can use the last iteration of currentKeyCopy for this
 	if (in_Triangle->perfect_clamp_x == 1)
 	{
+		/*
+		
+		The below logic is needed, because of the 32 = next rule in the blueprint system; For example, if the x of the points in question is 32, then 
+		this lies on the border of the blueprints at 0,0,0 and 1,0,0. If it's perfectly flat, we must check the direction of x that the center of the contour line lies in.
+		
+		*/
+
 		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
-		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNE.cornerPoint.x)
+		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNW.cornerPoint.x)		// check the triangle centroid, compare it to the center of the contour line 
 		{
-			for (int c = 0; c < 3; c++)
+			if (in_Directions.x_direction == -1)
 			{
-				//in_Triangle->pointKeys[c].
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].x -= 1;
+					cout << "Key altered as a result of perfect clamping (X NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+				}
+			}
+		}
+		else if (tempLine.pointA.x == currentBorderLineList.corner_LowerNE.cornerPoint.x)
+		{
+			if (in_Directions.x_direction == 1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].x += 1;
+					cout << "Key altered as a result of perfect clamping (X POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+				}
+			}
+		}
+	}
+
+	if (in_Triangle->perfect_clamp_y == 1)
+	{
+		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		if (tempLine.pointA.y == currentBorderLineList.corner_LowerNW.cornerPoint.y)		// triangle is at very bottom
+		{
+			if (in_Directions.y_direction == -1)	// if the clamped triangle is at the very bottom and plan direction is BELOW, shift all points by -1
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].y -= 1;
+					cout << "Key altered as a result of perfect clamping (Y NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+				}
+			}
+		}
+		else if (tempLine.pointA.y == currentBorderLineList.corner_UpperNW.cornerPoint.y)	// triangle is at very top
+		{
+			if (in_Directions.y_direction == 1)		// if the clamped triangle is at the very top and plan direction is ABOVE, shift all points by 1
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].y += 1;
+					cout << "Key altered as a result of perfect clamping (Y POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+				}
 			}
 		}
 	}

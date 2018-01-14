@@ -3,11 +3,35 @@
 #include "OSContourPlan.h"
 
 
-OSContourPlan::OSContourPlan(float in_x, float in_y, float in_z)
+OSContourPlan::OSContourPlan(OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
 	startPoint.x = in_x;
 	startPoint.y = in_y;
 	startPoint.z = in_z;
+	if (in_Dir == OSPDir::BELOW)		// default direction would be "below"
+	{
+		planDirections.y_direction = -1;
+	}
+	else if (in_Dir == OSPDir::ABOVE)
+	{
+		planDirections.y_direction = 1;
+	}
+	else if (in_Dir == OSPDir::WEST)
+	{
+		planDirections.x_direction = -1;
+	}
+	else if (in_Dir == OSPDir::EAST)
+	{
+		planDirections.x_direction = 1;
+	}
+	else if (in_Dir == OSPDir::NORTH)
+	{
+		planDirections.z_direction = -1;
+	}
+	else if (in_Dir == OSPDir::SOUTH)
+	{
+		planDirections.z_direction = 1;
+	}
 }
 
 OSContourPlan::OSContourPlan(OSTrianglePoint in_Point)

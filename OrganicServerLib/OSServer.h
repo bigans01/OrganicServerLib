@@ -5,7 +5,9 @@
 #include "OrganicSystem.h"
 #include "OSContourPlan.h"
 #include "OSTrianglePoint.h"
+#include "OSPDir.h"
 #include "EnclaveCollectionBlueprint.h"
+#include "OSContourPlanDirections.h"
 #include "EnclaveKeyDef.h"
 #include "ECBBorderLineList.h"
 #include "ECBCarvePointArray.h"
@@ -24,7 +26,7 @@ public:
 	OSServer();
 	OSServer(int x);
 
-	void addContourPlan(string in_string, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
+	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists
 	void executeContourPlan(string in_string);										// executes operations for all triangle strips in a triangle plan
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
@@ -34,10 +36,11 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
-	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle);
-	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle);
-	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle);
+	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
+	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
+	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
+	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
 	OrganicSystem* organicSystemPtr;
 };
 
