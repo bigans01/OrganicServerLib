@@ -11,6 +11,8 @@
 #include "EnclaveKeyDef.h"
 #include "ECBBorderLineList.h"
 #include "ECBCarvePointArray.h"
+#include "ECBPoly.h"
+#include "ECBPolyLine.h"
 #include "ECBPolyPointTri.h"
 #include "EnclaveKeyTri.h"
 #include <unordered_map>
@@ -41,6 +43,7 @@ private:
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
+	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	OrganicSystem* organicSystemPtr;
 };
 

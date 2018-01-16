@@ -17,8 +17,9 @@ public:
 	OSTriangleLine	triangleLines[3];			// stores 3 lines
 
 	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2);
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> polygonPieceMap;			// stores the type of polygon piece, for each blueprint touched (intersected?) by this plan
+	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> polygonPieceMap;			// stores the ID of the corresponding ECBPolygon(s) related to this instance of OSContouredTriangle, the ID of which is found in each blueprint.
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBBorderValues, EnclaveKeyDef::KeyHasher> ecbBorderMap;
+	//std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> 
 	OSContouredTriangle();
 	int isTriangleFlat = 0;				// set to 1 if the Triangle is flat (all points on same y level)
 	int perfect_clamp_x = 0;			// are all 3 points of this triangle perfectly on x axis?

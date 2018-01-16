@@ -133,15 +133,15 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	OSContouredTriangle testTriangle;
 	ECBPolyPoint testPoint_0, testPoint_1, testPoint_2;
 	testPoint_0.x = 64.0f;
-	testPoint_0.y = 32.0f;
+	testPoint_0.y = 0.0f;
 	testPoint_0.z = 0.0f;
 
 	testPoint_1.x = 54.0f;
-	testPoint_1.y = 32.0f;		// previously: -1.3f
+	testPoint_1.y = 0.0f;		// previously: -1.3f
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 32.0f;		// previously: 1.0f
+	testPoint_2.y = 0.0f;		// previously: 1.0f
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -340,7 +340,7 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 		*/
 	}
 
-	// Step 2: check if triangle is perfectly clamped to x, y, or z
+	// Step 2: check if triangle is perfectly clamped to x, y, or z (Type 2 condition)
 	if ((in_Triangle->triangleLines[0].clamped_to_x == 1) && (in_Triangle->triangleLines[1].clamped_to_x == 1) && (in_Triangle->triangleLines[2].clamped_to_x == 1))
 	{
 		cout << "triangle is perfectly clamped to x!" << endl;
@@ -358,10 +358,58 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	}
 
 
-	// step 2: check for Type 2 condition: at least one point is on a border of the currently designated blueprint
+	// step 3: calibrate point keys, after conditinos have been checked
 	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
+
+	// step 4: begin ray cast sequence
+	rayCastTrianglePoints(in_Triangle);
+
+}
+
+void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
+{
+	// loop through each point
+	for (int x = 0; x < 3; x++)
+	{
+		//cout << "Key value of point:  " << in_Triangle->pointKeys[x].x << ", " << in_Triangle->pointKeys[x].y << ", " << in_Triangle->pointKeys[x].z << endl;
+		int checkResult = checkIfBlueprintExists(in_Triangle->pointKeys[x]);	// returns 0 if it didn't exist, 1 if so
+		if (checkResult == 0)		// create a blueprint if it doesnt exist already
+		{
+			EnclaveCollectionBlueprint newBlueprint;
+			ECBPoly newPoly;
+			ECBPolyLine newPolyLine;
+			newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
+			newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
+			// need angle set here
+			// need angle set here
+			newBlueprint.polygonMap[0] = newPoly;							// insert a new poly
+			blueprintMap[in_Triangle->pointKeys[x]] = newBlueprint;			// insert the new blueprint
+			in_Triangle->polygonPieceMap[in_Triangle->pointKeys[x]] = 0;	// since it's a new blueprint, the first element in polygonPieceMap will be 0
+			cout << "Blueprint didn't exist for polygon insertion, creating with polygonPieceMap insert at element 0" << endl;
+		}
+		else if (checkResult == 1)	// blueprint already exists
+		{
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(in_Triangle->pointKeys[x]);	// check to see if the polygon exists already in the contoured triangle
+			if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
+			{
+				int blueprintIDofFoundPolygon = polyMapIter->second;	// get the corresponding int value from the triangle's registered blueprint polygon map
+				EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[in_Triangle->pointKeys[x]];	// get a pointer to the blueprint (for code readability only)
+				ECBPolyLine newPolyLine;
+				newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
+				newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
+				// need angle set here
+				// need angle set here
+				blueprintPtr->polygonMap[blueprintIDofFoundPolygon].lineMap[x] = newPolyLine;
+				cout << "Blueprint existed for polygon insertion. " << endl;
+			}
+			else  // wasn't found
+			{
+
+			}
+		}
+	}
 }
 
 void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
@@ -396,7 +444,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 				for (int a = 0; a < 3; a++)
 				{
 					in_Triangle->pointKeys[a].x -= 1;
-					cout << "Key altered as a result of perfect clamping (X NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+					cout << "Key altered as a result of perfect clamping (X NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
 				}
 			}
 		}
@@ -407,13 +455,13 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 				for (int a = 0; a < 3; a++)
 				{
 					in_Triangle->pointKeys[a].x += 1;
-					cout << "Key altered as a result of perfect clamping (X POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+					cout << "Key altered as a result of perfect clamping (X POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
 				}
 			}
 		}
 	}
 
-	if (in_Triangle->perfect_clamp_y == 1)
+	else if (in_Triangle->perfect_clamp_y == 1)
 	{
 		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
 		if (tempLine.pointA.y == currentBorderLineList.corner_LowerNW.cornerPoint.y)		// triangle is at very bottom
@@ -423,7 +471,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 				for (int a = 0; a < 3; a++)
 				{
 					in_Triangle->pointKeys[a].y -= 1;
-					cout << "Key altered as a result of perfect clamping (Y NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+					cout << "Key altered as a result of perfect clamping (Y NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
 				}
 			}
 		}
@@ -434,11 +482,39 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 				for (int a = 0; a < 3; a++)
 				{
 					in_Triangle->pointKeys[a].y += 1;
-					cout << "Key altered as a result of perfect clamping (Y POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].x << endl;
+					cout << "Key altered as a result of perfect clamping (Y POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
 				}
 			}
 		}
 	}
+
+	else if (in_Triangle->perfect_clamp_z == 1)
+	{
+		OSTriangleLine tempLine = in_Triangle->triangleLines[0];
+		if (tempLine.pointA.z == currentBorderLineList.corner_LowerNW.cornerPoint.z)		// triangle is at very bottom
+		{
+			if (in_Directions.z_direction == -1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].z -= 1;
+					cout << "Key altered as a result of perfect clamping (Z NEGATIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
+				}
+			}
+		}
+		else if (tempLine.pointA.z == currentBorderLineList.corner_LowerSW.cornerPoint.z)
+		{
+			if (in_Directions.z_direction == 1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					in_Triangle->pointKeys[a].z += 1;
+					cout << "Key altered as a result of perfect clamping (Z POSITIVE): " << in_Triangle->pointKeys[a].x << ", " << in_Triangle->pointKeys[a].y << ", " << in_Triangle->pointKeys[a].z << endl;
+				}
+			}
+		}
+	}
+
 }
 
 void OSServer::findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList)
