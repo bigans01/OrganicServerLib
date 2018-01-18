@@ -378,35 +378,148 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 		if (checkResult == 0)		// create a blueprint if it doesnt exist already
 		{
 			EnclaveCollectionBlueprint newBlueprint;
-			ECBPoly newPoly;
-			ECBPolyLine newPolyLine;
-			newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
-			newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
+			//ECBPoly newPoly;
+			//ECBPolyLine newPolyLine;
+			//newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
+			//newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
 			// need angle set here
 			// need angle set here
-			newBlueprint.polygonMap[0] = newPoly;							// insert a new poly
-			blueprintMap[in_Triangle->pointKeys[x]] = newBlueprint;			// insert the new blueprint
-			in_Triangle->polygonPieceMap[in_Triangle->pointKeys[x]] = 0;	// since it's a new blueprint, the first element in polygonPieceMap will be 0
-			cout << "Blueprint didn't exist for polygon insertion, creating with polygonPieceMap insert at element 0" << endl;
+			//newBlueprint.polygonMap[0] = newPoly;							
+			//blueprintMap[in_Triangle->pointKeys[x]] = newBlueprint;			// insert the new blueprint
+			//in_Triangle->polygonPieceMap[in_Triangle->pointKeys[x]] = 0;	// since it's a new blueprint, the first element in polygonPieceMap will be 0
+			tracePointThroughBlueprints(in_Triangle, x);					// trace point (line) through blueprints
+			//cout << "Blueprint didn't exist for polygon insertion, creating with polygonPieceMap insert at element 0" << endl;
 		}
 		else if (checkResult == 1)	// blueprint already exists
 		{
+			tracePointThroughBlueprints(in_Triangle, x);
+
+			/*
 			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(in_Triangle->pointKeys[x]);	// check to see if the polygon exists already in the contoured triangle
 			if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
 			{
 				int blueprintIDofFoundPolygon = polyMapIter->second;	// get the corresponding int value from the triangle's registered blueprint polygon map
 				EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[in_Triangle->pointKeys[x]];	// get a pointer to the blueprint (for code readability only)
-				ECBPolyLine newPolyLine;
-				newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
-				newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
+				//ECBPolyLine newPolyLine;
+				//newPolyLine.pointA = in_Triangle->triangleLines[x].pointA;		// set the new line to the pointed-to point A
+				//newPolyLine.pointB = in_Triangle->triangleLines[x].pointB;		// set the new line to the pointed-to point B
 				// need angle set here
 				// need angle set here
-				blueprintPtr->polygonMap[blueprintIDofFoundPolygon].lineMap[x] = newPolyLine;
+				//blueprintPtr->polygonMap[blueprintIDofFoundPolygon].lineMap[x] = newPolyLine;
 				cout << "Blueprint existed for polygon insertion. " << endl;
 			}
 			else  // wasn't found
 			{
 
+			}
+			*/
+		}
+	}
+}
+
+void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
+{
+
+	// STEP 1:	set appropriate values of keys 
+	EnclaveKeyDef::EnclaveKey originPointKey;
+	EnclaveKeyDef::EnclaveKey endPointKey;
+
+	if (in_pointID < 2)
+	{
+		originPointKey = in_Triangle->pointKeys[in_pointID];
+		endPointKey = in_Triangle->pointKeys[in_pointID + 1];
+	}
+	else if (in_pointID == 2)
+	{
+		originPointKey = in_Triangle->pointKeys[2];
+		endPointKey = in_Triangle->pointKeys[0];
+	}
+	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// incrementing key will constantly increment and/or decrement as it traverses blueprints
+
+
+
+
+
+	// STEP 2: initiating tracing
+	if (originPointKey == endPointKey)		// both points exist in same blueprint
+	{
+		cout << "The begin point for line " << in_pointID << " is in same area as its endpoint" << endl;
+		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
+		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
+		{
+			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
+			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
+			ECBPolyLine newPolyLine;												// create a new poly line
+			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
+			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
+			blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
+		}
+		else  // polygon wasn't found, it needs to be created
+		{
+			ECBPoly newPoly;
+			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
+			int elementID = blueprintPtr->polygonMap.size();						// will store the ID of the newly inserted polygon
+			blueprintPtr->polygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
+			ECBPolyLine newPolyLine;												// create a new poly line
+			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
+			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
+			blueprintPtr->polygonMap[elementID].lineMap[in_pointID] = newPolyLine;
+		}
+	}
+	else								// points do not exist in same blueprint
+	{
+		cout << "The begin point for line " << in_pointID << " is NOT in same area as its endpoint" << endl;
+		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
+		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
+		{
+			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
+			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
+			cout << "Incrementing point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+			cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+
+			//EnclaveKeyDef::EnclaveKey stupidKey;
+			//EnclaveKeyDef::EnclaveKey *stupidKeyPtr = &stupidKey;
+
+			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			while (!(incrementingKey == endPointKey))			// 	&&		(incrementingKey.y != endPointKey.y)		&&		(incrementingKey.z != endPointKey.z)
+			{ 
+				cout << "whoops! oh mannn!" << endl;
+				if (endPointKey.x > incrementingKey.x)
+				{
+					incrementingKey.x += 1;
+				}
+				else if (endPointKey.x < incrementingKey.x)
+				{
+					incrementingKey.x -= 1;
+				}
+			}
+				
+				
+			
+
+			
+		}
+		else  // polygon wasn't found, it needs to be created
+		{
+			ECBPoly newPoly;
+			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
+			cout << "Incrementing point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+			cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+			blueprintPtr->polygonMap[blueprintPtr->polygonMap.size()] = newPoly;		// insert a new polygon; the ID will be equalto the size
+
+
+			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			while (!(incrementingKey == endPointKey))			// && (incrementingKey.y != endPointKey.y) && (incrementingKey.z != endPointKey.z)
+			{
+				cout << "whoops! oh mannn!" << endl;
+				if (endPointKey.x > incrementingKey.x)
+				{
+					incrementingKey.x += 1;
+				}
+				else if (endPointKey.x < incrementingKey.x)
+				{
+					incrementingKey.x -= 1;
+				}
 			}
 		}
 	}

@@ -5,6 +5,7 @@
 #include "OrganicSystem.h"
 #include "OSContourPlan.h"
 #include "OSTrianglePoint.h"
+#include "OSTriangleLineTraverser.h"
 #include "OSPDir.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "OSContourPlanDirections.h"
@@ -44,6 +45,7 @@ private:
 	void findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
+	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
 	OrganicSystem* organicSystemPtr;
 };
 

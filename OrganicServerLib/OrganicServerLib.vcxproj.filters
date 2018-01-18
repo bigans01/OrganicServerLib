@@ -57,6 +57,9 @@
     <ClInclude Include="OSPDir.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OSTriangleLineTraverser.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -78,6 +81,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSContouredTriangle.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSTriangleLineTraverser.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
