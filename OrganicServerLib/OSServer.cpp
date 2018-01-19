@@ -136,12 +136,12 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_0.y = 0.0f;
 	testPoint_0.z = 0.0f;
 
-	testPoint_1.x = 54.0f;
+	testPoint_1.x = 28.0f;
 	testPoint_1.y = 0.0f;		// previously: -1.3f
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 0.0f;		// previously: 1.0f
+	testPoint_2.y = 33.0f;		// previously: 1.0f
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -481,6 +481,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			//EnclaveKeyDef::EnclaveKey *stupidKeyPtr = &stupidKey;
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			/*
 			while (!(incrementingKey == endPointKey))			// 	&&		(incrementingKey.y != endPointKey.y)		&&		(incrementingKey.z != endPointKey.z)
 			{ 
 				cout << "whoops! oh mannn!" << endl;
@@ -493,7 +494,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 					incrementingKey.x -= 1;
 				}
 			}
-				
+			*/
 				
 			
 
@@ -509,6 +510,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			/*
 			while (!(incrementingKey == endPointKey))			// && (incrementingKey.y != endPointKey.y) && (incrementingKey.z != endPointKey.z)
 			{
 				cout << "whoops! oh mannn!" << endl;
@@ -521,6 +523,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 					incrementingKey.x -= 1;
 				}
 			}
+			*/
 		}
 	}
 }

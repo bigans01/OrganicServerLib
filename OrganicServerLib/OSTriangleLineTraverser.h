@@ -6,6 +6,7 @@
 #include "OSContouredTriangle.h"
 #include "EnclaveKeyDef.h"
 #include "OrganicUtils.h"
+#include "ECBFaceIntersect.h"
 
 class OSTriangleLineTraverser
 {

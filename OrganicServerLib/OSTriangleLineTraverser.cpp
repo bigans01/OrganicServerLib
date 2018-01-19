@@ -25,7 +25,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
-
+	ECBFaceIntersect resultantIntersect = OrganicUtils::findClosestIntersection(beginPoint, endPoint, beginKey, endKey);
 
 }
 
