@@ -141,7 +141,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_1.z = -3.0f;
 
 	testPoint_2.x = 69.0f;
-	testPoint_2.y = 33.0f;		// previously: 1.0f
+	testPoint_2.y = 32.0f;		// previously: 1.0f
 	testPoint_2.z = -10.0f;
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -358,7 +358,7 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	}
 
 
-	// step 3: calibrate point keys, after conditinos have been checked
+	// step 3: calibrate point keys, after conditions have been checked
 	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
