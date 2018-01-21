@@ -102,9 +102,9 @@ void OSContouredTriangle::determineLineAngles()
 
 
 		OSTriangleLine* line0 = &triangleLines[x];
-		std::cout << "line pointA.y: " << line0->pointA.x << ", " <<  line0->pointA.y << ", " <<  line0->pointA.z << std::endl;
-		std::cout << "line pointB.y: " << line0->pointB.x << ", " <<  line0->pointB.y << ", " <<  line0->pointB.z << std::endl;
-		std::cout << "line length: " << line0->lineLength << std::endl;
+		//std::cout << "line pointA.y: " << line0->pointA.x << ", " <<  line0->pointA.y << ", " <<  line0->pointA.z << std::endl;
+		//std::cout << "line pointB.y: " << line0->pointB.x << ", " <<  line0->pointB.y << ", " <<  line0->pointB.z << std::endl;
+		//std::cout << "line length: " << line0->lineLength << std::endl;
 
 
 
