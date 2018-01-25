@@ -22,8 +22,9 @@ public:
 	ECBPolyPoint beginPoint;				// equals point A of line
 	ECBPolyPoint currentIterationEndpoint;	// equals whatever the point is when this line hits an ECB border
 	ECBPolyPoint endPoint;					// equals point B of line
+	OSServer* serverPtr;
 	int lineID = 0;							// ID of the line, in relation to the triangle it belongs to (0, 1, or 2)
-	void traverseLineOnce();				// traverse the line through one blueprint (used if both line points are not in same blueprint)
+	void traverseLineOnce(OSContouredTriangle* in_TrianglePtr);				// traverse the line through one blueprint (used if both line points are not in same blueprint)
 };
 
 #endif

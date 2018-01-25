@@ -146,19 +146,27 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 
 
-
+	// X == Y test
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 16.0f;
 	testPoint_0.z = 16.0f;
 
 	testPoint_1.x = 16.0f;
 	testPoint_1.y = -16.0f;		// previously: -1.3f
-	testPoint_1.z = 16.0f;
+	testPoint_1.z = 49.0f;
 
 	testPoint_2.x = 69.0f;
 	testPoint_2.y = 33.0f;		// previously: 1.0f
 	testPoint_2.z = -10.0f;
 
+	// X == Z test
+	testPoint_0.x = 48.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 16.0f;
+
+	testPoint_1.x = 16.0f;
+	testPoint_1.y = -15.8f;		// previously: -1.3f
+	testPoint_1.z = 48.0f;
 
 
 	testTriangle.trianglePoints[0] = testPoint_0;
@@ -383,10 +391,10 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 
 	// step 4: begin ray cast sequence
-	for (int x = 0; x < 340; x++)
-	{
+	//for (int x = 0; x < 340; x++)
+	//{
 		rayCastTrianglePoints(in_Triangle);
-	}
+	//}
 
 }
 
