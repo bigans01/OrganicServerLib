@@ -33,6 +33,7 @@ public:
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists
 	void executeContourPlan(string in_string);										// executes operations for all triangle strips in a triangle plan
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
+	friend class OSTriangleLineTraverser;
 
 private:
 	std::unordered_map<string, OSContourPlan> contourPlanMap;

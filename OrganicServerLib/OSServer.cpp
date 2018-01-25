@@ -153,7 +153,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 	testPoint_1.x = 16.0f;
 	testPoint_1.y = -16.0f;		// previously: -1.3f
-	testPoint_1.z = 48.0f;
+	testPoint_1.z = 16.0f;
 
 	testPoint_2.x = 69.0f;
 	testPoint_2.y = 33.0f;		// previously: 1.0f
@@ -289,20 +289,20 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 		if ((linePtr->pointB.z - linePtr->pointA.z) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
-			cout << "Z check: " << endl;
+			//cout << "Z check: " << endl;
 			tempMeta[x].structLinePtr->clamped_to_z = 1;
 			if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) != 0)
 			{
-				cout << "Z shift is not 0" << endl;
+				//cout << "Z shift is not 0" << endl;
 				if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) > 0)
 				{
-					cout << "Z difference is positive" << endl;
+					//cout << "Z difference is positive" << endl;
 					tempMeta[x].structLinePtr->clamped_to_z = 1;
 					tempMeta[x].structLinePtr->z_clamp_direction = 1;
 				}
 				else if ((tempMeta[x].thirdPoint.z - tempMeta[x].structLinePtr->pointA.z) < 0)
 				{
-					cout << "Z difference is negative" << endl;
+					//cout << "Z difference is negative" << endl;
 					tempMeta[x].structLinePtr->clamped_to_z = 1;
 					tempMeta[x].structLinePtr->z_clamp_direction = -1;
 				}
@@ -383,7 +383,7 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 
 	// step 4: begin ray cast sequence
-	for (int x = 0; x < 300; x++)
+	for (int x = 0; x < 340; x++)
 	{
 		rayCastTrianglePoints(in_Triangle);
 	}
@@ -394,6 +394,7 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 {
 	//cout << "ray cast test" << endl;
 	// loop through each point
+
 	for (int x = 0; x < 3; x++)
 	{
 		//cout << "Key value of point:  " << in_Triangle->pointKeys[x].x << ", " << in_Triangle->pointKeys[x].y << ", " << in_Triangle->pointKeys[x].z << endl;
@@ -461,25 +462,26 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// incrementing key will constantly increment and/or decrement as it traverses blueprints
 
 
-
-
-
 	// STEP 2: initiating tracing
 	if (originPointKey == endPointKey)		// both points exist in same blueprint
 	{
 		//cout << "The begin point for line " << in_pointID << " is in same area as its endpoint" << endl;
+		
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
 		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
 		{
+			
 			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
 			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
 			blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
+			
 		}
 		else  // polygon wasn't found, it needs to be created
 		{
+			
 			ECBPoly newPoly;
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			int elementID = blueprintPtr->polygonMap.size();						// will store the ID of the newly inserted polygon
@@ -488,7 +490,9 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
 			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
 			blueprintPtr->polygonMap[elementID].lineMap[in_pointID] = newPolyLine;
+			
 		}
+		
 	}
 	else								// points do not exist in same blueprint
 	{
@@ -504,7 +508,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			//EnclaveKeyDef::EnclaveKey stupidKey;
 			//EnclaveKeyDef::EnclaveKey *stupidKeyPtr = &stupidKey;
 
-			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
+			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			/*
 			while (!(incrementingKey == endPointKey))			// 	&&		(incrementingKey.y != endPointKey.y)		&&		(incrementingKey.z != endPointKey.z)
 			{ 
@@ -533,7 +538,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			blueprintPtr->polygonMap[blueprintPtr->polygonMap.size()] = newPoly;		// insert a new polygon; the ID will be equalto the size
 
 
-			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID);
+			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
+			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			/*
 			while (!(incrementingKey == endPointKey))			// && (incrementingKey.y != endPointKey.y) && (incrementingKey.z != endPointKey.z)
 			{
@@ -982,7 +988,7 @@ void OSServer::findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_L
 		
 	}
 
-	// check for influence from clamp flags in the line
+	// check for influence from clamp flags in the line; if its clamped to x/y/z, check to see if it rotates on this line's axis in either negative or positive fashion (needs explanation/diagram)
 	if ((in_Line.clamped_to_x == 1) && (in_Triangle->perfect_clamp_x == 0))
 	{
 		cout << "x clamp entry" << endl;
@@ -1021,7 +1027,7 @@ void OSServer::findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_L
 	}
 	if ((in_Line.clamped_to_z == 1) && (in_Triangle->perfect_clamp_z == 0))
 	{
-		cout << "z clamp entry" << endl;
+		//cout << "z clamp entry" << endl;
 		if ((in_Line.z_clamp_direction == 1) && (in_Line.pointA.z == in_borderLineList.corner_UpperSW.cornerPoint.z))
 		{
 			cout << "positive entry " << endl;
@@ -1029,7 +1035,7 @@ void OSServer::findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_L
 			tempKey.z = 1;
 			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, tempKey);
 		}
-		else if ((in_Line.z_clamp_direction == 1) && (in_Line.pointA.z == in_borderLineList.corner_UpperNW.cornerPoint.z))
+		else if ((in_Line.z_clamp_direction == -1) && (in_Line.pointA.z == in_borderLineList.corner_UpperNW.cornerPoint.z))
 		{
 			cout << "negative entry " << endl;
 			EnclaveKeyDef::EnclaveKey tempKey;

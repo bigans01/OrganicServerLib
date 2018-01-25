@@ -7,18 +7,23 @@
 #include "EnclaveKeyDef.h"
 #include "OrganicUtils.h"
 #include "ECBFaceIntersect.h"
+#include "EnclaveCollectionBlueprint.h"
 
+class OSServer;
 class OSTriangleLineTraverser
 {
 public:
-	OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID);
+	OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr);
 	EnclaveKeyDef::EnclaveKey beginKey;		// the beginning key = the key that point A lies in
 	EnclaveKeyDef::EnclaveKey currentKey;	// the current key value
+	EnclaveKeyDef::EnclaveKey nextKeyAdd;	// how much will be added to currentKey in the next iteration
 	EnclaveKeyDef::EnclaveKey endKey;		// the ending key = the key that point B lies in (will be done when this happens)
 
 	ECBPolyPoint beginPoint;				// equals point A of line
 	ECBPolyPoint currentIterationEndpoint;	// equals whatever the point is when this line hits an ECB border
 	ECBPolyPoint endPoint;					// equals point B of line
+	int lineID = 0;							// ID of the line, in relation to the triangle it belongs to (0, 1, or 2)
+	void traverseLineOnce();				// traverse the line through one blueprint (used if both line points are not in same blueprint)
 };
 
 #endif
