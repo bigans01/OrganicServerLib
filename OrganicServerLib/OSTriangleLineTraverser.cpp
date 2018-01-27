@@ -68,9 +68,13 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TrianglePtr)
 {
+	cout << "currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
+	cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << endl;
 	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;						// get a pointer to the current key
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);	// add the nextKeyAdd to currentKey
+	cout << "NEW currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
+	nextKeyAdd = resultantIntersect.incrementingKey;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_TrianglePtr->polygonPieceMap.find(*currentKeyPtr);	// check to see if the polygon exists already in the contoured triangle (using the currentKeyPtr)
 																																								/**/
 	if (polyMapIter != in_TrianglePtr->polygonPieceMap.end())	// polygon was already found

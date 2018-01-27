@@ -541,7 +541,11 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 				}
 			}
 			*/
-				
+			while (!(lineRef->currentKey == lineRef->endKey))
+			{
+				lineRef->traverseLineOnce(in_Triangle);
+				//lineRef->traverseLineOnce(in_Triangle);
+			}
 			
 
 			
@@ -572,6 +576,11 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 				}
 			}
 			*/
+			while (!(lineRef->currentKey == lineRef->endKey))
+			{
+				lineRef->traverseLineOnce(in_Triangle);
+				//lineRef->traverseLineOnce(in_Triangle);
+			}
 		}
 	}
 }
