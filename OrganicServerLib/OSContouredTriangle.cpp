@@ -117,37 +117,73 @@ void OSContouredTriangle::determineLineAngles()
 		{
 			if (line0->pointA.y > line0->pointB.y)		// elevation of A is greater than B
 			{
-				OSTrianglePoint newPoint;			// new point has same Y as A, but has B's x/z
+				OSTrianglePoint newPoint, newPoint2;			// new point has same Y as A, but has B's x/z
 				newPoint.x = line0->pointB.x;
 				newPoint.y = line0->pointA.y;
-				newPoint.z = line0->pointB.z;
+				newPoint.z = line0->pointA.z;		// if viewing from Z-axis, this needs to be the same as point A.
+
+				newPoint2.x = line0->pointB.x;
+				newPoint2.y = line0->pointB.y;
+				newPoint2.z = line0->pointA.z;
+
+				float zViewAdjacentLine_Xpow = pow((newPoint.x - line0->pointA.x), 2.0f);
+				float zViewAdjacentLine_Ypow = pow((newPoint.y - line0->pointA.y), 2.0f);
+				float zViewAdjacentLine_Zpow = pow((newPoint.z - line0->pointA.z), 2.0f);
+				float zViewAdjacentLine = sqrt(zViewAdjacentLine_Xpow + zViewAdjacentLine_Ypow + zViewAdjacentLine_Zpow);
+
+				float zViewHypotenuseLine_Xpow = pow((newPoint2.x - line0->pointA.x), 2.0f);
+				float zViewHypotenuseLine_Ypow = pow((newPoint2.y - line0->pointA.y), 2.0f);
+				float zViewHypotenuseLine_Zpow = pow((newPoint2.z - line0->pointA.z), 2.0f);
+				float zViewHypotenuseLine = sqrt(zViewHypotenuseLine_Xpow + zViewHypotenuseLine_Ypow + zViewHypotenuseLine_Zpow);
+
+
 
 				// get distance between A and the new point
-				float x_pow = pow((newPoint.x - line0->pointA.x), 2.0f);
-				float y_pow = pow((newPoint.y - line0->pointA.y), 2.0f);
-				float z_pow = pow((newPoint.z - line0->pointA.z), 2.0f);
-				float newLineLength = sqrt(x_pow + y_pow + z_pow);
-				line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
+				//float x_pow = pow((newPoint.x - line0->pointA.x), 2.0f);
+				//float y_pow = pow((newPoint.y - line0->pointA.y), 2.0f);
+				//float z_pow = pow((newPoint.z - line0->pointA.z), 2.0f);
+				//float newLineLength = sqrt(x_pow + y_pow + z_pow);
+
+				//line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
+				line0->angleToYaxis = acos(zViewAdjacentLine / zViewHypotenuseLine) * (180 / PI);
+
 				std::cout << "A is greater, Angle is: " << line0->angleToYaxis << std::endl;
 				std::cout << "Performing rotation on z-axis..." << std::endl;
-				rotateTriangleFromZAxis(x);
+				//rotateTriangleFromZAxis(x);
 			}
 			else if (line0->pointA.y < line0->pointB.y)	// elevation of A is less than B
 			{
-				OSTrianglePoint newPoint;			// new point has same Y as B, but has A's x/z
+				OSTrianglePoint newPoint, newPoint2;			// new point has same Y as B, but has A's x/z
 				newPoint.x = line0->pointA.x;
 				newPoint.y = line0->pointB.y;
-				newPoint.z = line0->pointA.z;
+				newPoint.z = line0->pointB.z;
+
+				newPoint2.x = line0->pointA.x;
+				newPoint2.y = line0->pointA.y;
+				newPoint2.z = line0->pointB.z;
+
+				float zViewAdjacentLine_Xpow = pow((newPoint.x - line0->pointB.x), 2.0f);
+				float zViewAdjacentLine_Ypow = pow((newPoint.y - line0->pointB.y), 2.0f);
+				float zViewAdjacentLine_Zpow = pow((newPoint.z - line0->pointB.z), 2.0f);
+				float zViewAdjacentLine = sqrt(zViewAdjacentLine_Xpow + zViewAdjacentLine_Ypow + zViewAdjacentLine_Zpow);
+
+				float zViewHypotenuseLine_Xpow = pow((newPoint2.x - line0->pointB.x), 2.0f);
+				float zViewHypotenuseLine_Ypow = pow((newPoint2.y - line0->pointB.y), 2.0f);
+				float zViewHypotenuseLine_Zpow = pow((newPoint2.z - line0->pointB.z), 2.0f);
+				float zViewHypotenuseLine = sqrt(zViewHypotenuseLine_Xpow + zViewHypotenuseLine_Ypow + zViewHypotenuseLine_Zpow);
 
 				// get distance between A and the new point
-				float x_pow = pow((newPoint.x - line0->pointB.x), 2.0f);
-				float y_pow = pow((newPoint.y - line0->pointB.y), 2.0f);
-				float z_pow = pow((newPoint.z - line0->pointB.z), 2.0f);
-				float newLineLength = sqrt(x_pow + y_pow + z_pow);
-				line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
+				//float x_pow = pow((newPoint.x - line0->pointB.x), 2.0f);
+				//float y_pow = pow((newPoint.y - line0->pointB.y), 2.0f);
+				//float z_pow = pow((newPoint.z - line0->pointB.z), 2.0f);
+				//float newLineLength = sqrt(x_pow + y_pow + z_pow);
+				std::cout << "adjacent length: " << zViewAdjacentLine << std::endl;
+				std::cout << "hypotenuse length: " << zViewHypotenuseLine << std::endl;
+
+				line0->angleToYaxis = acos(zViewAdjacentLine / zViewHypotenuseLine) * (180 / PI);
 				std::cout << "B is greater, Angle is: " << line0->angleToYaxis << std::endl;
 				std::cout << "Performing rotation on z-axis..." << std::endl;
-				rotateTriangleFromZAxis(x);
+				//rotateTriangleFromZAxis(x);
 			}
 		}
 

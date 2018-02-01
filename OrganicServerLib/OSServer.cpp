@@ -183,6 +183,20 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.z = -10.0f;
 
 
+	// Rotation test
+	testPoint_0.x = 4.0f;
+	testPoint_0.y = 28.0f;
+	testPoint_0.z = 10.0f;
+
+	testPoint_1.x = 35.0f;
+	testPoint_1.y = 18.0f;
+	testPoint_1.z = 12.0f;
+
+	testPoint_2.x = 14.0f;
+	testPoint_2.y = 20.0f;
+	testPoint_2.z = 13.5f;
+
+
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
 	testTriangle.trianglePoints[2] = testPoint_2;
