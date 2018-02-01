@@ -27,6 +27,14 @@ void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, flo
 void OSServer::executeContourPlan(string in_string)
 {
 	cout << "calling executeContourPlan... (3)" << endl;
+	OrganicUtils::findAdjacentUsingCAH(35.0f, 4.00048f);
+	OrganicUtils::findHypotenuseUsingCAH(35.0f, 3.277f);
+	OrganicUtils::findAngleUsingCAH(3.277f, 4.00048f);		// 3.277, 4.00048			// 6.554,	8.00096
+
+	OrganicUtils::findOppositeUsingSOH(35.0f, 4.00048f);
+	OrganicUtils::findHypotenuseUsingSOH(35.0f, 2.29458f);
+	OrganicUtils::findAngleUsingSOH(2.29458f, 4.00048f);
+	//OrganicUtils::findAngleUsingCAH(6.554, 8.00096);		// 3.277, 4.00048			// 6.554,	8.00096
 	OSContourPlan* planPtr = &contourPlanMap[in_string];
 	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
@@ -60,7 +68,7 @@ void OSServer::executeContourPlan(string in_string)
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
-	// STEP 1:  determine line lengths, angles
+	// STEP T-1:  determine line lengths, angles
 	in_Triangle->determineLineLengths();
 	in_Triangle->determineLineAngles();
 
@@ -392,6 +400,8 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 
 
 	// step 3: calibrate point keys, after conditions have been checked
+
+	// STEP T-2
 	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
@@ -399,8 +409,12 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	// step 4: begin ray cast sequence
 	//for (int x = 0; x < 340; x++)
 	//{
+
+		// STEP T-3
 		rayCastTrianglePoints(in_Triangle);
 	//}
+
+	// STEP T-4
 
 }
 
@@ -426,11 +440,14 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 			//newBlueprint.polygonMap[0] = newPoly;							
 			//blueprintMap[in_Triangle->pointKeys[x]] = newBlueprint;			// insert the new blueprint
 			//in_Triangle->polygonPieceMap[in_Triangle->pointKeys[x]] = 0;	// since it's a new blueprint, the first element in polygonPieceMap will be 0
+
+			// STEP T-3.2
 			tracePointThroughBlueprints(in_Triangle, x);					// trace point (line) through blueprints
 			//cout << "Blueprint didn't exist for polygon insertion, creating with polygonPieceMap insert at element 0" << endl;
 		}
 		else if (checkResult == 1)	// blueprint already exists
 		{
+			// STEP T-3.2
 			tracePointThroughBlueprints(in_Triangle, x);
 
 			/*

@@ -129,7 +129,8 @@ void OSContouredTriangle::determineLineAngles()
 				float newLineLength = sqrt(x_pow + y_pow + z_pow);
 				line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
 				std::cout << "A is greater, Angle is: " << line0->angleToYaxis << std::endl;
-
+				std::cout << "Performing rotation on z-axis..." << std::endl;
+				rotateTriangleFromZAxis(x);
 			}
 			else if (line0->pointA.y < line0->pointB.y)	// elevation of A is less than B
 			{
@@ -145,8 +146,85 @@ void OSContouredTriangle::determineLineAngles()
 				float newLineLength = sqrt(x_pow + y_pow + z_pow);
 				line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
 				std::cout << "B is greater, Angle is: " << line0->angleToYaxis << std::endl;
+				std::cout << "Performing rotation on z-axis..." << std::endl;
+				rotateTriangleFromZAxis(x);
 			}
 		}
+
+	}
+}
+
+void OSContouredTriangle::rotateTriangleFromZAxis(int in_Point)
+{
+	if (in_Point == 0) // first point, index 0 (line is also 0)
+	{
+		ECBPolyPoint pointToShiftTo0 = trianglePoints[0];
+		ECBPolyPoint point2 = trianglePoints[1];
+		ECBPolyPoint point3 = trianglePoints[2];
+		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
+		float yShiftValue = pointToShiftTo0.y;				
+		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
+		pointToShiftTo0.y -= pointToShiftTo0.y;
+		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
+		point2.y -= pointToShiftTo0.y;
+		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
+		point3.y -= pointToShiftTo0.y;
+
+		float rotationAngle = triangleLines[0].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
+		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
+		// begin rotation calculations
+		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
+		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
+
+		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
+		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
+
+	}
+	else if (in_Point == 1) // second point, index 1
+	{
+		ECBPolyPoint pointToShiftTo0 = trianglePoints[1];
+		ECBPolyPoint point2 = trianglePoints[2];
+		ECBPolyPoint point3 = trianglePoints[0];
+		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
+		float yShiftValue = pointToShiftTo0.y;
+		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
+		pointToShiftTo0.y -= pointToShiftTo0.y;
+		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
+		point2.y -= pointToShiftTo0.y;
+		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
+		point3.y -= pointToShiftTo0.y;
+
+		float rotationAngle = triangleLines[1].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
+		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
+		// begin rotation calculations
+		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
+		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
+
+		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
+		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
+	}
+	else if (in_Point == 2) // third point, index 2
+	{
+		ECBPolyPoint pointToShiftTo0 = trianglePoints[2];
+		ECBPolyPoint point2 = trianglePoints[1];
+		ECBPolyPoint point3 = trianglePoints[0];
+		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
+		float yShiftValue = pointToShiftTo0.y;
+		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
+		pointToShiftTo0.y -= pointToShiftTo0.y;
+		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
+		point2.y -= pointToShiftTo0.y;
+		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
+		point3.y -= pointToShiftTo0.y;
+
+		float rotationAngle = triangleLines[2].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
+		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
+		// begin rotation calculations
+		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
+		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
+
+		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
+		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
 	}
 }
 
