@@ -27,6 +27,8 @@ public:
 	int perfect_clamp_z = 0;			// ...z axis?
 	void addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType);
 	void determineLineLengths();		// gets the length of lines
+	void determineAxisInterceptDistances();
+	void determineLineAxisIntercept(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint);
 	void rotateTriangleFromZAxis(int in_Point);
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
 };

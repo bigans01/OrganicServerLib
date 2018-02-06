@@ -71,6 +71,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	// STEP T-1:  determine line lengths, angles
 	in_Triangle->determineLineLengths();
 	in_Triangle->determineLineAngles();
+	//in_Triangle->determineAxisInterceptDistances();
 
 	CursorPathTraceContainer testContainer = OrganicUtils::getPreciseCoordinate(-32.2f);		// testing only; make sure that going +32.0f into a blueprint means default behavior is to go into the next blueprint in that direction
 	cout << "container test: -----------" << endl;
@@ -192,8 +193,8 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_1.y = 18.0f;
 	testPoint_1.z = 12.0f;
 
-	testPoint_2.x = 14.0f;
-	testPoint_2.y = 20.0f;
+	testPoint_2.x = 10.0f;
+	testPoint_2.y = 10.0f;
 	testPoint_2.z = 13.5f;
 
 
@@ -202,6 +203,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testTriangle.trianglePoints[2] = testPoint_2;
 	testTriangle.determineLineLengths();
 	testTriangle.determineLineAngles();
+	testTriangle.determineAxisInterceptDistances();
 	for (int x = 0; x < 3; x++)
 	{
 		CursorPathTraceContainer x_container, y_container, z_container;

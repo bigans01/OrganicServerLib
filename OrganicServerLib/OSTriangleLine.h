@@ -15,6 +15,9 @@ public:
 	// some comment
 	ECBPolyPoint pointA;
 	ECBPolyPoint pointB;
+	ECBPolyPoint x_interceptSlope;
+	ECBPolyPoint y_interceptSlope;
+	ECBPolyPoint z_interceptSlope;
 	char clamped_to_x = 0;			// cache optimized, 8 bytes used only (2 DWORDS)
 	char clamped_to_y = 0;
 	char clamped_to_z = 0;

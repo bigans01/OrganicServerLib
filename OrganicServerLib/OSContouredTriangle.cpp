@@ -264,7 +264,150 @@ void OSContouredTriangle::rotateTriangleFromZAxis(int in_Point)
 	}
 }
 
+void OSContouredTriangle::determineAxisInterceptDistances()
+{
+	determineLineAxisIntercept(&triangleLines[0], trianglePoints[2]);
+	determineLineAxisIntercept(&triangleLines[1], trianglePoints[0]);
+	determineLineAxisIntercept(&triangleLines[2], trianglePoints[1]);
+}
+
+void OSContouredTriangle::determineLineAxisIntercept(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint)
+{
+	// X axis	||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	float line_pointA_x = in_LinePtr->pointA.x;		// get the x values of each point
+	float line_pointB_x = in_LinePtr->pointB.x;
+	float thirdPoint_x = in_thirdPoint.x;
+
+
+
+	ECBPolyPoint currentSlope;						// get the current slope (this may be switched later)
+	currentSlope.x = in_LinePtr->pointB.x - in_LinePtr->pointA.x;
+	currentSlope.y = in_LinePtr->pointB.y - in_LinePtr->pointA.y;
+	currentSlope.z = in_LinePtr->pointB.z - in_LinePtr->pointA.z;
+
+	ECBPolyPoint currentSlopeNormalized;
+	currentSlopeNormalized.x = (in_LinePtr->pointB.x - in_LinePtr->pointA.x) / abs(in_LinePtr->pointB.x - in_LinePtr->pointA.x);
+	currentSlopeNormalized.y = (in_LinePtr->pointB.y - in_LinePtr->pointA.y) / abs(in_LinePtr->pointB.y - in_LinePtr->pointA.y);
+	currentSlopeNormalized.z = (in_LinePtr->pointB.z - in_LinePtr->pointA.z) / abs(in_LinePtr->pointB.z - in_LinePtr->pointA.z);
+
+	//std::cout << "-------------float test----------" << std::endl;
+	//std::cout << "Value 1: " << -83.0f / -16.0645f << std::endl;
+	//std::cout << "Value 2: " << 16.0833f / 3.1129f << std::endl;
+
+	// when slope is positive...
+	if ((thirdPoint_x > line_pointA_x) && (thirdPoint_x < line_pointB_x))	// the third point's x lies between the line's point A and B
+	{
+		std::cout << "X is between A and B points..." << std::endl;
+		float newPointTravelDistance = (thirdPoint_x - line_pointA_x);		// distance on the line that the new point will have to travel
+		float newPointSlope = newPointTravelDistance / currentSlope.x;		// get the new slope calculation for this point's x (y, z?)
+		ECBPolyPoint newPoint;												// value that stores the new point coordinates
+		newPoint.x = thirdPoint_x;
+		newPoint.y = in_LinePtr->pointA.y + (currentSlope.y * newPointSlope);
+		newPoint.z = in_LinePtr->pointA.z + (currentSlope.z * newPointSlope);
+
+		std::cout << "current normalized slope: " << currentSlopeNormalized.x << ", " << currentSlopeNormalized.y << ", " << currentSlopeNormalized.z << std::endl;
+		std::cout << "slope multiply test: " << currentSlope.y * newPointSlope << std::endl;
+		std::cout << "----First point coordinates----: " << in_LinePtr->pointA.x << ",  " << in_LinePtr->pointA.y << ", " << in_LinePtr->pointA.z << std::endl;
+		std::cout << "----Second point coordinates----: " << in_LinePtr->pointB.x << ",  " << in_LinePtr->pointB.y << ", " << in_LinePtr->pointB.z << std::endl;
+		std::cout << "----Third point coordinates----: " << in_thirdPoint.x << ", " << in_thirdPoint.y << ", " << in_thirdPoint.z << std::endl;
+		std::cout << "----New point coordinates----  : " << newPoint.x << ", " << newPoint.y << ", " << newPoint.z << std::endl;
+
+		ECBPolyPoint temp_x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+		//temp_x_interceptSlope.x = in_thirdPoint.x - newPoint.x;
+		//temp_x_interceptSlope.y = in_thirdPoint.y - newPoint.y;
+		//temp_x_interceptSlope.z = in_thirdPoint.z - newPoint.z;
+		std::cout << "X-intercept slope is: " << temp_x_interceptSlope.x << ", " << temp_x_interceptSlope.y << ", " << temp_x_interceptSlope.z << std::endl;
+		in_LinePtr->x_interceptSlope = temp_x_interceptSlope;
+	}
+	else if 
+			(
+				((thirdPoint_x > line_pointB_x) && currentSlopeNormalized.x == 1)		// slope is positive; third point's x would have to be greater than point B's x
+				||
+				((thirdPoint_x < line_pointB_x) && currentSlopeNormalized.x == -1)		// slope is negative; third point's x would have to be less than point B's x
+			)	// thirdPoint's x value is further past point B 
+				{
+					if (currentSlopeNormalized.x == 1)
+					{
+						std::cout << "X slope is positive, but third point's X is greater than point B's X" << std::endl;
+						float line_length_to_new_point = abs(in_thirdPoint.x - in_LinePtr->pointA.x);
+						float original_line_length = abs(in_LinePtr->pointB.x - in_LinePtr->pointA.x);	// distance from point A to point B (x)
+						float slope_multiplier = line_length_to_new_point / original_line_length;
+						ECBPolyPoint newPoint;
+						newPoint.x = thirdPoint_x;
+						newPoint.y = in_LinePtr->pointA.y + (currentSlope.y * slope_multiplier);
+						newPoint.z = in_LinePtr->pointA.z + (currentSlope.z * slope_multiplier);
+						std::cout << "New point is: " << newPoint.x << ", " << newPoint.y << ", " << newPoint.z << std::endl;
+						ECBPolyPoint temp_x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+						std::cout << "X-intercept slope is: " << temp_x_interceptSlope.x << ", " << temp_x_interceptSlope.y << ", " << temp_x_interceptSlope.z << std::endl;
+						in_LinePtr->x_interceptSlope = temp_x_interceptSlope;		// store the result in the line's x-intercept slope value
+
+					}
+					else if (currentSlopeNormalized.x == -1)
+					{
+						std::cout << "X slope is negative, but third point's X is less than point B's x" << std::endl;
+						float line_length_to_new_point = abs(in_thirdPoint.x - in_LinePtr->pointA.x);	// distance from point A to the new point (x)
+						float original_line_length = abs(in_LinePtr->pointB.x - in_LinePtr->pointA.x);	// distance from point A to point B (x)
+						float slope_multiplier = line_length_to_new_point / original_line_length;
+						ECBPolyPoint newPoint;
+						newPoint.x = thirdPoint_x;
+						newPoint.y = in_LinePtr->pointA.y + (currentSlope.y * slope_multiplier);
+						newPoint.z = in_LinePtr->pointA.z + (currentSlope.z * slope_multiplier);
+						std::cout << "New point is: " << newPoint.x << ", " << newPoint.y << ", " << newPoint.z << std::endl;
+						ECBPolyPoint temp_x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+						std::cout << "X-intercept slope is: " << temp_x_interceptSlope.x << ", " << temp_x_interceptSlope.y << ", " << temp_x_interceptSlope.z << std::endl;
+						in_LinePtr->x_interceptSlope = temp_x_interceptSlope;		// store the result in the line's x-intercept slope value
+					}
+				}
+	else if 
+			(
+				((thirdPoint_x < line_pointA_x) && currentSlopeNormalized.x == 1)		// slope is positive, but third point's x would have to be less than point A's x
+				||
+				((thirdPoint_x > line_pointA_x) && currentSlopeNormalized.x == -1)		// slope is negative, but third point's x would have to be greater than point A's x
+			)	
+			
+				{
+					if (currentSlopeNormalized.x == 1)
+					{
+						std::cout << "X slope is positive, but third point's X is less than than point A's X" << std::endl;
+						currentSlope = OrganicUtils::findSlope(in_LinePtr->pointB, in_LinePtr->pointA);	// reverse the slope
+						float line_length_to_new_point = abs(in_thirdPoint.x - in_LinePtr->pointB.x);	// needs to be reversed; distance is to new point now comes as the distance between point B and the new point's x
+						float original_line_length = abs(in_LinePtr->pointB.x - in_LinePtr->pointA.x);	// this doesn't need to be reversed since it's always an absolute value
+						float slope_multiplier = line_length_to_new_point / original_line_length;
+						ECBPolyPoint newPoint;
+						newPoint.x = thirdPoint_x;
+						newPoint.y = in_LinePtr->pointB.y + (currentSlope.y * slope_multiplier);
+						newPoint.z = in_LinePtr->pointB.z + (currentSlope.z * slope_multiplier);
+						std::cout << "New point is: " << newPoint.x << ", " << newPoint.y << ", " << newPoint.z << std::endl;
+						ECBPolyPoint temp_x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+						std::cout << "X-intercept slope is: " << temp_x_interceptSlope.x << ", " << temp_x_interceptSlope.y << ", " << temp_x_interceptSlope.z << std::endl;
+						in_LinePtr->x_interceptSlope = temp_x_interceptSlope;		// store the result in the line's x-intercept slope value
+
+					}
+					else if (currentSlopeNormalized.x == -1)
+					{
+						std::cout << "X slope is negative, but third point's X is greater than point A's x" << std::endl;
+						currentSlope = OrganicUtils::findSlope(in_LinePtr->pointB, in_LinePtr->pointA);	// reverse the slope
+						float line_length_to_new_point = abs(in_thirdPoint.x - in_LinePtr->pointB.x);	// needs to be reversed; distance is to new point now comes as the distance between point B and the new point's x
+						float original_line_length = abs(in_LinePtr->pointB.x - in_LinePtr->pointA.x);	// this doesn't need to be reversed since it's always an absolute value
+						float slope_multiplier = line_length_to_new_point / original_line_length;
+						ECBPolyPoint newPoint;
+						newPoint.x = thirdPoint_x;
+						newPoint.y = in_LinePtr->pointB.y + (currentSlope.y * slope_multiplier);
+						newPoint.z = in_LinePtr->pointB.z + (currentSlope.z * slope_multiplier);
+						std::cout << "New point is: " << newPoint.x << ", " << newPoint.y << ", " << newPoint.z << std::endl;
+						ECBPolyPoint temp_x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+						std::cout << "X-intercept slope is: " << temp_x_interceptSlope.x << ", " << temp_x_interceptSlope.y << ", " << temp_x_interceptSlope.z << std::endl;
+						in_LinePtr->x_interceptSlope = temp_x_interceptSlope;		// store the result in the line's x-intercept slope value
+					}
+				}
+
+	// when slope is negative...
+
+
+}
+
 OSContouredTriangle::OSContouredTriangle()
 {
 	// for adding to unordered_map
 }
+
