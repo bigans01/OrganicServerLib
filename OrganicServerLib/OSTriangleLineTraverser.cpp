@@ -42,8 +42,8 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
 		ECBPolyLine newPolyLine;												// create a new poly line
-		newPolyLine.pointA = resultantIntersect.originPoint;		// set the new line to the pointed-to point A
-		newPolyLine.pointB = resultantIntersect.intersectedPoint;		// set the new line to the pointed-to point B
+		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID);
+		cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[in_lineID] = newPolyLine;
 
 	}
@@ -55,8 +55,8 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		int elementID = blueprintPtr->polygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->polygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
-		newPolyLine.pointA = resultantIntersect.originPoint;					// set the new line to the pointed-to point A
-		newPolyLine.pointB = resultantIntersect.intersectedPoint;				// set the new line to the pointed-to point B
+		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID);
+		cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		blueprintPtr->polygonMap[elementID].lineMap[in_lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
 
@@ -83,8 +83,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 		EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
 		ECBPolyLine newPolyLine;												// create a new poly line
-		newPolyLine.pointA = resultantIntersect.originPoint;		// set the new line to the pointed-to point A
-		newPolyLine.pointB = resultantIntersect.intersectedPoint;		// set the new line to the pointed-to point B
+		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID);
+		cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[lineID] = newPolyLine;
 
 	}
@@ -96,8 +96,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		int elementID = blueprintPtr->polygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->polygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
-		newPolyLine.pointA = resultantIntersect.originPoint;					// set the new line to the pointed-to point A
-		newPolyLine.pointB = resultantIntersect.intersectedPoint;				// set the new line to the pointed-to point B
+		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID);
+		cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		blueprintPtr->polygonMap[elementID].lineMap[lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
 

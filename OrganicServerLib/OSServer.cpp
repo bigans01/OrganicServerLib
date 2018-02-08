@@ -489,6 +489,15 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 	}
 }
 
+void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID)
+{
+	in_LinePtr->pointA = in_Triangle->triangleLines[in_pointID].pointA;							// set the new line to the pointed-to point A
+	in_LinePtr->pointB = in_Triangle->triangleLines[in_pointID].pointB;							// set the new line to the pointed-to point B
+	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
+	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
+	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
+}
+
 void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
 {
 
@@ -523,8 +532,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			ECBPolyLine newPolyLine;												// create a new poly line
-			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
-			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
+			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
+			cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
 			
 		}
@@ -536,8 +545,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			int elementID = blueprintPtr->polygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->polygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
-			newPolyLine.pointA = in_Triangle->triangleLines[in_pointID].pointA;		// set the new line to the pointed-to point A
-			newPolyLine.pointB = in_Triangle->triangleLines[in_pointID].pointB;		// set the new line to the pointed-to point B
+			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
+			cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->polygonMap[elementID].lineMap[in_pointID] = newPolyLine;
 			
 		}

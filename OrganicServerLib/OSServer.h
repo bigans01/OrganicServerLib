@@ -47,6 +47,7 @@ private:
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
+	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 	OrganicSystem* organicSystemPtr;
 };
 
