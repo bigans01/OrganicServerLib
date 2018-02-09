@@ -190,6 +190,17 @@ void OSContouredTriangle::determineLineAngles()
 	}
 }
 
+void OSContouredTriangle::determineType2and3Lines()
+{
+	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyIter = polygonPieceMap.begin();
+	for (polyIter; polyIter != polygonPieceMap.end(); polyIter++)
+	{
+		EnclaveKeyDef::EnclaveKey currentBlueprintKey = polyIter->first;
+		int currentBlueprintPoly = polyIter->second;
+		ECBPoly* polyPtr;
+	}
+}
+
 void OSContouredTriangle::rotateTriangleFromZAxis(int in_Point)
 {
 	if (in_Point == 0) // first point, index 0 (line is also 0)

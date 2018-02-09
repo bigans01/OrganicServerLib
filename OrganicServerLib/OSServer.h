@@ -45,9 +45,11 @@ private:
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKey(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
+	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
+	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
 	OrganicSystem* organicSystemPtr;
 };
 

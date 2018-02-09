@@ -7,6 +7,7 @@
 #include "EnclaveKeyDef.h"
 #include "OSTriangleLine.h"
 #include "ECBBorderValues.h"
+#include "ECBPoly.h"
 #include <unordered_map>
 #include <math.h>
 
@@ -29,6 +30,7 @@ public:
 	void determineLineLengths();		// gets the length of lines
 	void determineAxisInterceptDistances();
 	void determineLineAxisIntercept(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint);
+	void determineType2and3Lines();		// calculates the Type 2 and Type 3 lines for each line in the triangle
 	void rotateTriangleFromZAxis(int in_Point);
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
 };
