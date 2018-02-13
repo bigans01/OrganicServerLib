@@ -48,6 +48,7 @@ private:
 	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
+	void constructTestBlueprints();
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
 	OrganicSystem* organicSystemPtr;

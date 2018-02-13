@@ -6,6 +6,8 @@
 
 OSServer::OSServer()
 {
+	//addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
+	constructTestBlueprints();
 	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);
 	organicSystemPtr = &Organic;
 }
@@ -22,6 +24,21 @@ void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, flo
 	//contourPlanMap[in_string].planMode = 0;	// add a new plan			<<< ---- error is here (FIXED)
 	contourPlanMap[in_planName] = tempPlan;
 
+}
+
+void OSServer::constructTestBlueprints()
+{
+	std::cout << "||||||| constructing blueprints...." << std::endl;
+	addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
+	OSContourPlan* planRef = getContourPlan("plan");		// get pointer to the plan
+	ECBPolyPoint passPoint;
+	passPoint.x = -85.0f;
+	passPoint.y = 70.0f;
+	passPoint.z = 90.0f;
+	planRef->addContourLine(0, 15.0f, 70.0f, 8, passPoint);
+	OSContourLine* linePtr = planRef->getContourLine(0);
+	planRef->buildTriangleStrips(0);								// build the first triangle strip for the plan
+	executeContourPlan("plan");
 }
 
 void OSServer::executeContourPlan(string in_string)
@@ -223,7 +240,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	cout << ">>>>>beginning determineTriangleRelativityToECB" << endl;
 	auto bluestart = std::chrono::high_resolution_clock::now();
 	determineTriangleRelativityToECB(&testTriangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
-	determineTriangleType2and3Lines(&testTriangle);
+	determineTriangleType2and3Lines(&testTriangle);		// T-4 cycle through triangle border polys
 	auto blueend = std::chrono::high_resolution_clock::now();
 	cout << ">>>>>ending determineTriangleRelativityToECB" << endl;
 	std::chrono::duration<double> blueelapsed = blueend - bluestart;
