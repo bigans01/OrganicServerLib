@@ -7,9 +7,13 @@
 OSServer::OSServer()
 {
 	//addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
-	constructTestBlueprints();
-	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);
-	organicSystemPtr = &Organic;
+	constructTestBlueprints();											// construct test blueprints for server-side testing
+	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);						// create organic system
+	organicSystemPtr = &Organic;										// assign pointer
+	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
+	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
+	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
+
 }
 
 OSServer::OSServer(int x)
