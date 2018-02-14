@@ -28,6 +28,7 @@ public:
 	
 	OSServer();
 	OSServer(int x);
+	OSServer(OrganicSystem* in_organicSystemPtr);
 
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists

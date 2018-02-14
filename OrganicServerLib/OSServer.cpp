@@ -13,7 +13,20 @@ OSServer::OSServer()
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
 	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
+	//organicSystemPtr->s
+	//organicSystemPtr->SetupFutureCollectionMM(tempKey);
+	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
+}
 
+OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
+{
+	organicSystemPtr = in_organicSystemPtr;
+	constructTestBlueprints();
+	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
+	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
+	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
+	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
+	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 }
 
 OSServer::OSServer(int x)
@@ -95,10 +108,10 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//in_Triangle->determineAxisInterceptDistances();
 
 	CursorPathTraceContainer testContainer = OrganicUtils::getPreciseCoordinate(-32.2f);		// testing only; make sure that going +32.0f into a blueprint means default behavior is to go into the next blueprint in that direction
-	cout << "container test: -----------" << endl;
-	cout << "collection" << testContainer.CollectionCoord << endl;
-	cout << "chunk" << testContainer.ChunkCoord << endl;
-	cout << "block" << testContainer.BlockCoord << endl;
+	//cout << "container test: -----------" << endl;
+	//cout << "collection" << testContainer.CollectionCoord << endl;
+	//cout << "chunk" << testContainer.ChunkCoord << endl;
+	//cout << "block" << testContainer.BlockCoord << endl;
 
 	EnclaveKeyTri currentTriKey;		// for usage with new function determineTriangleRelativityToECB
 	ECBPolyPointTri currentTriPoint;
@@ -267,15 +280,15 @@ void OSServer::determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle)
 		ECBPoly* polyPtr = &blueprintMap[currentBlueprintKey].polygonMap[currentBlueprintPoly];
 		std::unordered_map<int, ECBPolyLine>::iterator polyLineIterBegin = polyPtr->lineMap.begin();
 		std::unordered_map<int, ECBPolyLine>::iterator polyLineIterEnd = polyPtr->lineMap.end();
-		cout << "--------Key: " << currentBlueprintKey.x << ", " << currentBlueprintKey.y << ", " << currentBlueprintKey.z << endl;
+		//cout << "--------Key: " << currentBlueprintKey.x << ", " << currentBlueprintKey.y << ", " << currentBlueprintKey.z << endl;
 
 		for (polyLineIterBegin; polyLineIterBegin != polyLineIterEnd; polyLineIterBegin++)
 		{
-			cout << "Line detected!!! " << endl;
-			cout << "Point A: " << polyLineIterBegin->second.pointA.x << ", " << polyLineIterBegin->second.pointA.y << ", " << polyLineIterBegin->second.pointA.z << endl;
-			cout << "Point B: " << polyLineIterBegin->second.pointB.x << ", " << polyLineIterBegin->second.pointB.y << ", " << polyLineIterBegin->second.pointB.z << endl;
+			//cout << "Line detected!!! " << endl;
+			//cout << "Point A: " << polyLineIterBegin->second.pointA.x << ", " << polyLineIterBegin->second.pointA.y << ", " << polyLineIterBegin->second.pointA.z << endl;
+			//cout << "Point B: " << polyLineIterBegin->second.pointB.x << ", " << polyLineIterBegin->second.pointB.y << ", " << polyLineIterBegin->second.pointB.z << endl;
 		}
-		cout << "----------------" << endl;
+		//cout << "----------------" << endl;
 	}
 }
 
@@ -468,15 +481,24 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 
 	// step 4: begin ray cast sequence
-	//for (int x = 0; x < 340; x++)
-	//{
+	cout << "----Ray cast performance test---- (1020 iterations) " << endl;
+	auto bluestart = std::chrono::high_resolution_clock::now();
+	for (int x = 0; x < 340; x++)
+	{
 
 		// STEP T-3
 		rayCastTrianglePoints(in_Triangle);
-	//}
+	}
 
 	// STEP T-4
 	
+	
+	//determineTriangleRelativityToECB(&testTriangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
+	//determineTriangleType2and3Lines(&testTriangle);		// T-4 cycle through triangle border polys
+	auto blueend = std::chrono::high_resolution_clock::now();
+	//cout << ">>>>>ending determineTriangleRelativityToECB" << endl;
+	std::chrono::duration<double> blueelapsed = blueend - bluestart;
+	std::cout << "Elapsed time, (1020) ray casts " << blueelapsed.count() << std::endl;
 }
 
 void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
@@ -569,16 +591,16 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		originPointKey = in_Triangle->pointKeys[2];
 		endPointKey = in_Triangle->pointKeys[0];
 	}
-	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// incrementing key will constantly increment and/or decrement as it traverses blueprints
+	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
 
 
 	// STEP 2: initiating tracing
 	if (originPointKey == endPointKey)		// both points exist in same blueprint
 	{
 		//cout << "The begin point for line " << in_pointID << " is in same area as its endpoint" << endl;
-		cout << "-----------origin and end point the same ------------------" << endl;
-		cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
-		cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+		//cout << "-----------origin and end point the same ------------------" << endl;
+		//cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+		//cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
 		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
 		{
@@ -587,7 +609,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
-			cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+			//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->polygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
 			
 		}
@@ -600,7 +622,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			blueprintPtr->polygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
-			cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+			//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->polygonMap[elementID].lineMap[in_pointID] = newPolyLine;
 			in_Triangle->addPolygonPiece(incrementingKey, elementID);
 			//in_Triangle->polygonPieceMap[incrementingKey] = elementID;				// add the elementID to the triangle's polygonPieceMap
@@ -616,9 +638,9 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		{
 			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
-			cout << "-----------------------------" << endl;
-			cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
-			cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+			//cout << "-----------------------------" << endl;
+			//cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+			//cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
 
 			//EnclaveKeyDef::EnclaveKey stupidKey;
 			//EnclaveKeyDef::EnclaveKey *stupidKeyPtr = &stupidKey;
@@ -652,9 +674,9 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		{
 			ECBPoly newPoly;
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
-			cout << "-----------------------------" << endl;
-			cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
-			cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+			//cout << "-----------------------------" << endl;
+			//cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+			//cout << "End point value is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
 			int currentBlueprintPolyMapSize = blueprintPtr->polygonMap.size();
 			blueprintPtr->polygonMap[currentBlueprintPolyMapSize] = newPoly;		// insert a new polygon; the ID will be equalto the size
 			in_Triangle->addPolygonPiece(incrementingKey, currentBlueprintPolyMapSize);
