@@ -26,6 +26,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
 	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
+	organicSystemPtr->JobRunEntireBlueprint(tempKey);
 	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 }
 
