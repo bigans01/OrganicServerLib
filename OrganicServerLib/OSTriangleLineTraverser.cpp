@@ -82,6 +82,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	//cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << endl;
 	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;													// get a pointer to the current key
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
+
 	//cout << "NEW currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	nextKeyAdd = resultantIntersect.incrementingKey;

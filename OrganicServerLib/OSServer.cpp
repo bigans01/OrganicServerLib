@@ -23,11 +23,20 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	organicSystemPtr = in_organicSystemPtr;
 	constructTestBlueprints();
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
+	tempKey.x = -1;
+	tempKey.y = 0;
+	tempKey.z = 0;
 	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
 	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
+	EnclaveKeyDef::EnclaveKey debugKey;
+	//debugKey.x = -1;
+	//std::cout << "Current poly line count is: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
+	//std::cout << "Current poly line count when added to the OrganicSystem: " << organicSystemPtr->BlueprintMatrix.BlueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
+	//cout << "----------------POLY LINE COUNT BEFORE job run call: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << endl;
 	organicSystemPtr->JobRunEntireBlueprint(tempKey);
-	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
+	//cout << "----------------POLY LINE COUNT AFTER job run call: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << endl;
+
 }
 
 OSServer::OSServer(int x)
@@ -220,7 +229,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 
 	// Rotation test
-	testPoint_0.x = 4.0f;
+	testPoint_0.x = -14.0f;		// previously: 4.0f
 	testPoint_0.y = 28.0f;
 	testPoint_0.z = 10.0f;
 
@@ -291,6 +300,10 @@ void OSServer::determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle)
 		}
 		//cout << "----------------" << endl;
 	}
+
+	EnclaveKeyDef::EnclaveKey debugKey;
+	debugKey.x = -1;
+	std::cout << "(DEBUG ATTEMPT 2) Current poly line count is: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
 }
 
 void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
@@ -484,15 +497,17 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	// step 4: begin ray cast sequence
 	cout << "----Ray cast performance test---- (1020 iterations) " << endl;
 	auto bluestart = std::chrono::high_resolution_clock::now();
-	for (int x = 0; x < 340; x++)
-	{
+	//for (int x = 0; x < 340; x++)
+	//{
 
 		// STEP T-3
 		rayCastTrianglePoints(in_Triangle);
-	}
+	//}
 
 	// STEP T-4
-	
+	EnclaveKeyDef::EnclaveKey debugKey;
+	debugKey.x = -1;
+	std::cout << "Current poly line count is: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
 	
 	//determineTriangleRelativityToECB(&testTriangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	//determineTriangleType2and3Lines(&testTriangle);		// T-4 cycle through triangle border polys
@@ -559,6 +574,7 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 
 void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID)
 {
+	in_LinePtr->lineID = in_pointID;
 	in_LinePtr->pointA = in_Triangle->triangleLines[in_pointID].pointA;							// set the new line to the pointed-to point A
 	in_LinePtr->pointB = in_Triangle->triangleLines[in_pointID].pointB;							// set the new line to the pointed-to point B
 	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
@@ -568,6 +584,7 @@ void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in
 
 void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint)
 {
+	in_LinePtr->lineID = in_pointID;
 	in_LinePtr->pointA = in_beginPoint;							// set the new line to the pointed-to point A
 	in_LinePtr->pointB = in_endPoint;							// set the new line to the pointed-to point B
 	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
@@ -648,6 +665,10 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
+			if (incrementingKey.x == -1)
+			{
+				cout << "IN NEGATIVE BLUEPRINT " << endl;
+			}
 			/*
 			while (!(incrementingKey == endPointKey))			// 	&&		(incrementingKey.y != endPointKey.y)		&&		(incrementingKey.z != endPointKey.z)
 			{ 
@@ -685,6 +706,10 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
+			if (incrementingKey.x == -1)
+			{
+				cout << "IN NEGATIVE BLUEPRINT " << endl;
+			}
 			/*
 			while (!(incrementingKey == endPointKey))			// && (incrementingKey.y != endPointKey.y) && (incrementingKey.z != endPointKey.z)
 			{
