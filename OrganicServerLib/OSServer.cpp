@@ -229,7 +229,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 
 	// Rotation test
-	testPoint_0.x = -14.0f;		// previously: 4.0f
+	testPoint_0.x = -13.65f;		// previously: 4.0f
 	testPoint_0.y = 28.0f;
 	testPoint_0.z = 10.0f;
 
