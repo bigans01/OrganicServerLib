@@ -34,7 +34,14 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	//std::cout << "Current poly line count is: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
 	//std::cout << "Current poly line count when added to the OrganicSystem: " << organicSystemPtr->BlueprintMatrix.BlueprintMap[debugKey].polygonMap[0].lineMap.size() << std::endl;
 	//cout << "----------------POLY LINE COUNT BEFORE job run call: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << endl;
+
+	std::cout << "|||||||||| Begin Blueprint Run..... " << std::endl;
+	auto bluestart = std::chrono::high_resolution_clock::now();
 	organicSystemPtr->JobRunEntireBlueprint(tempKey);
+	auto blueend = std::chrono::high_resolution_clock::now();
+	std::cout << "|||||||||| End Blueprint Run. " << std::endl;
+	std::chrono::duration<double> blueelapsed = blueend - bluestart;
+	std::cout << ">>>> blueprint run time: " << blueelapsed.count() << std::endl;
 	//cout << "----------------POLY LINE COUNT AFTER job run call: " << blueprintMap[debugKey].polygonMap[0].lineMap.size() << endl;
 
 }
