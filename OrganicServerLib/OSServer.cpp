@@ -221,7 +221,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 
 
-	// X == Z test
+	// X == Z test (NEW CODE 2) OK
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 16.0f;
 	testPoint_0.z = 16.0f;
@@ -235,20 +235,20 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.z = -10.0f;
 
 
-	// Rotation test - OK
-	testPoint_0.x = -14.21f;		// previously: 4.0f
-	testPoint_0.y = 28.00f;
-	testPoint_0.z = 10.23f;
+	// Rotation test - (NEW CODE 2) OK
+	//testPoint_0.x = -14.21f;		// previously: 4.0f
+	//testPoint_0.y = 28.00f;
+	//testPoint_0.z = 10.23f;
 
-	testPoint_1.x = 35.0f;			// previous: 35f
-	testPoint_1.y = 18.0f;
-	testPoint_1.z = 12.0f;
+	//testPoint_1.x = 35.0f;			// previous: 35f
+	//testPoint_1.y = 18.0f;
+	//testPoint_1.z = 12.0f;
 
-	testPoint_2.x = 10.0f;			// previous:: 10f
-	testPoint_2.y = 10.0f;
-	testPoint_2.z = 13.5f;
+	//testPoint_2.x = 10.0f;			// previous:: 10f
+	//testPoint_2.y = 10.0f;
+	//testPoint_2.z = 13.5f;
 
-	// right angle test - OK
+	// right angle test - (NEW CODE 2) OK
 	//testPoint_0.x = -12.0f;
 	//testPoint_0.y = 10.0f;
 	//testPoint_0.z = 10.0f;
@@ -260,33 +260,46 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//testPoint_2.x = -4.0f;
 	//testPoint_2.y = 16.0f;
 	//testPoint_2.z = 16.0f;
-	//
-	// clamped to border of collection - OK
-	//testPoint_0.x = -12.0f;
+	
+	// clamped to border of collection - (NEW CODE 2) OK
+	//testPoint_0.x = -12.0f;	
 	//testPoint_0.y = 10.0f;
 	//testPoint_0.z = 10.0f;
-	//
+	
 	//testPoint_1.x = 0.0f;	// previous was -4.0f
 	//testPoint_1.y = 10.0f;
 	//testPoint_1.z = 10.0f;
-	//
+	
 	//testPoint_2.x = 0.0f;	// previous was -4.0f
 	//testPoint_2.y = 16.0f;
 	//testPoint_2.z = 16.0f;
 
 
-	// Rotation test - ERROR
+	// Rotation test - (NEW CODE 2) OK
 	testPoint_0.x = -14.21f;		
 	testPoint_0.y = 28.00f;
 	testPoint_0.z = 10.23f;
-
-	testPoint_1.x = 35.0f;			
-	testPoint_1.y = -18.0f;			// previous: 18.0f
-	testPoint_1.z = 12.0f;
-
+	
+	testPoint_1.x = 45.5f;			
+	testPoint_1.y = -12.0f;			// previous: 18.0f
+	testPoint_1.z = 20.0f;
+	
 	testPoint_2.x = 10.0f;			
 	testPoint_2.y = -10.0f;			// previous: 10.0f
 	testPoint_2.z = 10.0f;
+
+	// Right angle, test for OSContouredTriangle::determineLineAxisIntercept
+	testPoint_0.x = -8.00f;
+	testPoint_0.y = 0.0f;
+	testPoint_0.z = 0.0f;
+
+	testPoint_1.x = 0.0f;
+	testPoint_1.y = 8.0f;			// previous: 18.0f
+	testPoint_1.z = 8.0f;
+
+	testPoint_2.x = -8.0f;
+	testPoint_2.y = 0.0f;			// previous: 10.0f
+	testPoint_2.z = 8.0f;
 	
 
 

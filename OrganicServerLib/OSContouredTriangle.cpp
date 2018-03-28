@@ -306,7 +306,7 @@ void OSContouredTriangle::determineLineAxisIntercept(OSTriangleLine* in_LinePtr,
 	//std::cout << "Value 1: " << -83.0f / -16.0645f << std::endl;
 	//std::cout << "Value 2: " << 16.0833f / 3.1129f << std::endl;
 
-	
+	std::cout << ">>>>>>>>>>>>>>>>> calling determineLineAxisIntercept" << std::endl;
 	if 
 			(
 				((thirdPoint_x > line_pointA_x) && (thirdPoint_x < line_pointB_x))
@@ -447,6 +447,36 @@ void OSContouredTriangle::determineLineAxisIntercept(OSTriangleLine* in_LinePtr,
 						*/
 					}
 				}
+	else if
+			(
+				(thirdPoint_x == line_pointA_x)		// x of third point is equal to first line point's x
+			)
+			
+				{
+					std::cout << "x of third point is equal to the x of the line's point A!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointA;
+					in_LinePtr->x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if 
+			(
+				(thirdPoint_x == line_pointB_x)		// x of third point is equal to second line point's x
+			)
+				{ 
+					std::cout << "x of third point is equal to the x of the line's point B!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointB;
+					in_LinePtr->x_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if
+			(
+				(line_pointA_x == line_pointB_x)
+			)
+				{
+					std::cout << "point A and point B x are equal!" << std::endl;
+					in_LinePtr->x_interceptSlope = OrganicUtils::findSlope(in_LinePtr->pointA, in_LinePtr->pointB);
+				}
+
+
+
 
 	// Y axis	||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	float line_pointA_y = in_LinePtr->pointA.y;
@@ -577,6 +607,35 @@ void OSContouredTriangle::determineLineAxisIntercept(OSTriangleLine* in_LinePtr,
 
 				}
 
+	else if
+			(
+				(thirdPoint_y == line_pointA_y)		// x of third point is equal to first line point's x
+			)
+
+				{
+					std::cout << "y of third point is equal to the y of the line's point A!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointA;
+					in_LinePtr->y_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if
+			(
+				(thirdPoint_y == line_pointB_y)		// x of third point is equal to second line point's x
+			)
+				{
+					std::cout << "y of third point is equal to the y of the line's point B!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointB;
+					in_LinePtr->y_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if
+			(
+				(line_pointA_y == line_pointB_y)
+			)
+				{
+					std::cout << "point A and point B y are equal!" << std::endl;
+					in_LinePtr->y_interceptSlope = OrganicUtils::findSlope(in_LinePtr->pointA, in_LinePtr->pointB);
+				}
+
+
 	// Z axis	||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	float line_pointA_z = in_LinePtr->pointA.z;
 	float line_pointB_z = in_LinePtr->pointB.z;
@@ -656,6 +715,40 @@ void OSContouredTriangle::determineLineAxisIntercept(OSTriangleLine* in_LinePtr,
 						//std::cout << "Z slope is negative, but third point's Z is greater than point A's Z" << std::endl;
 					}
 				}
+
+	else if
+			(
+				(thirdPoint_z == line_pointA_z)		// x of third point is equal to first line point's x
+			)
+
+				{
+					std::cout << "z of third point is equal to the z of the line's point A!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointA;
+					in_LinePtr->z_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if
+			(
+				(thirdPoint_z == line_pointB_z)		// x of third point is equal to second line point's x
+			)
+				{
+					std::cout << "z of third point is equal to the z of the line's point B!" << std::endl;
+					ECBPolyPoint newPoint = in_LinePtr->pointB;
+					in_LinePtr->z_interceptSlope = OrganicUtils::findSlope(newPoint, in_thirdPoint);
+				}
+	else if 
+			(
+				(line_pointA_z == line_pointB_z)
+			)
+				{
+					std::cout << "point A and point B z are equal!" << std::endl;
+					in_LinePtr->z_interceptSlope = OrganicUtils::findSlope(in_LinePtr->pointA, in_LinePtr->pointB);
+				}
+			
+
+	std::cout << "intercept Slopes for this line: " << std::endl;
+	std::cout << "x-slope: " << in_LinePtr->x_interceptSlope.x << ", " << in_LinePtr->x_interceptSlope.y << ", " << in_LinePtr->x_interceptSlope.z << ", " << std::endl;
+	std::cout << "y-slope: " << in_LinePtr->y_interceptSlope.x << ", " << in_LinePtr->y_interceptSlope.y << ", " << in_LinePtr->y_interceptSlope.z << ", " << std::endl;
+	std::cout << "z-slope: " << in_LinePtr->z_interceptSlope.x << ", " << in_LinePtr->z_interceptSlope.y << ", " << in_LinePtr->z_interceptSlope.z << ", " << std::endl;
 }
 
 
