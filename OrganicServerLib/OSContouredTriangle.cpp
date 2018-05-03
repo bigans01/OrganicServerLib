@@ -21,6 +21,7 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 void OSContouredTriangle::determineLineLengths()
 {
 	// calc line 1, aka "0"
+	std::cout << "Determining line lengths, points..." << std::endl;
 	OSTriangleLine* triangleLineRef_0 = &triangleLines[0];
 	ECBPolyPoint* point_A_ref = &trianglePoints[0];
 	ECBPolyPoint* point_B_ref = &trianglePoints[1];
