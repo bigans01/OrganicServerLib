@@ -42,6 +42,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
 		ECBPolyLine newPolyLine;												// create a new poly line
+
 		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
@@ -56,7 +57,9 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	{
 		//cout << "|||| Polygon was NOT found!! " << endl;
 		ECBPoly newPoly;
+		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
+		
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
@@ -115,6 +118,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << " origin Point: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << ", " << std::endl;
 		//cout << " intersected Point: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << std::endl;
 		ECBPoly newPoly;
+		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size

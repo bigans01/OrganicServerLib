@@ -34,7 +34,12 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	//std::cout << "Current poly line count is: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
 	//std::cout << "Current poly line count when added to the OrganicSystem: " << organicSystemPtr->BlueprintMatrix.BlueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
 	//cout << "----------------POLY LINE COUNT BEFORE job run call: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << endl;
-
+	unsigned char testChar = 63;
+	unsigned char testChar2 = 255;
+	OrganicUtils::setUnsignedCharBit2(&testChar, 6, 0);
+	OrganicUtils::findNibbleByte(12);
+	OrganicUtils::getNibbleFromUnsignedChar(&testChar2, 8);
+	
 	std::cout << "|||||||||| Begin Blueprint Run..... " << std::endl;
 	auto bluestart = std::chrono::high_resolution_clock::now();
 	organicSystemPtr->JobRunEntireBlueprint(tempKey);
@@ -301,18 +306,18 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.y = 0.0f;			// previous: 10.0f
 	testPoint_2.z = 8.0f;
 
-	// For tracing test
-	testPoint_0.x = -27.0f;
-	testPoint_0.y = 7.23f;		// previous: 7.0f
-	testPoint_0.z = 1.23f;		// previous: 0.0f
+	// For tracing test (same faces)
+	//testPoint_0.x = -26.8f;
+	//testPoint_0.y = 7.00f;		// previous: 7.0f
+	//testPoint_0.z = 1.00f;		// previous: 0.0f
 
-	testPoint_1.x = -1.0f;
-	testPoint_1.y = 7.23f;			// previous: 18.0f
-	testPoint_1.z = 1.23f;
+	//testPoint_1.x = -1.2f;
+	//testPoint_1.y = 7.00f;			// previous: 18.0f
+	//testPoint_1.z = 1.00f;
 
-	testPoint_2.x = -1.0f;
-	testPoint_2.y = 15.0f;			// previous: 10.0f
-	testPoint_2.z = 27.0f;
+	//testPoint_2.x = -1.0f;
+	//testPoint_2.y = 7.0f;			// previous: 10.0f
+	//testPoint_2.z = 27.0f;
 
 	// For line/corner intersect test across blueprints
 	// For tracing test
@@ -328,6 +333,31 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//testPoint_2.y = -16.0f;			// previous: 10.0f
 	//testPoint_2.z = 48.0f;
 
+	// for common T1 points test
+	testPoint_0.x = -26.8f;
+	testPoint_0.y = 7.23f;		// previous: 7.0f
+	testPoint_0.z = 1.23f;		// previous: 0.0f
+
+	testPoint_1.x = 13.2f;
+	testPoint_1.y = 7.23f;			// previous: 18.0f
+	testPoint_1.z = 1.23f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 15.23f;			// previous: 10.0f
+	testPoint_2.z = 27.23f;
+
+	// for perfect clamp test
+	testPoint_0.x = -26.8f;
+	testPoint_0.y = 7.23f;		// previous: 7.0f
+	testPoint_0.z = 1.23f;		// previous: 0.0f
+
+	testPoint_1.x = -10.2f;
+	testPoint_1.y = 7.23f;			// previous: 18.0f
+	testPoint_1.z = 1.23f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 7.23f;			// previous: 10.0f
+	testPoint_2.z = 27.23f;
 
 
 	testTriangle.trianglePoints[0] = testPoint_0;
@@ -422,7 +452,7 @@ void OSServer::determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle)
 
 void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
-	//cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
+	cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
 	int conditionMetFlag = 0;			// determines what condition has been met
 
@@ -606,7 +636,7 @@ void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle
 	// STEP T-2
 	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
-	//cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
+	cout << "Relativity job END ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 
 	// step 4: begin ray cast sequence
 	cout << "----Ray cast performance test---- (1020 iterations) " << endl;
@@ -785,6 +815,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		{
 			
 			ECBPoly newPoly;
+			fillPolyWithClampResult(&newPoly, in_Triangle);
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
@@ -854,6 +885,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		else  // polygon wasn't found, it needs to be created
 		{
 			ECBPoly newPoly;
+			fillPolyWithClampResult(&newPoly, in_Triangle);
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			//cout << "-----------------------------" << endl;
 			//cout << "Begin point value is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
@@ -897,6 +929,18 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			}
 			
 		}
+	}
+}
+
+void OSServer::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle)
+{
+	if (in_contouredTriangle->perfect_clamp_x == 1
+		||
+		in_contouredTriangle->perfect_clamp_y == 1
+		||
+		in_contouredTriangle->perfect_clamp_z == 1)
+	{
+		in_polyPtr->isPolyPerfectlyClamped = 1;
 	}
 }
 
