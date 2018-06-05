@@ -21,14 +21,40 @@ OSServer::OSServer()
 OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 {
 	organicSystemPtr = in_organicSystemPtr;
-	constructTestBlueprints();
+	//constructTestBlueprints();
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
+
+	// original temp key
 	tempKey.x = -1;
 	tempKey.y = 0;
 	tempKey.z = 0;
+
+	
+	/*
+	// temp key #1 for 1000's location range
+	tempKey.x = 99;
+	tempKey.y = 0;
+	tempKey.z = 0;
+
+	// temp key #1 for 10000's location range
+	tempKey.x = 999;
+	tempKey.y = 0;
+	tempKey.z = 0;
+
+	// temp key #2 for 10000's location range
+	tempKey.x = 999;
+	tempKey.y = 1000;
+	tempKey.z = 0;
+
+	// temp key #3 for 10000's location range
+	tempKey.x = 999;
+	tempKey.y = 1000;
+	tempKey.z = 1000;
+	*/
+
 	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
-	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
-	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
+	//organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
+	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
 	EnclaveKeyDef::EnclaveKey debugKey;
 	//debugKey.x = -1;
 	//std::cout << "Current poly line count is: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
@@ -39,10 +65,22 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	OrganicUtils::setUnsignedCharBit2(&testChar, 6, 0);
 	OrganicUtils::findNibbleByte(12);
 	OrganicUtils::getNibbleFromUnsignedChar(&testChar2, 8);
-	
+	std::cout << "++++++++new rounding test:++++++++ " << std::endl;
+	//float newTestFloat = 80000.9923f;
+	EnclaveKeyDef::EnclaveKey specialTestKey;
+	specialTestKey.x = 1000;
+	specialTestKey.y = 1000;
+	specialTestKey.z = 1000;
+	ECBPolyPoint testPoint;
+	testPoint.x = 32000.01f;
+	testPoint.y = 32000.355f;
+	testPoint.z = 32000.3723f;
+	//OrganicUtils::roundPolyPointToHundredthsTest(testPoint);
+	OrganicUtils::roundToAppropriatePrecision(testPoint, specialTestKey);
+
 	std::cout << "|||||||||| Begin Blueprint Run..... " << std::endl;
 	auto bluestart = std::chrono::high_resolution_clock::now();
-	organicSystemPtr->JobRunEntireBlueprint(tempKey);
+	//organicSystemPtr->JobRunEntireBlueprint(tempKey);
 	auto blueend = std::chrono::high_resolution_clock::now();
 	std::cout << "|||||||||| End Blueprint Run. " << std::endl;
 	std::chrono::duration<double> blueelapsed = blueend - bluestart;
@@ -120,6 +158,11 @@ void OSServer::executeContourPlan(string in_string)
 
 	traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 
+}
+
+void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
+{
+	organicSystemPtr->AddBlueprint(in_key, blueprintMap[in_key]);		// assign constructed blueprint to organic system
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
@@ -317,7 +360,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 	//testPoint_2.x = -1.0f;
 	//testPoint_2.y = 7.0f;			// previous: 10.0f
-	//testPoint_2.z = 27.0f;
+	//testPoint_2.z = 27.0f;j
 
 	// For line/corner intersect test across blueprints
 	// For tracing test
@@ -348,17 +391,100 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 	// for perfect clamp test
 	testPoint_0.x = -26.8f;
-	testPoint_0.y = 7.23f;		// previous: 7.0f
-	testPoint_0.z = 1.23f;		// previous: 0.0f
+	testPoint_0.y = 7.00f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
 
 	testPoint_1.x = -10.2f;
-	testPoint_1.y = 7.23f;			// previous: 18.0f
-	testPoint_1.z = 1.23f;
+	testPoint_1.y = 7.00f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
 
 	testPoint_2.x = -1.23f;
-	testPoint_2.y = 7.23f;			// previous: 10.0f
-	testPoint_2.z = 27.23f;
+	testPoint_2.y = 7.00f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
 
+	
+	// for generating t2 lines from a single t1 line
+	testPoint_0.x = -48.0f;
+	testPoint_0.y = 7.00f;
+	testPoint_0.z = 16.00f;
+
+	testPoint_1.x = 16.0f;
+	testPoint_1.y = 7.00f;
+	testPoint_1.z = 16.00f;
+
+	testPoint_2.x = -16.0f;
+	testPoint_2.y = 7.00f;		
+	testPoint_2.z = 80.00f;		
+
+	// for testing roundToAppropriatePrecision
+
+	
+	testPoint_0.x = -48.0f;		// previous: -48
+	testPoint_0.y = 16.00f;
+	testPoint_0.z = 16.00f;
+
+	testPoint_1.x = 16.0f;		// previous: 16
+	testPoint_1.y = 16.00f;
+	testPoint_1.z = 16.00f;
+
+	testPoint_2.x = -16.0f;		// previous: -16
+	testPoint_2.y = -80.00f;	// -80.0f = error!
+	testPoint_2.z = 112.00f;	// previous: 112, current is 180		 // + 68 *should* cause an error.
+	
+
+	/*
+	// test #1 for 1000s range point locations
+	testPoint_0.x = 3152.0f;		// previous: -48		// NOW: 3152
+	testPoint_0.y = 16.00f;
+	testPoint_0.z = 16.00f;
+
+	testPoint_1.x = 3216.0f;		// previous: 16			// NOW: 3216
+	testPoint_1.y = 16.00f;
+	testPoint_1.z = 16.00f;
+
+	testPoint_2.x = 3184.00f;		// previous: -16		// NOW: 3184	// alternate: 3183.88
+	testPoint_2.y = -80.00f;	// -80.0f = error!
+	testPoint_2.z = 112.00f;
+
+	// testing for 10000s range point locations; Passed (5/27/2018)
+	testPoint_0.x = 31952.0f;		// previous: -48			// NOW: 31952
+	testPoint_0.y = 16.00f;
+	testPoint_0.z = 16.00f;
+
+	testPoint_1.x = 32016.0f;		// previous: 16				// NOW: 32016
+	testPoint_1.y = 16.00f;
+	testPoint_1.z = 16.00f;
+
+	testPoint_2.x = 31984.0f;		// previous: -16			// NOW: 31984
+	testPoint_2.y = -80.00f;	// -80.0f = error!
+	testPoint_2.z = 112.00f;
+
+	// test #2 for 10000s range point locations; Passed (5/27/2018)
+	testPoint_0.x = 31952.0f;		// previous: -48			// NOW: 31952
+	testPoint_0.y = 32016.00f;			// previous: 16				// NOW: 32016
+	testPoint_0.z = 16.00f;
+
+	testPoint_1.x = 32016.0f;		// previous: 16				// NOW: 32016
+	testPoint_1.y = 32016.00f;			// previous: 16				// NOW: 32016
+	testPoint_1.z = 16.00f;
+
+	testPoint_2.x = 31984.0f;		// previous: -16			// NOW: 31984
+	testPoint_2.y = 31920.00f;	// -80.0f = error!				// NOW: 31920
+	testPoint_2.z = 112.00f;
+
+	// test #3 for 10000s range point locations;
+	testPoint_0.x = 31952.0f;		// previous: -48			// NOW: 31952
+	testPoint_0.y = 32016.00f;			// previous: 16				// NOW: 32016
+	testPoint_0.z = 32016.00f;				// previous: 16				// NOW: 32016
+
+	testPoint_1.x = 32016.0f;		// previous: 16				// NOW: 32016
+	testPoint_1.y = 32016.00f;			// previous: 16				// NOW: 32016
+	testPoint_1.z = 32016.00f;				// previous: 16				// NOW: 32016
+
+	testPoint_2.x = 31984.0f;		// previous: -16			// NOW: 31984
+	testPoint_2.y = 31920.00f;	// -80.0f = error!				// NOW: 31920
+	testPoint_2.z = 32112.00f;		// previous 112.00f			// NOW:								// 32180 causes error!!!!
+	*/
 
 	testTriangle.trianglePoints[0] = testPoint_0;
 	testTriangle.trianglePoints[1] = testPoint_1;
@@ -675,6 +801,7 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 
 	for (int x = 0; x < 3; x++)
 	{
+		std::cout << "~~~~~~~~~~~~~~Beginning trace of line " << x <<  std::endl;
 		//cout << "Key value of point:  " << in_Triangle->pointKeys[x].x << ", " << in_Triangle->pointKeys[x].y << ", " << in_Triangle->pointKeys[x].z << endl;
 		int checkResult = checkIfBlueprintExists(in_Triangle->pointKeys[x]);	// returns 0 if it didn't exist, 1 if so
 		if (checkResult == 0)		// create a blueprint if it doesnt exist already
@@ -720,6 +847,7 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 			}
 			*/
 		}
+		std::cout << "~~~~~~~~~~~~~~Ending trace of line " << x << std::endl;
 	}
 }
 
@@ -785,18 +913,18 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		endPointKey = in_Triangle->pointKeys[0];
 	}
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
-	std::cout << std::endl;
-	std::cout << "Origin point key: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << std::endl;
-	std::cout << "End point key: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
-	std::cout << std::endl;
+	//std::cout << std::endl;
+	//std::cout << "Origin point key: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << std::endl;
+	//std::cout << "End point key: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
+	//std::cout << std::endl;
 
 	// STEP 2: initiating tracing
 	if (originPointKey == endPointKey)		// both points exist in same blueprint
 	{
 		//cout << "The begin point for line " << in_pointID << " is in same area as its endpoint" << endl;
-		cout << "-----------origin and end point the same ------------------" << endl;
-		cout << "Begin point key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
-		cout << "End point key is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+		//cout << "-----------origin and end point the same ------------------" << endl;
+		//cout << "Begin point key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+		//cout << "End point key is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
 		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
 		{
@@ -805,8 +933,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
-			std::cout << "Line ref begin point:" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << ", " << std::endl;
-			std::cout << "Line ref end point:" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << ", " << std::endl;
+			//std::cout << "Line ref begin point:" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << ", " << std::endl;
+			//std::cout << "Line ref end point:" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << ", " << std::endl;
 			//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
 			
@@ -821,8 +949,8 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
-			std::cout << "Line ref begin point:" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << ", " << std::endl;
-			std::cout << "Line ref end point:" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << ", " << std::endl;
+			//std::cout << "Line ref begin point:" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << ", " << std::endl;
+			//std::cout << "Line ref end point:" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << ", " << std::endl;
 			//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
 			in_Triangle->addPolygonPiece(incrementingKey, elementID);
@@ -839,20 +967,20 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		{
 			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
-			cout << "-----------------------------origin and end point not the same " << endl;
-			cout << "Begin point key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
-			cout << "End point key is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
+			//cout << "-----------------------------origin and end point not the same " << endl;
+			//cout << "Begin point key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << ", " << endl;
+			//cout << "End point key is: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << ", " << endl;
 
 			//EnclaveKeyDef::EnclaveKey stupidKey;
 			//EnclaveKeyDef::EnclaveKey *stupidKeyPtr = &stupidKey;
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
-			std::cout << "Line ref begin point:" << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
-			std::cout << "Line ref end point:" << lineRef->endPoint.x << ", " << lineRef->endPoint.y << ", " << lineRef->endPoint.z << ", " << std::endl;
+			//std::cout << "Line ref begin point:" << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
+			//std::cout << "Line ref end point:" << lineRef->endPoint.x << ", " << lineRef->endPoint.y << ", " << lineRef->endPoint.z << ", " << std::endl;
 			if (incrementingKey.x == -1)
 			{
-				cout << "IN NEGATIVE BLUEPRINT " << endl;
+				//cout << "IN NEGATIVE BLUEPRINT " << endl;
 			}
 			/*
 			while (!(incrementingKey == endPointKey))			// 	&&		(incrementingKey.y != endPointKey.y)		&&		(incrementingKey.z != endPointKey.z)
@@ -868,9 +996,9 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 				}
 			}
 			*/
-			std::cout << "Line ref begin point (polygon was found)>>: " << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
-			std::cout << "++++++++++++++++++++++++++++++" << std::endl;
-			std::cout << std::endl;
+			//std::cout << "Line ref begin point (polygon was found)>>: " << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
+			//std::cout << "++++++++++++++++++++++++++++++" << std::endl;
+			//std::cout << std::endl;
 
 			
 			while (!(lineRef->currentKey == lineRef->endKey))
@@ -897,11 +1025,11 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
-			std::cout << "Line ref begin point:" << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
-			std::cout << "Line ref end point:" << lineRef->endPoint.x << ", " << lineRef->endPoint.y << ", " << lineRef->endPoint.z << ", " << std::endl;
+			//std::cout << "Line ref begin point:" << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
+			//std::cout << "Line ref end point:" << lineRef->endPoint.x << ", " << lineRef->endPoint.y << ", " << lineRef->endPoint.z << ", " << std::endl;
 			if (incrementingKey.x == -1)
 			{
-				cout << "IN NEGATIVE BLUEPRINT " << endl;
+				//cout << "IN NEGATIVE BLUEPRINT " << endl;
 			}
 			/*
 			while (!(incrementingKey == endPointKey))			// && (incrementingKey.y != endPointKey.y) && (incrementingKey.z != endPointKey.z)
@@ -917,9 +1045,9 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 				}
 			}
 			*/
-			std::cout << "Line ref begin point (polygon wasn't found)>>: " << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
-			std::cout << "++++++++++++++++++++++++++++++" << std::endl;
-			std::cout << std::endl;
+			//std::cout << "Line ref begin point (polygon wasn't found)>>: " << lineRef->beginPoint.x << ", " << lineRef->beginPoint.y << ", " << lineRef->beginPoint.z << ", " << std::endl;
+			//std::cout << "++++++++++++++++++++++++++++++" << std::endl;
+			//std::cout << std::endl;
 			
 			
 			while (!(lineRef->currentKey == lineRef->endKey))
@@ -941,6 +1069,19 @@ void OSServer::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle*
 		in_contouredTriangle->perfect_clamp_z == 1)
 	{
 		in_polyPtr->isPolyPerfectlyClamped = 1;
+	}
+
+	if (in_contouredTriangle->perfect_clamp_x == 1)
+	{
+		in_polyPtr->isPolyPerfectlyClamped = 1;
+	}
+	if (in_contouredTriangle->perfect_clamp_y == 1)
+	{
+		in_polyPtr->isPolyPerfectlyClamped = 2;
+	}
+	if (in_contouredTriangle->perfect_clamp_z == 1)
+	{
+		in_polyPtr->isPolyPerfectlyClamped = 3;
 	}
 }
 

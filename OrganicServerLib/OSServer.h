@@ -32,8 +32,11 @@ public:
 
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists
-	void executeContourPlan(string in_string);										// executes operations for all triangle strips in a triangle plan
+	void constructTestBlueprints();
+	void executeContourPlan(string in_string);										// executes operations for all triangle strips in a triangle plan]
+	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
+	OrganicSystem* organicSystemPtr;
 	friend class OSTriangleLineTraverser;
 
 private:
@@ -49,11 +52,10 @@ private:
 	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
-	void constructTestBlueprints();
+	
 	static void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
-	OrganicSystem* organicSystemPtr;
 };
 
 #endif
