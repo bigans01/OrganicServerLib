@@ -18,9 +18,12 @@ OSServer::OSServer()
 	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 }
 
-OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
+OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode)
 {
-	organicSystemPtr = in_organicSystemPtr;
+	organicSystemPtr = in_organicSystemPtr;	// set organicSystemPtr
+	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
+	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
+	createSlaves();							// create the number of slaves
 	//constructTestBlueprints();
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
 
@@ -87,6 +90,11 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr)
 	std::cout << ">>>> blueprint run time: " << blueelapsed.count() << std::endl;
 	//cout << "----------------POLY LINE COUNT AFTER job run call: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << endl;
 
+}
+
+OSServer::~OSServer()
+{
+	deleteSlaves();
 }
 
 OSServer::OSServer(int x)
@@ -893,6 +901,73 @@ void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in
 	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
+}
+
+void OSServer::createSlaves()
+{
+	for (int x = 0; x < numberOfSlaves; x++)
+	{
+		organicServerSlaves[x] = new thread_pool;
+	}
+}
+
+void OSServer::deleteSlaves()
+{
+	for (int x = 0; x < numberOfSlaves; x++)
+	{
+		delete organicServerSlaves[x];
+	}
+}
+
+void OSServer::runServer()
+{
+	if (serverRunMode == 0)
+	{
+		while (checkServerStatus(std::ref(serverReadWrite)) == 1)
+		{
+
+		}
+	}
+	else if (serverRunMode == 1)
+	{
+		while (checkServerStatus(std::ref(serverReadWrite)) == 1)
+		{
+			organicSystemPtr->runOrganicTick();
+		}
+		organicSystemPtr->GLCleanup();
+	}
+}
+
+void OSServer::executeCommandLine()
+{
+	std::future<int> testFuture = organicServerSlaves[0]->submit5(&OSServer::runCommandLine, this, std::ref(serverReadWrite));
+}
+
+int OSServer::runCommandLine(mutex& in_serverReadWrite)
+{
+	while (checkServerStatus(std::ref(in_serverReadWrite)) == 1)
+	{
+		std::cout << "Waiting for command...." << std::endl;
+		int input_value;
+		std::cout << "> ";
+		std::cin >> input_value;
+		setServerStatus(std::ref(in_serverReadWrite), input_value);
+	}
+	int returnVal = 5;
+	return returnVal;
+}
+
+int OSServer::checkServerStatus(mutex& in_serverReadWrite)
+{
+	std::lock_guard<std::mutex> lock(std::ref(serverReadWrite));
+	return isServerActive;
+}
+
+
+void OSServer::setServerStatus(mutex& in_serverReadWrite, int in_valueToSet)
+{
+	std::lock_guard<std::mutex> lock(in_serverReadWrite);
+	isServerActive = in_valueToSet;
 }
 
 void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
