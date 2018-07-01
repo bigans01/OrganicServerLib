@@ -7,6 +7,7 @@
 #include "OSTrianglePoint.h"
 #include "OSTriangleLineTraverser.h"
 #include "OSPDir.h"
+#include "OrganicThreadController.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "OSContourPlanDirections.h"
 #include "EnclaveKeyDef.h"
@@ -39,14 +40,19 @@ public:
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	OrganicSystem* organicSystemPtr;
+	OrganicThreadController threadController;
 	friend class OSTriangleLineTraverser;
 	short isServerActive = 1;			// flag for determining server
 	short numberOfSlaves = 0;			// number of slave threads
 	int serverRunMode = 0;				// will be set in constructor
+	int isCommandLineRunning = 1;
+	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
 	thread_pool* organicServerSlaves[16];	// up to 16 "slave" threads
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
+	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
+	std::condition_variable commandLineCV;
 
 private:
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
@@ -63,10 +69,13 @@ private:
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
 	void createSlaves();
 	void deleteSlaves();
-	int runCommandLine(mutex& in_serverReadWrite);
+	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);
 	//int getServerStatus();
 	int checkServerStatus(mutex& in_serverReadWrite);
-	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet);
+	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus);
+	void signalCommandLineShutdown(mutex& in_serverReadWrite, int in_valueToSet, int* in_clShutdownFlag);
+	int getCommandLineShutdownValue(mutex& in_serverReadWrite);
+	void signalServerShutdown(mutex& in_serverMutex);
 	static void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);

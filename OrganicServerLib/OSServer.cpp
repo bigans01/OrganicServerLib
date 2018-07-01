@@ -384,7 +384,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//testPoint_2.y = -16.0f;			// previous: 10.0f
 	//testPoint_2.z = 48.0f;
 
-	// for common T1 points test
+	// TEST 01: for common T1 points test
 	testPoint_0.x = -26.8f;
 	testPoint_0.y = 7.23f;		// previous: 7.0f
 	testPoint_0.z = 1.23f;		// previous: 0.0f
@@ -397,8 +397,9 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.y = 15.23f;			// previous: 10.0f
 	testPoint_2.z = 27.23f;
 
-	// for perfect clamp test
-	testPoint_0.x = -26.8f;
+	
+	//  TEST 02: for perfect clamp test
+	testPoint_0.x = -26.4f;
 	testPoint_0.y = 7.00f;		// previous: 7.0f
 	testPoint_0.z = 1.00f;		// previous: 0.0f
 
@@ -407,11 +408,13 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_1.z = 1.00f;
 
 	testPoint_2.x = -1.23f;
-	testPoint_2.y = 7.00f;			// previous: 10.0f
+	testPoint_2.y = 7.45f;			// previous: 10.0f
 	testPoint_2.z = 27.00f;
 
 	
-	// for generating t2 lines from a single t1 line
+	
+	/*
+	// TEST 03: for generating t2 lines from a single t1 line
 	testPoint_0.x = -48.0f;
 	testPoint_0.y = 7.00f;
 	testPoint_0.z = 16.00f;
@@ -424,7 +427,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.y = 7.00f;		
 	testPoint_2.z = 80.00f;		
 
-	// for testing roundToAppropriatePrecision
+	// TEST 04: for testing roundToAppropriatePrecision
 
 	
 	testPoint_0.x = -48.0f;		// previous: -48
@@ -432,13 +435,13 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_0.z = 16.00f;
 
 	testPoint_1.x = 16.0f;		// previous: 16
-	testPoint_1.y = 16.00f;
+	testPoint_1.y = 10.00f;
 	testPoint_1.z = 16.00f;
 
 	testPoint_2.x = -16.0f;		// previous: -16
 	testPoint_2.y = -80.00f;	// -80.0f = error!
 	testPoint_2.z = 112.00f;	// previous: 112, current is 180		 // + 68 *should* cause an error.
-	
+	*/
 
 	/*
 	// test #1 for 1000s range point locations
@@ -936,23 +939,61 @@ void OSServer::runServer()
 		}
 		organicSystemPtr->GLCleanup();
 	}
+	//std::unique_lock<std::mutex> commandLineMutex(commandLineRunningMutex);
+	//commandLineCV.wait(commandLineMutex);
+	
+	while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0)
+	{
+		std::cout << "Whoa" << std::endl;
+	}
+	
+	std::cout << "Hey we got here..." << std::endl;
+
 }
 
 void OSServer::executeCommandLine()
 {
-	std::future<int> testFuture = organicServerSlaves[0]->submit5(&OSServer::runCommandLine, this, std::ref(serverReadWrite));
+	int* commandLineRunningRef = &isCommandLineRunning;
+	int* clShutdownStatus = &isCommandLineShutDown;
+	std::future<int> testFuture = organicServerSlaves[0]->submit5(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
+	//testFuture.wait();
+	//signalServerShutdown(std::ref(serverReadWrite));	// signal for shutdown after command line thread has closed
 }
 
-int OSServer::runCommandLine(mutex& in_serverReadWrite)
+int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus)
 {
+	std::cout << ">> Job submission begin..." << std::endl;
+	int isCommandLineRunning = 1;
+	int* isCommandLineRunningPtr = &in_commandLineRunningStatus;
+	//int* isCommandLineRunningPtr = &isCommandLineRunning;
+	
+	/*
 	while (checkServerStatus(std::ref(in_serverReadWrite)) == 1)
 	{
 		std::cout << "Waiting for command...." << std::endl;
 		int input_value;
 		std::cout << "> ";
 		std::cin >> input_value;
-		setServerStatus(std::ref(in_serverReadWrite), input_value);
+		setServerStatus(std::ref(in_serverReadWrite), input_value, std::ref(isCommandLineRunning));
 	}
+	*/
+
+	
+	//while (isCommandLineRunning == 1)
+	while (*isCommandLineRunningPtr == 1)
+	{
+		std::cout << "Waiting for command...." << std::endl;
+		int input_value;
+		std::cout << "> ";
+		std::cin >> input_value;
+		setServerStatus(std::ref(in_serverReadWrite), input_value, std::ref(isCommandLineRunningPtr));
+	}
+	std::cout << "Pre-hang..." << std::endl;
+	signalServerShutdown(std::ref(in_serverReadWrite));
+	std::cout << "Pre-hang 2..." << std::endl;
+	signalCommandLineShutdown(std::ref(in_serverReadWrite), 1, std::ref(is_commandLineShutDownStatus));
+	//in_conditionVariable.notify_all();
+	std::cout << "post notify.." << std::endl;
 	int returnVal = 5;
 	return returnVal;
 }
@@ -960,14 +1001,55 @@ int OSServer::runCommandLine(mutex& in_serverReadWrite)
 int OSServer::checkServerStatus(mutex& in_serverReadWrite)
 {
 	std::lock_guard<std::mutex> lock(std::ref(serverReadWrite));
+	//std::cout << "Server status checked..." << std::endl;
 	return isServerActive;
 }
 
 
-void OSServer::setServerStatus(mutex& in_serverReadWrite, int in_valueToSet)
+void OSServer::setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus)
 {
 	std::lock_guard<std::mutex> lock(in_serverReadWrite);
-	isServerActive = in_valueToSet;
+	if (in_valueToSet == 0)
+	{
+		//isServerActive = in_valueToSet;
+		std::cout << "shutdown flag found! " << std::endl;
+		*in_commandLineStatus = 0;
+	}
+	else if (in_valueToSet == 10)	// "stop" the test thread"
+	{
+		threadController.signalStop();
+	}
+	else if (in_valueToSet == 11)
+	{
+		threadController.signalStart();
+	}
+	else if (in_valueToSet == 12)
+	{
+		std::cout << "Attempting delete....>>" << std::endl;
+		//threadController.deleteThread();
+		std::cout << "Delete succeeded..." << std::endl;
+	}
+}
+
+void OSServer::signalCommandLineShutdown(mutex& in_serverReadWrite, int in_valueToSet, int* in_clShutdownFlag)
+{
+	std::lock_guard<std::mutex> lock(in_serverReadWrite);
+	std::cout << "(1) shutdown flag call complete" << std::endl;
+	//*in_clShutdownFlag = 1;
+	isCommandLineShutDown = 1;
+	std::cout << "(2) shutdown flag call complete" << std::endl;
+}
+
+int OSServer::getCommandLineShutdownValue(mutex& in_serverReadWrite)
+{
+	std::lock_guard<std::mutex> lock(in_serverReadWrite);
+	return isCommandLineShutDown;
+}
+
+void OSServer::signalServerShutdown(mutex& in_serverMutex)
+{
+	std::lock_guard<std::mutex> lock(std::ref(in_serverMutex));
+	isServerActive = 0;
 }
 
 void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
