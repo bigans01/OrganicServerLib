@@ -6,6 +6,7 @@
 #include "OSContourPlan.h"
 #include "OSTrianglePoint.h"
 #include "OSTriangleLineTraverser.h"
+#include "OrganicStemcellManager.h"
 #include "OSPDir.h"
 #include "OrganicThreadController.h"
 #include "EnclaveCollectionBlueprint.h"
@@ -21,7 +22,6 @@
 #include <string>
 #include <chrono>
 #include <mutex>
-#include "thread_pool.h"
 
 
 
@@ -40,7 +40,7 @@ public:
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	OrganicSystem* organicSystemPtr;
-	OrganicThreadController threadController;
+	OrganicStemcellManager OSCManager;
 	friend class OSTriangleLineTraverser;
 	short isServerActive = 1;			// flag for determining server
 	short numberOfSlaves = 0;			// number of slave threads
@@ -49,11 +49,9 @@ public:
 	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
-	thread_pool* organicServerSlaves[16];	// up to 16 "slave" threads
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
 	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
 	std::condition_variable commandLineCV;
-
 private:
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
@@ -67,10 +65,7 @@ private:
 	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);
 	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
-	void createSlaves();
-	void deleteSlaves();
 	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);
-	//int getServerStatus();
 	int checkServerStatus(mutex& in_serverReadWrite);
 	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus);
 	void signalCommandLineShutdown(mutex& in_serverReadWrite, int in_valueToSet, int* in_clShutdownFlag);

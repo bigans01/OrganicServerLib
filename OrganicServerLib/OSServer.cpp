@@ -23,7 +23,8 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	organicSystemPtr = in_organicSystemPtr;	// set organicSystemPtr
 	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
 	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
-	createSlaves();							// create the number of slaves
+	OSCManager.initialize(1, 2);			// signal for server mode, 1 thread
+	//createSlaves();							// create the number of slaves
 	//constructTestBlueprints();
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
 
@@ -94,7 +95,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 
 OSServer::~OSServer()
 {
-	deleteSlaves();
+	//deleteSlaves();
 }
 
 OSServer::OSServer(int x)
@@ -906,22 +907,6 @@ void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in
 	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
 }
 
-void OSServer::createSlaves()
-{
-	for (int x = 0; x < numberOfSlaves; x++)
-	{
-		organicServerSlaves[x] = new thread_pool;
-	}
-}
-
-void OSServer::deleteSlaves()
-{
-	for (int x = 0; x < numberOfSlaves; x++)
-	{
-		delete organicServerSlaves[x];
-	}
-}
-
 void OSServer::runServer()
 {
 	if (serverRunMode == 0)
@@ -939,9 +924,6 @@ void OSServer::runServer()
 		}
 		organicSystemPtr->GLCleanup();
 	}
-	//std::unique_lock<std::mutex> commandLineMutex(commandLineRunningMutex);
-	//commandLineCV.wait(commandLineMutex);
-	
 	while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0)
 	{
 		std::cout << "Whoa" << std::endl;
@@ -955,7 +937,8 @@ void OSServer::executeCommandLine()
 {
 	int* commandLineRunningRef = &isCommandLineRunning;
 	int* clShutdownStatus = &isCommandLineShutDown;
-	std::future<int> testFuture = organicServerSlaves[0]->submit5(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
+	//std::future<int> testFuture = organicServerSlaves[0]->submit5(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
+	std::future<int> testFuture2 = OSCManager.stemcellMap[0].threadPtr->submit(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
 	//testFuture.wait();
 	//signalServerShutdown(std::ref(serverReadWrite));	// signal for shutdown after command line thread has closed
 }
@@ -965,21 +948,6 @@ int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable&
 	std::cout << ">> Job submission begin..." << std::endl;
 	int isCommandLineRunning = 1;
 	int* isCommandLineRunningPtr = &in_commandLineRunningStatus;
-	//int* isCommandLineRunningPtr = &isCommandLineRunning;
-	
-	/*
-	while (checkServerStatus(std::ref(in_serverReadWrite)) == 1)
-	{
-		std::cout << "Waiting for command...." << std::endl;
-		int input_value;
-		std::cout << "> ";
-		std::cin >> input_value;
-		setServerStatus(std::ref(in_serverReadWrite), input_value, std::ref(isCommandLineRunning));
-	}
-	*/
-
-	
-	//while (isCommandLineRunning == 1)
 	while (*isCommandLineRunningPtr == 1)
 	{
 		std::cout << "Waiting for command...." << std::endl;
@@ -988,12 +956,8 @@ int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable&
 		std::cin >> input_value;
 		setServerStatus(std::ref(in_serverReadWrite), input_value, std::ref(isCommandLineRunningPtr));
 	}
-	std::cout << "Pre-hang..." << std::endl;
 	signalServerShutdown(std::ref(in_serverReadWrite));
-	std::cout << "Pre-hang 2..." << std::endl;
 	signalCommandLineShutdown(std::ref(in_serverReadWrite), 1, std::ref(is_commandLineShutDownStatus));
-	//in_conditionVariable.notify_all();
-	std::cout << "post notify.." << std::endl;
 	int returnVal = 5;
 	return returnVal;
 }
@@ -1001,7 +965,6 @@ int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable&
 int OSServer::checkServerStatus(mutex& in_serverReadWrite)
 {
 	std::lock_guard<std::mutex> lock(std::ref(serverReadWrite));
-	//std::cout << "Server status checked..." << std::endl;
 	return isServerActive;
 }
 
@@ -1017,17 +980,25 @@ void OSServer::setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int
 	}
 	else if (in_valueToSet == 10)	// "stop" the test thread"
 	{
-		threadController.signalStop();
+		//threadController.signalStop();
+		OSCManager.stemcellMap[1].signalStop();		// halt the test thread
 	}
 	else if (in_valueToSet == 11)
 	{
-		threadController.signalStart();
+		//threadController.signalStart();
+		OSCManager.stemcellMap[1].signalStart();	// resume the test thread
 	}
 	else if (in_valueToSet == 12)
 	{
 		std::cout << "Attempting delete....>>" << std::endl;
-		//threadController.deleteThread();
+		//.deleteThread();
 		std::cout << "Delete succeeded..." << std::endl;
+	}
+
+	else if (in_valueToSet == 5)
+	{
+		std::cout << "Toggling targeting..." << std::endl;
+		organicSystemPtr->director.toggleTargeting();
 	}
 }
 
