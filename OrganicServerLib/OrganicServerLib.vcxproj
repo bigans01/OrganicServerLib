@@ -142,6 +142,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="OSCommandDirector.h" />
     <ClInclude Include="OSPDir.h" />
     <ClInclude Include="OSAmpField.h" />
     <ClInclude Include="OSContouredTriangle.h" />
@@ -159,6 +160,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="OSAmpField.cpp" />
+    <ClCompile Include="OSCommandDirector.cpp" />
     <ClCompile Include="OSContouredTriangle.cpp" />
     <ClCompile Include="OSContourLine.cpp" />
     <ClCompile Include="OSContourPlan.cpp" />

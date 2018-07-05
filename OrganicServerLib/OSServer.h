@@ -6,6 +6,7 @@
 #include "OSContourPlan.h"
 #include "OSTrianglePoint.h"
 #include "OSTriangleLineTraverser.h"
+#include "OSCommandDirector.h"
 #include "OrganicStemcellManager.h"
 #include "OSPDir.h"
 #include "OrganicThreadController.h"
@@ -41,6 +42,7 @@ public:
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	OrganicSystem* organicSystemPtr;
 	OrganicStemcellManager OSCManager;
+	OSCommandDirector OSdirector;
 	friend class OSTriangleLineTraverser;
 	short isServerActive = 1;			// flag for determining server
 	short numberOfSlaves = 0;			// number of slave threads

@@ -24,6 +24,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
 	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
 	OSCManager.initialize(1, 2);			// signal for server mode, 1 thread
+	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
 	//createSlaves();							// create the number of slaves
 	//constructTestBlueprints();
 	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
