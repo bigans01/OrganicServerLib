@@ -54,7 +54,7 @@ void OSContourPlan::performSingleTriangleTest()
 	//triangleStripMap[0].triangleMap = c
 }
 
-void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, mutex& heapmutex)
+void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, mutex& heapmutex)
 {
 	std::lock_guard<std::mutex> lock(heapmutex);	// lock for heap usage
 	ECBPolyPoint testPoint_0;
@@ -93,9 +93,10 @@ void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyP
 		//currentTriKey.triKey[x] = blueprintKey;
 		testTriangle.pointKeys[x] = blueprintKey;
 	}
-	int baseStripSize = triangleStripMap[0].triangleMap.size();		// get the number of triangles in the base strip, should be 0
-	std::cout << "### Adding new triangle with ID " << baseStripSize;
+	int baseStripSize = triangleStripMap[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
+	std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
 	triangleStripMap[0].triangleMap[baseStripSize] = testTriangle;
+	std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
 void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)
