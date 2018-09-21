@@ -23,6 +23,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	organicSystemPtr = in_organicSystemPtr;	// set organicSystemPtr
 	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
 	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
+	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex
 	OSCManager.initialize(1, 2);			// signal for server mode, 1 thread
 	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
 	//createSlaves();							// create the number of slaves
@@ -58,31 +59,13 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	*/
 
 	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
-	//organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
-	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(tempKey);
 	EnclaveKeyDef::EnclaveKey debugKey;
-	//debugKey.x = -1;
-	//std::cout << "Current poly line count is: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
-	//std::cout << "Current poly line count when added to the OrganicSystem: " << organicSystemPtr->BlueprintMatrix.BlueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
-	//cout << "----------------POLY LINE COUNT BEFORE job run call: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << endl;
 	unsigned char testChar = 63;
 	unsigned char testChar2 = 255;
 	OrganicUtils::setUnsignedCharBit2(&testChar, 6, 0);
 	OrganicUtils::findNibbleByte(12);
 	OrganicUtils::getNibbleFromUnsignedChar(&testChar2, 8);
 	std::cout << "++++++++new rounding test:++++++++ " << std::endl;
-	//float newTestFloat = 80000.9923f;
-	EnclaveKeyDef::EnclaveKey specialTestKey;
-	specialTestKey.x = 1000;
-	specialTestKey.y = 1000;
-	specialTestKey.z = 1000;
-	ECBPolyPoint testPoint;
-	testPoint.x = 32000.01f;
-	testPoint.y = 32000.355f;
-	testPoint.z = 32000.3723f;
-	//OrganicUtils::roundPolyPointToHundredthsTest(testPoint);
-	OrganicUtils::roundToAppropriatePrecision(testPoint, specialTestKey);
-
 	std::cout << "|||||||||| Begin Blueprint Run..... " << std::endl;
 	auto bluestart = std::chrono::high_resolution_clock::now();
 	//organicSystemPtr->JobRunEntireBlueprint(tempKey);
@@ -320,6 +303,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//testPoint_2.z = 16.0f;
 	
 	// clamped to border of collection - (NEW CODE 2) OK
+	/*
 	testPoint_0.x = -12.0f;	
 	testPoint_0.y = 10.0f;
 	testPoint_0.z = 10.0f;
@@ -331,9 +315,10 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.x = 0.0f;	// previous was -4.0f
 	testPoint_2.y = 16.0f;
 	testPoint_2.z = 16.0f;
-
+	*/
 
 	// Rotation test - (NEW CODE 2) OK
+	/*
 	testPoint_0.x = -14.21f;		
 	testPoint_0.y = 28.00f;
 	testPoint_0.z = 10.23f;
@@ -345,8 +330,10 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.x = 10.0f;			
 	testPoint_2.y = -10.0f;			// previous: 10.0f
 	testPoint_2.z = 10.0f;
+	*/
 
 	// Right angle, test for OSContouredTriangle::determineLineAxisIntercept
+	/*
 	testPoint_0.x = -8.00f;
 	testPoint_0.y = 0.0f;
 	testPoint_0.z = 0.0f;
@@ -358,19 +345,8 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.x = -8.0f;
 	testPoint_2.y = 0.0f;			// previous: 10.0f
 	testPoint_2.z = 8.0f;
+	*/
 
-	// For tracing test (same faces)
-	//testPoint_0.x = -26.8f;
-	//testPoint_0.y = 7.00f;		// previous: 7.0f
-	//testPoint_0.z = 1.00f;		// previous: 0.0f
-
-	//testPoint_1.x = -1.2f;
-	//testPoint_1.y = 7.00f;			// previous: 18.0f
-	//testPoint_1.z = 1.00f;
-
-	//testPoint_2.x = -1.0f;
-	//testPoint_2.y = 7.0f;			// previous: 10.0f
-	//testPoint_2.z = 27.0f;j
 
 	// For line/corner intersect test across blueprints
 	// For tracing test
@@ -386,34 +362,153 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	//testPoint_2.y = -16.0f;			// previous: 10.0f
 	//testPoint_2.z = 48.0f;
 
-	// TEST 01: for common T1 points test
-	testPoint_0.x = -26.8f;
-	testPoint_0.y = 7.23f;		// previous: 7.0f
-	testPoint_0.z = 1.23f;		// previous: 0.0f
-
-	testPoint_1.x = 13.2f;
-	testPoint_1.y = 7.23f;			// previous: 18.0f
-	testPoint_1.z = 1.23f;
-
-	testPoint_2.x = -1.23f;
-	testPoint_2.y = 15.23f;			// previous: 10.0f
-	testPoint_2.z = 27.23f;
-
 	
-	//  TEST 02: for perfect clamp test
-	testPoint_0.x = -26.4f;
+
+	/*
+	// For tracing test (same faces) (PERFECT CLAMP, NOT READY FOR TESTING YET)
+	testPoint_0.x = -27.0f;
 	testPoint_0.y = 7.00f;		// previous: 7.0f
 	testPoint_0.z = 1.00f;		// previous: 0.0f
 
-	testPoint_1.x = -10.2f;
+	testPoint_1.x = -1.0f;
+	testPoint_1.y = 7.00f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
+
+	testPoint_2.x = -1.0f;
+	testPoint_2.y = 7.0f;			// previous: 10.0f
+	testPoint_2.z = 27.0f;
+	*/
+
+	/**/
+
+	// TEST 00: for common T1 points?? test (FIXED? (maybe), 7/21/2018)
+	/*
+	testPoint_0.x = -26.8f;
+	testPoint_0.y = 7.00f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
+
+	testPoint_1.x = -1.23f;
 	testPoint_1.y = 7.00f;			// previous: 18.0f
 	testPoint_1.z = 1.00f;
 
 	testPoint_2.x = -1.23f;
+	testPoint_2.y = 15.00f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+	*/
+	
+	// TEST 00-B:for common T1 points?? was error on 7/21/2018, but became new issue when filling triangle interior
+	// new issue: infinite filling when using interior fill 
+	
+	/*
+	testPoint_0.x = -26.8f;												
+	testPoint_0.y = 7.00f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
+
+	testPoint_1.x = -1.23f;
+	testPoint_1.y = 7.23f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 15.00f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+	*/
+
+	/*
+	// TEST 00-C: original points that caused error TEST 00-B
+	testPoint_0.x = -26.8f;
+	testPoint_0.y = 7.23f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
+
+	testPoint_1.x = -1.23f;															// <<------ crash is with this line (point 1 to point 2)
+	testPoint_1.y = 7.23f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 15.23f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+	*/
+
+	// TEST 01: triangle clamped on one line
+	
+	
+	
+	// TEST 01: triangle clamped on one line; For tracing test (same faces)	 (Issue resolved on 7/22/2018)
+	/*
+	testPoint_0.x = -27.0f;
+	testPoint_0.y = 7.00f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
+
+	testPoint_1.x = -1.0f;
+	testPoint_1.y = 7.00f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
+
+	testPoint_2.x = -1.00f;
+	testPoint_2.y = 15.00f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+	*/
+	
+	
+	//  TEST 02: non-clamped triangle with 3 points
+	
+	testPoint_0.x = -26.4f;
+	testPoint_0.y = 6.78f;		// previous: 7.0f		// error with 6.78 here (7/5/2018) --> fixed, 7/9/2018
+	testPoint_0.z = 1.00f;		// previous: 0.0f		
+
+	testPoint_1.x = -10.2f;
+	testPoint_1.y = 20.80f;			// previous: 18.0f			(7.80, 10.80, 20.80f); 20.80f leads to interesting resutls/angles
+	testPoint_1.z = 4.70f;
+
+	testPoint_2.x = -1.23f;
 	testPoint_2.y = 7.45f;			// previous: 10.0f
 	testPoint_2.z = 27.00f;
-
 	
+	
+	/*
+	// TEST 03: triangle clamped on one line; For tracing test (same faces)	 (Issue resolved on 7/22/2018)
+	
+	testPoint_0.x = -9.0f;
+	testPoint_0.y = 1.00f;		// previous: 7.0f
+	testPoint_0.z = 1.00f;		// previous: 0.0f
+
+	testPoint_1.x = -1.0f;
+	testPoint_1.y = 1.00f;			// previous: 18.0f
+	testPoint_1.z = 1.00f;
+
+	testPoint_2.x = -1.00f;
+	testPoint_2.y = 9.00f;			// previous: 10.0f
+	testPoint_2.z = 9.00f;
+	*/
+	
+	/*
+	//  TEST 04: reddit reveal
+	testPoint_0.x = -26.4f;
+	testPoint_0.y = 6.78f;		// previous: 7.0f		// error with 6.78 here (7/5/2018) --> fixed, 7/9/2018
+	testPoint_0.z = 1.00f;		// previous: 0.0f		
+
+	testPoint_1.x = -10.2f;
+	testPoint_1.y = 9.80f;			// previous: 18.0f			(7.80, 10.80, 20.80f); 20.80f leads to interesting resutls/angles
+	testPoint_1.z = 4.70f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 7.45f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+	*/
+	
+	
+	// REVERSE CLOCKWISE TEST
+	/*
+	testPoint_0.x = -26.4f;
+	testPoint_0.y = 6.78f;		// previous: 7.0f		// error with 6.78 here (7/5/2018) --> fixed, 7/9/2018
+	testPoint_0.z = 1.00f;		// previous: 0.0f		
+
+	testPoint_1.x = -1.23f;
+	testPoint_1.y = 7.45f;			// previous: 10.0f
+	testPoint_1.z = 27.00f;
+
+	testPoint_2.x = -10.2f;
+	testPoint_2.y = 20.80f;			// previous: 18.0f			(7.80, 10.80, 20.80f); 20.80f leads to interesting resutls/angles
+	testPoint_2.z = 4.70f;
+	*/
 	
 	/*
 	// TEST 03: for generating t2 lines from a single t1 line
@@ -428,22 +523,123 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	testPoint_2.x = -16.0f;
 	testPoint_2.y = 7.00f;		
 	testPoint_2.z = 80.00f;		
+	*/
 
-	// TEST 04: for testing roundToAppropriatePrecision
+	// TEST 04: for testing roundToAppropriatePrecision		(CURRENTLY in  use as of 7/5/2018)
 
-	
+	/*
 	testPoint_0.x = -48.0f;		// previous: -48
 	testPoint_0.y = 16.00f;
 	testPoint_0.z = 16.00f;
 
-	testPoint_1.x = 16.0f;		// previous: 16
-	testPoint_1.y = 10.00f;
-	testPoint_1.z = 16.00f;
+	testPoint_1.x = 16.00f;		// previous: 16			// bugged: 16.00f
+	testPoint_1.y = 10.00f;								// bugged: 10.00f
+	testPoint_1.z = 16.00f;								// bugged: 16.00f
 
 	testPoint_2.x = -16.0f;		// previous: -16
 	testPoint_2.y = -80.00f;	// -80.0f = error!
 	testPoint_2.z = 112.00f;	// previous: 112, current is 180		 // + 68 *should* cause an error.
 	*/
+
+	
+	// TEST 05: right angle with new distance algorithms	-- Seems to be working, 2 and 3 candidate hits are appropriately rounding!
+	/*
+	testPoint_0.x = -12.0f;
+	testPoint_0.y = 10.0f;
+	testPoint_0.z = 10.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 2.0f;
+	testPoint_2.z = 2.0f;
+	*/
+
+	// TEST 06-A: Multi-primary line tracing, segment-end trace
+
+	/**/
+	
+	/*
+	testPoint_0.x = -42.0f;
+	testPoint_0.y = 10.0f;
+	testPoint_0.z = 10.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 2.0f;
+	testPoint_2.z = 2.0f;
+	*/
+	
+	
+	// TEST 06-B: Multi-primary line tracing, segment-end trace
+	
+	testPoint_0.x = -42.0f;
+	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 2.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 2.0f;
+	testPoint_2.z = 2.0f;
+	
+
+	/*
+	// TEST 07-a: Multi-primary line tracing, constructing multiple T2 lines from one T1
+	testPoint_0.x = -24.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 8.0f;
+
+	testPoint_1.x = 24.0f;
+	testPoint_1.y = 12.0f;
+	testPoint_1.z = 12.0f;
+
+	testPoint_2.x = 0.0f;
+	testPoint_2.y = 8.0f;
+	testPoint_2.z = 48.0f;
+	*/
+
+	
+	
+	// TEST 07-b: (reverse direction of 07-a)
+	/*
+	testPoint_0.x = -24.0f; 
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 8.0f;
+
+	testPoint_1.x = 0.0f;
+	testPoint_1.y = 8.0f;
+	testPoint_1.z = 48.0f;
+
+	testPoint_2.x = 24.0f;
+	testPoint_2.y = 12.0f;
+	testPoint_2.z = 12.0f;
+	*/
+	
+
+	
+	// TEST 08: Multi-primary line tracing, constructing multiple T2 lines from T1; 3 lines get constructed here
+	/*
+	testPoint_0.x = -48.0f;
+	testPoint_0.y = 10.0f;
+	testPoint_0.z = -12.0f;
+
+	testPoint_1.x = -16.0f;
+	testPoint_1.y = 20.0f;
+	testPoint_1.z = 24.0f;
+
+	testPoint_2.x = 16.0f;
+	testPoint_2.y = 10.0f;
+	testPoint_2.z = -12.0f;
+	*/
+	
 
 	/*
 	// test #1 for 1000s range point locations

@@ -53,6 +53,7 @@ public:
 	void executeCommandLine();			// runs the command line
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
 	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
+	std::mutex* heapMutexRef;			// a reference to a stored heap mutex ref
 	std::condition_variable commandLineCV;
 private:
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
