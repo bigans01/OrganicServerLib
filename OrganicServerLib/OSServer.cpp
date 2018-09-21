@@ -6,16 +6,9 @@
 
 OSServer::OSServer()
 {
-	//addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
 	constructTestBlueprints();											// construct test blueprints for server-side testing
 	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);						// create organic system
 	organicSystemPtr = &Organic;										// assign pointer
-	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
-	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
-	organicSystemPtr->AddBlueprint(tempKey, blueprintMap[tempKey]);		// assign constructed blueprint to organic system
-	//organicSystemPtr->s
-	//organicSystemPtr->SetupFutureCollectionMM(tempKey);
-	cout << "(POST MM setup) Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 }
 
 OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode)
@@ -26,37 +19,6 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSCManager.initialize(1, 2);			// signal for server mode, 2 threads
 	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));	
-	EnclaveKeyDef::EnclaveKey tempKey;									// temp key for known test blueprint
-
-	// original temp key
-	tempKey.x = -1;
-	tempKey.y = 0;
-	tempKey.z = 0;
-
-	
-	/*
-	// temp key #1 for 1000's location range
-	tempKey.x = 99;
-	tempKey.y = 0;
-	tempKey.z = 0;
-
-	// temp key #1 for 10000's location range
-	tempKey.x = 999;
-	tempKey.y = 0;
-	tempKey.z = 0;
-
-	// temp key #2 for 10000's location range
-	tempKey.x = 999;
-	tempKey.y = 1000;
-	tempKey.z = 0;
-
-	// temp key #3 for 10000's location range
-	tempKey.x = 999;
-	tempKey.y = 1000;
-	tempKey.z = 1000;
-	*/
-
-	cout << "Temp key is: " << tempKey.x << ", " << tempKey.y << ", " << tempKey.z << ", " << endl;	// output
 }
 
 OSServer::~OSServer()
@@ -73,9 +35,7 @@ OSServer::OSServer(int x)
 void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
 	OSContourPlan tempPlan(in_Dir, in_x, in_y, in_z);
-	//contourPlanMap[in_string].planMode = 0;	// add a new plan			<<< ---- error is here (FIXED)
 	contourPlanMap[in_planName] = tempPlan;
-
 }
 
 void OSServer::constructTestBlueprints()
@@ -566,7 +526,7 @@ void OSServer::constructTestBlueprints()
 
 
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work.
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeContourPlan("plan");
 }
 
@@ -588,7 +548,6 @@ void OSServer::executeContourPlan(string in_string)
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 		}
 	}
-	
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -604,7 +563,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 
 void OSServer::determineTriangleCentroid(OSContouredTriangle* in_Triangle)
 {
-
+	// reserved for later, potentially will be axed/deleted
 }
 
 
