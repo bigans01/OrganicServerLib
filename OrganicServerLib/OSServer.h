@@ -37,7 +37,9 @@ public:
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists
 	void constructTestBlueprints();
+	void constructTestBlueprintsV2();
 	void executeContourPlan(string in_string);										// executes operations for all triangle strips in a triangle plan]
+	void executeContourPlanV2(string in_string);
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	OrganicSystem* organicSystemPtr;
@@ -61,6 +63,7 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
+	void traceTriangleThroughBlueprintsV2(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);

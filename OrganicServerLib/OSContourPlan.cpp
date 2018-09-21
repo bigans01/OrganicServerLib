@@ -49,6 +49,54 @@ OSContourPlan::OSContourPlan(const OSContourPlan& plan_a)
 	startPoint = plan_a.startPoint;			// must match corresponding = operator
 }
 
+void OSContourPlan::performSingleTriangleTest()
+{
+	//triangleStripMap[0].triangleMap = c
+}
+
+void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, mutex& heapmutex)
+{
+	std::lock_guard<std::mutex> lock(heapmutex);	// lock for heap usage
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	testPoint_0.x = -42.0f;
+	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 2.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 2.0f;
+	testPoint_2.z = 2.0f;
+	OSContouredTriangle testTriangle;
+	testTriangle.trianglePoints[0] = in_x;
+	testTriangle.trianglePoints[1] = in_y;
+	testTriangle.trianglePoints[2] = in_z;
+	testTriangle.determineLineLengths();
+	testTriangle.determineAxisInterceptDistances();
+	for (int x = 0; x < 3; x++)
+	{
+		CursorPathTraceContainer x_container, y_container, z_container;
+		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+
+		EnclaveKeyDef::EnclaveKey blueprintKey;
+		blueprintKey.x = x_container.CollectionCoord;
+		blueprintKey.y = y_container.CollectionCoord;
+		blueprintKey.z = z_container.CollectionCoord;
+
+		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
+		//currentTriKey.triKey[x] = blueprintKey;
+		testTriangle.pointKeys[x] = blueprintKey;
+	}
+	int baseStripSize = triangleStripMap[0].triangleMap.size();		// get the number of triangles in the base strip, should be 0
+	std::cout << "### Adding new triangle with ID " << baseStripSize;
+	triangleStripMap[0].triangleMap[baseStripSize] = testTriangle;
+}
 
 void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)
 {

@@ -111,6 +111,32 @@ void OSServer::constructTestBlueprints()
 	executeContourPlan("plan");
 }
 
+void OSServer::constructTestBlueprintsV2()
+{
+	std::cout << "||||||| constructing blueprints (version 2)...." << std::endl;
+	addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
+	OSContourPlan* planRef = getContourPlan("plan");		// get pointer to the plan
+
+	// Triangle #1 point data
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	testPoint_0.x = -42.0f;
+	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 2.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 2.0f;
+	testPoint_2.z = 2.0f;
+
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, std::ref(*heapMutexRef));	// this call may need some work.
+	executeContourPlanV2("plan");
+}
+
 void OSServer::executeContourPlan(string in_string)
 {
 	cout << "calling executeContourPlan... (3)" << endl;
@@ -151,6 +177,27 @@ void OSServer::executeContourPlan(string in_string)
 
 	traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 
+}
+
+void OSServer::executeContourPlanV2(string in_string)
+{
+	OSContourPlan* planPtr = &contourPlanMap[in_string];
+	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
+	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
+	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
+	
+	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
+	{
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = stripMapIterator->second.triangleMap.end();
+		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
+		{
+			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
+			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			traceTriangleThroughBlueprintsV2(currentTriangle, planPtr->planDirections);
+		}
+	}
+	
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -750,6 +797,12 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 	cout << ">>>>>ending determineTriangleRelativityToECB" << endl;
 	std::chrono::duration<double> blueelapsed = blueend - bluestart;
 	std::cout << "Elapsed time (Triangle calibration)::: " << blueelapsed.count() << std::endl;
+}
+
+void OSServer::traceTriangleThroughBlueprintsV2(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
+{
+	determineTriangleRelativityToECB(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
+	determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
 }
 
 void OSServer::determineTriangleCentroid(OSContouredTriangle* in_Triangle)

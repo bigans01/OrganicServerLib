@@ -13,9 +13,10 @@
 #include "OSContourPlanDirections.h"
 #include "OSTrianglePoint.h"
 #include "ECBPolyPoint.h"
+#include "OrganicUtils.h"
+#include <mutex>
+#include "CursorPathTraceContainer.h"
 
-// what the hell
-//class OSServer;
 class OSContourPlan
 {
 public:
@@ -46,6 +47,8 @@ public:
 	void amplifyContourLinePoints(int in_lineID);
 	void buildTriangleStrips(int layerDepth);
 	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
+	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, mutex& heapmutex);
+	void performSingleTriangleTest();
 	ECBPolyPoint startPoint;						// the center x/y/z coord of the plan
 	OSContourPlanDirections planDirections;			// the default plan directions, in case there are any perfect clampings
 
