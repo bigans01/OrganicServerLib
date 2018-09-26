@@ -17,6 +17,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
 	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
 	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
+	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	OSCManager.initialize(1, 2);			// signal for server mode, 2 threads
 	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));	
 }
@@ -34,6 +35,7 @@ OSServer::OSServer(int x)
 
 void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
+	std::lock_guard<std::mutex> lock(*heapMutexRef);	// heap mutex lock
 	OSContourPlan tempPlan(in_Dir, in_x, in_y, in_z);
 	contourPlanMap[in_planName] = tempPlan;
 }
@@ -557,8 +559,8 @@ void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
-	determineTriangleRelativityToECB(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
-	determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
+	calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
+	//determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
 }
 
 void OSServer::determineTriangleCentroid(OSContouredTriangle* in_Triangle)
@@ -594,7 +596,23 @@ void OSServer::determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle)
 	std::cout << "(DEBUG ATTEMPT 2) Current poly line count is: " << blueprintMap[debugKey].primaryPolygonMap[0].lineMap.size() << std::endl;
 }
 
-void OSServer::determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
+void OSServer::writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys)
+{
+	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_keys];	// get a pointer to the blueprint
+	std::unordered_map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->primaryPolygonMap.begin();	// beginning of the poly map
+	std::unordered_map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->primaryPolygonMap.end();		// ending of the poly map
+	for (currentPrimaryPoly; currentPrimaryPoly != primaryPolyEnd; ++currentPrimaryPoly)
+	{
+
+	}
+}
+
+void OSServer::analyzeECBPoly(ECBPoly* in_polyRef)
+{
+
+}
+
+void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
 	cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
@@ -989,7 +1007,7 @@ void OSServer::signalServerShutdown(mutex& in_serverMutex)
 
 void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
 {
-
+	std::lock_guard<std::mutex> lock(*heapMutexRef);
 	// STEP 1:	set appropriate values of keys 
 	EnclaveKeyDef::EnclaveKey originPointKey;
 	EnclaveKeyDef::EnclaveKey endPointKey;
@@ -1018,7 +1036,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
 			blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
-			
+			OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 		}
 		else  // polygon wasn't found, it needs to be created
 		{
@@ -1519,6 +1537,7 @@ void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangl
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 {
+	std::lock_guard<std::mutex> lock(*heapMutexRef);	// heap mutex lock
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintMapIterator;
 	blueprintMapIterator = blueprintMap.find(in_Key);
 	if (blueprintMapIterator != blueprintMap.end())

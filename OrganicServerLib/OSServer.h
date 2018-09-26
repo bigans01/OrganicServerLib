@@ -19,6 +19,7 @@
 #include "ECBPolyLine.h"
 #include "ECBPolyPointTri.h"
 #include "EnclaveKeyTri.h"
+#include "OSWinAdapter.h"
 #include <unordered_map>
 #include <string>
 #include <chrono>
@@ -34,8 +35,8 @@ public:
 	OSServer(int x);
 	OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode);
 	~OSServer();						// destructor; required for deletion of threads
-	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap
-	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);					// returns 1 if blueprint exists
+	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
+	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
 	void constructTestBlueprints();
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
@@ -61,13 +62,15 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);		// constructs primary polygon lines for each line of the contoured triangle that the 
-	void determineTriangleRelativityToECB(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
+	void calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
+	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
+	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
-	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);
+	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);		// currently unused, should be axed at a later time
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);				// after the lines of a contoured triangle have been calibrated, this function traces the lines through the "world" and adds 1 new polygon (along with 1 primary line in that polygon) for each blueprint the line passes through.
-	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);
+	void tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID);		// traces a point (line) through the blueprints it will traverse (requires heap mutex)
 	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);
 	int checkServerStatus(mutex& in_serverReadWrite);
 	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus);
