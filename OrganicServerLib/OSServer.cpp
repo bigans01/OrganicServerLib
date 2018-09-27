@@ -18,6 +18,7 @@ OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, in
 	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
 	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
+	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, 2);			// signal for server mode, 2 threads
 	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));	
 }
@@ -548,6 +549,18 @@ void OSServer::executeContourPlan(string in_string)
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+
+			// write (overwrite) a blueprint file for each blueprint traversed
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorEnd = currentTriangle->polygonPieceMap.end();
+			for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
+			{
+				EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
+				std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
+				EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
+				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, blueprintRef);
+			}
+
 		}
 	}
 }
@@ -610,6 +623,11 @@ void OSServer::writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys)
 void OSServer::analyzeECBPoly(ECBPoly* in_polyRef)
 {
 
+}
+
+void OSServer::setCurrentWorld(std::string in_worldName)
+{
+	currentWorld = in_worldName;
 }
 
 void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
@@ -1036,7 +1054,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
 			blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
-			OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
+			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 		}
 		else  // polygon wasn't found, it needs to be created
 		{
@@ -1049,6 +1067,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
 			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
+			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			in_Triangle->addPolygonPiece(incrementingKey, elementID);
 			
 		}
@@ -1079,6 +1098,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			int currentBlueprintPolyMapSize = blueprintPtr->primaryPolygonMap.size();
 			blueprintPtr->primaryPolygonMap[currentBlueprintPolyMapSize] = newPoly;		// insert a new polygon; the ID will be equalto the size
+			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			in_Triangle->addPolygonPiece(incrementingKey, currentBlueprintPolyMapSize);
 
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);

@@ -50,6 +50,7 @@ public:
 	int serverRunMode = 0;				// will be set in constructor
 	int isCommandLineRunning = 1;
 	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
+	std::string currentWorld;
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
@@ -65,6 +66,7 @@ private:
 	void calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
+	void setCurrentWorld(std::string in_worldName);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
