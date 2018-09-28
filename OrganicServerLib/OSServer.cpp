@@ -921,14 +921,14 @@ void OSServer::runServer()
 {
 	if (serverRunMode == 0)				// server would be alone, with no instance of an OrganicSystem (prototype only, uncertain of use)
 	{
-		while (checkServerStatus(std::ref(serverReadWrite)) == 1)
+		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0)	// run until the command line is shutdown
 		{
 
 		}
 	}
 	else if (serverRunMode == 1)		// server runs actively alongside an instance of an OrganicSystem
 	{
-		while (checkServerStatus(std::ref(serverReadWrite)) == 1)		// run until the server is shutdown
+		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0) // ""
 		{
 			organicSystemPtr->runOrganicTick();
 		}
@@ -946,7 +946,6 @@ void OSServer::executeCommandLine()
 int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus)
 {
 	std::cout << ">> Job submission begin..." << std::endl;
-	int isCommandLineRunning = 1;
 	int* isCommandLineRunningPtr = &in_commandLineRunningStatus;
 	while (*isCommandLineRunningPtr == 1)
 	{
