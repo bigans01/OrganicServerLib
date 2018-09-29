@@ -4,23 +4,17 @@
 //#include "OSContourPlan.h"
 //#include "shitTest.h"
 
-OSServer::OSServer()
+OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves)
 {
-	constructTestBlueprints();											// construct test blueprints for server-side testing
-	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);						// create organic system
-	organicSystemPtr = &Organic;										// assign pointer
-}
-
-OSServer::OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode)
-{
-	organicSystemPtr = in_organicSystemPtr;	// set organicSystemPtr
-	numberOfSlaves = in_numberOfSlaves;		// set number of slaves
-	serverRunMode = in_serverRunMode;		// set the run mode (0, 1, 2, 3) etc
+	client.createOS(numberOfFactories, T1_bufferCubeSize, T2_bufferCubeSize, windowWidth, windowHeight, serverMode);		// create the client's OS
+	organicSystemPtr = client.OS;																							// assign organicSystemPtr to the client's OS
+	numberOfSlaves = serverSlaves;		// set number of slaves
+	serverRunMode = serverMode;		// set the run mode (0, 1, 2, 3) etc
 	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, 2);			// signal for server mode, 2 threads
-	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));	
+	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
 }
 
 OSServer::~OSServer()
@@ -28,11 +22,7 @@ OSServer::~OSServer()
 	//deleteSlaves();
 }
 
-OSServer::OSServer(int x)
-{
-	OrganicSystem Organic(3, 3, 13, 1024, 768, 3);
-	organicSystemPtr = &Organic;
-}
+
 
 void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
@@ -559,6 +549,9 @@ void OSServer::executeContourPlan(string in_string)
 				std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
 				EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
 				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, blueprintRef);
+				EnclaveCollectionBlueprint readBackBP;
+				OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, &readBackBP);
+				OSWinAdapter::outputBlueprintStats(&readBackBP);
 			}
 
 		}

@@ -24,6 +24,7 @@
 #include <string>
 #include <chrono>
 #include <mutex>
+#include "OrganicClient.h"
 
 
 
@@ -31,9 +32,10 @@ class OSServer
 {
 public:
 	
-	OSServer();
-	OSServer(int x);
-	OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode);
+	//OSServer();
+	//OSServer(int x);
+	//OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode);
+	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);
 	~OSServer();						// destructor; required for deletion of threads
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
@@ -41,7 +43,9 @@ public:
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
-	OrganicSystem* organicSystemPtr;
+	OrganicClient client;				// client holder
+	std::shared_ptr<OrganicSystem> organicSystemPtr;
+	//std::shared_ptr<OrganicSystem> sharedOSPtr;
 	OrganicStemcellManager OSCManager;
 	OSCommandDirector OSdirector;
 	friend class OSTriangleLineTraverser;
