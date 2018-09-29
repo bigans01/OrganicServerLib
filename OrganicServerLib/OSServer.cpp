@@ -8,12 +8,34 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 {
 	client.createOS(numberOfFactories, T1_bufferCubeSize, T2_bufferCubeSize, windowWidth, windowHeight, serverMode);		// create the client's OS
 	organicSystemPtr = client.OS;																							// assign organicSystemPtr to the client's OS
-	numberOfSlaves = serverSlaves;		// set number of slaves
+	numberOfSlaves = serverSlaves;		// set number of server slaves
 	serverRunMode = serverMode;		// set the run mode (0, 1, 2, 3) etc
 	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
-	OSCManager.initialize(1, 2);			// signal for server mode, 2 threads
+	OSCManager.initialize(1, serverSlaves);			// signal for server mode, 2 threads
+	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
+}
+
+OSServer::OSServer()
+{
+	ServerProperties serverProperties = OSWinAdapter::readServerProperties();
+	std::cout << "++++++Performing startup via pre-defined server properties++++++" << std::endl;
+	std::cout << "Factories: " << serverProperties.factoryCount << std::endl;
+	std::cout << "T1 size: " << serverProperties.T1_bufferCubeSize << std::endl;
+	std::cout << "T2 size: " << serverProperties.T2_bufferCubeSize << std::endl;
+	std::cout << "OpenGL width: " << serverProperties.windowWidth << std::endl;
+	std::cout << "OpenGL height: " << serverProperties.windowHeight << std::endl;
+	std::cout << "Run mode: " << serverProperties.runMode << std::endl;
+	std::cout << "Server slaves: " << serverProperties.serverSlaves << std::endl;
+	client.createOS(serverProperties.factoryCount, serverProperties.T1_bufferCubeSize, serverProperties.T2_bufferCubeSize, serverProperties.windowWidth, serverProperties.windowHeight, serverProperties.runMode);		// create the client's OS
+	organicSystemPtr = client.OS;																							// assign organicSystemPtr to the client's OS
+	numberOfSlaves = serverProperties.serverSlaves;		// set number of server slaves
+	serverRunMode = serverProperties.runMode;		// set the run mode (0, 1, 2, 3) etc
+	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
+	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
+	setCurrentWorld("test");	// test world folder
+	OSCManager.initialize(1, serverProperties.serverSlaves);			// signal for server mode, 2 threads
 	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
 }
 

@@ -25,17 +25,15 @@
 #include <chrono>
 #include <mutex>
 #include "OrganicClient.h"
+#include "ServerProperties.h"
 
 
 
 class OSServer
 {
 public:
-	
-	//OSServer();
-	//OSServer(int x);
-	//OSServer(OrganicSystem* in_organicSystemPtr, int in_numberOfSlaves, int in_serverRunMode);
-	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);
+	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
+	OSServer();			// will read from server properties file to start
 	~OSServer();						// destructor; required for deletion of threads
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
