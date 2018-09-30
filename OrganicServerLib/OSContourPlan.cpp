@@ -57,6 +57,7 @@ void OSContourPlan::performSingleTriangleTest()
 void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, mutex& heapmutex)
 {
 	std::lock_guard<std::mutex> lock(heapmutex);	// lock for heap usage
+	/*
 	ECBPolyPoint testPoint_0;
 	ECBPolyPoint testPoint_1;
 	ECBPolyPoint testPoint_2;
@@ -71,6 +72,7 @@ void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyP
 	testPoint_2.x = -8.3f;
 	testPoint_2.y = 2.0f;
 	testPoint_2.z = 2.0f;
+	*/
 	OSContouredTriangle testTriangle;
 	testTriangle.trianglePoints[0] = in_x;
 	testTriangle.trianglePoints[1] = in_y;

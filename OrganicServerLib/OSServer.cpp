@@ -433,6 +433,12 @@ void OSServer::constructTestBlueprints()
 	testPoint_2.y = 2.0f;
 	testPoint_2.z = 2.0f;
 
+	
+	ECBPolyPoint testPoint_4;
+	testPoint_4.x = -8.3f;
+	testPoint_4.y = 2.0f;
+	testPoint_4.z = 20.0f;
+	
 
 	/*
 	// TEST 07-a: Multi-primary line tracing, constructing multiple T2 lines from one T1
@@ -542,6 +548,7 @@ void OSServer::constructTestBlueprints()
 
 
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeContourPlan("plan");
 }
 
