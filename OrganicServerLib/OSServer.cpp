@@ -547,8 +547,9 @@ void OSServer::constructTestBlueprints()
 
 
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeContourPlan("plan");
 }
 
