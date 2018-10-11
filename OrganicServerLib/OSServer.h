@@ -32,34 +32,38 @@
 class OSServer
 {
 public:
-	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
-	OSServer();			// will read from server properties file to start
-	~OSServer();						// destructor; required for deletion of threads
-	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
-	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
-	void constructTestBlueprints();
-	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
-	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
-	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
-	OrganicClient client;				// client holder
+
+	OrganicClient client;
 	std::shared_ptr<OrganicSystem> organicSystemPtr;
-	//std::shared_ptr<OrganicSystem> sharedOSPtr;
 	OrganicStemcellManager OSCManager;
 	OSCommandDirector OSdirector;
-	friend class OSTriangleLineTraverser;
 	short isServerActive = 1;			// flag for determining server
 	short numberOfSlaves = 0;			// number of slave threads
 	int serverRunMode = 0;				// will be set in constructor
 	int isCommandLineRunning = 1;
 	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
 	std::string currentWorld;
-	void runServer();					// runs the server, after the command line has been set up.
-	void executeCommandLine();			// runs the command line
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
 	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
 	std::mutex* heapMutexRef;			// a reference to a stored heap mutex ref
 	std::condition_variable commandLineCV;
+	//OrganicClient client;				// client holder
+
+	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
+	OSServer();			// will read from server properties file to start
+	~OSServer();						// destructor; required for deletion of threads
+
+	void runServer();					// runs the server, after the command line has been set up.
+	void executeCommandLine();			// runs the command line
+	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
+	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
+	void constructTestBlueprints();
+	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
+	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
+	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
+	
 private:
+	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints

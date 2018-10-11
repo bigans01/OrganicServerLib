@@ -421,8 +421,8 @@ void OSServer::constructTestBlueprints()
 
 	// TEST 06-B: Multi-primary line tracing, segment-end trace
 
-	testPoint_0.x = -42.0f;
-	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.x = -122.0f;			// test: 82, 150, 122
+	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short; bug for -2.4 fixed see (10/3/2018)
 	testPoint_0.z = 2.0f;
 
 	testPoint_1.x = -4.0f;
@@ -433,11 +433,33 @@ void OSServer::constructTestBlueprints()
 	testPoint_2.y = 2.0f;
 	testPoint_2.z = 2.0f;
 
+
+
 	
 	ECBPolyPoint testPoint_4;
 	testPoint_4.x = -8.3f;
 	testPoint_4.y = 2.0f;
 	testPoint_4.z = 20.0f;
+
+	
+	/*
+	// perfect clamp test
+	testPoint_0.x = -42.0f;
+	testPoint_0.y = 10.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short; bug for -2.4 fixed see (10/3/2018)
+	testPoint_0.z = 2.0f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = 10.0f;
+	testPoint_1.z = 10.0f;
+
+	testPoint_2.x = -8.3f;
+	testPoint_2.y = 10.0f;
+	testPoint_2.z = 2.0f;
+
+	testPoint_4.x = -8.3f;
+	testPoint_4.y = 10.0f;
+	testPoint_4.z = 20.0f;
+	*/
 	
 
 	/*
@@ -547,9 +569,11 @@ void OSServer::constructTestBlueprints()
 
 
 
-	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
+	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
 	executeContourPlan("plan");
 }
 
@@ -590,7 +614,7 @@ void OSServer::executeContourPlan(string in_string)
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
-	organicSystemPtr->AddBlueprint(in_key, blueprintMap[in_key]);		// assign constructed blueprint to organic system
+	organicSystemPtr->AddBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
