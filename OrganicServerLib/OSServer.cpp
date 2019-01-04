@@ -569,8 +569,8 @@ void OSServer::constructTestBlueprints()
 
 
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 5, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 5, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
@@ -613,11 +613,11 @@ void OSServer::constructTestBlueprints2()
 	testPoint_5.y = 7.0f;
 	testPoint_5.z = 15.0f;
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 10, std::ref(*heapMutexRef));
 	executeContourPlan("plan");
 }
 
@@ -661,7 +661,14 @@ void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 	organicSystemPtr->AddBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
 }
 
-void OSServer::transferAllBlueprintsToLocalOS()
+void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
+{
+	transferBlueprintToLocalOS(in_key);
+	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
+	organicSystemPtr->AddKeyToRenderList(in_key);
+}
+
+void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 {
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintBegin = blueprintMap.begin();
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintEnd = blueprintMap.end();
@@ -1163,6 +1170,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		{
 			
 			ECBPoly newPoly;
+			newPoly.materialID = in_Triangle->materialID;
 			fillPolyWithClampResult(&newPoly, in_Triangle);
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
@@ -1197,6 +1205,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		else  // polygon wasn't found, it needs to be created
 		{
 			ECBPoly newPoly;
+			newPoly.materialID = in_Triangle->materialID;
 			fillPolyWithClampResult(&newPoly, in_Triangle);
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];
 			int currentBlueprintPolyMapSize = blueprintPtr->primaryPolygonMap.size();

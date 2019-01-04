@@ -50,7 +50,7 @@ public:
 	//OrganicClient client;				// client holder
 
 	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
-	OSServer();			// will read from server properties file to start
+	OSServer();							// will read from server properties file to start
 	~OSServer();						// destructor; required for deletion of threads
 
 	void runServer();					// runs the server, after the command line has been set up.
@@ -60,8 +60,8 @@ public:
 	void constructTestBlueprints();
 	void constructTestBlueprints2();
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
-	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
-	void transferAllBlueprintsToLocalOS();		// transfers all processed blueprints to the local OS.
+	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
+	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	
 private:
@@ -75,6 +75,7 @@ private:
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
+	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);

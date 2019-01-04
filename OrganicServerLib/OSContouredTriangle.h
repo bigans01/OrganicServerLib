@@ -22,7 +22,8 @@ public:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBBorderValues, EnclaveKeyDef::KeyHasher> ecbBorderMap;
 	//std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> 
 	OSContouredTriangle();
-	int isTriangleFlat = 0;				// set to 1 if the Triangle is flat (all points on same y level)
+	short isTriangleFlat = 0;				// set to 1 if the Triangle is flat (all points on same y level)
+	short materialID = 0;				// what is the material made of? stone, brick, snow, dirt, etc?
 	int perfect_clamp_x = 0;			// are all 3 points of this triangle perfectly on x axis?
 	int perfect_clamp_y = 0;			// ...y axis?
 	int perfect_clamp_z = 0;			// ...z axis?
