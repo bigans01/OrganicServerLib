@@ -577,6 +577,50 @@ void OSServer::constructTestBlueprints()
 	executeContourPlan("plan");
 }
 
+void OSServer::constructTestBlueprints2() 
+{
+	std::cout << "||||||| constructing blueprints (version 2)...." << std::endl;
+	addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
+	OSContourPlan* planRef = getContourPlan("plan");		// get pointer to the plan
+
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	ECBPolyPoint testPoint_3;
+	ECBPolyPoint testPoint_4;
+	ECBPolyPoint testPoint_5;
+	testPoint_0.x = 16.5f;
+	testPoint_0.y = 8.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 20.5f;
+
+	testPoint_1.x = 13.5f;
+	testPoint_1.y = 7.0f;
+	testPoint_1.z = 26.0f;
+
+	testPoint_2.x = 17.5f;
+	testPoint_2.y = 7.0f;
+	testPoint_2.z = 26.0f;
+
+	testPoint_3.x = 25.5f;
+	testPoint_3.y = 7.0f;
+	testPoint_3.z = 17.0f;
+
+	testPoint_4.x = 16.5f;
+	testPoint_4.y = 7.0f;
+	testPoint_4.z = 15.0f;
+
+	testPoint_5.x = 7.5f;
+	testPoint_5.y = 7.0f;
+	testPoint_5.z = 15.0f;
+
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, std::ref(*heapMutexRef));
+	executeContourPlan("plan");
+}
+
 void OSServer::executeContourPlan(string in_string)
 {
 	OSContourPlan* planPtr = &contourPlanMap[in_string];
@@ -615,6 +659,19 @@ void OSServer::executeContourPlan(string in_string)
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
 	organicSystemPtr->AddBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
+}
+
+void OSServer::transferAllBlueprintsToLocalOS()
+{
+	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintBegin = blueprintMap.begin();
+	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintEnd = blueprintMap.end();
+	for (blueprintBegin; blueprintBegin != blueprintEnd; blueprintBegin++)
+	{
+		EnclaveKeyDef::EnclaveKey currentKey = blueprintBegin->first;
+		transferBlueprintToLocalOS(currentKey);
+		organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
+		organicSystemPtr->AddKeyToRenderList(currentKey);
+	}
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)

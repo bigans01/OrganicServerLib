@@ -58,8 +58,10 @@ public:
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
 	void constructTestBlueprints();
+	void constructTestBlueprints2();
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
+	void transferAllBlueprintsToLocalOS();		// transfers all processed blueprints to the local OS.
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	
 private:
