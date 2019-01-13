@@ -53,6 +53,15 @@ void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, flo
 	contourPlanMap[in_planName] = tempPlan;
 }
 
+void OSServer::addContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
+{
+	std::cout << "Adding new contour plan... (style 2)" << std::endl;
+	OSContourPlan tempPlan(in_polyPoint);
+	contourPlanMap[in_planName] = tempPlan;
+	OSContourPlan* tempPlanRef = &contourPlanMap[in_planName];
+	tempPlanRef->setFormation(in_Formation, in_polyPoint, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
+}
+
 void OSServer::constructTestBlueprints()
 {
 	//planRef->addContourLine(0, 15.0f, 70.0f, 8, passPoint);
@@ -619,6 +628,56 @@ void OSServer::constructTestBlueprints2()
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 10, std::ref(*heapMutexRef));
 	executeContourPlan("plan");
+}
+
+void OSServer::constructTestBlueprints3()
+{
+	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	mountainSummit.y = 30;
+	mountainSummit.x = 0;
+	mountainSummit.z = 0;
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 10, 9, 9);
+	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
+	std::cout << "Number of contour lines: " << planRef->contourLineMap.size() << std::endl;
+	OSContourLine* lineRef = &planRef->contourLineMap[0];
+	std::cout << "Line ref acquired... >>>" << std::endl;
+	std::cout << "Mountain summit is: " << mountainSummit.x << ", " << mountainSummit.y << ", " << mountainSummit.z << std::endl;
+	std::cout << "Point 0 is: " << lineRef->smartContourPoint[0].getPolyPoint().x << ", " << lineRef->smartContourPoint[0].getPolyPoint().y << ", " << lineRef->smartContourPoint[0].getPolyPoint().z << std::endl;
+	std::cout << "Point 1 is: " << lineRef->smartContourPoint[1].getPolyPoint().x << ", " << lineRef->smartContourPoint[1].getPolyPoint().y << ", " << lineRef->smartContourPoint[1].getPolyPoint().z << std::endl;
+	std::cout << "Point 2 is: " << lineRef->smartContourPoint[2].getPolyPoint().x << ", " << lineRef->smartContourPoint[2].getPolyPoint().y << ", " << lineRef->smartContourPoint[2].getPolyPoint().z << std::endl;
+	std::cout << "Point 3 is: " << lineRef->smartContourPoint[3].getPolyPoint().x << ", " << lineRef->smartContourPoint[3].getPolyPoint().y << ", " << lineRef->smartContourPoint[3].getPolyPoint().z << std::endl;
+
+	// for summit at 30, 5, 5
+	ECBPolyPoint otherPoint0;
+	otherPoint0.x = 14;
+	otherPoint0.y = 20;
+	otherPoint0.z = 5;
+
+	ECBPolyPoint otherPoint1;
+	otherPoint1.x = 5;
+	otherPoint1.y = 20;
+	otherPoint1.z = 14;
+
+	ECBPolyPoint otherPoint2;
+	otherPoint2.x = -4;
+	otherPoint2.y = 20;
+	otherPoint2.z = 5;
+
+	ECBPolyPoint otherPoint3;
+	otherPoint3.x = 5;
+	otherPoint3.y = 20;
+	otherPoint3.z = -4;
+
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10, std::ref(*heapMutexRef));
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10, std::ref(*heapMutexRef));
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10, std::ref(*heapMutexRef));
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+	executeContourPlan("mountain");
 }
 
 void OSServer::executeContourPlan(string in_string)

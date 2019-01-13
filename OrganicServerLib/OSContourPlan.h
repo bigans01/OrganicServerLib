@@ -12,6 +12,8 @@
 #include "OSContouredTriangleStrip.h"
 #include "OSContourPlanDirections.h"
 #include "OSTrianglePoint.h"
+#include "OSTerrainFormation.h"
+#include "OSTerrainFormation.h"
 #include "ECBPolyPoint.h"
 #include "OrganicUtils.h"
 #include <mutex>
@@ -23,19 +25,35 @@ public:
 	
 	OSContourPlan(OSPDir in_Dir, float in_x, float in_y, float in_z);
 	OSContourPlan(OSTrianglePoint in_Point);
+	OSContourPlan(ECBPolyPoint in_Point);
+	OSContourPlan(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	OSContourPlan();
 
 	OSContourPlan(const OSContourPlan& plan_a);				// explicit copy constructor
 	OSContourPlan& operator=(OSContourPlan&& plan_a)
 	{
 		planDirections = plan_a.planDirections;
+		terrainFormation = plan_a.terrainFormation;
+		
+		/*
+		unordered_map<int, OSContourLine>::iterator contourLineBegin = plan_a.contourLineMap.begin();
+		unordered_map<int, OSContourLine>::iterator contourLineEnd = plan_a.contourLineMap.end();
+		for (contourLineBegin; contourLineBegin != contourLineEnd; contourLineBegin++)
+		{
+			int currentIndex = contourLineBegin->first;
+			contourLineMap[currentIndex] = contourLineBegin->second;
+			std::cout << "Wooooo 1" << std::endl;
+		}
+		*/
 		return *this;
 	}
 
 	OSContourPlan& operator=(const OSContourPlan& plan_a)
 	{
 		planDirections = plan_a.planDirections;
+		terrainFormation = plan_a.terrainFormation;
 		startPoint = plan_a.startPoint;
+		std::cout << "Wooooo 2" << std::endl;
 		return *this;
 	}
 
@@ -49,9 +67,10 @@ public:
 	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
 	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID, mutex& heapmutex);
 	void performSingleTriangleTest();
+	void setFormation(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	ECBPolyPoint startPoint;						// the center x/y/z coord of the plan
 	OSContourPlanDirections planDirections;			// the default plan directions, in case there are any perfect clampings
-
+	OSTerrainFormation terrainFormation = OSTerrainFormation::NOVAL;
 private:
 	friend class OSServer;
 	unordered_map<int, OSContourLine> contourLineMap;
@@ -60,6 +79,9 @@ private:
 	int contourLineCount = 0;			// the number of contour lines in contourLineMap
 	int planMode = 0;					// 0 is default
 	int numberOfTriangleStrips = 0;
+	//float layerDistance = 0.0f;
+	//float startRadius = 0.0f;
+	//float expansionValue
 	
 
 };

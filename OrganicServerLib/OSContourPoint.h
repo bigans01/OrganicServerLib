@@ -1,4 +1,5 @@
 #pragma once
+#include "ECBPolyPoint.h"
 
 class OSContourPoint
 {
@@ -12,5 +13,5 @@ public:
 	OSContourPoint(float in_angle);
 	OSContourPoint(float in_angle, float in_x, float in_y, float in_z);
 	OSContourPoint();
-
+	ECBPolyPoint getPolyPoint();
 };

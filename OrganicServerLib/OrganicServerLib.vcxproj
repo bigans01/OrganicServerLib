@@ -152,6 +152,7 @@
     <ClInclude Include="OSContourPlanDirections.h" />
     <ClInclude Include="OSContourPoint.h" />
     <ClInclude Include="OSServer.h" />
+    <ClInclude Include="OSTerrainFormation.h" />
     <ClInclude Include="OSTriangleLine.h" />
     <ClInclude Include="OSTriangleLineTraverser.h" />
     <ClInclude Include="OSTrianglePoint.h" />

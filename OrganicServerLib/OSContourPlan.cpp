@@ -39,6 +39,30 @@ OSContourPlan::OSContourPlan(OSTrianglePoint in_Point)
 	//startPoint = in_Point;
 }
 
+OSContourPlan::OSContourPlan(ECBPolyPoint in_Point)
+{
+
+}
+
+OSContourPlan::OSContourPlan(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
+{
+	terrainFormation = in_Formation;
+	startPoint = in_startPoint;
+
+	if (in_Formation == OSTerrainFormation::MOUNTAIN)
+	{
+		// set up the first contour line
+		float currentYElevation = in_startPoint.y - in_distanceBetweenLayers;
+		addContourLine(contourLineCount, in_startRadius, currentYElevation, 4, in_startPoint);
+		amplifyContourLinePoints(0);
+		std::cout << "Preparing cycle..." << std::endl;
+		for (int x = 0; x < 4; x++)
+		{
+			std::cout << x << ": " << "(" << contourLineMap[0].smartContourPoint[x].x << ", " << contourLineMap[0].smartContourPoint[x].y << ", " << contourLineMap[0].smartContourPoint[x].z << ") " << std::endl;
+		}
+	}
+}
+
 OSContourPlan::OSContourPlan()
 {
 	// for adding into unordered map
@@ -52,6 +76,25 @@ OSContourPlan::OSContourPlan(const OSContourPlan& plan_a)
 void OSContourPlan::performSingleTriangleTest()
 {
 	//triangleStripMap[0].triangleMap = c
+}
+
+void OSContourPlan::setFormation(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
+{
+	terrainFormation = in_Formation;
+	startPoint = in_startPoint;
+
+	if (in_Formation == OSTerrainFormation::MOUNTAIN)
+	{
+		// set up the first contour line
+		float currentYElevation = in_startPoint.y - in_distanceBetweenLayers;
+		addContourLine(contourLineCount, in_startRadius, currentYElevation, 4, in_startPoint);
+		amplifyContourLinePoints(0);
+		std::cout << "Preparing cycle..." << std::endl;
+		for (int x = 0; x < 4; x++)
+		{
+			std::cout << x << ": " << "(" << contourLineMap[0].smartContourPoint[x].x << ", " << contourLineMap[0].smartContourPoint[x].y << ", " << contourLineMap[0].smartContourPoint[x].z << ") " << std::endl;
+		}
+	}
 }
 
 void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID, mutex& heapmutex)

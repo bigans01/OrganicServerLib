@@ -8,6 +8,7 @@ OSContourLine::OSContourLine(float in_baseDistance, float in_contourElevation, i
 	contourElevation = in_contourElevation;
 	numberOfPoints = in_numberOfPoints;
 	centerPoint = in_trianglePoint;
+	centerPoint.y = in_contourElevation;
 	addPoints();
 }
 
@@ -106,6 +107,7 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 			contourPointPointer->x = Xvalue + centerPoint.x;
 			contourPointPointer->y = centerPoint.y;
 			contourPointPointer->z = Zvalue + centerPoint.z;
+			smartContourPoint[in_pointIndex] = roundToHundredths(smartContourPoint[in_pointIndex]);
 			pointWithinField = 1;
 		}
 	}
@@ -122,8 +124,16 @@ void OSContourLine::amplifyPoint(int in_pointIndex, float in_pointAngle)
 		contourPointPointer->x = Xvalue + centerPoint.x;
 		contourPointPointer->y = centerPoint.y;
 		contourPointPointer->z = Zvalue + centerPoint.z;
+		smartContourPoint[in_pointIndex] = roundToHundredths(smartContourPoint[in_pointIndex]);
 		//cout << "Final distance line is: (no amp field) " << finalDistance << endl;
 	}
 }
 
-
+OSContourPoint OSContourLine::roundToHundredths(OSContourPoint in_contourPoint)
+{
+	OSContourPoint returnPoint;
+	returnPoint.x = floor(in_contourPoint.x * 100 + 0.5) / 100;
+	returnPoint.y = floor(in_contourPoint.y * 100 + 0.5) / 100;
+	returnPoint.z = floor(in_contourPoint.z * 100 + 0.5) / 100;
+	return returnPoint;
+}

@@ -19,3 +19,12 @@ OSContourPoint::OSContourPoint(float in_angle)
 {
 	point_angle = in_angle;
 }
+
+ECBPolyPoint OSContourPoint::getPolyPoint()
+{
+	ECBPolyPoint returnPoint;
+	returnPoint.x = x;
+	returnPoint.y = y;
+	returnPoint.z = z;
+	return returnPoint;
+}

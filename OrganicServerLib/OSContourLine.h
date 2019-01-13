@@ -49,6 +49,7 @@ public:
 		pointCurrentIndex = line_a.pointCurrentIndex;				// <---- error is here 
 		numberOfPoints = line_a.numberOfPoints;
 		centerPoint = line_a.centerPoint;
+		/**/
 		smartContourPoint.reset(new OSContourPoint[numberOfPoints]);
 		for (int x = 0; x < numberOfPoints; x++)
 		{
@@ -74,7 +75,7 @@ public:
 	void amplifyPoint(int in_pointIndex, float in_pointAngle);
 	void amplifyAllPoints();
 	void addPoints();
-
+	OSContourPoint roundToHundredths(OSContourPoint in_contourPoint);
 };
 
 #endif

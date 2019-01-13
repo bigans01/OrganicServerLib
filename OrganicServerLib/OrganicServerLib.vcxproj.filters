@@ -63,6 +63,9 @@
     <ClInclude Include="OSCommandDirector.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OSTerrainFormation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
