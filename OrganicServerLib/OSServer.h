@@ -57,16 +57,17 @@ public:
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
 	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
-	void addContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void addContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
 	void constructTestBlueprints();
 	void constructTestBlueprints2();
 	void constructTestBlueprints3();	// for mountain testing
+	void constructTestBlueprints4();	// side testing
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
-	
+	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 private:
 	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
@@ -78,7 +79,6 @@ private:
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
-	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);

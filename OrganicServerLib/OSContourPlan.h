@@ -34,7 +34,6 @@ public:
 	{
 		planDirections = plan_a.planDirections;
 		terrainFormation = plan_a.terrainFormation;
-		
 		/*
 		unordered_map<int, OSContourLine>::iterator contourLineBegin = plan_a.contourLineMap.begin();
 		unordered_map<int, OSContourLine>::iterator contourLineEnd = plan_a.contourLineMap.end();
@@ -65,9 +64,11 @@ public:
 	void amplifyContourLinePoints(int in_lineID);
 	void buildTriangleStrips(int layerDepth);
 	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
+	void constructStripTriangles(int in_stripID, int in_materialID, mutex& heapmutex);
 	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID, mutex& heapmutex);
 	void performSingleTriangleTest();
-	void setFormation(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void setFormationBaseContourPoints(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void amplifyAllContourLinePoints();
 	ECBPolyPoint startPoint;						// the center x/y/z coord of the plan
 	OSContourPlanDirections planDirections;			// the default plan directions, in case there are any perfect clampings
 	OSTerrainFormation terrainFormation = OSTerrainFormation::NOVAL;
@@ -75,7 +76,6 @@ private:
 	friend class OSServer;
 	unordered_map<int, OSContourLine> contourLineMap;
 	unordered_map<int, OSContouredTriangleStrip> triangleStripMap;
-
 	int contourLineCount = 0;			// the number of contour lines in contourLineMap
 	int planMode = 0;					// 0 is default
 	int numberOfTriangleStrips = 0;

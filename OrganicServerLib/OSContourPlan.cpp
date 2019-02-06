@@ -41,7 +41,7 @@ OSContourPlan::OSContourPlan(OSTrianglePoint in_Point)
 
 OSContourPlan::OSContourPlan(ECBPolyPoint in_Point)
 {
-
+	startPoint = in_Point;
 }
 
 OSContourPlan::OSContourPlan(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
@@ -78,7 +78,7 @@ void OSContourPlan::performSingleTriangleTest()
 	//triangleStripMap[0].triangleMap = c
 }
 
-void OSContourPlan::setFormation(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
+void OSContourPlan::setFormationBaseContourPoints(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
 {
 	terrainFormation = in_Formation;
 	startPoint = in_startPoint;
@@ -86,6 +86,7 @@ void OSContourPlan::setFormation(OSTerrainFormation in_Formation, ECBPolyPoint i
 	if (in_Formation == OSTerrainFormation::MOUNTAIN)
 	{
 		// set up the first contour line
+		/*
 		float currentYElevation = in_startPoint.y - in_distanceBetweenLayers;
 		addContourLine(contourLineCount, in_startRadius, currentYElevation, 4, in_startPoint);
 		amplifyContourLinePoints(0);
@@ -94,6 +95,30 @@ void OSContourPlan::setFormation(OSTerrainFormation in_Formation, ECBPolyPoint i
 		{
 			std::cout << x << ": " << "(" << contourLineMap[0].smartContourPoint[x].x << ", " << contourLineMap[0].smartContourPoint[x].y << ", " << contourLineMap[0].smartContourPoint[x].z << ") " << std::endl;
 		}
+		*/
+
+		float currentY = in_startPoint.y;
+		int currentNumberOfPoints = 4;				// first layer always starts with 4 points (for now, this will probably change later)
+		float currentRadius = in_startRadius;		// set the start radius
+		for (int x = 0; x < in_numberOfLayers; x++)
+		{
+			currentY -= in_distanceBetweenLayers;	// subtract the distance between layers for each layer being added
+			if (x != 0)								// it isn't necessary to add on to the radius for the very first strip
+			{
+				currentRadius += in_expansionValue;
+				currentNumberOfPoints += 4;
+			}
+			addContourLine(contourLineCount, currentRadius, currentY, currentNumberOfPoints, in_startPoint);
+		}
+	}
+}
+
+void OSContourPlan::amplifyAllContourLinePoints()
+{
+	int numberOfLayers = contourLineMap.size();
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		amplifyContourLinePoints(x);
 	}
 }
 
@@ -141,7 +166,7 @@ void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyP
 	}
 	int baseStripSize = triangleStripMap[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
 	std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
-	triangleStripMap[0].triangleMap[baseStripSize] = testTriangle;
+	triangleStripMap[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
 	std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
@@ -233,6 +258,86 @@ void OSContourPlan::createFirstLayerTriangles()
 
 	numberOfTriangleStrips++;	// increment number of triangle strips;
 	
+}
+
+void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, mutex& heapmutex)
+{
+	if (in_stripID == 0)
+	{
+		OSContourLine* firstLineRef = &contourLineMap[0];
+		int numberOfPoints = firstLineRef->numberOfPoints;
+		for (int x = 0; x < numberOfPoints - 1; x++)
+		{
+			//OSContourPoint* contourPointPointer = &PointMap[in_pointIndex];
+
+			// first triangle point
+			OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[x];
+			ECBPolyPoint pointOne;
+			pointOne.x = contourPointPointer->x;
+			pointOne.y = contourPointPointer->y;
+			pointOne.z = contourPointPointer->z;
+
+			//second triangle point
+			contourPointPointer = &firstLineRef->smartContourPoint[x + 1];
+			ECBPolyPoint pointTwo;
+			pointTwo.x = contourPointPointer->x;
+			pointTwo.y = contourPointPointer->y;
+			pointTwo.z = contourPointPointer->z;
+
+			//third triangle point
+			ECBPolyPoint pointThree;
+			pointThree.x = startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
+			pointThree.y = startPoint.y;
+			pointThree.z = startPoint.z;
+
+			//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
+			OSContouredTriangle triangleToAdd;
+			constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID, heapmutex);
+			/*
+			triangleToAdd.trianglePoints[0] = startPoint;
+			triangleToAdd.trianglePoints[1] = pointOne;
+			triangleToAdd.trianglePoints[2] = pointTwo;
+			triangleToAdd.materialID = in_materialID;		// set the material of the triangle
+			triangleToAdd.determineLineLengths();
+			triangleToAdd.determineAxisInterceptDistances();
+			triangleStripMap[0].triangleMap[x] = triangleToAdd;
+			*/
+
+		}
+		// do the following for the last triangle only
+		int finalPointOne = numberOfPoints - 1;
+
+		OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[finalPointOne];
+		ECBPolyPoint pointOne;
+		pointOne.x = contourPointPointer->x;
+		pointOne.y = contourPointPointer->y;
+		pointOne.z = contourPointPointer->z;
+
+		contourPointPointer = &firstLineRef->smartContourPoint[0];
+		ECBPolyPoint pointTwo;
+		pointTwo.x = contourPointPointer->x;
+		pointTwo.y = contourPointPointer->y;
+		pointTwo.z = contourPointPointer->z;
+
+		ECBPolyPoint pointThree;
+		pointThree.x = startPoint.x;
+		pointThree.y = startPoint.y;
+		pointThree.z = startPoint.z;
+
+		//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
+		OSContouredTriangle triangleToAdd;
+		constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID, heapmutex);
+		/*
+		triangleToAdd.trianglePoints[0] = startPoint;
+		triangleToAdd.trianglePoints[1] = pointOne;
+		triangleToAdd.trianglePoints[2] = pointTwo;
+		triangleToAdd.materialID = in_materialID;		// set the material of the triangle
+		triangleToAdd.determineLineLengths();
+		triangleToAdd.determineAxisInterceptDistances();
+		triangleStripMap[0].triangleMap[finalPointOne] = triangleToAdd;
+		*/
+		std::cout << "First layer triangle created, via new function call...." << endl;
+	}
 }
 
 void OSContourPlan::amplifyContourLinePoints(int in_lineID)
