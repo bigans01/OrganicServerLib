@@ -339,22 +339,87 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 
 		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, heapmutex);
 		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, heapmutex);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, heapmutex);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, heapmutex);
 
 	}
 }
 
 void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex)
 {
-	int basePointForCurrentLine = (in_quadrantID * (in_pointsPerQuadrant - 1));		// get the point ID on the current line to start at, which is based on the quadrant id
-	int basePointForPreviousLine = (in_quadrantID * (in_pointsPerQuadrant - 2));	// get the point ID on the previous line to start at, which is based on the quadrant ID
-	int numberOfTriangles = (in_pointsPerQuadrant - 1);			// the number of triangles to produce in the outer shell
-
-	// produce the triangles
-
-	for (int x = 0; x < numberOfTriangles; x++)
+	if (in_quadrantID != 3)		// don't do this for the last quadrant
 	{
-		std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing quadrant triangle " << std::endl;
+		int basePointForCurrentLine = (in_quadrantID * (in_pointsPerQuadrant - 1));		// get the point ID on the current line to start at, which is based on the quadrant id
+		int basePointForPreviousLine = (in_quadrantID * (in_pointsPerQuadrant - 2));	// get the point ID on the previous line to start at, which is based on the quadrant ID
+		int numberOfTriangles = (in_pointsPerQuadrant - 1);			// the number of triangles to produce in the outer shell
 
+		// produce the triangles
+
+		for (int x = 0; x < numberOfTriangles; x++)
+		{
+			std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing quadrant triangle " << std::endl;
+
+			OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
+			ECBPolyPoint firstPoint;
+			firstPoint.x = firstContourPoint->x;
+			firstPoint.y = firstContourPoint->y;
+			firstPoint.z = firstContourPoint->z;
+
+			OSContourPoint* secondContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine];		// get the second point from the current line
+			ECBPolyPoint secondPoint;
+			secondPoint.x = secondContourPoint->x;
+			secondPoint.y = secondContourPoint->y;
+			secondPoint.z = secondContourPoint->z;
+
+			OSContourPoint* thirdContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine + 1];	// get the third point from the current line
+			ECBPolyPoint thirdPoint;
+			thirdPoint.x = thirdContourPoint->x;
+			thirdPoint.y = thirdContourPoint->y;
+			thirdPoint.z = thirdContourPoint->z;
+
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+
+			basePointForPreviousLine++;		// iterate the base points
+			basePointForCurrentLine++;		// ""
+
+		}
+	}
+
+	else if (in_quadrantID == 3)	// special case for the last quadrant
+	{
+		int basePointForCurrentLine = (in_quadrantID * (in_pointsPerQuadrant - 1));		// get the point ID on the current line to start at, which is based on the quadrant id
+		int basePointForPreviousLine = (in_quadrantID * (in_pointsPerQuadrant - 2));	// get the point ID on the previous line to start at, which is based on the quadrant ID
+		int numberOfNormalTriangles = (in_pointsPerQuadrant - 1) - 1;	// we need special logic for the very last triangle
+		for (int x = 0; x < numberOfNormalTriangles; x++)
+		{
+			std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing FINAL quadrant triangle " << std::endl;
+
+			OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
+			ECBPolyPoint firstPoint;
+			firstPoint.x = firstContourPoint->x;
+			firstPoint.y = firstContourPoint->y;
+			firstPoint.z = firstContourPoint->z;
+
+			OSContourPoint* secondContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine];		// get the second point from the current line
+			ECBPolyPoint secondPoint;
+			secondPoint.x = secondContourPoint->x;
+			secondPoint.y = secondContourPoint->y;
+			secondPoint.z = secondContourPoint->z;
+
+			OSContourPoint* thirdContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine + 1];	// get the third point from the current line
+			ECBPolyPoint thirdPoint;
+			thirdPoint.x = thirdContourPoint->x;
+			thirdPoint.y = thirdContourPoint->y;
+			thirdPoint.z = thirdContourPoint->z;
+
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+
+			basePointForPreviousLine++;		// iterate the base points
+			basePointForCurrentLine++;		// ""
+		}
+
+		// perform logic for final triangle
+		basePointForPreviousLine = 0;
 		OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
 		ECBPolyPoint firstPoint;
 		firstPoint.x = firstContourPoint->x;
@@ -367,19 +432,14 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 		secondPoint.y = secondContourPoint->y;
 		secondPoint.z = secondContourPoint->z;
 
-		OSContourPoint* thirdContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine + 1];	// get the third point from the current line
+		OSContourPoint* thirdContourPoint = &in_currentLine->smartContourPoint[0];	// get the third point from the current line
 		ECBPolyPoint thirdPoint;
 		thirdPoint.x = thirdContourPoint->x;
 		thirdPoint.y = thirdContourPoint->y;
 		thirdPoint.z = thirdContourPoint->z;
 
 		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
-
-		basePointForPreviousLine++;		// iterate the base points
-		basePointForCurrentLine++;		// ""
-
 	}
-
 }
 
 void OSContourPlan::amplifyContourLinePoints(int in_lineID)

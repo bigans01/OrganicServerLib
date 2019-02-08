@@ -687,6 +687,7 @@ void OSServer::constructTestBlueprints3()
 	//planRef->buildTriangleStrips(0);
 	planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
 	planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
 
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
