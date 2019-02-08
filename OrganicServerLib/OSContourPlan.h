@@ -81,6 +81,7 @@ private:
 	int numberOfTriangleStrips = 0;
 
 	void constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex);
+	void constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex);
 	//float layerDistance = 0.0f;
 	//float startRadius = 0.0f;
 	//float expansionValue

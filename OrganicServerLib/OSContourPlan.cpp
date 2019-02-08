@@ -342,6 +342,10 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, heapmutex);
 		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, heapmutex);
 
+		//constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, heapmutex);
+		//constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, heapmutex);
+		//constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, heapmutex);
+
 	}
 }
 
@@ -440,6 +444,45 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 
 		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
 	}
+}
+
+void OSContourPlan::constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex)
+{
+	if (in_quadrantID != 3)		// don't do this for the last quadrant
+	{
+		int basePointForCurrentLine = (in_quadrantID * (in_pointsPerQuadrant - 1)) + 1;		// get the point ID on the current line to start at, which is based on the quadrant id; because this is an inner shell, we increment base point by 1
+		int basePointForPreviousLine = (in_quadrantID * (in_pointsPerQuadrant - 2));	// get the point ID on the previous line to start at, which is based on the quadrant ID
+		int numberOfTriangles = (in_pointsPerQuadrant - 2);			// the number of triangles to produce in the inner shell; will be equal to points per quadrant - 2.
+
+		for (int x = 0; x < numberOfTriangles; x++)
+		{
+			OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
+			ECBPolyPoint firstPoint;
+			firstPoint.x = firstContourPoint->x;
+			firstPoint.y = firstContourPoint->y;
+			firstPoint.z = firstContourPoint->z;
+
+			OSContourPoint* secondContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine + 1];		// get the second point from the current line
+			ECBPolyPoint secondPoint;
+			secondPoint.x = secondContourPoint->x;
+			secondPoint.y = secondContourPoint->y;
+			secondPoint.z = secondContourPoint->z;
+
+			OSContourPoint* thirdContourPoint = &in_currentLine->smartContourPoint[basePointForCurrentLine];	// get the third point from the current line
+			ECBPolyPoint thirdPoint;
+			thirdPoint.x = thirdContourPoint->x;
+			thirdPoint.y = thirdContourPoint->y;
+			thirdPoint.z = thirdContourPoint->z;
+
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+
+			basePointForPreviousLine++;		// iterate the base points
+			basePointForCurrentLine++;		// ""
+		}
+
+
+	}
+
 }
 
 void OSContourPlan::amplifyContourLinePoints(int in_lineID)
