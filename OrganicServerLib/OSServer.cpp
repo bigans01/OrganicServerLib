@@ -643,7 +643,10 @@ void OSServer::constructTestBlueprints3()
 	mountainSummit.x = 2.45;
 	mountainSummit.z = 2.61;
 
-	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 2, 10, 9, 9);	// create the points in all contour lines
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 2, 6.81, 9, 9);	// create the points in all contour lines
 	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
@@ -683,10 +686,14 @@ void OSServer::constructTestBlueprints3()
 	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10, std::ref(*heapMutexRef));
 	//planRef->buildTriangleStrips(0);
 	planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
+	planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
+
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeContourPlan("mountain");
 }
 
