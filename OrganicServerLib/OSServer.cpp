@@ -646,7 +646,14 @@ void OSServer::constructTestBlueprints3()
 	// 10 is stable
 	// 6.81 causes anomaly at peak
 
-	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 2, 6.81, 9, 9);	// create the points in all contour lines
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 5, 6.81, 9, 9);	// create the points in all contour lines
 	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
@@ -685,9 +692,16 @@ void OSServer::constructTestBlueprints3()
 	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10, std::ref(*heapMutexRef));
 	//planRef->buildTriangleStrips(0);
+
+	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
+
 	planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
 	planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
+	planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
+	planRef->constructStripTriangles(3, 10, std::ref(*heapMutexRef));
+	planRef->constructStripTriangles(4, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(5, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(6, 10, std::ref(*heapMutexRef));
 
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
