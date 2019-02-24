@@ -165,9 +165,9 @@ void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyP
 		testTriangle.pointKeys[x] = blueprintKey;
 	}
 	int baseStripSize = triangleStripMap[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
-	std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
+	//std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
 	triangleStripMap[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
-	std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
+	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
 void OSContourPlan::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)
@@ -267,7 +267,7 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 		OSContourLine* firstLineRef = &contourLineMap[0];
 		int numberOfPoints = firstLineRef->numberOfPoints;
 		ECBPolyPoint currentContourCenter = firstLineRef->centerPoint;
-		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		//std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
 		for (int x = 0; x < numberOfPoints - 1; x++)
 		{
 			//OSContourPoint* contourPointPointer = &PointMap[in_pointIndex];
@@ -331,8 +331,8 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 
 		int numberOfPoints = currentLineRef->numberOfPoints;
 		ECBPolyPoint currentContourCenter = currentLineRef->centerPoint;
-		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
-		std::cout << "Number of points on this contour line is: " << currentLineRef->numberOfPoints << std::endl;
+		//std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		//std::cout << "Number of points on this contour line is: " << currentLineRef->numberOfPoints << std::endl;
 
 		int pointsPerQuadrantCurrentLine = (numberOfPoints / 4) + 1;	// get the number of points per quadrant,  for the current line
 		int trianglesForCurrentLine = pointsPerQuadrantCurrentLine - 1;	// the number of triangles in each quadrant is equal to the number of points per quadrant - 1
@@ -361,7 +361,7 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 
 		for (int x = 0; x < numberOfTriangles; x++)
 		{
-			std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing quadrant triangle " << std::endl;
+			//std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing quadrant triangle " << std::endl;
 
 			OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
 			ECBPolyPoint firstPoint;

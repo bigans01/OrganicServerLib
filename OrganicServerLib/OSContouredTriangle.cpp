@@ -21,7 +21,7 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 void OSContouredTriangle::determineLineLengths()
 {
 	// calc line 1, aka "0"
-	std::cout << "Determining line lengths, points..." << std::endl;
+	//std::cout << "Determining line lengths, points..." << std::endl;
 	OSTriangleLine* triangleLineRef_0 = &triangleLines[0];
 	ECBPolyPoint* point_A_ref = &trianglePoints[0];
 	ECBPolyPoint* point_B_ref = &trianglePoints[1];
@@ -41,7 +41,7 @@ void OSContouredTriangle::determineLineLengths()
 	float y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
 	float z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
 	triangleLineRef_0->lineLength = sqrt(x_pow + y_pow + z_pow);
-	std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
+	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
 
 	// calc line 2, aka "1"
 	OSTriangleLine* triangleLineRef_1 = &triangleLines[1];
@@ -60,7 +60,7 @@ void OSContouredTriangle::determineLineLengths()
 	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
 	z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
 	triangleLineRef_1->lineLength = sqrt(x_pow + y_pow + z_pow);
-	std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
+	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
 
 	// calc line 2, aka "3"
 	OSTriangleLine* triangleLineRef_2 = &triangleLines[2];
@@ -79,7 +79,7 @@ void OSContouredTriangle::determineLineLengths()
 	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
 	z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
 	triangleLineRef_2->lineLength = sqrt(x_pow + y_pow + z_pow);
-	std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
+	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
 	//float point_B_ref->yx_pow = pow((triangleLineRef_1->pointB.x))
 	//std::cout << "line lengths: " << std::endl;
 	//std::cout << triangleLineRef_0->lineLength << std::endl;

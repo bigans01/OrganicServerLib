@@ -777,7 +777,7 @@ void OSServer::executeContourPlan(string in_string)
 			for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
 			{
 				EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
-				std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
+				//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
 				EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
 				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, blueprintRef);
 				EnclaveCollectionBlueprint readBackBP;
@@ -876,7 +876,7 @@ void OSServer::setCurrentWorld(std::string in_worldName)
 
 void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
 {
-	cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
+	//cout << "Relativity job BEGIN ||||||||||||||||||||||||||||||||||||||||||||||||||||" << endl;
 	// step 1: check for Type 1 condition: 2 points of triangle that have a pair of the same coordinates (clamped to an axis)
 	int conditionMetFlag = 0;			// determines what condition has been met
 
@@ -917,20 +917,20 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 		if ((linePtr->pointB.x - linePtr->pointA.x) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
-			cout << "X check: " << endl;
+			//cout << "X check: " << endl;
 			tempMeta[x].structLinePtr->clamped_to_x = 1;
 			if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) != 0)
 			{
-				cout << "X shift is not 0" << endl;
+				//cout << "X shift is not 0" << endl;
 				if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) > 0)
 				{
-					cout << "X difference is positive" << endl;
+					//cout << "X difference is positive" << endl;
 					tempMeta[x].structLinePtr->clamped_to_x = 1;
 					tempMeta[x].structLinePtr->x_clamp_direction = 1;
 				}
 				else if ((tempMeta[x].thirdPoint.x - tempMeta[x].structLinePtr->pointA.x) < 0)
 				{
-					cout << "X difference is positive" << endl;
+					//cout << "X difference is positive" << endl;
 					tempMeta[x].structLinePtr->clamped_to_x = 1;
 					tempMeta[x].structLinePtr->x_clamp_direction = -1;
 				}
@@ -942,20 +942,20 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 		if ((linePtr->pointB.y - linePtr->pointA.y) == 0)	// if they are equal to exactly 0, increment
 		{
 			conditionCount++;
-			cout << "Y check: " << endl;
+			//cout << "Y check: " << endl;
 			tempMeta[x].structLinePtr->clamped_to_y = 1;			// indicate the line is clamped to y
 			if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) != 0)
 			{
-				cout << "Y shift is not 0" << endl;
+				//cout << "Y shift is not 0" << endl;
 				if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) > 0)
 				{
-					cout << "Y difference is positive" << endl;
+					//cout << "Y difference is positive" << endl;
 					tempMeta[x].structLinePtr->clamped_to_y = 1;				// signal this line is clamped to y
 					tempMeta[x].structLinePtr->y_clamp_direction = 1;			// positive slope = positive y
 				}
 				else if ((tempMeta[x].thirdPoint.y - tempMeta[x].structLinePtr->pointA.y) < 0)
 				{
-					cout << "Y difference is negative" << endl;
+					//cout << "Y difference is negative" << endl;
 					tempMeta[x].structLinePtr->clamped_to_y = 1;				
 					tempMeta[x].structLinePtr->y_clamp_direction = -1;			
 				}
@@ -1070,8 +1070,8 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 	for (int x = 0; x < 3; x++)
 	{
 		//std::cout << "Line " << x << std::endl;
-		std::cout << in_Triangle->triangleLines[x].pointA.x << ", " << in_Triangle->triangleLines[x].pointA.y << ", " << in_Triangle->triangleLines[x].pointA.z << std::endl;
-		std::cout << in_Triangle->triangleLines[x].pointB.x << ", " << in_Triangle->triangleLines[x].pointB.y << ", " << in_Triangle->triangleLines[x].pointB.z << std::endl;
+		//std::cout << in_Triangle->triangleLines[x].pointA.x << ", " << in_Triangle->triangleLines[x].pointA.y << ", " << in_Triangle->triangleLines[x].pointA.z << std::endl;
+		//std::cout << in_Triangle->triangleLines[x].pointB.x << ", " << in_Triangle->triangleLines[x].pointB.y << ", " << in_Triangle->triangleLines[x].pointB.z << std::endl;
 	}
 }
 
@@ -1495,7 +1495,7 @@ void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangl
 
 
 	ECBPolyPoint pointToCheck = in_Line.pointA;
-	std::cout << "OrganicServerLib, pointToCheck: " << pointToCheck.x << ", " << pointToCheck.y << ", " << pointToCheck.z << ", " << std::endl;
+	//std::cout << "OrganicServerLib, pointToCheck: " << pointToCheck.x << ", " << pointToCheck.y << ", " << pointToCheck.z << ", " << std::endl;
 	// NEW CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	// First, cycle through all 8 corner points: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	if (pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x	&&		pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y	&&		pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)		// Lower NW
@@ -1738,7 +1738,7 @@ void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangl
 	// check for influence from clamp flags in the line; if its clamped to x/y/z, check to see if it rotates on this line's axis in either negative or positive fashion (needs explanation/diagram)
 	if ((in_Line.clamped_to_x == 1) && (in_Triangle->perfect_clamp_x == 0))
 	{
-		cout << "x clamp entry" << endl;
+		//cout << "x clamp entry" << endl;
 		if ((in_Line.x_clamp_direction == 1)	&&	(in_Line.pointA.x == in_borderLineList.corner_LowerNE.cornerPoint.x))	
 		{
 			cout << "positive entry " << endl;
@@ -1756,7 +1756,7 @@ void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangl
 	}
 	if ((in_Line.clamped_to_y == 1) && (in_Triangle->perfect_clamp_y == 0))
 	{
-		cout << "y clamp entry" << endl;
+		//cout << "y clamp entry" << endl;
 		if ((in_Line.y_clamp_direction == 1) && (in_Line.pointA.y == in_borderLineList.corner_UpperNW.cornerPoint.y))		
 		{
 			cout << "positive entry " << endl;
