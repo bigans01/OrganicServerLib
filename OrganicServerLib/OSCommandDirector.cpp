@@ -3,8 +3,8 @@
 #include "OSCommandDirector.h"
 #include "OSServer.h"
 
-void OSCommandDirector::initialize(OSServer* in_organicServerPtr, std::mutex& in_mutex)
+void OSCommandDirector::initialize(OSServer* in_organicServerPtr)
 {
 	OSptr = in_organicServerPtr;
-	assignedHeapMutex = &in_mutex;
+	//assignedHeapMutex = &in_mutex;
 }

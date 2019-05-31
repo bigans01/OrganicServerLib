@@ -29,6 +29,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	serverPtr = in_serverPtr;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
+	//std::cout << "-->>>> begiging OS Triangle Line Traverser..." << std::endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(beginPoint, endPoint, beginKey, endKey);	// do the initial set up; beginKey will be replaced by currentKey in later function calls
 	nextKeyAdd = resultantIntersect.incrementingKey;					// the next key add will be a result from previous function call
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;		// set the incrementing point
@@ -57,6 +58,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	{
 		//cout << "|||| Polygon was NOT found!! " << endl;
 		ECBPoly newPoly;
+		newPoly.materialID = in_TrianglePtr->materialID;
 		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
 		
@@ -118,6 +120,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << " origin Point: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << ", " << std::endl;
 		//cout << " intersected Point: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << std::endl;
 		ECBPoly newPoly;
+		newPoly.materialID = in_TrianglePtr->materialID;
 		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon

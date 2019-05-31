@@ -14,7 +14,7 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverSlaves);			// signal for server mode, 2 threads
-	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
+	OSdirector.initialize(this);
 }
 
 OSServer::OSServer()
@@ -36,7 +36,8 @@ OSServer::OSServer()
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverProperties.serverSlaves);			// signal for server mode, 2 threads
-	OSdirector.initialize(this, std::ref(organicSystemPtr->heapmutex));
+	OSdirector.initialize(this);
+	//organicSystemPtr->
 }
 
 OSServer::~OSServer()
@@ -56,7 +57,8 @@ void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, flo
 void OSServer::addContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
 {
 	std::cout << "Adding new contour plan... (style 2)" << std::endl;
-	OSContourPlan tempPlan(in_polyPoint);
+	OSPDir formationDir = getFormationDirections(in_Formation);
+	OSContourPlan tempPlan(formationDir, in_polyPoint.x, in_polyPoint.y, in_polyPoint.z);
 	contourPlanMap[in_planName] = tempPlan;
 	OSContourPlan* tempPlanRef = &contourPlanMap[in_planName];
 	tempPlanRef->setFormationBaseContourPoints(in_Formation, in_polyPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
@@ -578,8 +580,8 @@ void OSServer::constructTestBlueprints()
 
 
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 5, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 5, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
@@ -622,11 +624,11 @@ void OSServer::constructTestBlueprints2()
 	testPoint_5.y = 7.0f;
 	testPoint_5.z = 15.0f;
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 10, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 10, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 2, std::ref(*heapMutexRef));
 	executeContourPlan("plan");
 }
 
@@ -652,8 +654,8 @@ void OSServer::constructTestBlueprints3()
 	//										: 1.81 (PASS)
 	//										: 0.81 (PASS)
 
-
-	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, 5, 6.81, 9, 9);	// create the points in all contour lines
+	int numberOfLayers = 12;		// current is 17 (max at 22)
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
@@ -695,13 +697,34 @@ void OSServer::constructTestBlueprints3()
 
 	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
 
-	planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
-	planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
-	planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
-	planRef->constructStripTriangles(3, 10, std::ref(*heapMutexRef));
-	planRef->constructStripTriangles(4, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
+	//planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(3, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(4, 10, std::ref(*heapMutexRef));
+
+	
+	
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2, std::ref(*heapMutexRef));	// construct an individual layer
+	}
+	
+
+	// debugging line for individual layer: (layer 10 causes crash).
+
+	//planRef->constructStripTriangles(9, 10, std::ref(*heapMutexRef));	// construct an individual layer
+	//planRef->constructStripTriangles(10, 10, std::ref(*heapMutexRef));	// construct an individual layer
+	//planRef->constructStripTriangles(16, 10, std::ref(*heapMutexRef));	// construct an individual layer
+
 	//planRef->constructStripTriangles(5, 10, std::ref(*heapMutexRef));
 	//planRef->constructStripTriangles(6, 10, std::ref(*heapMutexRef));
+
+	//planRef->constructStripTriangles(17, 10, std::ref(*heapMutexRef));		// OK
+	//planRef->constructStripTriangles(18, 10, std::ref(*heapMutexRef));		
+	//planRef->constructStripTriangles(19, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(20, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(21, 10, std::ref(*heapMutexRef));
 
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
@@ -769,7 +792,9 @@ void OSServer::executeContourPlan(string in_string)
 		{
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			//std::cout << "---beginning trace-through" << std::endl;
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+			//std::cout << "---ending trace-through" << std::endl;
 
 			// write (overwrite) a blueprint file for each blueprint traversed
 			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
@@ -783,10 +808,12 @@ void OSServer::executeContourPlan(string in_string)
 				EnclaveCollectionBlueprint readBackBP;
 				OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, &readBackBP);
 				OSWinAdapter::outputBlueprintStats(&readBackBP);
+				//std::cout << ">> Blueprint stats outputted...???" << std::endl;
 			}
-
 		}
+		//std::cout << "Blueprint writing complete!!! (1)" << std::endl;
 	}
+	//std::cout << "Blueprint writing complete!!! (2)" << std::endl;
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -797,7 +824,7 @@ void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
 	transferBlueprintToLocalOS(in_key);
-	organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
+	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
 	organicSystemPtr->AddKeyToRenderList(in_key);
 }
 
@@ -809,7 +836,7 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	{
 		EnclaveKeyDef::EnclaveKey currentKey = blueprintBegin->first;
 		transferBlueprintToLocalOS(currentKey);
-		organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
+		//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
 		organicSystemPtr->AddKeyToRenderList(currentKey);
 	}
 }
@@ -1062,8 +1089,9 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 
 
 	// STEP T-3
+	//std::cout << "--ray cast beginning..." << std::endl;
 	rayCastTrianglePoints(in_Triangle);		// runs the lines through the "world" and sets them up in their appropriate blueprints
-
+	//std::cout << "--ray cast completed.." << std::endl;
 
 	// STEP T-4
 	auto blueend = std::chrono::high_resolution_clock::now();
@@ -1159,6 +1187,21 @@ void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in
 	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
+}
+
+OSPDir OSServer::getFormationDirections(OSTerrainFormation in_terrainFormation)
+{
+	OSPDir returnDir;
+	if (in_terrainFormation == OSTerrainFormation::MOUNTAIN)
+	{
+		returnDir = OSPDir::BELOW;
+		std::cout << "Mountain detected, will OSPDir will be BELOW" << std::endl;
+	}
+	else
+	{
+		returnDir = OSPDir::NOVAL;
+	}
+	return returnDir;
 }
 
 void OSServer::runServer()
@@ -1323,13 +1366,17 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_Triangle->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
 		if (polyMapIter != in_Triangle->polygonPieceMap.end())	// polygon was already found
 		{
+			//std::cout << "++++++++++++Branch 1 hit (begin) " << std::endl;
 			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
+			//std::cout << "++++++++++++Branch 1 hit (mid)" << std::endl;
 			while (!(lineRef->currentKey == lineRef->endKey))
 			{
+				//std::cout << "Traversal call...." << std::endl;
 				lineRef->traverseLineOnce(in_Triangle);
+				//std::cout << "traversing once...!!!" << std::endl;
 			}
 			
 
@@ -1337,6 +1384,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		}
 		else  // polygon wasn't found, it needs to be created
 		{
+			//std::cout << "Branch 2 hit" << std::endl;
 			ECBPoly newPoly;
 			newPoly.materialID = in_Triangle->materialID;
 			fillPolyWithClampResult(&newPoly, in_Triangle);
@@ -1351,9 +1399,12 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			while (!(lineRef->currentKey == lineRef->endKey))
 			{
 				lineRef->traverseLineOnce(in_Triangle);
+				//std::cout << "traversing once...!!!" << std::endl;
 			}
 			
 		}
+		//cout << "Ending this section..." << std::endl;
+
 	}
 }
 

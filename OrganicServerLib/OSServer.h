@@ -45,7 +45,7 @@ public:
 	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
 	std::string currentWorld;
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
-	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
+	std::mutex commandLineRunningMutex;	// mutex for when the command line runs6
 	std::mutex* heapMutexRef;			// a reference to a stored heap mutex ref
 	std::condition_variable commandLineCV;
 	//OrganicClient client;				// client holder
@@ -94,6 +94,7 @@ private:
 	static void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
+	OSPDir getFormationDirections(OSTerrainFormation in_terrainFormation);
 };
 
 #endif

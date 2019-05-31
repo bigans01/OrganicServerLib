@@ -396,7 +396,7 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 		int numberOfNormalTriangles = (in_pointsPerQuadrant - 1) - 1;	// we need special logic for the very last triangle
 		for (int x = 0; x < numberOfNormalTriangles; x++)
 		{
-			std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing FINAL quadrant triangle " << std::endl;
+			//std::cout << "!!!!!!!!!!!!!!!!!!!!! ->>>>>>>>> constructing FINAL quadrant triangle " << std::endl;
 
 			OSContourPoint* firstContourPoint = &in_previousLine->smartContourPoint[basePointForPreviousLine];		// get the first point from the previous line
 			ECBPolyPoint firstPoint;
