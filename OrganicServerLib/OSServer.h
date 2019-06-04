@@ -45,8 +45,7 @@ public:
 	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
 	std::string currentWorld;
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
-	std::mutex commandLineRunningMutex;	// mutex for when the command line runs6
-	std::mutex* heapMutexRef;			// a reference to a stored heap mutex ref
+	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
 	std::condition_variable commandLineCV;
 	//OrganicClient client;				// client holder
 

@@ -10,7 +10,6 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 	organicSystemPtr = client.OS;																							// assign organicSystemPtr to the client's OS
 	numberOfSlaves = serverSlaves;		// set number of server slaves
 	serverRunMode = serverMode;		// set the run mode (0, 1, 2, 3) etc
-	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverSlaves);			// signal for server mode, 2 threads
@@ -32,12 +31,10 @@ OSServer::OSServer()
 	organicSystemPtr = client.OS;																							// assign organicSystemPtr to the client's OS
 	numberOfSlaves = serverProperties.serverSlaves;		// set number of server slaves
 	serverRunMode = serverProperties.runMode;		// set the run mode (0, 1, 2, 3) etc
-	heapMutexRef = &organicSystemPtr->heapmutex;	// set the heap mutex; always use the OrganicSystem's heap mutex when running in this mode
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverProperties.serverSlaves);			// signal for server mode, 2 threads
 	OSdirector.initialize(this);
-	//organicSystemPtr->
 }
 
 OSServer::~OSServer()
@@ -49,7 +46,6 @@ OSServer::~OSServer()
 
 void OSServer::addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z)
 {
-	std::lock_guard<std::mutex> lock(*heapMutexRef);	// heap mutex lock
 	OSContourPlan tempPlan(in_Dir, in_x, in_y, in_z);
 	contourPlanMap[in_planName] = tempPlan;
 }
@@ -580,11 +576,11 @@ void OSServer::constructTestBlueprints()
 
 
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
-	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
+	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
 	executeContourPlan("plan");
 }
 
@@ -624,11 +620,11 @@ void OSServer::constructTestBlueprints2()
 	testPoint_5.y = 7.0f;
 	testPoint_5.z = 15.0f;
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 2, std::ref(*heapMutexRef));	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 2, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_3, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, 0, 2);
 	executeContourPlan("plan");
 }
 
@@ -689,47 +685,47 @@ void OSServer::constructTestBlueprints3()
 	otherPoint3.y = 20;
 	otherPoint3.z = -4;
 	*/
-	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10, std::ref(*heapMutexRef));
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10);
 	//planRef->buildTriangleStrips(0);
 
 	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
 
-	//planRef->constructStripTriangles(0, 10, std::ref(*heapMutexRef));		// new function: produces all triangles in a strip, when points are ready etc
-	//planRef->constructStripTriangles(1, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(2, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(3, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(4, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(0, 10);		// new function: produces all triangles in a strip, when points are ready etc
+	//planRef->constructStripTriangles(1, 10);
+	//planRef->constructStripTriangles(2, 10);
+	//planRef->constructStripTriangles(3, 10);
+	//planRef->constructStripTriangles(4, 10);
 
 	
 	
 	for (int x = 0; x < numberOfLayers; x++)
 	{
-		planRef->constructStripTriangles(x, 2, std::ref(*heapMutexRef));	// construct an individual layer
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
 	}
 	
 
 	// debugging line for individual layer: (layer 10 causes crash).
 
-	//planRef->constructStripTriangles(9, 10, std::ref(*heapMutexRef));	// construct an individual layer
-	//planRef->constructStripTriangles(10, 10, std::ref(*heapMutexRef));	// construct an individual layer
-	//planRef->constructStripTriangles(16, 10, std::ref(*heapMutexRef));	// construct an individual layer
+	//planRef->constructStripTriangles(9, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(10, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(16, 10);	// construct an individual layer
 
-	//planRef->constructStripTriangles(5, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(6, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(5, 10);
+	//planRef->constructStripTriangles(6, 10);
 
-	//planRef->constructStripTriangles(17, 10, std::ref(*heapMutexRef));		// OK
-	//planRef->constructStripTriangles(18, 10, std::ref(*heapMutexRef));		
-	//planRef->constructStripTriangles(19, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(20, 10, std::ref(*heapMutexRef));
-	//planRef->constructStripTriangles(21, 10, std::ref(*heapMutexRef));
+	//planRef->constructStripTriangles(17, 10);		// OK
+	//planRef->constructStripTriangles(18, 10);		
+	//planRef->constructStripTriangles(19, 10);
+	//planRef->constructStripTriangles(20, 10);
+	//planRef->constructStripTriangles(21, 10);
 
-	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
-	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10, std::ref(*heapMutexRef));
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10);
 
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeContourPlan("mountain");
@@ -772,7 +768,7 @@ void OSServer::constructTestBlueprints4()
 
 	addContourPlan("plan", OSPDir::BELOW, -85.0f, 80.0f, 90.0f);
 	OSContourPlan* planRef = getContourPlan("plan");		// get pointer to the plan
-	planRef->constructSingleContouredTriangle(point_0, point_1, point_2, 0, 5, std::ref(*heapMutexRef));
+	planRef->constructSingleContouredTriangle(point_0, point_1, point_2, 0, 5);
 	executeContourPlan("plan");
 
 }
@@ -818,14 +814,14 @@ void OSServer::executeContourPlan(string in_string)
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
-	organicSystemPtr->AddBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
+	organicSystemPtr->addBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
 }
 
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
 	transferBlueprintToLocalOS(in_key);
 	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
-	organicSystemPtr->AddKeyToRenderList(in_key);
+	organicSystemPtr->addKeyToRenderList(in_key);
 }
 
 void OSServer::sendAndRenderAllBlueprintsToLocalOS()
@@ -837,7 +833,7 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 		EnclaveKeyDef::EnclaveKey currentKey = blueprintBegin->first;
 		transferBlueprintToLocalOS(currentKey);
 		//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
-		organicSystemPtr->AddKeyToRenderList(currentKey);
+		organicSystemPtr->addKeyToRenderList(currentKey);
 	}
 }
 
@@ -1219,7 +1215,7 @@ void OSServer::runServer()
 		{
 			organicSystemPtr->runOrganicTick();
 		}
-		organicSystemPtr->GLCleanup();
+		organicSystemPtr->glCleanup();
 	}
 }
 
@@ -1311,7 +1307,6 @@ void OSServer::signalServerShutdown(mutex& in_serverMutex)
 
 void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int in_pointID)
 {
-	std::lock_guard<std::mutex> lock(*heapMutexRef);
 	// STEP 1:	set appropriate values of keys 
 	EnclaveKeyDef::EnclaveKey originPointKey;
 	EnclaveKeyDef::EnclaveKey endPointKey;
@@ -1853,7 +1848,6 @@ void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangl
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 {
-	std::lock_guard<std::mutex> lock(*heapMutexRef);	// heap mutex lock
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintMapIterator;
 	blueprintMapIterator = blueprintMap.find(in_Key);
 	if (blueprintMapIterator != blueprintMap.end())

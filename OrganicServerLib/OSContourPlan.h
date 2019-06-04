@@ -64,8 +64,8 @@ public:
 	void amplifyContourLinePoints(int in_lineID);
 	void buildTriangleStrips(int layerDepth);
 	void createFirstLayerTriangles();				// creates a triangle strip with the very first contour line, where the center of this strip (that is, the 3rd point) is equal to the "peak" of this plan
-	void constructStripTriangles(int in_stripID, int in_materialID, mutex& heapmutex);
-	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID, mutex& heapmutex);
+	void constructStripTriangles(int in_stripID, int in_materialID);
+	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID);
 	void performSingleTriangleTest();
 	void setFormationBaseContourPoints(OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	void amplifyAllContourLinePoints();
@@ -80,8 +80,8 @@ private:
 	int planMode = 0;					// 0 is default
 	int numberOfTriangleStrips = 0;
 
-	void constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex);
-	void constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex);
+	void constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID);
+	void constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID);
 	//float layerDistance = 0.0f;
 	//float startRadius = 0.0f;
 	//float expansionValue

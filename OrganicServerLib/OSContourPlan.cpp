@@ -122,9 +122,8 @@ void OSContourPlan::amplifyAllContourLinePoints()
 	}
 }
 
-void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID, mutex& heapmutex)
+void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, int in_triangleStripID, short in_materialID)
 {
-	std::lock_guard<std::mutex> lock(heapmutex);	// lock for heap usage
 	/*
 	ECBPolyPoint testPoint_0;
 	ECBPolyPoint testPoint_1;
@@ -260,7 +259,7 @@ void OSContourPlan::createFirstLayerTriangles()
 	
 }
 
-void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, mutex& heapmutex)
+void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID)
 {
 	if (in_stripID == 0)
 	{
@@ -294,7 +293,7 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 
 			//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
 			OSContouredTriangle triangleToAdd;
-			constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID, heapmutex);
+			constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID);
 
 
 		}
@@ -320,7 +319,7 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 
 		//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
 		OSContouredTriangle triangleToAdd;
-		constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID, heapmutex);
+		constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID);
 
 		std::cout << "First layer triangle created, via new function call...." << endl;
 	}
@@ -337,19 +336,19 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID, m
 		int pointsPerQuadrantCurrentLine = (numberOfPoints / 4) + 1;	// get the number of points per quadrant,  for the current line
 		int trianglesForCurrentLine = pointsPerQuadrantCurrentLine - 1;	// the number of triangles in each quadrant is equal to the number of points per quadrant - 1
 
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, heapmutex);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, heapmutex);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, heapmutex);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, heapmutex);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID);
 
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, heapmutex);
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, heapmutex);
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, heapmutex);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID);
 
 	}
 }
 
-void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex)
+void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID)
 {
 	if (in_quadrantID != 3)		// don't do this for the last quadrant
 	{
@@ -381,7 +380,7 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -416,7 +415,7 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -442,11 +441,11 @@ void OSContourPlan::constructOuterQuadrantShell(OSContourLine* in_currentLine, O
 		thirdPoint.y = thirdContourPoint->y;
 		thirdPoint.z = thirdContourPoint->z;
 
-		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID);
 	}
 }
 
-void OSContourPlan::constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, mutex& heapmutex)
+void OSContourPlan::constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID)
 {
 	if (in_quadrantID != 3)		// don't do this for the last quadrant
 	{
@@ -474,7 +473,7 @@ void OSContourPlan::constructInnerQuadrantShell(OSContourLine* in_currentLine, O
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID, heapmutex);
+			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_triangleStripID, in_materialID);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
