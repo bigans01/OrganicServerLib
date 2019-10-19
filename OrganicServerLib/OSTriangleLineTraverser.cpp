@@ -35,6 +35,23 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;		// set the incrementing point
 	//std::cout << "--Initial resultant intersect: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_TrianglePtr->polygonPieceMap.find(beginKey);	// check to see if the polygon exists already in the contoured triangle
+	int debugIncremental = 0;
+	if
+	(
+		(beginKey.x == 7)
+		&&
+		(beginKey.y == -6)
+		&&
+		(beginKey.z == -1)
+	)
+	{
+		//std::cout << "SERVER: incrementing key to analyze FOUND in CASE 2 " << std::endl;
+		//debugIncremental = 1;
+		//std::cout << "Triangle's points are: " << std::endl;
+		//std::cout << "T 0: " << in_TrianglePtr->trianglePoints[0].x << ", " << in_TrianglePtr->trianglePoints[0].y << ", " << in_TrianglePtr->trianglePoints[0].z << std::endl;
+		//std::cout << "T 1: " << in_TrianglePtr->trianglePoints[1].x << ", " << in_TrianglePtr->trianglePoints[1].y << ", " << in_TrianglePtr->trianglePoints[1].z << std::endl;
+		//std::cout << "T 2: " << in_TrianglePtr->trianglePoints[2].x << ", " << in_TrianglePtr->trianglePoints[2].y << ", " << in_TrianglePtr->trianglePoints[2].z << std::endl;
+	}
 
 	/**/
 	if (polyMapIter != in_TrianglePtr->polygonPieceMap.end())	// polygon was already found
@@ -51,6 +68,17 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//cout << ":::::blueprint ID: " << beginKey.x << ", " << beginKey.y << ", " << beginKey.z << endl;
 		//cout << ":::::elementID: " << polygonIDinBlueprint << endl;
 		//cout << ":::::lineID: " << lineID << endl;
+		if (debugIncremental == 1)
+		{
+			std::cout << "Poly line points: " << std::endl;
+			std::cout << "0: " << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+			std::cout << "1: " << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+			std::cout << "2: " << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+			std::cout << "----Slopes: " << std::endl;
+			std::cout << "X: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+			std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
+			std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
+		}
 		blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_lineID] = newPolyLine;
 
 	}
@@ -72,6 +100,17 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//cout << ":::::blueprint ID: " << beginKey.x << ", " << beginKey.y << ", " << beginKey.z << endl;
 		//cout << ":::::elementID: " << elementID << endl;
 		//cout << ":::::lineID: " << lineID << endl;
+		if (debugIncremental == 1)
+		{
+			std::cout << "Poly line points: " << std::endl;
+			std::cout << "0: " << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+			std::cout << "1: " << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+			std::cout << "2: " << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+			std::cout << "----Slopes: " << std::endl;
+			std::cout << "X: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+			std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
+			std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
+		}
 		blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
 

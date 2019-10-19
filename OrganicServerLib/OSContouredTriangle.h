@@ -30,7 +30,9 @@ public:
 	void addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType);
 	void determineLineLengths();		// gets the length of lines
 	void determineAxisInterceptDistances();
+	void determineAxisInterceptDistancesDebug();
 	void determineLineAxisIntercept(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint);
+	void determineLineAxisInterceptDebug(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint, int in_lineID);
 	void determineType2and3Lines();		// calculates the Type 2 and Type 3 lines for each line in the triangle
 	void rotateTriangleFromZAxis(int in_Point);
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle

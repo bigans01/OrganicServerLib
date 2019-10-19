@@ -39,7 +39,7 @@ OSServer::OSServer()
 
 OSServer::~OSServer()
 {
-	//deleteSlaves();
+	OSCManager.despawnAllCells();
 }
 
 
@@ -638,7 +638,7 @@ void OSServer::constructTestBlueprints3()
 	mountainSummit.z = 2;
 
 	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 2.45;
+	mountainSummit.x = 1002.45;
 	mountainSummit.z = 2.61;
 
 	// 10 is stable
@@ -650,7 +650,7 @@ void OSServer::constructTestBlueprints3()
 	//										: 1.81 (PASS)
 	//										: 0.81 (PASS)
 
-	int numberOfLayers = 12;		// current is 17 (max at 22)
+	int numberOfLayers = 14;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
 	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
@@ -708,7 +708,7 @@ void OSServer::constructTestBlueprints3()
 	
 
 	// debugging line for individual layer: (layer 10 causes crash).
-
+	//planRef->constructStripTriangles(13, 2);	// construct an individual layer
 	//planRef->constructStripTriangles(9, 10);	// construct an individual layer
 	//planRef->constructStripTriangles(10, 10);	// construct an individual layer
 	//planRef->constructStripTriangles(16, 10);	// construct an individual layer
@@ -734,6 +734,7 @@ void OSServer::constructTestBlueprints3()
 void OSServer::constructTestBlueprints4()
 {
 	std::cout << "||||||| constructing blueprints (version 4)...." << std::endl;
+	/*
 	ECBPolyPoint point_0;
 	point_0.x = -16;
 	point_0.y = 32;
@@ -746,7 +747,23 @@ void OSServer::constructTestBlueprints4()
 
 	ECBPolyPoint point_2;
 	point_2.x = -16;
-	point_2.y = 16;
+	point_2.y = 16;	// old was 16
+	point_2.z = 32;
+	*/
+
+	ECBPolyPoint point_0;
+	point_0.x = 0;
+	point_0.y = 0;
+	point_0.z = 0;
+
+	ECBPolyPoint point_1;
+	point_1.x = 0;
+	point_1.y = 0;
+	point_1.z = 32;
+
+	ECBPolyPoint point_2;
+	point_2.x = 32;
+	point_2.y = 0;	// old was 16
 	point_2.z = 32;
 
 	/*
@@ -773,8 +790,114 @@ void OSServer::constructTestBlueprints4()
 
 }
 
+void OSServer::constructDebugBlueprint1()
+{
+	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 2.45;
+	mountainSummit.z = 2.61;
+
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+	int numberOfLayers = 27;		// current is 17 (max at 35)
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
+	OSContourLine* lineRef = &planRef->contourLineMap[0];
+	std::cout << "Line ref acquired... >>>" << std::endl;
+	std::cout << "Mountain summit is: " << mountainSummit.x << ", " << mountainSummit.y << ", " << mountainSummit.z << std::endl;
+	std::cout << "Point 0 is: " << lineRef->smartContourPoint[0].getPolyPoint().x << ", " << lineRef->smartContourPoint[0].getPolyPoint().y << ", " << lineRef->smartContourPoint[0].getPolyPoint().z << std::endl;
+	std::cout << "Point 1 is: " << lineRef->smartContourPoint[1].getPolyPoint().x << ", " << lineRef->smartContourPoint[1].getPolyPoint().y << ", " << lineRef->smartContourPoint[1].getPolyPoint().z << std::endl;
+	std::cout << "Point 2 is: " << lineRef->smartContourPoint[2].getPolyPoint().x << ", " << lineRef->smartContourPoint[2].getPolyPoint().y << ", " << lineRef->smartContourPoint[2].getPolyPoint().z << std::endl;
+	std::cout << "Point 3 is: " << lineRef->smartContourPoint[3].getPolyPoint().x << ", " << lineRef->smartContourPoint[3].getPolyPoint().y << ", " << lineRef->smartContourPoint[3].getPolyPoint().z << std::endl;
+
+	// for summit at 30, 5, 5
+	/*
+	ECBPolyPoint otherPoint0;
+	otherPoint0.x = 14;
+	otherPoint0.y = 20;
+	otherPoint0.z = 5;
+
+	ECBPolyPoint otherPoint1;
+	otherPoint1.x = 5;
+	otherPoint1.y = 20;
+	otherPoint1.z = 14;
+
+	ECBPolyPoint otherPoint2;
+	otherPoint2.x = -4;
+	otherPoint2.y = 20;
+	otherPoint2.z = 5;
+
+	ECBPolyPoint otherPoint3;
+	otherPoint3.x = 5;
+	otherPoint3.y = 20;
+	otherPoint3.z = -4;
+	*/
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10);
+	//planRef->buildTriangleStrips(0);
+
+	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
+
+	//planRef->constructStripTriangles(0, 10);		// new function: produces all triangles in a strip, when points are ready etc
+	//planRef->constructStripTriangles(1, 10);
+	//planRef->constructStripTriangles(2, 10);
+	//planRef->constructStripTriangles(3, 10);
+	//planRef->constructStripTriangles(4, 10);
+
+
+	/*
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	*/
+	
+	planRef->constructStripTriangles(24, 2);	// construct an individual layer
+
+	// debugging line for individual layer: (layer 10 causes crash).
+
+	//planRef->constructStripTriangles(9, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(10, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(16, 10);	// construct an individual layer
+
+	//planRef->constructStripTriangles(5, 10);
+	//planRef->constructStripTriangles(6, 10);
+
+	//planRef->constructStripTriangles(17, 10);		// OK
+	//planRef->constructStripTriangles(18, 10);		
+	//planRef->constructStripTriangles(19, 10);
+	//planRef->constructStripTriangles(20, 10);
+	//planRef->constructStripTriangles(21, 10);
+
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10);
+
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeContourPlan("mountain");
+}
+
 void OSServer::executeContourPlan(string in_string)
 {
+	std::cout << "SERVER: Executing contour plan. " << std::endl;
 	OSContourPlan* planPtr = &contourPlanMap[in_string];
 	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
@@ -788,6 +911,18 @@ void OSServer::executeContourPlan(string in_string)
 		{
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			if
+				(
+					(currentTriangle->trianglePoints[0].x > 227.0f)
+					&&
+					(currentTriangle->trianglePoints[0].x < 228.0f)
+				)
+			{
+				std::cout << "SERVER: triangle to debug found! " << std::endl;
+				std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << currentTriangle->trianglePoints[0].z << std::endl;
+			}
+			//std::cout << "Tracing triangle with points: " << std::endl;
+			//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << currentTriangle->trianglePoints[0].z << std::endl;
 			//std::cout << "---beginning trace-through" << std::endl;
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 			//std::cout << "---ending trace-through" << std::endl;
@@ -1322,7 +1457,23 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 		endPointKey = in_Triangle->pointKeys[0];
 	}
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
-
+	int debugIncremental = 0;
+	if
+		(
+		(incrementingKey.x == 7)
+			&&
+			(incrementingKey.y == -6)
+			&&
+			(incrementingKey.z == -1)
+			)
+	{
+		//std::cout << "SERVER: incrementing key to analyze FOUND in CASE 1 (Point " << in_pointID << ") " << std::endl;
+		//debugIncremental = 1;
+		//std::cout << "Triangle's points are: " << std::endl;
+		//std::cout << "T 0: " << in_Triangle->trianglePoints[0].x << ", " << in_Triangle->trianglePoints[0].y << ", " << in_Triangle->trianglePoints[0].z << std::endl;
+		//std::cout << "T 1: " << in_Triangle->trianglePoints[1].x << ", " << in_Triangle->trianglePoints[1].y << ", " << in_Triangle->trianglePoints[1].z << std::endl;
+		//std::cout << "T 2: " << in_Triangle->trianglePoints[2].x << ", " << in_Triangle->trianglePoints[2].y << ", " << in_Triangle->trianglePoints[2].z << std::endl;
+	}
 	// STEP 2: initiating tracing
 	if (originPointKey == endPointKey)		// both points exist in same blueprint
 	{
@@ -1334,6 +1485,17 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
+			if (debugIncremental == 1)
+			{
+				std::cout << "Poly line points: " << std::endl;
+				std::cout << "0: " << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+				std::cout << "1: " << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+				std::cout << "2: " << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+				std::cout << "----Slopes: " << std::endl;
+				std::cout << "X: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+				std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
+				std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
+			}
 			blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 		}
@@ -1348,6 +1510,17 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_Triangle, in_pointID);
+			if (debugIncremental == 1)
+			{
+				std::cout << "Poly line points: " << std::endl;
+				std::cout << "0: " << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+				std::cout << "1: " << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+				std::cout << "2: " << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+				std::cout << "----Slopes: " << std::endl;
+				std::cout << "X: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+				std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
+				std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
+			}
 			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			in_Triangle->addPolygonPiece(incrementingKey, elementID);

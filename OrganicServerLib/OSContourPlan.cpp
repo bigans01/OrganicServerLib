@@ -146,6 +146,17 @@ void OSContourPlan::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyP
 	testTriangle.trianglePoints[2] = in_z;
 	testTriangle.materialID = in_materialID;		// set the material of the triangle
 	testTriangle.determineLineLengths();
+	/*
+	if (testTriangle.trianglePoints[0].x > 218.0f)
+	{
+
+		testTriangle.determineAxisInterceptDistancesDebug();
+	}
+	else
+	{
+		testTriangle.determineAxisInterceptDistances();
+	}
+	*/
 	testTriangle.determineAxisInterceptDistances();
 	for (int x = 0; x < 3; x++)
 	{

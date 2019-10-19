@@ -62,6 +62,7 @@ public:
 	void constructTestBlueprints2();
 	void constructTestBlueprints3();	// for mountain testing
 	void constructTestBlueprints4();	// side testing
+	void constructDebugBlueprint1();
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
