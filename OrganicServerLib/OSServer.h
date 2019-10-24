@@ -68,6 +68,7 @@ public:
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
+	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key);							// testing only (for now)
 private:
 	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, OSContourPlan> contourPlanMap;

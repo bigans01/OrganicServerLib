@@ -300,7 +300,7 @@ void OSServer::constructTestBlueprints()
 
 	//  TEST 02: non-clamped triangle with 3 points
 
-	testPoint_0.x = -26.4f;
+	testPoint_0.x = -37.4f;
 	testPoint_0.y = 6.78f;		// previous: 7.0f		// error with 6.78 here (7/5/2018) --> fixed, 7/9/2018
 	testPoint_0.z = 1.00f;		// previous: 0.0f		
 
@@ -428,6 +428,7 @@ void OSServer::constructTestBlueprints()
 
 	// TEST 06-B: Multi-primary line tracing, segment-end trace
 
+	/*
 	testPoint_0.x = -122.0f;			// test: 82, 150, 122
 	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short; bug for -2.4 fixed see (10/3/2018)
 	testPoint_0.z = 2.0f;
@@ -447,7 +448,7 @@ void OSServer::constructTestBlueprints()
 	testPoint_4.x = -8.3f;
 	testPoint_4.y = 2.0f;
 	testPoint_4.z = 20.0f;
-
+	*/
 	
 	/*
 	// perfect clamp test
@@ -577,7 +578,7 @@ void OSServer::constructTestBlueprints()
 
 
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
@@ -950,6 +951,18 @@ void OSServer::executeContourPlan(string in_string)
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
 	organicSystemPtr->addBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
+}
+
+void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key)
+{
+	auto bpBegin = blueprintMap.begin();
+	auto bpEnd = blueprintMap.end();
+	for (bpBegin; bpBegin != bpEnd; bpBegin++)
+	{
+		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
+	}
+
+	client.fracturePolysInBlueprint(in_key, &blueprintMap[in_key], PolyFractureMode::INITIAL_FILL);
 }
 
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
