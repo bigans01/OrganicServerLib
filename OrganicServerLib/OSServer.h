@@ -27,6 +27,7 @@
 #include <mutex>
 #include "OrganicClient.h"
 #include "ServerProperties.h"
+#include "TriangleLine.h"
 
 
 
@@ -81,7 +82,7 @@ private:
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
 	void calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
-	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
+	void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, TriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
 	void determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle);		// currently unused, should be axed at a later time
 	void rayCastTrianglePoints(OSContouredTriangle* in_Triangle);				// after the lines of a contoured triangle have been calibrated, this function traces the lines through the "world" and adds 1 new polygon (along with 1 primary line in that polygon) for each blueprint the line passes through.

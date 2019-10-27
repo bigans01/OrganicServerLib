@@ -1055,7 +1055,7 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 	struct lineMeta
 	{
 		int line_ID = 0;				// for the loop
-		OSTriangleLine* structLinePtr;	// ptr to the actual line
+		TriangleLine* structLinePtr;	// ptr to the actual line
 		ECBPolyPoint thirdPoint;		// = to point B of next line in the sequence
 		int is_clamped = 0;				// is this line clamped?
 	};
@@ -1077,7 +1077,7 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 
 
 
-		OSTriangleLine* linePtr = &in_Triangle->triangleLines[x];	// get reference to appropriate line
+		TriangleLine* linePtr = &in_Triangle->triangleLines[x];	// get reference to appropriate line
 		int x_match = 0;					// indicates B.x- A.x = 0
 		int y_match = 0;					// y
 		int z_match = 0;					// z
@@ -1620,7 +1620,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 	ECBBorderLineList currentBorderLineList;
 	for (int x = 0; x < 3; x++)
 	{
-		OSTriangleLine currentLine = in_Triangle->triangleLines[x];											// get the line
+		TriangleLine currentLine = in_Triangle->triangleLines[x];											// get the line
 		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &in_Triangle->pointKeys[x];									// get a pointer to the key of the point
 		currentKeyCopy = in_Triangle->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
 		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
@@ -1637,7 +1637,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 		
 		*/
 
-		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		TriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
 		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNW.cornerPoint.x)		// check the triangle centroid, compare it to the center of the contour line 
 		{
 			if (in_Directions.x_direction == -1)
@@ -1664,7 +1664,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 
 	else if (in_Triangle->perfect_clamp_y == 1)
 	{
-		OSTriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		TriangleLine tempLine = in_Triangle->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
 		if (tempLine.pointA.y == currentBorderLineList.corner_LowerNW.cornerPoint.y)		// triangle is at very bottom
 		{
 			if (in_Directions.y_direction == -1)	// if the clamped triangle is at the very bottom and plan direction is BELOW, shift all points by -1
@@ -1691,7 +1691,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 
 	else if (in_Triangle->perfect_clamp_z == 1)
 	{
-		OSTriangleLine tempLine = in_Triangle->triangleLines[0];
+		TriangleLine tempLine = in_Triangle->triangleLines[0];
 		if (tempLine.pointA.z == currentBorderLineList.corner_LowerNW.cornerPoint.z)		// triangle is at very bottom
 		{
 			if (in_Directions.z_direction == -1)
@@ -1718,7 +1718,7 @@ void OSServer::calibrateTrianglePointKeys(OSContouredTriangle* in_Triangle, OSCo
 
 }
 
-void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, OSTriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList)
+void OSServer::findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, TriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList)
 {
 	EnclaveKeyDef::EnclaveKey calibratedKey;
 	//EnclaveKeyDef::EnclaveKey curentKey = *in_KeyPtr;

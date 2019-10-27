@@ -5,8 +5,9 @@
 
 #include "OSTrianglePoint.h"
 #include "EnclaveKeyDef.h"
-#include "OSTriangleLine.h"
+#include "TriangleLine.h"
 #include "ECBBorderValues.h"
+#include "PolyUtils.h"
 #include "ECBPoly.h"
 #include <unordered_map>
 #include <math.h>
@@ -15,7 +16,7 @@ class OSContouredTriangle {
 public:
 	ECBPolyPoint trianglePoints[3];				// stores 3 points
 	EnclaveKeyDef::EnclaveKey pointKeys[3];		// stores the keys of the 3 points
-	OSTriangleLine	triangleLines[3];			// stores 3 lines
+	TriangleLine triangleLines[3];			// stores 3 lines
 
 	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2);
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> polygonPieceMap;			// stores the ID of the corresponding ECBPolygon(s) related to this instance of OSContouredTriangle, the ID of which is found in each blueprint.
@@ -31,8 +32,8 @@ public:
 	void determineLineLengths();		// gets the length of lines
 	void determineAxisInterceptDistances();
 	void determineAxisInterceptDistancesDebug();
-	void determineLineAxisIntercept(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint);
-	void determineLineAxisInterceptDebug(OSTriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint, int in_lineID);
+	//void determineLineAxisIntercept(TriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint);
+	//void determineLineAxisInterceptDebug(TriangleLine* in_LinePtr, ECBPolyPoint in_thirdPoint, int in_lineID);
 	void determineType2and3Lines();		// calculates the Type 2 and Type 3 lines for each line in the triangle
 	void rotateTriangleFromZAxis(int in_Point);
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
