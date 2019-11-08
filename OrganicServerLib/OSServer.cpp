@@ -71,6 +71,7 @@ void OSServer::constructTestBlueprints()
 	ECBPolyPoint testPoint_0;
 	ECBPolyPoint testPoint_1;
 	ECBPolyPoint testPoint_2;
+	ECBPolyPoint testPoint_3;
 	testPoint_0.x = -42.0f;
 	testPoint_0.y = 2.4f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 2.0f;
@@ -574,10 +575,43 @@ void OSServer::constructTestBlueprints()
 	testPoint_2.z = 32112.00f;		// previous 112.00f			// NOW:								// 32180 causes error!!!!
 	*/
 
+	// NEW TEST, for fracturing
+	testPoint_0.x = -37.4f;
+	testPoint_0.y = 6.78f;		// previous: 7.0f		// error with 6.78 here (7/5/2018) --> fixed, 7/9/2018
+	testPoint_0.z = 1.00f;		// previous: 0.0f		
+
+	testPoint_1.x = -10.2f;
+	testPoint_1.y = 20.80f;			// previous: 18.0f			(7.80, 10.80, 20.80f); 20.80f leads to interesting resutls/angles
+	testPoint_1.z = 4.70f;
+
+	testPoint_2.x = -1.23f;
+	testPoint_2.y = 7.45f;			// previous: 10.0f
+	testPoint_2.z = 27.00f;
+
+	testPoint_3.x = -37.4f;
+	testPoint_3.y = 6.78f;
+	testPoint_3.z = 17.00f;
+
+	ECBPolyPoint otherTriangle_0, otherTriangle_1, otherTriangle_2;
+	otherTriangle_0.x = 16.0f;
+	otherTriangle_0.y = 24.0f;
+	otherTriangle_0.z = 16.0f;
+
+	otherTriangle_1.x = -16.0f;
+	otherTriangle_1.y = 24.0f;
+	otherTriangle_1.z = 16.0f;
+
+	otherTriangle_2.x = -16.0f;
+	otherTriangle_2.y = 24.0f;
+	otherTriangle_2.z = -16.0f;
+
+	// Part 2 of fracturing test:
 
 
 
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
@@ -1027,8 +1061,8 @@ void OSServer::determineTriangleType2and3Lines(OSContouredTriangle* in_Triangle)
 void OSServer::writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys)
 {
 	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_keys];	// get a pointer to the blueprint
-	std::unordered_map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->primaryPolygonMap.begin();	// beginning of the poly map
-	std::unordered_map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->primaryPolygonMap.end();		// ending of the poly map
+	std::map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->primaryPolygonMap.begin();	// beginning of the poly map
+	std::map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->primaryPolygonMap.end();		// ending of the poly map
 	for (currentPrimaryPoly; currentPrimaryPoly != primaryPolyEnd; ++currentPrimaryPoly)
 	{
 
@@ -1291,7 +1325,7 @@ void OSServer::rayCastTrianglePoints(OSContouredTriangle* in_Triangle)
 
 void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID)
 {
-	in_LinePtr->lineID = in_pointID;
+	//in_LinePtr->lineID = in_pointID;
 	in_LinePtr->pointA = in_Triangle->triangleLines[in_pointID].pointA;							// set the new line to the pointed-to point A
 	in_LinePtr->pointB = in_Triangle->triangleLines[in_pointID].pointB;							// set the new line to the pointed-to point B
 	if (in_pointID == 0)																		// set the third point in the line (this will only be used when the line of point A and B is perfectly clamped to an axis)
@@ -1313,7 +1347,7 @@ void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in
 
 void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint)
 {
-	in_LinePtr->lineID = in_pointID;
+	//in_LinePtr->lineID = in_pointID;
 	in_LinePtr->pointA = in_beginPoint;							// set the new line to the pointed-to point A
 	in_LinePtr->pointB = in_endPoint;							// set the new line to the pointed-to point B
 	if (in_pointID == 0)																		// set the third point in the line (this will only be used when the line of point A and B is perfectly clamped to an axis)
