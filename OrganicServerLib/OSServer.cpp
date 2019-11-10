@@ -607,11 +607,38 @@ void OSServer::constructTestBlueprints()
 
 	// Part 2 of fracturing test:
 
+	ECBPolyPoint otherTriangle2_0, otherTriangle2_1, otherTriangle2_2;
+	otherTriangle2_0.x = 16.0f;
+	otherTriangle2_0.y = 28.0f;
+	otherTriangle2_0.z = 16.0f;
 
+	otherTriangle2_1.x = -16.0f;
+	otherTriangle2_1.y = 28.0f;
+	otherTriangle2_1.z = 16.0f;
 
+	otherTriangle2_2.x = 16.0f;
+	otherTriangle2_2.y = 28.0f;
+	otherTriangle2_2.z = 23.0f;
+
+	ECBPolyPoint otherTriangle3_0, otherTriangle3_1, otherTriangle3_2;		// this triangle will be "whole", as in all its points are contained the in the blueprint. 
+	otherTriangle3_0.x = -2.0f;
+	otherTriangle3_0.y = 30.0f;
+	otherTriangle3_0.z = 16.0f;
+				 
+	otherTriangle3_1.x = -16.0f;
+	otherTriangle3_1.y = 30.0f;
+	otherTriangle3_1.z = 16.0f;
+				 
+	otherTriangle3_2.x = -2.0f;
+	otherTriangle3_2.y = 30.0f;
+	otherTriangle3_2.z = 23.0f;
+
+	planRef->constructSingleContouredTriangle(otherTriangle3_0, otherTriangle3_1, otherTriangle3_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(otherTriangle2_0, otherTriangle2_1, otherTriangle2_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(otherTriangle3_0, otherTriangle3_1, otherTriangle3_2, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_4, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_4, 0);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)	// will cause system crash??? (why?)
@@ -997,6 +1024,120 @@ void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key)
 	}
 
 	client.fracturePolysInBlueprint(in_key, &blueprintMap[in_key], PolyFractureMode::INITIAL_FILL);
+}
+
+void OSServer::runPolyFracturerForAllBlueprints()
+{
+	auto bpBegin = blueprintMap.begin();
+	auto bpEnd = blueprintMap.end();
+	for (bpBegin; bpBegin != bpEnd; bpBegin++)
+	{
+		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
+		client.fracturePolysInBlueprint(bpBegin->first, &bpBegin->second, PolyFractureMode::INITIAL_FILL);
+	}
+}
+
+void OSServer::constructTestBlueprintsForFracturing()
+{
+	std::cout << "||||||| constructing blueprints for FRACTURING test...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 1002.45;
+	mountainSummit.z = 2.61;
+
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+	int numberOfLayers = 2;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
+	addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
+	OSContourLine* lineRef = &planRef->contourLineMap[0];
+	std::cout << "Line ref acquired... >>>" << std::endl;
+	std::cout << "Mountain summit is: " << mountainSummit.x << ", " << mountainSummit.y << ", " << mountainSummit.z << std::endl;
+	std::cout << "Point 0 is: " << lineRef->smartContourPoint[0].getPolyPoint().x << ", " << lineRef->smartContourPoint[0].getPolyPoint().y << ", " << lineRef->smartContourPoint[0].getPolyPoint().z << std::endl;
+	std::cout << "Point 1 is: " << lineRef->smartContourPoint[1].getPolyPoint().x << ", " << lineRef->smartContourPoint[1].getPolyPoint().y << ", " << lineRef->smartContourPoint[1].getPolyPoint().z << std::endl;
+	std::cout << "Point 2 is: " << lineRef->smartContourPoint[2].getPolyPoint().x << ", " << lineRef->smartContourPoint[2].getPolyPoint().y << ", " << lineRef->smartContourPoint[2].getPolyPoint().z << std::endl;
+	std::cout << "Point 3 is: " << lineRef->smartContourPoint[3].getPolyPoint().x << ", " << lineRef->smartContourPoint[3].getPolyPoint().y << ", " << lineRef->smartContourPoint[3].getPolyPoint().z << std::endl;
+
+	// for summit at 30, 5, 5
+	/*
+	ECBPolyPoint otherPoint0;
+	otherPoint0.x = 14;
+	otherPoint0.y = 20;
+	otherPoint0.z = 5;
+
+	ECBPolyPoint otherPoint1;
+	otherPoint1.x = 5;
+	otherPoint1.y = 20;
+	otherPoint1.z = 14;
+
+	ECBPolyPoint otherPoint2;
+	otherPoint2.x = -4;
+	otherPoint2.y = 20;
+	otherPoint2.z = 5;
+
+	ECBPolyPoint otherPoint3;
+	otherPoint3.x = 5;
+	otherPoint3.y = 20;
+	otherPoint3.z = -4;
+	*/
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10);
+	//planRef->buildTriangleStrips(0);
+
+	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
+
+	//planRef->constructStripTriangles(0, 10);		// new function: produces all triangles in a strip, when points are ready etc
+	//planRef->constructStripTriangles(1, 10);
+	//planRef->constructStripTriangles(2, 10);
+	//planRef->constructStripTriangles(3, 10);
+	//planRef->constructStripTriangles(4, 10);
+
+
+
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+
+	// debugging line for individual layer: (layer 10 causes crash).
+	//planRef->constructStripTriangles(13, 2);	// construct an individual layer
+	//planRef->constructStripTriangles(9, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(10, 10);	// construct an individual layer
+	//planRef->constructStripTriangles(16, 10);	// construct an individual layer
+
+	//planRef->constructStripTriangles(5, 10);
+	//planRef->constructStripTriangles(6, 10);
+
+	//planRef->constructStripTriangles(17, 10);		// OK
+	//planRef->constructStripTriangles(18, 10);		
+	//planRef->constructStripTriangles(19, 10);
+	//planRef->constructStripTriangles(20, 10);
+	//planRef->constructStripTriangles(21, 10);
+
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[0].getPolyPoint(), lineRef->smartContourPoint[1].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[1].getPolyPoint(), lineRef->smartContourPoint[2].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10);
+
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeContourPlan("mountain");
 }
 
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)

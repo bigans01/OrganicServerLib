@@ -62,6 +62,7 @@ public:
 	void constructTestBlueprints();
 	void constructTestBlueprints2();
 	void constructTestBlueprints3();	// for mountain testing
+	void constructTestBlueprintsForFracturing();	// for fracturing mountain testing (for now)
 	void constructTestBlueprints4();	// side testing
 	void constructDebugBlueprint1();
 	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
@@ -70,6 +71,7 @@ public:
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key);							// testing only (for now)
+	void runPolyFracturerForAllBlueprints();
 private:
 	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, OSContourPlan> contourPlanMap;
