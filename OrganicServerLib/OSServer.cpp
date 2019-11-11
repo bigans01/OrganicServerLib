@@ -1014,7 +1014,7 @@ void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 	organicSystemPtr->addBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
 }
 
-void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key)
+void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel)
 {
 	auto bpBegin = blueprintMap.begin();
 	auto bpEnd = blueprintMap.end();
@@ -1023,7 +1023,7 @@ void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key)
 		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
 	}
 
-	client.fracturePolysInBlueprint(in_key, &blueprintMap[in_key], PolyFractureMode::INITIAL_FILL);
+	client.fracturePolysInBlueprint(in_key, &blueprintMap[in_key], PolyFractureMode::INITIAL_FILL, in_debugLevel);		// we can set any debug level we want to here.
 }
 
 void OSServer::runPolyFracturerForAllBlueprints()
@@ -1033,7 +1033,7 @@ void OSServer::runPolyFracturerForAllBlueprints()
 	for (bpBegin; bpBegin != bpEnd; bpBegin++)
 	{
 		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
-		client.fracturePolysInBlueprint(bpBegin->first, &bpBegin->second, PolyFractureMode::INITIAL_FILL);
+		client.fracturePolysInBlueprint(bpBegin->first, &bpBegin->second, PolyFractureMode::INITIAL_FILL, PolyDebugLevel::NONE);
 	}
 }
 

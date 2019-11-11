@@ -28,6 +28,7 @@
 #include "OrganicClient.h"
 #include "ServerProperties.h"
 #include "TriangleLine.h"
+#include "PolyDebugLevel.h"
 
 
 
@@ -70,7 +71,7 @@ public:
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
-	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key);							// testing only (for now)
+	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
 	void runPolyFracturerForAllBlueprints();
 private:
 	friend class OSTriangleLineTraverser;
