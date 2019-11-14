@@ -997,10 +997,13 @@ void OSServer::executeContourPlan(string in_string)
 				EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
 				//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
 				EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
-				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, blueprintRef);
+				std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;
+				//std::map<int, ECBPoly> sillyPolys;
+				//polyMapRef = &sillyPolys;
+				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, polyMapRef);
 				EnclaveCollectionBlueprint readBackBP;
-				OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, &readBackBP);
-				OSWinAdapter::outputBlueprintStats(&readBackBP);
+				OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, polyMapRef);
+				OSWinAdapter::outputBlueprintStats(polyMapRef);
 				//std::cout << ">> Blueprint stats outputted...???" << std::endl;
 			}
 		}
