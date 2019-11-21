@@ -29,6 +29,9 @@
 #include "ServerProperties.h"
 #include "TriangleLine.h"
 #include "PolyDebugLevel.h"
+#include "ContourBase.h"
+#include "ContouredMountain.h"
+#include "BlankContour.h"
 
 
 
@@ -57,28 +60,36 @@ public:
 
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
-	void addContourPlan(string in_planName, OSPDir in_Dir, float in_x, float in_y, float in_z);		// adds a plan to contourPlanMap	(requires heap mutex)
-	void addContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void addDerivedContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
-	void constructTestBlueprints();
-	void constructTestBlueprints2();
-	void constructTestBlueprints3();	// for mountain testing
-	void constructTestBlueprintsForFracturing();	// for fracturing mountain testing (for now)
-	void constructTestBlueprints4();	// side testing
-	void constructDebugBlueprint1();
-	void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
+
+	// blueprint testing functions
+	void constructTestBlueprints();		// CONVERTED 
+	void constructTestBlueprints2();	// CONVERTED
+	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
+	void constructTestBlueprintsForFracturing();	// CONVERTED	// for fracturing mountain testing (for now)
+	void constructTestBlueprintsForContourBaseTesting();	// CONVERTED, for fracturing mountain testing (for now)
+	void constructTestBlueprints4();	// CONVERTED // side testing
+	void constructDebugBlueprint1();	// CONVERTED
+
+	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
+	void executeDerivedContourPlan(string in_string);
+
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
-	OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
+	//OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
+	ContourBase* getDerivedContourPlan(string in_string);
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
 	void runPolyFracturerForAllBlueprints();
 private:
 	friend class OSTriangleLineTraverser;
-	std::unordered_map<string, OSContourPlan> contourPlanMap;
+	//std::unordered_map<string, OSContourPlan> contourPlanMap;
+	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
+
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);

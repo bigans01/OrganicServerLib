@@ -66,6 +66,15 @@
     <ClInclude Include="OSTerrainFormation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ContourBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredMountain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="BlankContour.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -93,6 +102,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSCommandDirector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredMountain.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="BlankContour.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
