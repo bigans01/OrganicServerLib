@@ -711,7 +711,7 @@ void OSServer::constructTestBlueprints3()
 	//										: 1.81 (PASS)
 	//										: 0.81 (PASS)
 
-	int numberOfLayers = 14;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
+	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
 	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* planRef = getDerivedContourPlan("mountain");
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
@@ -721,6 +721,36 @@ void OSServer::constructTestBlueprints3()
 	}
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
+}
+
+void OSServer::constructTestBlueprints5()
+{
+	std::cout << "||||||| constructing blueprints (version 2)...." << std::endl;
+	// Triangle #1 point data
+	ECBPolyPoint startPoint;
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	ECBPolyPoint massReferencePoint;
+
+	testPoint_0.x = 1047.86;
+	testPoint_0.y = -26.17;
+	testPoint_0.z = 2.57;
+
+	testPoint_1.x = 1056.38;
+	testPoint_1.y = -32.58;
+	testPoint_1.z = 2.57;
+
+	testPoint_2.x = 1054.9;
+	testPoint_2.y = -32.58;
+	testPoint_2.z = -11;
+
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	planRef->constructSingleContouredTriangle(testPoint_1, testPoint_0, testPoint_2, massReferencePoint, 0, 5);
+	executeDerivedContourPlan("plan");
+
 }
 
 void OSServer::constructTestBlueprints4()
@@ -915,7 +945,7 @@ void OSServer::constructTestBlueprintsForFracturing()
 	//										: 1.81 (PASS)
 	//										: 0.81 (PASS)
 
-	int numberOfLayers = 2;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
+	int numberOfLayers = 7;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
 	//addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	//OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
 	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
@@ -972,12 +1002,14 @@ void OSServer::constructTestBlueprintsForFracturing()
 	//planRef->constructStripTriangles(4, 10);
 
 
-
+	
 	for (int x = 0; x < numberOfLayers; x++)
 	{
 		planRef->constructStripTriangles(x, 2);	// construct an individual layer
 	}
+	
 
+	//planRef->constructStripTriangles(5, 2);	// construct an individual layer
 
 	// debugging line for individual layer: (layer 10 causes crash).
 	//planRef->constructStripTriangles(13, 2);	// construct an individual layer
@@ -999,6 +1031,97 @@ void OSServer::constructTestBlueprintsForFracturing()
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[2].getPolyPoint(), lineRef->smartContourPoint[3].getPolyPoint(), 0, 10);
 	//planRef->constructSingleContouredTriangle(mountainSummit, lineRef->smartContourPoint[3].getPolyPoint(), lineRef->smartContourPoint[0].getPolyPoint(), 0, 10);
 
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlan("mountain");
+}
+
+void OSServer::constructTestBlueprintsForFracturing2()
+{
+	std::cout << "||||||| constructing blueprints for FRACTURING test...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 1002.45;
+	mountainSummit.z = 2.61;
+
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+	int numberOfLayers = 7;		// current is 17 (max at 22) // Fatal error at layer 14 when going 1000+x
+	//addContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	//OSContourPlan* planRef = getContourPlan("mountain");		// get pointer to the plan
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+
+
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+
+	/*
+	std::cout << "Number of contour lines: -->" << planRef->contourLineMap.size() << std::endl;
+	OSContourLine* lineRef = &planRef->contourLineMap[0];
+	std::cout << "Line ref acquired... >>>" << std::endl;
+	std::cout << "Mountain summit is: " << mountainSummit.x << ", " << mountainSummit.y << ", " << mountainSummit.z << std::endl;
+	std::cout << "Point 0 is: " << lineRef->smartContourPoint[0].getPolyPoint().x << ", " << lineRef->smartContourPoint[0].getPolyPoint().y << ", " << lineRef->smartContourPoint[0].getPolyPoint().z << std::endl;
+	std::cout << "Point 1 is: " << lineRef->smartContourPoint[1].getPolyPoint().x << ", " << lineRef->smartContourPoint[1].getPolyPoint().y << ", " << lineRef->smartContourPoint[1].getPolyPoint().z << std::endl;
+	std::cout << "Point 2 is: " << lineRef->smartContourPoint[2].getPolyPoint().x << ", " << lineRef->smartContourPoint[2].getPolyPoint().y << ", " << lineRef->smartContourPoint[2].getPolyPoint().z << std::endl;
+	std::cout << "Point 3 is: " << lineRef->smartContourPoint[3].getPolyPoint().x << ", " << lineRef->smartContourPoint[3].getPolyPoint().y << ", " << lineRef->smartContourPoint[3].getPolyPoint().z << std::endl;
+	*/
+
+	// for summit at 30, 5, 5
+	/*
+	ECBPolyPoint otherPoint0;
+	otherPoint0.x = 14;
+	otherPoint0.y = 20;
+	otherPoint0.z = 5;
+
+	ECBPolyPoint otherPoint1;
+	otherPoint1.x = 5;
+	otherPoint1.y = 20;
+	otherPoint1.z = 14;
+
+	ECBPolyPoint otherPoint2;
+	otherPoint2.x = -4;
+	otherPoint2.y = 20;
+	otherPoint2.z = 5;
+
+	ECBPolyPoint otherPoint3;
+	otherPoint3.x = 5;
+	otherPoint3.y = 20;
+	otherPoint3.z = -4;
+	*/
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint0, otherPoint1, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint1, otherPoint2, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint2, otherPoint3, 0, 10);
+	//planRef->constructSingleContouredTriangle(mountainSummit, otherPoint3, otherPoint0, 0, 10);
+	//planRef->buildTriangleStrips(0);
+
+	// length of 13, paired with a depth between lines of 10.81 causes uncoordinated triangle
+
+	//planRef->constructStripTriangles(0, 10);		// new function: produces all triangles in a strip, when points are ready etc
+	//planRef->constructStripTriangles(1, 10);
+	//planRef->constructStripTriangles(2, 10);
+	//planRef->constructStripTriangles(3, 10);
+	//planRef->constructStripTriangles(4, 10);
+
+
+	/*
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	*/
+
+	planRef->constructStripTriangles(5, 2);	// construct an individual layer
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
 }

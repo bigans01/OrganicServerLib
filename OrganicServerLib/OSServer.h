@@ -52,7 +52,6 @@ public:
 	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
 	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
 	std::condition_variable commandLineCV;
-	//OrganicClient client;				// client holder
 
 	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
 	OSServer();							// will read from server properties file to start
@@ -67,7 +66,9 @@ public:
 	void constructTestBlueprints();		// CONVERTED 
 	void constructTestBlueprints2();	// CONVERTED
 	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
+	void constructTestBlueprints5();	
 	void constructTestBlueprintsForFracturing();	// CONVERTED	// for fracturing mountain testing (for now)
+	void constructTestBlueprintsForFracturing2();	// CONVERTED	// for fracturing mountain testing (for now)
 	void constructTestBlueprintsForContourBaseTesting();	// CONVERTED, for fracturing mountain testing (for now)
 	void constructTestBlueprints4();	// CONVERTED // side testing
 	void constructDebugBlueprint1();	// CONVERTED
@@ -77,14 +78,12 @@ public:
 
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
-	//OSContourPlan* getContourPlan(string in_string);								// return a pointer to a valid contourPlan
 	ContourBase* getDerivedContourPlan(string in_string);
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
 	void runPolyFracturerForAllBlueprints();
 private:
 	friend class OSTriangleLineTraverser;
-	//std::unordered_map<string, OSContourPlan> contourPlanMap;
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
