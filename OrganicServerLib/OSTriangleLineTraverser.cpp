@@ -4,8 +4,8 @@
 #include "ECBIntersectMeta.h"
 #include "OSServer.h"
 
-//OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr)
-OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
+OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr)
+//OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
 {
 	if (in_lineID < 2)
 	{
@@ -27,8 +27,8 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		endPoint = in_TrianglePtr->triangleLines[2].pointB;
 		lineID = 2;
 	}
-	serverPtr = in_serverPtr;
-	//blueprintMapRef = in_blueprintMapPtr;
+	//serverPtr = in_serverPtr;
+	blueprintMapRef = in_blueprintMapPtr;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
 	//std::cout << "-->>>> begiging OS Triangle Line Traverser..." << std::endl;
@@ -60,10 +60,14 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	{
 		//cout << "|||| Polygon was found!! " << endl;
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
-		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
+
+		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
 		//&blueprintMapRef->find(incrementingKey)->second;
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
+		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
+
 		ECBPolyLine newPolyLine;												// create a new poly line
+		//EnclaveCollectionBlueprint* testPtr = &(*blueprintMapRef)[beginKey];
 
 		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
@@ -92,8 +96,10 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		ECBPoly newPoly;
 		newPoly.materialID = in_TrianglePtr->materialID;
 		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
-		EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
+
+		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
+		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
 		
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
@@ -145,8 +151,11 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	{
 		//cout << "|||| Polygon was found!! " << endl;
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
+
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;	// get a pointer to the blueprint (for code readability only)
-		EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
+		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
+
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServer::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
@@ -167,8 +176,11 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		ECBPoly newPoly;
 		newPoly.materialID = in_TrianglePtr->materialID;
 		OSServer::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
+
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;
-		EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
+		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
+
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line

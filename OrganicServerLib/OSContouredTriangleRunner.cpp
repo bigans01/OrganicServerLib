@@ -5,8 +5,8 @@ void OSContouredTriangleRunner::performRun()
 {
 	checkForPerfectClamping();			// check for any perfect clamping conditions.
 	calibrateTrianglePointKeys();		// perform key calibration; adjusts keys if any perfect clamping conditions are met.
-
-
+	rayCastTrianglePoints();
+	contouredTrianglePtr->checkIfPointsAreInSameBlueprint();
 }
 
 void OSContouredTriangleRunner::checkForPerfectClamping()
@@ -478,7 +478,9 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		{
 
 			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
-			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
+			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
+			//&(*blueprintMapRef)[currentKey];
+			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
 			/*
@@ -503,7 +505,10 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			ECBPoly newPoly;
 			newPoly.materialID = contouredTrianglePtr->materialID;
 			//fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
-			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
+			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
+			//
+			//&(*blueprintMapRef)[currentKey];
+			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
@@ -536,8 +541,10 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		{
 			//std::cout << "++++++++++++Branch 1 hit (begin) " << std::endl;
 			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
-			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
-			/*
+			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
+			//&(*blueprintMapRef)[currentKey];
+			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
+			
 			OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			//std::cout << "++++++++++++Branch 1 hit (mid)" << std::endl;
@@ -547,7 +554,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 				lineRef->traverseLineOnce(contouredTrianglePtr);
 				//std::cout << "traversing once...!!!" << std::endl;
 			}
-			*/
+			
 
 
 		}
@@ -556,13 +563,15 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//std::cout << "Branch 2 hit" << std::endl;
 			ECBPoly newPoly;
 			newPoly.materialID = contouredTrianglePtr->materialID;
-			//fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
-			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
+			fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
+			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
+			//&(*blueprintMapRef)[currentKey];
+			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			int currentBlueprintPolyMapSize = blueprintPtr->primaryPolygonMap.size();
 			blueprintPtr->primaryPolygonMap[currentBlueprintPolyMapSize] = newPoly;		// insert a new polygon; the ID will be equalto the size
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			contouredTrianglePtr->addPolygonPiece(incrementingKey, currentBlueprintPolyMapSize);
-			/*
+			
 			OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			while (!(lineRef->currentKey == lineRef->endKey))
@@ -570,7 +579,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 				lineRef->traverseLineOnce(contouredTrianglePtr);
 				//std::cout << "traversing once...!!!" << std::endl;
 			}
-			*/
+			
 		}
 		//cout << "Ending this section..." << std::endl;
 
@@ -597,4 +606,16 @@ void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in
 	in_LinePtr->x_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].z_interceptSlope;		// "" z
+}
+
+void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle)
+{
+	if (in_contouredTriangle->perfect_clamp_x == 1
+		||
+		in_contouredTriangle->perfect_clamp_y == 1
+		||
+		in_contouredTriangle->perfect_clamp_z == 1)
+	{
+		in_polyPtr->isPolyPerfectlyClamped = 1;
+	}
 }

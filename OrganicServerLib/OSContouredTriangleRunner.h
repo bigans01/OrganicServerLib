@@ -31,6 +31,7 @@ class OSContouredTriangleRunner
 		void rayCastTrianglePoints();		// trace the points (lines) through the blueprints; inner filling of the ContouredTriangle isn't done here (this comes later)
 		void tracePointThroughBlueprints(int in_pointID);
 		void fillLineMetaData(ECBPolyLine* in_LinePtr, int in_pointID);
+		void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
 };
 
 #endif
