@@ -38,6 +38,7 @@ public:
 	void determineType2and3Lines();		// calculates the Type 2 and Type 3 lines for each line in the triangle
 	void rotateTriangleFromZAxis(int in_Point);
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
+	bool checkIfPointsAreInSameBlueprint();
 };
 
 #endif

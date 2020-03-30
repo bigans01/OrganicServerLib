@@ -192,6 +192,38 @@ void OSContouredTriangle::determineLineAngles()
 	}
 }
 
+bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
+{
+	bool result = true; 
+	if
+		(
+		(pointKeys[0].x == pointKeys[1].x)
+			&&
+			(pointKeys[1].x == pointKeys[2].x)
+
+			&&
+
+			(pointKeys[0].y == pointKeys[1].y)
+			&&
+			(pointKeys[1].y == pointKeys[2].y)
+
+			&&
+
+			(pointKeys[0].z == pointKeys[1].z)
+			&&
+			(pointKeys[1].z == pointKeys[2].z)
+			)
+	{
+		std::cout << "!!!! ContouredTriangle is isolated to one blueprint. " << std::endl;
+	}
+	else
+	{
+		std::cout << "!!!! ContouredTriangle spans multiple blueprints...filling checks required. " << std::endl;
+		result = false;
+	}
+	return result;
+}
+
 void OSContouredTriangle::determineType2and3Lines()
 {
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyIter = polygonPieceMap.begin();

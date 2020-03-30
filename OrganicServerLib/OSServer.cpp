@@ -39,7 +39,9 @@ OSServer::OSServer()
 
 OSServer::~OSServer()
 {
+	std::cout << "!!! OSServer destructor call BEGIN...." << std::endl;
 	OSCManager.despawnAllCells();
+	std::cout << "!!! OSServer destructor call END...." << std::endl;
 }
 
 void OSServer::addDerivedContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
@@ -689,6 +691,36 @@ void OSServer::constructTestBlueprints2()
 	executeDerivedContourPlan("plan");
 }
 
+void OSServer::constructBlueprintFillTest()
+{
+	std::cout << "||||||| Constructing blueprint fill test (version 1)...." << std::endl;
+	ECBPolyPoint startPoint, mrPoint;
+	startPoint.x = 0.0f;
+	startPoint.y = 20.0f;
+	startPoint.z = 0.0f;
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+
+	testPoint_0.x = 16.0f;
+	testPoint_0.y = -8.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 4.5f;
+
+	testPoint_1.x = -4.0f;
+	testPoint_1.y = -8.0f;
+	testPoint_1.z = -16.0f;
+
+	testPoint_2.x = -4.0f;
+	testPoint_2.y = 16.0f;
+	testPoint_2.z = 4.5f;
+
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	executeDerivedContourPlan("plan");
+}
+
 void OSServer::constructTestBlueprints3()
 {
 	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
@@ -835,19 +867,6 @@ void OSServer::executeDerivedContourPlan(string in_string)
 		{
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			if
-				(
-				(currentTriangle->trianglePoints[0].x > 227.0f)
-					&&
-					(currentTriangle->trianglePoints[0].x < 228.0f)
-					)
-			{
-				std::cout << "SERVER: triangle to debug found! " << std::endl;
-				std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << currentTriangle->trianglePoints[0].z << std::endl;
-			}
-			//std::cout << "Tracing triangle with points: " << std::endl;
-			//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << currentTriangle->trianglePoints[0].z << std::endl;
-			//std::cout << "---beginning trace-through" << std::endl;
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
 			//std::cout << "---ending trace-through" << std::endl;
 
@@ -1114,14 +1133,14 @@ void OSServer::constructTestBlueprintsForFracturing2()
 	//planRef->constructStripTriangles(4, 10);
 
 
-	/*
+	
 	for (int x = 0; x < numberOfLayers; x++)
 	{
 		planRef->constructStripTriangles(x, 2);	// construct an individual layer
 	}
-	*/
+	
 
-	planRef->constructStripTriangles(5, 2);	// construct an individual layer
+	//planRef->constructStripTriangles(5, 2);	// construct an individual layer
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
 }
@@ -1150,6 +1169,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 {
 	calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	//determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
+	OSContouredTriangleRunner(in_Triangle, in_Directions, &blueprintMap);
 }
 
 void OSServer::determineTriangleCentroid(OSContouredTriangle* in_Triangle)
@@ -1394,12 +1414,13 @@ void OSServer::calibrateAndRunContouredTriangle(OSContouredTriangle* in_Triangle
 	calibrateTrianglePointKeys(in_Triangle, in_Directions);
 
 
-	// STEP T-3
-	//std::cout << "--ray cast beginning..." << std::endl;
-	rayCastTrianglePoints(in_Triangle);		// runs the lines through the "world" and sets them up in their appropriate blueprints
-	//std::cout << "--ray cast completed.." << std::endl;
 
-	// STEP T-4
+	//std::cout << "--ray cast beginning..." << std::endl;
+	rayCastTrianglePoints(in_Triangle);						// STEP T-3: runs the lines through the "world" and sets them up in their appropriate blueprints
+	in_Triangle->checkIfPointsAreInSameBlueprint();			// STEP T-4: checks to see if any blueprint filling needs to occur
+ 	//std::cout << "--ray cast completed.." << std::endl;
+
+
 	auto blueend = std::chrono::high_resolution_clock::now();
 	for (int x = 0; x < 3; x++)
 	{
@@ -1712,6 +1733,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			//std::cout << "++++++++++++Branch 1 hit (begin) " << std::endl;
 			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
 			EnclaveCollectionBlueprint* blueprintPtr = &blueprintMap[incrementingKey];	// get a pointer to the blueprint (for code readability only)
+			//OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, &blueprintMap);
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			//std::cout << "++++++++++++Branch 1 hit (mid)" << std::endl;
@@ -1737,6 +1759,7 @@ void OSServer::tracePointThroughBlueprints(OSContouredTriangle* in_Triangle, int
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			in_Triangle->addPolygonPiece(incrementingKey, currentBlueprintPolyMapSize);
 
+			//OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, &blueprintMap);
 			OSTriangleLineTraverser lineTraverser(in_Triangle, in_pointID, this);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			while (!(lineRef->currentKey == lineRef->endKey))

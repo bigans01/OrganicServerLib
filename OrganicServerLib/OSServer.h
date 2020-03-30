@@ -9,8 +9,8 @@
 #include "OSTerrainFormation.h"
 #include "OSCommandDirector.h"
 #include "OrganicStemcellManager.h"
+#include "OSContouredTriangleRunner.h"
 #include "OSPDir.h"
-#include "OrganicThreadController.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "OSContourPlanDirections.h"
 #include "EnclaveKeyDef.h"
@@ -72,6 +72,7 @@ public:
 	void constructTestBlueprintsForContourBaseTesting();	// CONVERTED, for fracturing mountain testing (for now)
 	void constructTestBlueprints4();	// CONVERTED // side testing
 	void constructDebugBlueprint1();	// CONVERTED
+	void constructBlueprintFillTest();
 
 	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void executeDerivedContourPlan(string in_string);
