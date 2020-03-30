@@ -78,6 +78,9 @@
     <ClInclude Include="OSContouredTriangleRunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OSServerUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -114,6 +117,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSContouredTriangleRunner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSServerUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -8,8 +8,8 @@
 #include "OrganicUtils.h"
 #include "ECBFaceIntersect.h"
 #include "EnclaveCollectionBlueprint.h"
+#include "OSServerUtils.h"
 
-class OSServer;
 class OSTriangleLineTraverser
 {
 public:
@@ -23,7 +23,6 @@ public:
 	ECBPolyPoint beginPoint;				// equals point A of line
 	ECBPolyPoint currentIterationEndpoint;	// equals whatever the point is when this line hits an ECB border
 	ECBPolyPoint endPoint;					// equals point B of line
-	OSServer* serverPtr;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
 
 	int lineID = 0;							// ID of the line, in relation to the triangle it belongs to (0, 1, or 2)

@@ -580,51 +580,6 @@ void OSServer::setCurrentWorld(std::string in_worldName)
 	currentWorld = in_worldName;
 }
 
-
-void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID)
-{
-	//in_LinePtr->lineID = in_pointID;
-	in_LinePtr->pointA = in_Triangle->triangleLines[in_pointID].pointA;							// set the new line to the pointed-to point A
-	in_LinePtr->pointB = in_Triangle->triangleLines[in_pointID].pointB;							// set the new line to the pointed-to point B
-	if (in_pointID == 0)																		// set the third point in the line (this will only be used when the line of point A and B is perfectly clamped to an axis)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[2];
-	}
-	else if (in_pointID == 1)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[0];
-	}
-	else if (in_pointID == 2)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[1];
-	}
-	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
-	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
-	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
-}
-
-void OSServer::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint)
-{
-	//in_LinePtr->lineID = in_pointID;
-	in_LinePtr->pointA = in_beginPoint;							// set the new line to the pointed-to point A
-	in_LinePtr->pointB = in_endPoint;							// set the new line to the pointed-to point B
-	if (in_pointID == 0)																		// set the third point in the line (this will only be used when the line of point A and B is perfectly clamped to an axis)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[2];
-	}
-	else if (in_pointID == 1)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[0];
-	}
-	else if (in_pointID == 2)
-	{
-		in_LinePtr->pointC = in_Triangle->trianglePoints[1];
-	}
-	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
-	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
-	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
-}
-
 OSPDir OSServer::getFormationDirections(OSTerrainFormation in_terrainFormation)
 {
 	OSPDir returnDir;
@@ -744,33 +699,6 @@ void OSServer::signalServerShutdown(mutex& in_serverMutex)
 	std::lock_guard<std::mutex> lock(std::ref(in_serverMutex));
 	isServerActive = 0;
 }
-
-
-void OSServer::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle)
-{
-	if (in_contouredTriangle->perfect_clamp_x == 1
-		||
-		in_contouredTriangle->perfect_clamp_y == 1
-		||
-		in_contouredTriangle->perfect_clamp_z == 1)
-	{
-		in_polyPtr->isPolyPerfectlyClamped = 1;
-	}
-
-	if (in_contouredTriangle->perfect_clamp_x == 1)
-	{
-		in_polyPtr->isPolyPerfectlyClamped = 1;
-	}
-	if (in_contouredTriangle->perfect_clamp_y == 1)
-	{
-		in_polyPtr->isPolyPerfectlyClamped = 2;
-	}
-	if (in_contouredTriangle->perfect_clamp_z == 1)
-	{
-		in_polyPtr->isPolyPerfectlyClamped = 3;
-	}
-}
-
 
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 {

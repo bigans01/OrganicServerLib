@@ -156,6 +156,7 @@
     <ClInclude Include="OSContourPlanDirections.h" />
     <ClInclude Include="OSContourPoint.h" />
     <ClInclude Include="OSServer.h" />
+    <ClInclude Include="OSServerUtils.h" />
     <ClInclude Include="OSTerrainFormation.h" />
     <ClInclude Include="OSTriangleLine.h" />
     <ClInclude Include="OSTriangleLineTraverser.h" />
@@ -174,6 +175,7 @@
     <ClCompile Include="OSContourPlan.cpp" />
     <ClCompile Include="OSContourPoint.cpp" />
     <ClCompile Include="OSServer.cpp" />
+    <ClCompile Include="OSServerUtils.cpp" />
     <ClCompile Include="OSTriangleLineTraverser.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

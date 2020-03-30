@@ -101,9 +101,6 @@ private:
 	void signalCommandLineShutdown(mutex& in_serverReadWrite, int in_valueToSet, int* in_clShutdownFlag);
 	int getCommandLineShutdownValue(mutex& in_serverReadWrite);
 	void signalServerShutdown(mutex& in_serverMutex);
-	static void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
-	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
-	static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
 	OSPDir getFormationDirections(OSTerrainFormation in_terrainFormation);
 };
 
