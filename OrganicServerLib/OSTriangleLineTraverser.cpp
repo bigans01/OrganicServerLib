@@ -65,6 +65,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//&blueprintMapRef->find(incrementingKey)->second;
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
+		in_TrianglePtr->insertTracedBlueprint(beginKey);
 
 		ECBPolyLine newPolyLine;												// create a new poly line
 		//EnclaveCollectionBlueprint* testPtr = &(*blueprintMapRef)[beginKey];
@@ -100,6 +101,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
+		in_TrianglePtr->insertTracedBlueprint(beginKey);
 		
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
@@ -154,6 +156,10 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;	// get a pointer to the blueprint (for code readability only)
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		//if (!(currentKey == endKey))	// don't update the count if it is the last one.
+		//{
+			in_TrianglePtr->insertTracedBlueprint(currentKey);
+		//}
 		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
 
 		ECBPolyLine newPolyLine;												// create a new poly line
@@ -179,6 +185,10 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		//if (!(currentKey == endKey))	// don't update the count if it is the last one.
+		//{
+			in_TrianglePtr->insertTracedBlueprint(currentKey);
+		//}
 		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
 
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon

@@ -26,6 +26,7 @@ void OSContouredTriangle::determineLineLengths()
 	TriangleLine* triangleLineRef_0 = &triangleLines[0];
 	ECBPolyPoint* point_A_ref = &trianglePoints[0];
 	ECBPolyPoint* point_B_ref = &trianglePoints[1];
+	ECBPolyPoint* point_C_ref = &trianglePoints[2];
 	
 	//triangleLineRef_0->pointA.x = point_A_ref->x;
 	//triangleLineRef_0->pointA.y = point_A_ref->y;
@@ -36,6 +37,7 @@ void OSContouredTriangle::determineLineLengths()
 
 	triangleLineRef_0->pointA = *point_A_ref;
 	triangleLineRef_0->pointB = *point_B_ref;
+	triangleLineRef_0->pointC = *point_C_ref;
 
 
 	float x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
@@ -48,6 +50,7 @@ void OSContouredTriangle::determineLineLengths()
 	TriangleLine* triangleLineRef_1 = &triangleLines[1];
 	point_A_ref = &trianglePoints[1];
 	point_B_ref = &trianglePoints[2];
+	point_C_ref = &trianglePoints[0];
 	//triangleLineRef_1->pointA.x = point_A_ref->x;
 	//triangleLineRef_1->pointA.y = point_A_ref->y;
 	//triangleLineRef_1->pointA.z = point_A_ref->z;
@@ -56,6 +59,7 @@ void OSContouredTriangle::determineLineLengths()
 	//triangleLineRef_1->pointB.z = point_B_ref->z;
 	triangleLineRef_1->pointA = *point_A_ref;
 	triangleLineRef_1->pointB = *point_B_ref;
+	triangleLineRef_1->pointC = *point_C_ref;
 
 	x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
 	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
@@ -67,6 +71,7 @@ void OSContouredTriangle::determineLineLengths()
 	TriangleLine* triangleLineRef_2 = &triangleLines[2];
 	point_A_ref = &trianglePoints[2];
 	point_B_ref = &trianglePoints[0];
+	point_C_ref = &trianglePoints[1];
 	//triangleLineRef_2->pointA.x = point_A_ref->x;
 	//triangleLineRef_2->pointA.y = point_A_ref->y;
 	//triangleLineRef_2->pointA.z = point_A_ref->z;
@@ -75,6 +80,7 @@ void OSContouredTriangle::determineLineLengths()
 	//triangleLineRef_2->pointB.z = point_B_ref->z;
 	triangleLineRef_2->pointA = *point_A_ref;
 	triangleLineRef_2->pointB = *point_B_ref;
+	triangleLineRef_2->pointC = *point_C_ref;
 
 	x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
 	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
@@ -192,6 +198,11 @@ void OSContouredTriangle::determineLineAngles()
 	}
 }
 
+void OSContouredTriangle::insertTracedBlueprint(EnclaveKeyDef::EnclaveKey in_key)
+{
+	tracedBlueprintCountMap[in_key]++;	// increment the count
+}
+
 bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 {
 	bool result = true; 
@@ -214,7 +225,7 @@ bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 			(pointKeys[1].z == pointKeys[2].z)
 			)
 	{
-		std::cout << "!!!! ContouredTriangle is isolated to one blueprint. " << std::endl;
+		//std::cout << "!!!! ContouredTriangle is isolated to one blueprint. " << std::endl;
 	}
 	else
 	{

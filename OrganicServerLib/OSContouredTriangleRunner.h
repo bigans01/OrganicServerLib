@@ -10,6 +10,9 @@
 #include "EnclaveCollectionBlueprint.h"
 #include "EnclaveKeyDef.h"
 #include "OrganicUtils.h"
+#include "PrimaryLineT1.h"
+#include "PrimaryLineT1Array.h"
+#include "PolyRunDirection.h"
 
 class OSContouredTriangleRunner
 {
@@ -23,6 +26,8 @@ class OSContouredTriangleRunner
 		OSContourPlanDirections planDirections;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
 
+		//PrimaryLineT1Array contourLineArray;
+
 		void performRun();	// run the contoured triangle; perform filling
 	private:
 		void checkForPerfectClamping();		// checks to see if the contoured triangle is perfectly clamped.
@@ -31,7 +36,11 @@ class OSContouredTriangleRunner
 		void rayCastTrianglePoints();		// trace the points (lines) through the blueprints; inner filling of the ContouredTriangle isn't done here (this comes later)
 		void tracePointThroughBlueprints(int in_pointID);
 		void fillLineMetaData(ECBPolyLine* in_LinePtr, int in_pointID);
-		void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
+		void fillPolyWithClampResult(ECBPoly* in_polyPtr);
+		void prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef);
+		void runContouredTriangleOriginalDirection();
+		int isContouredTrianglePerfectlyClamped();
+		void printTracingCounts();
 };
 
 #endif

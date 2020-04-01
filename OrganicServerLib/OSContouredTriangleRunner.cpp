@@ -6,7 +6,16 @@ void OSContouredTriangleRunner::performRun()
 	checkForPerfectClamping();			// check for any perfect clamping conditions.
 	calibrateTrianglePointKeys();		// perform key calibration; adjusts keys if any perfect clamping conditions are met.
 	rayCastTrianglePoints();
-	contouredTrianglePtr->checkIfPointsAreInSameBlueprint();
+
+	printTracingCounts();
+
+	if (contouredTrianglePtr->checkIfPointsAreInSameBlueprint() == false)
+	{
+		runContouredTriangleOriginalDirection();
+	}
+	//prepareContouredTriangleData(PolyRunDirection::NORMAL);
+
+	// only do the following if all points are NOT in same blueprint
 }
 
 void OSContouredTriangleRunner::checkForPerfectClamping()
@@ -481,6 +490,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
+			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);			// traced blueprint set update (in case it wasn't inserted already.
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
 			/*
@@ -509,6 +519,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
+			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
@@ -544,7 +555,8 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
-			
+			//contouredTrianglePtr->insertTracedBlueprint(incrementingKey);						// traced blueprint set update (in case it wasn't inserted already.
+
 			OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
 			OSTriangleLineTraverser* lineRef = &lineTraverser;
 			//std::cout << "++++++++++++Branch 1 hit (mid)" << std::endl;
@@ -563,10 +575,12 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//std::cout << "Branch 2 hit" << std::endl;
 			ECBPoly newPoly;
 			newPoly.materialID = contouredTrianglePtr->materialID;
-			fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
+			fillPolyWithClampResult(&newPoly);
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
+			//contouredTrianglePtr->insertTracedBlueprint(incrementingKey);					// traced blueprint set update (in case it wasn't inserted already.							
+
 			int currentBlueprintPolyMapSize = blueprintPtr->primaryPolygonMap.size();
 			blueprintPtr->primaryPolygonMap[currentBlueprintPolyMapSize] = newPoly;		// insert a new polygon; the ID will be equalto the size
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
@@ -608,14 +622,74 @@ void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in
 	in_LinePtr->z_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].z_interceptSlope;		// "" z
 }
 
-void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle)
+void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr)
 {
-	if (in_contouredTriangle->perfect_clamp_x == 1
+	if (contouredTrianglePtr->perfect_clamp_x == 1
 		||
-		in_contouredTriangle->perfect_clamp_y == 1
+		contouredTrianglePtr->perfect_clamp_y == 1
 		||
-		in_contouredTriangle->perfect_clamp_z == 1)
+		contouredTrianglePtr->perfect_clamp_z == 1)
 	{
 		in_polyPtr->isPolyPerfectlyClamped = 1;
+	}
+}
+
+void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
+{
+	PrimaryLineT1Array contourLineArray;
+	prepareContouredTriangleData(PolyRunDirection::NORMAL, &contourLineArray);
+}
+
+void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef)
+{
+	int perfectClampFlag = isContouredTrianglePerfectlyClamped();		// is the contoured triangle perfectly clamped?
+	for (int x = 0; x < 3; x++)		// go through each line in the contoured triangle.
+	{
+		ECBPolyPoint pointA = contouredTrianglePtr->triangleLines[x].pointA;
+		ECBPolyPoint pointB = contouredTrianglePtr->triangleLines[x].pointB;
+		ECBPolyPoint pointC = contouredTrianglePtr->triangleLines[x].pointC;
+		PrimaryLineT1 newPrimaryLine;
+		newPrimaryLine.perfectClampValue = perfectClampFlag;
+		newPrimaryLine.beginPointRealXYZ = pointA;				// store actual XYZ values of point A
+		newPrimaryLine.endPointRealXYZ = pointB;				// store actual XYZ values of point B
+		newPrimaryLine.thirdPointRealXYZ = pointC;				// store actual XYZ values of point C (not always needed)
+		newPrimaryLine.intendedFaces = OrganicUtils::determineIntendedFacesV2(pointA, pointB, pointC, contouredTrianglePtr->triangleLines[x].x_interceptSlope, contouredTrianglePtr->triangleLines[x].y_interceptSlope, contouredTrianglePtr->triangleLines[x].z_interceptSlope);
+		std::cout << "!!!!! Points for line are: " << std::endl;
+		std::cout << "pointA: " << pointA.x << ", " << pointA.y << ", " << pointA.z << std::endl;
+		std::cout << "pointB: " << pointB.x << ", " << pointB.y << ", " << pointB.z << std::endl;
+		std::cout << "pointC: " << pointC.x << ", " << pointC.y << ", " << pointC.z << std::endl;
+
+		if (in_direction == PolyRunDirection::NORMAL)
+		{
+
+		}
+		else if (in_direction == PolyRunDirection::REVERSE)
+		{
+
+		}
+	}
+}
+
+int OSContouredTriangleRunner::isContouredTrianglePerfectlyClamped()
+{
+	int result = 0;
+	if (contouredTrianglePtr->perfect_clamp_x == 1
+		||
+		contouredTrianglePtr->perfect_clamp_y == 1
+		||
+		contouredTrianglePtr->perfect_clamp_z == 1)
+	{
+		result = 1;
+	}
+	return result;
+}
+
+void OSContouredTriangleRunner::printTracingCounts()
+{
+	auto traceBegin = contouredTrianglePtr->tracedBlueprintCountMap.begin();
+	auto traceEnd = contouredTrianglePtr->tracedBlueprintCountMap.end();
+	for (traceBegin; traceBegin != traceEnd; traceBegin++)
+	{
+		std::cout << "Key: (" << traceBegin->first.x << ", " << traceBegin->first.y << ", " << traceBegin->first.z << ") -> " << traceBegin->second << std::endl;
 	}
 }
