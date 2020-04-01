@@ -649,11 +649,16 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		ECBPolyPoint pointB = contouredTrianglePtr->triangleLines[x].pointB;
 		ECBPolyPoint pointC = contouredTrianglePtr->triangleLines[x].pointC;
 		PrimaryLineT1 newPrimaryLine;
+		newPrimaryLine.IDofLine = x;
 		newPrimaryLine.perfectClampValue = perfectClampFlag;
+		newPrimaryLine.isLineActiveInPoly = 1;
 		newPrimaryLine.beginPointRealXYZ = pointA;				// store actual XYZ values of point A
 		newPrimaryLine.endPointRealXYZ = pointB;				// store actual XYZ values of point B
 		newPrimaryLine.thirdPointRealXYZ = pointC;				// store actual XYZ values of point C (not always needed)
 		newPrimaryLine.intendedFaces = OrganicUtils::determineIntendedFacesV2(pointA, pointB, pointC, contouredTrianglePtr->triangleLines[x].x_interceptSlope, contouredTrianglePtr->triangleLines[x].y_interceptSlope, contouredTrianglePtr->triangleLines[x].z_interceptSlope);
+		newPrimaryLine.x_int = contouredTrianglePtr->triangleLines[x].x_interceptSlope;
+		newPrimaryLine.y_int = contouredTrianglePtr->triangleLines[x].y_interceptSlope;
+		newPrimaryLine.z_int = contouredTrianglePtr->triangleLines[x].z_interceptSlope;
 		std::cout << "!!!!! Points for line are: " << std::endl;
 		std::cout << "pointA: " << pointA.x << ", " << pointA.y << ", " << pointA.z << std::endl;
 		std::cout << "pointB: " << pointB.x << ", " << pointB.y << ", " << pointB.z << std::endl;
@@ -665,8 +670,15 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		}
 		else if (in_direction == PolyRunDirection::REVERSE)
 		{
-
+			newPrimaryLine.calibrateForBlueprintTracingWithInverseChecks(pointC);
 		}
+		in_contourLineArrayRef->addNewPrimaryLine(newPrimaryLine);
+	}
+
+	// check for line swap
+	if (in_direction == PolyRunDirection::REVERSE)
+	{
+		in_contourLineArrayRef->swapLinesForBlueprintTracing();
 	}
 }
 
@@ -690,6 +702,6 @@ void OSContouredTriangleRunner::printTracingCounts()
 	auto traceEnd = contouredTrianglePtr->tracedBlueprintCountMap.end();
 	for (traceBegin; traceBegin != traceEnd; traceBegin++)
 	{
-		std::cout << "Key: (" << traceBegin->first.x << ", " << traceBegin->first.y << ", " << traceBegin->first.z << ") -> " << traceBegin->second << std::endl;
+		std::cout << "Traced Key: (" << traceBegin->first.x << ", " << traceBegin->first.y << ", " << traceBegin->first.z << ") -> " << traceBegin->second << std::endl;
 	}
 }

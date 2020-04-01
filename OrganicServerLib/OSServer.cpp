@@ -216,6 +216,18 @@ void OSServer::constructBlueprintFillTest()
 	testPoint_2.y = 16.0f;
 	testPoint_2.z = 4.5f;
 
+	//testPoint_0.x = 16.0f;
+	//testPoint_0.y = 16.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	//testPoint_0.z = 4.5f;
+
+	//testPoint_1.x = 0.0f;
+	//testPoint_1.y = 16.0f;
+	//testPoint_1.z = 4.5f;
+
+	//testPoint_2.x = 8.0f;
+	//testPoint_2.y = 12.0f;
+	//testPoint_2.z = -4.5f;
+
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
