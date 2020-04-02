@@ -638,6 +638,7 @@ void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
 {
 	PrimaryLineT1Array contourLineArray;
 	prepareContouredTriangleData(PolyRunDirection::NORMAL, &contourLineArray);
+	fillBlueprintArea(&contourLineArray);
 }
 
 void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef)
@@ -652,6 +653,11 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		newPrimaryLine.IDofLine = x;
 		newPrimaryLine.perfectClampValue = perfectClampFlag;
 		newPrimaryLine.isLineActiveInPoly = 1;
+
+		EnclaveKeyPair pointBlueprintKeys = getBlueprintKeysForPrimaryLinePoints(x);	// get the CALIBRATED blueprint keys for the points
+		newPrimaryLine.beginPointBlueprintKey = pointBlueprintKeys.keyA;
+		newPrimaryLine.endPointBlueprintKey = pointBlueprintKeys.keyB;
+
 		newPrimaryLine.beginPointRealXYZ = pointA;				// store actual XYZ values of point A
 		newPrimaryLine.endPointRealXYZ = pointB;				// store actual XYZ values of point B
 		newPrimaryLine.thirdPointRealXYZ = pointC;				// store actual XYZ values of point C (not always needed)
@@ -659,10 +665,10 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		newPrimaryLine.x_int = contouredTrianglePtr->triangleLines[x].x_interceptSlope;
 		newPrimaryLine.y_int = contouredTrianglePtr->triangleLines[x].y_interceptSlope;
 		newPrimaryLine.z_int = contouredTrianglePtr->triangleLines[x].z_interceptSlope;
-		std::cout << "!!!!! Points for line are: " << std::endl;
-		std::cout << "pointA: " << pointA.x << ", " << pointA.y << ", " << pointA.z << std::endl;
-		std::cout << "pointB: " << pointB.x << ", " << pointB.y << ", " << pointB.z << std::endl;
-		std::cout << "pointC: " << pointC.x << ", " << pointC.y << ", " << pointC.z << std::endl;
+		//std::cout << "!!!!! Points for line are: " << std::endl;
+		//std::cout << "pointA: " << pointA.x << ", " << pointA.y << ", " << pointA.z << std::endl;
+		//std::cout << "pointB: " << pointB.x << ", " << pointB.y << ", " << pointB.z << std::endl;
+		//std::cout << "pointC: " << pointC.x << ", " << pointC.y << ", " << pointC.z << std::endl;
 
 		if (in_direction == PolyRunDirection::NORMAL)
 		{
@@ -679,6 +685,55 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 	if (in_direction == PolyRunDirection::REVERSE)
 	{
 		in_contourLineArrayRef->swapLinesForBlueprintTracing();
+	}
+	//in_contourLineArrayRef->printBlueprintTracingLines();
+}
+
+void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contourLineArrayRef)
+{
+	for (int x = 0; x < 3; x++)		// attempt fill through each line
+	{
+		OSBlueprintTraversalController traversalController(in_contourLineArrayRef->linkArray[x], in_contourLineArrayRef->linkArray[x].IDofLine);
+		if (traversalController.isLineContainedToOneBlueprint() == false)
+		{
+			//std::cout << "!!!" << std::endl;
+			std::cout << "!!! Beginning traversal for line: " << x << std::endl;
+			traversalController.blueprintTraverser.initialize(&in_contourLineArrayRef->linkArray[x]);		// initialize with the line from the primary t1 array
+
+
+
+			// begin while looping here
+			//  ...
+			// EX: while (OSBlueprintTraversalController.OSTriangleLineTraverserBare->isTraversalComplete == 0) etc...
+			//    {
+			//         do this if there's 1 line
+			//         --else
+			//	       do this if there's 2 lines
+			//    }
+			while (traversalController.blueprintTraverser.isRunComplete == 0)
+			{
+				//std::cout << "!!! Executing one traversal iteration for line " << x << std::endl;
+				traversalController.blueprintTraverser.checkIfRunComplete();
+				EnclaveKeyDef::EnclaveKey currentKey = traversalController.blueprintTraverser.currentKey;
+				int traceCount = contouredTrianglePtr->tracedBlueprintCountMap[currentKey];
+				//std::cout << "The currently traced blueprint (Key: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << ") has had " << traceCount << " primary lines go through it. " << std::endl;
+
+				if (traceCount == 1)
+				{
+
+				}
+				else if (traceCount == 2)
+				{
+
+				}
+				traversalController.blueprintTraverser.traverseLineOnce();
+			}
+
+		}
+		else
+		{
+			//std::cout << "+++" << std::endl;
+		}
 	}
 }
 
@@ -702,6 +757,22 @@ void OSContouredTriangleRunner::printTracingCounts()
 	auto traceEnd = contouredTrianglePtr->tracedBlueprintCountMap.end();
 	for (traceBegin; traceBegin != traceEnd; traceBegin++)
 	{
-		std::cout << "Traced Key: (" << traceBegin->first.x << ", " << traceBegin->first.y << ", " << traceBegin->first.z << ") -> " << traceBegin->second << std::endl;
+		//std::cout << "Traced Key: (" << traceBegin->first.x << ", " << traceBegin->first.y << ", " << traceBegin->first.z << ") -> " << traceBegin->second << std::endl;
 	}
+}
+
+EnclaveKeyPair OSContouredTriangleRunner::getBlueprintKeysForPrimaryLinePoints(int in_lineID)
+{
+	EnclaveKeyPair returnPair;
+	if (in_lineID < 2)
+	{
+		returnPair.keyA = contouredTrianglePtr->pointKeys[in_lineID];
+		returnPair.keyB = contouredTrianglePtr->pointKeys[in_lineID + 1];
+	}
+	else if (in_lineID == 2)
+	{
+		returnPair.keyA = contouredTrianglePtr->pointKeys[2];
+		returnPair.keyB = contouredTrianglePtr->pointKeys[0];
+	}
+	return returnPair;
 }

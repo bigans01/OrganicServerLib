@@ -13,6 +13,8 @@
 #include "PrimaryLineT1.h"
 #include "PrimaryLineT1Array.h"
 #include "PolyRunDirection.h"
+#include "EnclaveKeyPair.h"
+#include "OSBlueprintTraversalController.h"
 
 class OSContouredTriangleRunner
 {
@@ -37,10 +39,12 @@ class OSContouredTriangleRunner
 		void tracePointThroughBlueprints(int in_pointID);
 		void fillLineMetaData(ECBPolyLine* in_LinePtr, int in_pointID);
 		void fillPolyWithClampResult(ECBPoly* in_polyPtr);
+		void fillBlueprintArea(PrimaryLineT1Array* in_contourLineArrayRef);
 		void prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef);
 		void runContouredTriangleOriginalDirection();
 		int isContouredTrianglePerfectlyClamped();
 		void printTracingCounts();
+		EnclaveKeyPair getBlueprintKeysForPrimaryLinePoints(int in_lineID);
 };
 
 #endif

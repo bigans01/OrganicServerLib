@@ -229,7 +229,7 @@ bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 	}
 	else
 	{
-		std::cout << "!!!! ContouredTriangle spans multiple blueprints...filling checks required. " << std::endl;
+		//std::cout << "!!!! ContouredTriangle spans multiple blueprints...filling checks required. " << std::endl;
 		result = false;
 	}
 	return result;

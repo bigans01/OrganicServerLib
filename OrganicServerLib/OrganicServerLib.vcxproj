@@ -145,6 +145,7 @@
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
+    <ClInclude Include="OSBlueprintTraversalController.h" />
     <ClInclude Include="OSCommandDirector.h" />
     <ClInclude Include="OSContouredTriangleRunner.h" />
     <ClInclude Include="OSPDir.h" />
@@ -160,6 +161,7 @@
     <ClInclude Include="OSTerrainFormation.h" />
     <ClInclude Include="OSTriangleLine.h" />
     <ClInclude Include="OSTriangleLineTraverser.h" />
+    <ClInclude Include="OSTriangleLineTraverserBare.h" />
     <ClInclude Include="OSTrianglePoint.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -168,6 +170,7 @@
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />
     <ClCompile Include="OSAmpField.cpp" />
+    <ClCompile Include="OSBlueprintTraversalController.cpp" />
     <ClCompile Include="OSCommandDirector.cpp" />
     <ClCompile Include="OSContouredTriangle.cpp" />
     <ClCompile Include="OSContouredTriangleRunner.cpp" />
@@ -177,6 +180,7 @@
     <ClCompile Include="OSServer.cpp" />
     <ClCompile Include="OSServerUtils.cpp" />
     <ClCompile Include="OSTriangleLineTraverser.cpp" />
+    <ClCompile Include="OSTriangleLineTraverserBare.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

@@ -81,6 +81,12 @@
     <ClInclude Include="OSServerUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OSTriangleLineTraverserBare.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OSBlueprintTraversalController.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -120,6 +126,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSServerUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSBlueprintTraversalController.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSTriangleLineTraverserBare.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
