@@ -143,6 +143,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BlankContour.h" />
+    <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
     <ClInclude Include="OSBlueprintTraversalController.h" />
@@ -168,6 +169,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="BlankContour.cpp" />
+    <ClCompile Include="BlueprintFillerRunner.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />
     <ClCompile Include="OSAmpField.cpp" />
     <ClCompile Include="OSBlueprintTraversalController.cpp" />

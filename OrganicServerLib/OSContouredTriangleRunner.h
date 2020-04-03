@@ -15,6 +15,7 @@
 #include "PolyRunDirection.h"
 #include "EnclaveKeyPair.h"
 #include "OSBlueprintTraversalController.h"
+#include "BlueprintFillerRunner.h"
 
 class OSContouredTriangleRunner
 {

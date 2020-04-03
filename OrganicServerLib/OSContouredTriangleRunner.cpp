@@ -720,7 +720,9 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 
 				if (traceCount == 1)
 				{
-
+					// spawn a new primary line from THIS primary line; see "PrimaryLineT2IsolatedTracer" for reference in OrganicPolyOperationsLib.
+					BlueprintFillerRunner fillerRunner;
+					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x]);
 				}
 				else if (traceCount == 2)
 				{
