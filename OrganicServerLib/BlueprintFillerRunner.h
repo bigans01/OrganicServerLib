@@ -45,10 +45,10 @@ class BlueprintFillerRunner
 		// blueprint key
 		EnclaveKeyDef::EnclaveKey blueprintKey;	// the current blueprint key for the runner.
 
-		void initialize(PrimaryLineT1* in_lineRef);
+		void initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey);
 		bool checkIfRunComplete();			// check if the run is complete
 		void traverseLineOnce();
-		void constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef);
+		void constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey);
 
 		ECBPolyPoint getSlopeToUse(ECBPPOrientations in_interceptType);
 		ECBPolyPoint getInterceptToUseFromLine(ECBPolyPoint in_intercept1, ECBPolyPoint in_intercept2);

@@ -13,6 +13,7 @@ void OSTriangleLineTraverserBare::initialize(PrimaryLineT1* in_lineRef)
 
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(beginPoint, endPoint, beginKey, endKey);	// do the initial set up; beginKey will be replaced by currentKey in later function calls
 	nextKeyAdd = resultantIntersect.incrementingKey;					// the next key add will be a result from previous function call
+	currentIterationBeginPoint = beginPoint;							// set the initial value of the begin point
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;		// set the incrementing point
 
 }
@@ -37,12 +38,15 @@ bool OSTriangleLineTraverserBare::checkIfRunComplete()
 
 void OSTriangleLineTraverserBare::traverseLineOnce()
 {
-	//cout << "currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;	// test output only
-	//cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << endl;
+	std::cout << "currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;	// test output only
+	std::cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << std::endl;
 	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;													// get a pointer to the current key
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	nextKeyAdd = resultantIntersect.incrementingKey;
-	currentIterationEndpoint = resultantIntersect.intersectedPoint;
+	currentIterationBeginPoint = currentIterationEndpoint;			// set the begin point to be the previous end point
+	currentIterationEndpoint = resultantIntersect.intersectedPoint; // set the new end point
+
+	std::cout << "NEW currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;	// test output only
 }

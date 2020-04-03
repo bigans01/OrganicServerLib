@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BlueprintFillerRunner.h"
 
-void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef)
+void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey)
 {
 	// get the intercept point of the referenced line
 	//ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
@@ -14,7 +14,8 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef)
 	//std::cout << "!!! Original line coordinates are: Begin (" << in_lineRef->beginPointRealXYZ.x << ", " << in_lineRef->beginPointRealXYZ.y << ", " << in_lineRef->beginPointRealXYZ.z << ") | End (" << in_lineRef->endPointRealXYZ.x << ", " << in_lineRef->endPointRealXYZ.y << ", " << in_lineRef->endPointRealXYZ.z << ") " << std::endl;
 	//std::cout << "!!! New end point is: (" << initialIntersectedPoint.x << ", " << initialIntersectedPoint.y << ", " << initialIntersectedPoint.z << ") " << std::endl;
 	//std::cout << "!!! New point move vals are: (" << moveVals.x << ", " << moveVals.y << ", " << moveVals.z << ") " << std::endl;
-	constructFillerPrimaryInitial(in_lineRef);
+	std::cout << "~~~~~~~~~~~~ Beginning initial fill " << std::endl;
+	constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);
 
 }
 bool BlueprintFillerRunner::checkIfRunComplete()
@@ -27,7 +28,7 @@ void BlueprintFillerRunner::traverseLineOnce()
 
 }
 
-void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef)
+void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey)
 {
 	// set the initial slopes.
 	initial_x_slope = in_lineRef->x_int;
@@ -35,13 +36,25 @@ void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_line
 	initial_z_slope = in_lineRef->z_int;
 
 	// get the intercept point of the referenced line 
-	ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
-	ECBPolyPoint initialIntersectedPoint = initialIntersect.intersectedPoint;
-	currentBorderLineList = OrganicUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
+	//ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
+	//ECBPolyPoint initialIntersectedPoint = initialIntersect.intersectedPoint;
+
+	std::cout << "!! ## Line segment begin: " << in_currentSegmentBegin.x << ", " << in_currentSegmentBegin.y << ", " << in_currentSegmentBegin.z << std::endl;
+	int someVal = 3;
+	std::cout << "!! ## Line segment end: " << in_currentSegmentEnd.x << ", " << in_currentSegmentEnd.y << ", " << in_currentSegmentEnd.z << std::endl;
+
+	ECBPolyPoint initialIntersectedPoint = in_currentSegmentEnd;
+	//currentBorderLineList = OrganicUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
+	std::cout << ">> Current blueprint key is: " << in_currentSegmentBlueprintKey.x << ", " << in_currentSegmentBlueprintKey.y << ", " << in_currentSegmentBlueprintKey.z << std::endl;
+	currentBorderLineList = OrganicUtils::determineBorderLines(in_currentSegmentBlueprintKey);
+	//std::cout << "Current blueprint key is: " << in_currentSegmentBlueprintKey.x << ", " << in_currentSegmentBlueprintKey.y << ", " << in_currentSegmentBlueprintKey.x << std::endl;
 	ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(initialIntersectedPoint, &currentBorderLineList);
 
+	//std::cout << "!! Found inital orientation results..." << std::endl;
+
 	// set the current blueprint key.
-	blueprintKey = in_lineRef->beginPointBlueprintKey;
+	//blueprintKey = in_lineRef->beginPointBlueprintKey;
+	blueprintKey = in_currentSegmentBlueprintKey;
 
 	// get the move vals
 	//BorderDataMap borderData;
@@ -83,17 +96,17 @@ void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_line
 	// an intercept count of 1 will always mean a face is use
 	if (tempStorage.numberOfIntercepts == 1)
 	{
-		//std::cout << ">>>>> Face encountered! " << std::endl;
+		std::cout << ">>>>> Face encountered! " << std::endl;
 		// an intercept count of 1 will always mean a face is used
 		ECBPPOrientations slopeToUse = borderDataMapRef->faceInterceptMap[currentBeginOrientation.osubtype];
 		interceptToUse = getSlopeToUse(slopeToUse);
-		//std::cout << "|||| (face) Slope to use is: " << interceptToUse.x << ", " << interceptToUse.y << ", " << interceptToUse.z << std::endl;
+		std::cout << "|||| (face) Slope to use is: " << interceptToUse.x << ", " << interceptToUse.y << ", " << interceptToUse.z << std::endl;
 	}
 
 	// an intercept count of 2 means we need to get the appropriate slope from the line
 	else if (tempStorage.numberOfIntercepts == 2)
 	{
-		//std::cout << ">>>>>> Line encountered! " << std::endl;
+		std::cout << ">>>>>> Line encountered! " << std::endl;
 		// get the first face value
 		ECBPPOrientations face1 = borderDataMapRef->faceInterceptMap[tempStorage.tempFaceList.faceList[0]];
 		ECBPolyPoint intercept1 = getSlopeToUse(face1);
@@ -108,7 +121,7 @@ void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_line
 	// an intercept count of 3 means we need to get the appropriate slope from the corner (in theory, there should only be 1 valid slope ever)
 	else if (tempStorage.numberOfIntercepts == 3)
 	{
-		//std::cout << ">>>>>>>> Corner encountered! " << std::endl;
+		std::cout << ">>>>>>>> Corner encountered! " << std::endl;
 		moveValsToPass = borderDataMapRef->cornerMap[currentBeginOrientation.osubtype].borderLimits;
 		ECBPolyPoint polyPointToPass;
 		polyPointToPass.x = moveValsToPass.x;

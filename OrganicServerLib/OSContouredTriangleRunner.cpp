@@ -716,21 +716,22 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 				traversalController.blueprintTraverser.checkIfRunComplete();
 				EnclaveKeyDef::EnclaveKey currentKey = traversalController.blueprintTraverser.currentKey;
 				int traceCount = contouredTrianglePtr->tracedBlueprintCountMap[currentKey];
-				//std::cout << "The currently traced blueprint (Key: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << ") has had " << traceCount << " primary lines go through it. " << std::endl;
+				std::cout << "The currently traced blueprint (Key: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << ") has had " << traceCount << " primary lines go through it. " << std::endl;
 
 				if (traceCount == 1)
 				{
 					// spawn a new primary line from THIS primary line; see "PrimaryLineT2IsolatedTracer" for reference in OrganicPolyOperationsLib.
 					BlueprintFillerRunner fillerRunner;
-					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x]);
+					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey);
 				}
 				else if (traceCount == 2)
 				{
 
 				}
 				traversalController.blueprintTraverser.traverseLineOnce();
+				std::cout << "!!! Traversed to new blueprint.... " << std::endl;
 			}
-
+		
 		}
 		else
 		{
