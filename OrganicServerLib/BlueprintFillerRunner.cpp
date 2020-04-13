@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "BlueprintFillerRunner.h"
 
-void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey)
+void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, OSContouredTriangle* in_osTriangleRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
 	// get the intercept point of the referenced line
 	//ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
@@ -15,20 +15,207 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint i
 	//std::cout << "!!! New end point is: (" << initialIntersectedPoint.x << ", " << initialIntersectedPoint.y << ", " << initialIntersectedPoint.z << ") " << std::endl;
 	//std::cout << "!!! New point move vals are: (" << moveVals.x << ", " << moveVals.y << ", " << moveVals.z << ") " << std::endl;
 	std::cout << "~~~~~~~~~~~~ Beginning initial fill " << std::endl;
-	constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);
-
+	std::cout << "Parent Line point A: " << in_lineRef->beginPointRealXYZ.x << ", " << in_lineRef->beginPointRealXYZ.y << ", " << in_lineRef->beginPointRealXYZ.z << std::endl;
+	std::cout << "Parent Line point B: " << in_lineRef->endPointRealXYZ.x << ", " << in_lineRef->endPointRealXYZ.y << ", " << in_lineRef->endPointRealXYZ.z << std::endl;
+	tracedBlueprintCountMapRef = in_tracedBlueprintCountMapRef;
+	filledBlueprintMapRef = in_filledBlueprintMapRef;
+	contouredTrianglePtr = in_osTriangleRef;
+	blueprintMapRef = in_blueprintMapRef;
+	fillerRunnerPrimaryLine = constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);	// assign the primary line
+	primaryLineSlope = OrganicUtils::findSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);							
+	normalizedPrimaryLineSlope = OrganicUtils::findNormalizedSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);	
+	traverseToNewBlueprint();
 }
 bool BlueprintFillerRunner::checkIfRunComplete()
 {
-	bool result = false;
-	return result;
+	return isRunComplete;
 }
-void BlueprintFillerRunner::traverseLineOnce()
+void BlueprintFillerRunner::traverseToNewBlueprint()
 {
+	// first, check the orientation of the endpoint, to see if it's a corner, and perform special logic if so.
+	if (currentEndOrientation.otype == ECBPPOrientations::CORNER)
+	{
 
+	}
+
+	iterateAndCheckedForTouchedBlueprint();
 }
 
-void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey)
+void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
+{
+	
+	//EnclaveKeyDef::EnclaveKey tempMoveVals = borderDataMapRef->cornerMap[currentBeginOrientation.osubtype].borderLimits;
+	//currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);	// get the blueprint borders for this iteration, in order to figure out the next iteration.
+
+	/*
+	if (currentEndOrientation.otype == ECBPPOrientations::FACE)
+	{
+
+	}
+	else if (currentEndOrientation.otype == ECBPPOrientations::LINE)
+	{
+
+	}
+	else if (currentEndOrientation.otype == ECBPPOrientations::CORNER)
+	{
+
+	}
+	*/
+	std::cout << "###################### Beginning fill attempt. ######################### " << std::endl;
+	std::cout << "Point A of Line: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
+	std::cout << "Point B of Line: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
+	std::cout << "Slope of primary line: " << primaryLineSlope.x << ", " << primaryLineSlope.y << ", " << primaryLineSlope.z << std::endl;
+	std::cout << "Beginning value of blueprint key: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+	currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);
+	ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);
+	EnclaveKeyDef::EnclaveKey tempMoveVals = OrganicUtils::retrieveBorderDirection(currentEndpointOrientationResults, &borderData);
+	ECBPolyPoint commonValsToFind;
+	commonValsToFind.x = tempMoveVals.x;
+	commonValsToFind.y = tempMoveVals.y;
+	commonValsToFind.z = tempMoveVals.z;
+	ECBPolyPoint resultantMoveVals = OrganicUtils::findCommonMoveValues(commonValsToFind, normalizedPrimaryLineSlope);
+	std::cout << "!! Move vals for this iteration are: << " << resultantMoveVals.x << ", " << resultantMoveVals.y << ", " << resultantMoveVals.z << std::endl;
+	applyMovementToBlueprintKey(resultantMoveVals);					// shift the blueprint key we will go into
+	bool wasTraced = checkIfBlueprintWasTraced(blueprintKey);		// check if the new key was actually traced by the contoured triangle
+	
+	if (wasTraced == false)
+	{
+		while (checkIfRunComplete() == false)
+		{
+	
+			//primaryLineSlope = OrganicUtils::findSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);
+			//normalizedPrimaryLineSlope = OrganicUtils::findNormalizedSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);
+
+			fillerRunnerPrimaryLine.beginPointRealXYZ = fillerRunnerPrimaryLine.endPointRealXYZ;	// load the endpoint into the begin point.
+			ECBIntersectMeta intersectData = OrganicUtils::findClosestBlueprintIntersectionFromSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, primaryLineSlope, blueprintKey); // get the intersect data
+			fillerRunnerPrimaryLine.endPointRealXYZ = intersectData.intersectedPoint;			// load the new point into the line.
+			currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);           // set the new border lines based on the new blueprint key value.
+
+			std::cout << "!!! new value of beginPointRealXYZ: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
+			std::cout << "!!! new value of endPointRealXYZ: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
+			std::cout << "!!! new blueprint key value: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+
+			// check if current blueprint was filled
+			bool wasBlueprintFilled = checkIfBlueprintWasFilled(blueprintKey);
+			if (wasBlueprintFilled == false)
+			{
+				// fill the blueprint
+				std::cout << "!! >>> Blueprint not found as filled, filling... (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << ") " << std::endl;
+				insertKeyAsFilledAndCreatePoly(blueprintKey);
+
+			}
+			else if (wasBlueprintFilled == true)
+			{
+				// do nothing
+				std::cout << "!!! Blueprint was already filled.... (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << ") " << std::endl;
+			}
+
+			// iterate to the next blueprint, and check if it was a traced blueprint. If it isn't a traced blueprint, continue the while loop.
+			currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);	// set new endpoint orientation
+			tempMoveVals = OrganicUtils::retrieveBorderDirection(currentEndpointOrientationResults, &borderData);		// get the border direction
+			commonValsToFind.x = tempMoveVals.x;		// set the values for the common vals to find.
+			commonValsToFind.y = tempMoveVals.y;
+			commonValsToFind.z = tempMoveVals.z;
+			resultantMoveVals = OrganicUtils::findCommonMoveValues(commonValsToFind, normalizedPrimaryLineSlope);
+			applyMovementToBlueprintKey(resultantMoveVals);					// shift the blueprint key we will go into (may not be used in next iteration
+			wasTraced = checkIfBlueprintWasTraced(blueprintKey);
+			if (wasTraced == true)
+			{
+				std::cout << "!!! current blueprint was found as traced by the contour! >> (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+			}
+		}
+	}
+	
+	/*
+	if (wasTraced == true)
+	{
+		std::cout << "!!! current blueprint was found as traced by the contour! >> (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+	}
+	*/
+}
+
+void BlueprintFillerRunner::insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	// put the value of the newly added poly into here (when its found)
+	ECBPoly newPoly;
+	newPoly.materialID = contouredTrianglePtr->materialID;
+	EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[blueprintKey];
+
+	int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
+	blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
+	ECBPolyLine newLine;
+	fillECBPolyLineWithPrimary(&newLine);
+
+	blueprintPtr->primaryPolygonMap[elementID].lineMap[fillerRunnerPrimaryLine.IDofLine] = newLine;
+
+
+
+	(*filledBlueprintMapRef)[in_blueprintKey] = elementID;
+}
+
+void BlueprintFillerRunner::fillECBPolyLineWithPrimary(ECBPolyLine* in_polyLineRef)
+{
+	in_polyLineRef->pointA = fillerRunnerPrimaryLine.beginPointRealXYZ;
+	in_polyLineRef->pointB = fillerRunnerPrimaryLine.endPointRealXYZ;
+	in_polyLineRef->pointC = fillerRunnerPrimaryLine.thirdPointRealXYZ;
+	in_polyLineRef->x_interceptSlope = fillerRunnerPrimaryLine.x_int;
+	in_polyLineRef->y_interceptSlope = fillerRunnerPrimaryLine.y_int;
+	in_polyLineRef->z_interceptSlope = fillerRunnerPrimaryLine.z_int;
+}
+
+void BlueprintFillerRunner::applyMovementToBlueprintKey(ECBPolyPoint in_moveVals)
+{
+	if (in_moveVals.x != 0)
+	{
+		blueprintKey.x += in_moveVals.x;
+	}
+	if (in_moveVals.y != 0)
+	{
+		blueprintKey.y += in_moveVals.y;
+	}
+	if (in_moveVals.z != 0)
+	{
+		blueprintKey.z += in_moveVals.z;
+	}
+}
+
+bool BlueprintFillerRunner::checkIfBlueprintWasTraced(EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	//bool result = false;
+	auto keySearchResult = tracedBlueprintCountMapRef->find(in_blueprintKey);
+	std::cout << "Checking if key " << in_blueprintKey.x << ", " << in_blueprintKey.y << ", " << in_blueprintKey.z << " was traced by the triangle..." << std::endl;
+	if (keySearchResult != tracedBlueprintCountMapRef->end())
+	{
+		std::cout << ">>> Key was FOUND! " << std::endl;
+		//result = true;
+		isRunComplete = true;
+	}
+	else
+	{
+		std::cout << ">>> Key was *NOT* FOUND! " << std::endl;
+	}
+	//return result;
+	return isRunComplete;
+}
+
+bool BlueprintFillerRunner::checkIfBlueprintWasFilled(EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	bool isBlueprintFilled = false;
+	auto keySearchResult = filledBlueprintMapRef->find(in_blueprintKey);
+	std::cout << "Checking if key was filled... (" << in_blueprintKey.x << ", " << in_blueprintKey.y << ", " << in_blueprintKey.z << ") " << std::endl;
+	if (keySearchResult != filledBlueprintMapRef->end())
+	{
+		std::cout << ">>> Blueprint was already filled..." << std::endl;
+		isBlueprintFilled = true;
+	}
+	else
+	{
+		std::cout << ">>> Blueprint WASN'T filled..." << std::endl;
+	}
+	return isBlueprintFilled;
+}
+
+PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey)
 {
 	// set the initial slopes.
 	initial_x_slope = in_lineRef->x_int;
@@ -139,6 +326,35 @@ void BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1* in_line
 	std::cout << "!!! Initial begin point is: " << currentBeginPoint.x << ", " << currentBeginPoint.y << ", " << currentBeginPoint.z << std::endl;
 	std::cout << "!!! Initial end point is: " << currentEndPoint.x << ", " << currentEndPoint.y << ", " << currentEndPoint.z << std::endl;
 	std::cout << "!!! New move vals are: (" << newTestMoveVals.x << ", " << newTestMoveVals.y << ", " << newTestMoveVals.z << ") " << std::endl;
+
+	// setup variables for creation of new primary T2 line
+	ECBBorderValues PT2blueprintLimits = OrganicUtils::getBlueprintLimits(blueprintKey);
+	ECBPolyPointLocation PT2pointALocation = OrganicUtils::getPolyPointLocation(currentBeginPoint, PT2blueprintLimits);		// 
+	ECBPolyPointLocation PT2pointBLocation = OrganicUtils::getPolyPointLocation(currentTraceResults.resultingEndPoint, PT2blueprintLimits);		// 
+	PrimaryLineT1 newLine;
+	newLine.IDofLine = in_lineRef->IDofLine;		// make the newly spawned line ID the same as the line it was spawned from
+	newLine.perfectClampValue = in_lineRef->perfectClampValue;
+	newLine.beginPointRealXYZ = currentBeginPoint;			
+	newLine.endPointRealXYZ = currentEndPoint;
+	newLine.thirdPointRealXYZ = in_currentSegmentBegin;	// third point is equal to the begin point of the original primary line that this new line was spawned from.
+	newLine.intendedFaces = OrganicUtils::determineIntendedFaces(newLine.beginPointRealXYZ, newLine.endPointRealXYZ, newLine.thirdPointRealXYZ);
+	newLine.beginPointMeta = PT2pointALocation;
+	newLine.endPointMeta = PT2pointBLocation;
+	newLine.calibrate(newLine.thirdPointRealXYZ);
+	newLine.applySlopesFromParentLine(in_lineRef->intendedFaces, in_lineRef->x_int, in_lineRef->y_int, in_lineRef->z_int);
+
+	std::cout << "Parent line intended faces are: " << in_lineRef->intendedFaces.x << ", " << in_lineRef->intendedFaces.y << ", " << in_lineRef->intendedFaces.z << std::endl;
+	std::cout << "+++ Parent Line slopes +++ " << std::endl;
+	std::cout << "X: " << in_lineRef->x_int.x << ", " << in_lineRef->x_int.y << ",  " << in_lineRef->x_int.z << std::endl;
+	std::cout << "Y: " << in_lineRef->y_int.x << ", " << in_lineRef->y_int.y << ",  " << in_lineRef->y_int.z << std::endl;
+	std::cout << "Z: " << in_lineRef->z_int.x << ", " << in_lineRef->z_int.y << ",  " << in_lineRef->z_int.z << std::endl;
+	std::cout << "New line intended faces are: " << newLine.intendedFaces.x << ", " << newLine.intendedFaces.y << ", " << newLine.intendedFaces.z << std::endl;
+	std::cout << "X: " << newLine.x_int.x << ", " << newLine.x_int.y << ",  " << newLine.x_int.z << std::endl;
+	std::cout << "Y: " << newLine.y_int.x << ", " << newLine.y_int.y << ",  " << newLine.y_int.z << std::endl;
+	std::cout << "Z: " << newLine.z_int.x << ", " << newLine.z_int.y << ",  " << newLine.z_int.z << std::endl;
+
+	return newLine;
+
 }
 
 ECBPolyPoint BlueprintFillerRunner::getSlopeToUse(ECBPPOrientations in_interceptType)

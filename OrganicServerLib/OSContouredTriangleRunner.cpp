@@ -722,7 +722,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 				{
 					// spawn a new primary line from THIS primary line; see "PrimaryLineT2IsolatedTracer" for reference in OrganicPolyOperationsLib.
 					BlueprintFillerRunner fillerRunner;
-					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey);
+					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
 				}
 				else if (traceCount == 2)
 				{
