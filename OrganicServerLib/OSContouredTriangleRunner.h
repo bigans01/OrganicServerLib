@@ -16,6 +16,7 @@
 #include "EnclaveKeyPair.h"
 #include "OSBlueprintTraversalController.h"
 #include "BlueprintFillerRunner.h"
+#include "BorderDataMap.h"
 
 class OSContouredTriangleRunner
 {
@@ -28,7 +29,7 @@ class OSContouredTriangleRunner
 		OSContouredTriangle* contouredTrianglePtr = NULL;	// initialize to null; set in initializer list anyway
 		OSContourPlanDirections planDirections;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
-
+		BorderDataMap borderDataMapInstance;
 		//PrimaryLineT1Array contourLineArray;
 
 		void performRun();	// run the contoured triangle; perform filling
@@ -43,6 +44,8 @@ class OSContouredTriangleRunner
 		void fillBlueprintArea(PrimaryLineT1Array* in_contourLineArrayRef);
 		void prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef);
 		void runContouredTriangleOriginalDirection();
+		void runContouredTriangleReverseDirection();
+		bool checkIfPointIsOnBlueprintBorder(ECBPolyPoint in_point, EnclaveKeyDef::EnclaveKey in_blueprintKey);
 		int isContouredTrianglePerfectlyClamped();
 		void printTracingCounts();
 		EnclaveKeyPair getBlueprintKeysForPrimaryLinePoints(int in_lineID);

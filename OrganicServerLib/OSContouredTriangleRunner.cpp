@@ -9,13 +9,17 @@ void OSContouredTriangleRunner::performRun()
 
 	printTracingCounts();
 
+	contouredTrianglePtr->fillMetaDataInPrimaryCircuits();
 	if (contouredTrianglePtr->checkIfPointsAreInSameBlueprint() == false)
 	{
 		runContouredTriangleOriginalDirection();
+		//runContouredTriangleReverseDirection();
 	}
 	//prepareContouredTriangleData(PolyRunDirection::NORMAL);
 
 	// only do the following if all points are NOT in same blueprint
+
+	contouredTrianglePtr->printPrimarySegmentData();
 }
 
 void OSContouredTriangleRunner::checkForPerfectClamping()
@@ -493,6 +497,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);			// traced blueprint set update (in case it wasn't inserted already.
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
+			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
 			/*
 			if (debugIncremental == 1)
 			{
@@ -524,6 +529,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
+			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
 			/*
 			if (debugIncremental == 1)
 			{
@@ -636,8 +642,17 @@ void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr)
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
 {
+	std::cout << "########################## Running Original Direction ################################# " << std::endl;
 	PrimaryLineT1Array contourLineArray;
 	prepareContouredTriangleData(PolyRunDirection::NORMAL, &contourLineArray);
+	fillBlueprintArea(&contourLineArray);
+}
+
+void OSContouredTriangleRunner::runContouredTriangleReverseDirection()
+{
+	std::cout << "########################## Running Reverse Direction ################################# " << std::endl;
+	PrimaryLineT1Array contourLineArray;
+	prepareContouredTriangleData(PolyRunDirection::REVERSE, &contourLineArray);
 	fillBlueprintArea(&contourLineArray);
 }
 
@@ -716,7 +731,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 				traversalController.blueprintTraverser.checkIfRunComplete();
 				EnclaveKeyDef::EnclaveKey currentKey = traversalController.blueprintTraverser.currentKey;
 				int traceCount = contouredTrianglePtr->tracedBlueprintCountMap[currentKey];
-				std::cout << "The currently traced blueprint (Key: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << ") has had " << traceCount << " primary lines go through it. " << std::endl;
+				//std::cout << "The currently traced blueprint (Key: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << ") has had " << traceCount << " primary lines go through it. " << std::endl;
 
 				if (traceCount == 1)
 				{
@@ -726,10 +741,29 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 				}
 				else if (traceCount == 2)
 				{
-
+					/*
+					bool isOnBorder = checkIfPointIsOnBlueprintBorder(traversalController.blueprintTraverser.currentIterationEndpoint, currentKey);		// only proceed if the endpoint of the current line is on a border
+					if (isOnBorder == true)
+					{
+						BlueprintFillerRunner fillerRunner;
+						fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
+					}
+					*/
+					if (contouredTrianglePtr->primarySegmentTrackerMap[currentKey].currentSegmentCount == 2)
+					{
+						//std::cout << "::::: Primary segment tracker has 2 segments!! " << std::endl;
+						//std::cout << "Checking if line " << int(in_contourLineArrayRef->linkArray[x].IDofLine) << " is OPEN_MULTI..." << std::endl;
+						PrimaryCircuit* circuitRef = &contouredTrianglePtr->primarySegmentTrackerMap[currentKey];
+						if (circuitRef->checkIfSegmentIsOpenMulti(in_contourLineArrayRef->linkArray[x].IDofLine) == true)
+						{
+							//std::cout << "This line is OPEN_MULTI!!! " << std::endl;
+							BlueprintFillerRunner fillerRunner;
+							fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
+						}
+					}
 				}
 				traversalController.blueprintTraverser.traverseLineOnce();
-				std::cout << "!!! Traversed to new blueprint.... " << std::endl;
+				//std::cout << "!!! Traversed to new blueprint.... " << std::endl;
 			}
 		
 		}
@@ -738,6 +772,19 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 			//std::cout << "+++" << std::endl;
 		}
 	}
+}
+
+bool OSContouredTriangleRunner::checkIfPointIsOnBlueprintBorder(ECBPolyPoint in_point, EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	bool check = false;
+	ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(in_blueprintKey);
+	ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(in_point, &currentBorderLineList);
+	if (currentEndpointOrientationResults.osubtype != ECBPPOrientations::NOVAL)
+	{
+		check = true;
+		std::cout << "!!!! >>>> Point " << in_point.x << ", " << in_point.y << ", " << in_point.z << " is on a border" << std::endl;
+	}
+	return check;
 }
 
 int OSContouredTriangleRunner::isContouredTrianglePerfectlyClamped()

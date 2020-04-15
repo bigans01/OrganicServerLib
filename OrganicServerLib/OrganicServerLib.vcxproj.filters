@@ -90,6 +90,12 @@
     <ClInclude Include="BlueprintFillerRunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="PrimaryCircuitSegment.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PrimaryCircuit.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -138,6 +144,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BlueprintFillerRunner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimaryCircuit.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="PrimaryCircuitSegment.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

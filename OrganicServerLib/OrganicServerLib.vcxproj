@@ -164,6 +164,8 @@
     <ClInclude Include="OSTriangleLineTraverser.h" />
     <ClInclude Include="OSTriangleLineTraverserBare.h" />
     <ClInclude Include="OSTrianglePoint.h" />
+    <ClInclude Include="PrimaryCircuit.h" />
+    <ClInclude Include="PrimaryCircuitSegment.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -183,6 +185,8 @@
     <ClCompile Include="OSServerUtils.cpp" />
     <ClCompile Include="OSTriangleLineTraverser.cpp" />
     <ClCompile Include="OSTriangleLineTraverserBare.cpp" />
+    <ClCompile Include="PrimaryCircuit.cpp" />
+    <ClCompile Include="PrimaryCircuitSegment.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

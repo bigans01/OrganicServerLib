@@ -28,6 +28,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		lineID = 2;
 	}
 	//serverPtr = in_serverPtr;
+	contouredTriangleRef = in_TrianglePtr;
 	blueprintMapRef = in_blueprintMapPtr;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
@@ -71,6 +72,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//EnclaveCollectionBlueprint* testPtr = &(*blueprintMapRef)[beginKey];
 
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
+		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, beginKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
 		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
@@ -107,6 +109,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
+		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, beginKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
 		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
@@ -164,6 +167,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
+		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
 		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
@@ -195,6 +199,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
+		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
 		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;

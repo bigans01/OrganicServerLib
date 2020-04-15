@@ -8,9 +8,12 @@
 #include "TriangleLine.h"
 #include "ECBBorderValues.h"
 #include "PolyUtils.h"
+#include "PrimarySegmentTracker.h"
 #include "ECBPoly.h"
 #include <unordered_map>
 #include <math.h>
+#include "PrimaryCircuit.h"
+
 //#include <unordered_set>
 
 class OSContouredTriangle {
@@ -25,7 +28,7 @@ public:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBBorderValues, EnclaveKeyDef::KeyHasher> ecbBorderMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> tracedBlueprintCountMap;	// stores blueprint IDs that are a result of tracing the contour lines
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> filledBlueprintMap;		// stores blueprint IDs that were filled 
-	//std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> 
+	std::unordered_map<EnclaveKeyDef::EnclaveKey, PrimaryCircuit, EnclaveKeyDef::KeyHasher> primarySegmentTrackerMap;
 	OSContouredTriangle();
 	short isTriangleFlat = 0;				// set to 1 if the Triangle is flat (all points on same y level)
 	short materialID = 0;				// what is the material made of? stone, brick, snow, dirt, etc?
@@ -43,6 +46,9 @@ public:
 	void determineLineAngles();			// determines two angles for each line: an angle of rotation towards y axis, and an angle towards the 3rd point of the triangle
 	void insertTracedBlueprint(EnclaveKeyDef::EnclaveKey in_key);
 	bool checkIfPointsAreInSameBlueprint();
+	void addNewPrimarySegment(ECBPolyPoint in_lineSegmentPointA, ECBPolyPoint in_lineSegmentPointB, int in_lineID, EnclaveKeyDef::EnclaveKey in_blueprintKey);
+	void fillMetaDataInPrimaryCircuits();
+	void printPrimarySegmentData();
 };
 
 #endif

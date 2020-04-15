@@ -348,3 +348,35 @@ OSContouredTriangle::OSContouredTriangle()
 	// for adding to unordered_map
 }
 
+void OSContouredTriangle::addNewPrimarySegment(ECBPolyPoint in_lineSegmentPointA, ECBPolyPoint in_lineSegmentPointB, int in_lineID, EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	primarySegmentTrackerMap[in_blueprintKey].insertNewSegment(in_lineSegmentPointA, in_lineSegmentPointB, in_lineID);
+}
+
+void OSContouredTriangle::fillMetaDataInPrimaryCircuits()
+{
+	auto trackerMapBegin = primarySegmentTrackerMap.begin();
+	auto trackerMapEnd = primarySegmentTrackerMap.end();
+	for (trackerMapBegin; trackerMapBegin != trackerMapEnd; trackerMapBegin++)
+	{
+		trackerMapBegin->second.setBorderData(trackerMapBegin->first);
+		trackerMapBegin->second.fillSegmentArrayMetaData(1);		// using 1 for testing; may be replaced later.
+	}
+}
+
+void OSContouredTriangle::printPrimarySegmentData()
+{
+	auto trackerMapBegin = primarySegmentTrackerMap.begin();
+	auto trackerMapEnd = primarySegmentTrackerMap.end();
+	for (trackerMapBegin; trackerMapBegin != trackerMapEnd; trackerMapBegin++)
+	{
+		
+		std::cout << ":: Blueprint (" << trackerMapBegin->first.x << ", " << trackerMapBegin->first.y << ", " << trackerMapBegin->first.z << ") " << std::endl;
+		for (int x = 0; x < trackerMapBegin->second.currentSegmentCount; x++)
+		{
+			std::cout << "Segment " << x << ":-> Line ID: " << int(trackerMapBegin->second.primarySegments[x].lineID) << " | Point A: " << trackerMapBegin->second.primarySegments[x].beginPoint.x << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.y << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.z << " | Point B: " << trackerMapBegin->second.primarySegments[x].endPoint.x << ", " << trackerMapBegin->second.primarySegments[x].endPoint.y << ", " << trackerMapBegin->second.primarySegments[x].endPoint.z << std::endl;
+		}
+		
+	}
+}
+

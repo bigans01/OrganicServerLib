@@ -192,6 +192,7 @@ void OSServer::constructTestBlueprints2()
 
 void OSServer::constructBlueprintFillTest()
 {
+
 	std::cout << "||||||| Constructing blueprint fill test (version 1)...." << std::endl;
 	ECBPolyPoint startPoint, mrPoint;
 	startPoint.x = 0.0f;
@@ -264,6 +265,59 @@ void OSServer::constructTestBlueprints3()
 	}
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
+}
+
+void OSServer::constructMissingFillBlueprint3()
+{
+	/*
+	std::cout << "||||||| constructing 'Missing fill' for blueprints (version 3)...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 1002.45;
+	mountainSummit.z = 2.61;
+
+	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 29; x < 30; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlan("mountain");
+	*/
+
+	std::cout << "||||||| constructing blueprints (version 2)...." << std::endl;
+	ECBPolyPoint startPoint;
+	startPoint.x = -85.0f;
+	startPoint.y = -80.0f;
+	startPoint.z = 90.0f;
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	ECBPolyPoint otherTriangle_0, otherTriangle_1, otherTriangle_2;
+	otherTriangle_0.x = 867.89f;
+	otherTriangle_0.y = -189.76f;
+	otherTriangle_0.z = -221.03f;
+
+	otherTriangle_1.x = 855.4f;
+	otherTriangle_1.y = -196.57f;
+	otherTriangle_1.z = -223.83f;
+
+	otherTriangle_2.x = 867.45f;
+	otherTriangle_2.y = -196.57f;
+	otherTriangle_2.z = -231.22f;
+
+
+	ECBPolyPoint mrPoint;
+	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	executeDerivedContourPlan("plan");
 }
 
 void OSServer::constructTestBlueprints5()
@@ -378,7 +432,18 @@ void OSServer::executeDerivedContourPlan(string in_string)
 		{
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+			// DEBUG ONLY, temporary
+			//if (triangleMapIterator->first == 79)
+			//{
+				traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+				//std::cout << "###### Debug triangle points: " << std::endl;
+				//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << ", " << currentTriangle->trianglePoints[0].z << std::endl;
+				//std::cout << "1: " << currentTriangle->trianglePoints[1].x << ", " << currentTriangle->trianglePoints[1].y << ", " << currentTriangle->trianglePoints[1].z << std::endl;
+				//std::cout << "2: " << currentTriangle->trianglePoints[2].x << ", " << currentTriangle->trianglePoints[2].y << ", " << currentTriangle->trianglePoints[2].z << std::endl;
+
+				//int someVal = 3;
+				//std::cin >> someVal;
+			//}
 			//std::cout << "---ending trace-through" << std::endl;
 
 			// write (overwrite) a blueprint file for each blueprint traversed
