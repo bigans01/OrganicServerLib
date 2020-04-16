@@ -129,6 +129,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		}
 		blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
+		in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(beginKey, elementID); // Add the new poly to the ForgedPolyRegistry
 
 	}
 
@@ -208,6 +209,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << ":::::lineID: " << lineID << endl;
 		blueprintPtr->primaryPolygonMap[elementID].lineMap[lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(currentKey, elementID);					// add the polygon piece to the triangle
+		in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(currentKey, elementID); // Add the new poly to the ForgedPolyRegistry
 
 	}
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;

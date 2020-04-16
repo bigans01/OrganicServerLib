@@ -530,6 +530,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
+			runnerForgedPolyRegistryRef->addToPolyset(incrementingKey, elementID); // Add the new poly to the ForgedPolyRegistry
 			/*
 			if (debugIncremental == 1)
 			{
@@ -550,58 +551,15 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		}
 
 	}
-	else								// points do not exist in same blueprint
+	else								// points do not exist in same blueprint; run a OSTriangleLineTraverser
 	{
-		//cout << "The begin point for line " << in_pointID << " is NOT in same area as its endpoint" << endl;
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = contouredTrianglePtr->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
-		if (polyMapIter != contouredTrianglePtr->polygonPieceMap.end())	// polygon was already found
+		OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
+		OSTriangleLineTraverser* lineRef = &lineTraverser;
+		while (!(lineRef->currentKey == lineRef->endKey))
 		{
-			//std::cout << "++++++++++++Branch 1 hit (begin) " << std::endl;
-			int blueprintIDofFoundPolygon = polyMapIter->second;											// get the corresponding int value from the triangle's registered blueprint polygon map
-			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
-			//&(*blueprintMapRef)[currentKey];
-			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
-			//contouredTrianglePtr->insertTracedBlueprint(incrementingKey);						// traced blueprint set update (in case it wasn't inserted already.
-
-			OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
-			OSTriangleLineTraverser* lineRef = &lineTraverser;
-			//std::cout << "++++++++++++Branch 1 hit (mid)" << std::endl;
-			while (!(lineRef->currentKey == lineRef->endKey))
-			{
-				//std::cout << "Traversal call...." << std::endl;
-				lineRef->traverseLineOnce(contouredTrianglePtr);
-				//std::cout << "traversing once...!!!" << std::endl;
-			}
-			
-
+			lineRef->traverseLineOnce(contouredTrianglePtr);
 
 		}
-		else  // polygon wasn't found, it needs to be created
-		{
-			//std::cout << "Branch 2 hit" << std::endl;
-			ECBPoly newPoly;
-			newPoly.materialID = contouredTrianglePtr->materialID;
-			fillPolyWithClampResult(&newPoly);
-			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
-			//&(*blueprintMapRef)[currentKey];
-			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
-			//contouredTrianglePtr->insertTracedBlueprint(incrementingKey);					// traced blueprint set update (in case it wasn't inserted already.							
-
-			int currentBlueprintPolyMapSize = blueprintPtr->primaryPolygonMap.size();
-			blueprintPtr->primaryPolygonMap[currentBlueprintPolyMapSize] = newPoly;		// insert a new polygon; the ID will be equalto the size
-			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
-			contouredTrianglePtr->addPolygonPiece(incrementingKey, currentBlueprintPolyMapSize);
-			
-			OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
-			OSTriangleLineTraverser* lineRef = &lineTraverser;
-			while (!(lineRef->currentKey == lineRef->endKey))
-			{
-				lineRef->traverseLineOnce(contouredTrianglePtr);
-				//std::cout << "traversing once...!!!" << std::endl;
-			}
-			
-		}
-		//cout << "Ending this section..." << std::endl;
 
 	}
 }

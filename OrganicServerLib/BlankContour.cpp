@@ -38,12 +38,17 @@ void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBP
 	testPoint_2.y = 2.0f;
 	testPoint_2.z = 2.0f;
 	*/
+	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry);
+	/*
 	OSContouredTriangle testTriangle;
 	testTriangle.trianglePoints[0] = in_point0;
 	testTriangle.trianglePoints[1] = in_point1;
 	testTriangle.trianglePoints[2] = in_point2;
 	testTriangle.materialID = in_materialID;		// set the material of the triangle
 	testTriangle.massReferencePoint = in_massReferencePoint;
+	*/
+
+
 	testTriangle.determineLineLengths();
 	/*
 	if (testTriangle.trianglePoints[0].x > 218.0f)

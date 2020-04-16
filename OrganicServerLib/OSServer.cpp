@@ -467,6 +467,11 @@ void OSServer::executeDerivedContourPlan(string in_string)
 		//std::cout << "Blueprint writing complete!!! (1)" << std::endl;
 	}
 	//std::cout << "Blueprint writing complete!!! (2)" << std::endl;
+
+
+	
+	// perform fracturing for affected blueprints.
+	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -627,7 +632,7 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 {
 	//calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	//determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
-	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap);
+	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap, in_Triangle->forgedPolyRegistryRef);
 	runner.performRun();
 }
 

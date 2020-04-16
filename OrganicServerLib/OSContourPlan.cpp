@@ -302,7 +302,6 @@ void OSContourPlan::constructStripTriangles(int in_stripID, int in_materialID)
 			pointThree.y = startPoint.y;
 			pointThree.z = startPoint.z;
 
-			//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
 			OSContouredTriangle triangleToAdd;
 			constructSingleContouredTriangle(startPoint, pointOne, pointTwo, 0, in_materialID);
 

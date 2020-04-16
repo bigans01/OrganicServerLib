@@ -17,19 +17,24 @@
 #include "OSBlueprintTraversalController.h"
 #include "BlueprintFillerRunner.h"
 #include "BorderDataMap.h"
+#include "ForgedPolyRegistry.h"
 
 class OSContouredTriangleRunner
 {
 	public:
 		OSContouredTriangleRunner(OSContouredTriangle* in_trianglePtr, 
 			OSContourPlanDirections in_contourPlanDirections, 
-			std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef) 
-			: contouredTrianglePtr(in_trianglePtr), planDirections(in_contourPlanDirections), blueprintMapRef(in_blueprintMapRef) {}
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
+			ForgedPolyRegistry* in_forgedPolyRegistryRef
+		) 
+			: contouredTrianglePtr(in_trianglePtr), planDirections(in_contourPlanDirections), blueprintMapRef(in_blueprintMapRef), runnerForgedPolyRegistryRef(in_forgedPolyRegistryRef) {}
 
 		OSContouredTriangle* contouredTrianglePtr = NULL;	// initialize to null; set in initializer list anyway
 		OSContourPlanDirections planDirections;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
 		BorderDataMap borderDataMapInstance;
+		ForgedPolyRegistry* runnerForgedPolyRegistryRef;
+
 		//PrimaryLineT1Array contourLineArray;
 
 		void performRun();	// run the contoured triangle; perform filling

@@ -51,8 +51,6 @@ void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialI
 			pointThree.y = startPoint.y;
 			pointThree.z = startPoint.z;
 
-			//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
-			//OSContouredTriangle triangleToAdd;
 			constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
 
 			//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
@@ -77,8 +75,6 @@ void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialI
 		pointThree.y = startPoint.y;
 		pointThree.z = startPoint.z;
 
-		//OSContouredTriangle triangleToAdd(pointOne, pointTwo, pointThree);
-		//OSContouredTriangle triangleToAdd;
 		constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
 
 		//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
@@ -129,12 +125,16 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 	testPoint_2.y = 2.0f;
 	testPoint_2.z = 2.0f;
 	*/
+	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry);
+
+	/*
 	OSContouredTriangle testTriangle;
 	testTriangle.trianglePoints[0] = in_point0;
 	testTriangle.trianglePoints[1] = in_point1;
 	testTriangle.trianglePoints[2] = in_point2;
 	testTriangle.materialID = in_materialID;		// set the material of the triangle
 	testTriangle.massReferencePoint = in_massReferencePoint;
+	*/
 	testTriangle.determineLineLengths();
 	/*
 	if (testTriangle.trianglePoints[0].x > 218.0f)
