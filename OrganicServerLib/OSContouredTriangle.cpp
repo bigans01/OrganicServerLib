@@ -381,10 +381,10 @@ void OSContouredTriangle::printPrimarySegmentData()
 	for (trackerMapBegin; trackerMapBegin != trackerMapEnd; trackerMapBegin++)
 	{
 		
-		std::cout << ":: Blueprint (" << trackerMapBegin->first.x << ", " << trackerMapBegin->first.y << ", " << trackerMapBegin->first.z << ") " << std::endl;
+		//std::cout << ":: Blueprint (" << trackerMapBegin->first.x << ", " << trackerMapBegin->first.y << ", " << trackerMapBegin->first.z << ") " << std::endl;
 		for (int x = 0; x < trackerMapBegin->second.currentSegmentCount; x++)
 		{
-			std::cout << "Segment " << x << ":-> Line ID: " << int(trackerMapBegin->second.primarySegments[x].lineID) << " | Point A: " << trackerMapBegin->second.primarySegments[x].beginPoint.x << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.y << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.z << " | Point B: " << trackerMapBegin->second.primarySegments[x].endPoint.x << ", " << trackerMapBegin->second.primarySegments[x].endPoint.y << ", " << trackerMapBegin->second.primarySegments[x].endPoint.z << std::endl;
+			//std::cout << "Segment " << x << ":-> Line ID: " << int(trackerMapBegin->second.primarySegments[x].lineID) << " | Point A: " << trackerMapBegin->second.primarySegments[x].beginPoint.x << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.y << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.z << " | Point B: " << trackerMapBegin->second.primarySegments[x].endPoint.x << ", " << trackerMapBegin->second.primarySegments[x].endPoint.y << ", " << trackerMapBegin->second.primarySegments[x].endPoint.z << std::endl;
 		}
 		
 	}

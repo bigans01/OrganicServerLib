@@ -96,12 +96,6 @@
     <ClInclude Include="PrimaryCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ForgedPolyRegistry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ForgedPolySet.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -156,9 +150,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PrimaryCircuitSegment.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ForgedPolyRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ContourBase.cpp">

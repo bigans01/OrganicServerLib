@@ -600,7 +600,7 @@ void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr)
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
 {
-	std::cout << "########################## Running Original Direction ################################# " << std::endl;
+	//std::cout << "########################## Running Original Direction ################################# " << std::endl;
 	PrimaryLineT1Array contourLineArray;
 	prepareContouredTriangleData(PolyRunDirection::NORMAL, &contourLineArray);
 	fillBlueprintArea(&contourLineArray);
@@ -608,7 +608,7 @@ void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
 
 void OSContouredTriangleRunner::runContouredTriangleReverseDirection()
 {
-	std::cout << "########################## Running Reverse Direction ################################# " << std::endl;
+	//std::cout << "########################## Running Reverse Direction ################################# " << std::endl;
 	PrimaryLineT1Array contourLineArray;
 	prepareContouredTriangleData(PolyRunDirection::REVERSE, &contourLineArray);
 	fillBlueprintArea(&contourLineArray);
@@ -670,7 +670,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 		if (traversalController.isLineContainedToOneBlueprint() == false)
 		{
 			//std::cout << "!!!" << std::endl;
-			std::cout << "!!! Beginning traversal for line: " << x << std::endl;
+			// std::cout << "!!! Beginning traversal for line: " << x << std::endl;
 			traversalController.blueprintTraverser.initialize(&in_contourLineArrayRef->linkArray[x]);		// initialize with the line from the primary t1 array
 
 

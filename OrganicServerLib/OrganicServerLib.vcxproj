@@ -146,8 +146,6 @@
     <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
-    <ClInclude Include="ForgedPolyRegistry.h" />
-    <ClInclude Include="ForgedPolySet.h" />
     <ClInclude Include="OSBlueprintTraversalController.h" />
     <ClInclude Include="OSCommandDirector.h" />
     <ClInclude Include="OSContouredTriangleRunner.h" />
@@ -176,7 +174,6 @@
     <ClCompile Include="BlueprintFillerRunner.cpp" />
     <ClCompile Include="ContourBase.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />
-    <ClCompile Include="ForgedPolyRegistry.cpp" />
     <ClCompile Include="OSAmpField.cpp" />
     <ClCompile Include="OSBlueprintTraversalController.cpp" />
     <ClCompile Include="OSCommandDirector.cpp" />

@@ -73,6 +73,7 @@ public:
 	void constructTestBlueprints4();	// CONVERTED // side testing
 	void constructDebugBlueprint1();	// CONVERTED
 	void constructBlueprintFillTest();
+	void constructMultiMountTest();
 	void constructMissingFillBlueprint3();
 
 	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
