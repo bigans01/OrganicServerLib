@@ -27,6 +27,30 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	materialID = in_materialID;
 	massReferencePoint = in_massReferencePoint;
 	forgedPolyRegistryRef = in_forgedPolyRegistryRef;
+
+	glm::vec3 glmPoint0, glmPoint1, glmPoint2, glmMRP;
+	glmPoint0.x = trianglePoints[0].x;
+	glmPoint0.y = trianglePoints[0].y;
+	glmPoint0.z = trianglePoints[0].z;
+
+	glmPoint1.x = trianglePoints[1].x;
+	glmPoint1.y = trianglePoints[1].y;
+	glmPoint1.z = trianglePoints[1].z;
+
+	glmPoint2.x = trianglePoints[2].x;
+	glmPoint2.y = trianglePoints[2].y;
+	glmPoint2.z = trianglePoints[2].z;
+
+	glmMRP.x = massReferencePoint.x;
+	glmMRP.y = massReferencePoint.y;
+	glmMRP.z = massReferencePoint.z;
+
+	EmptyNormalFinder normalFinder(glmPoint0, glmPoint1, glmPoint2, glmMRP);
+
+	contouredEmptyNormal.x = normalFinder.calculatedNormal.x;
+	contouredEmptyNormal.y = normalFinder.calculatedNormal.y;
+	contouredEmptyNormal.z = normalFinder.calculatedNormal.z;
+
 }
 
 void OSContouredTriangle::determineLineLengths()

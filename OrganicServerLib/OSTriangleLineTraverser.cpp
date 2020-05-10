@@ -98,6 +98,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//cout << "|||| Polygon was NOT found!! " << endl;
 		ECBPoly newPoly;
 		newPoly.materialID = in_TrianglePtr->materialID;
+		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 
 		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
@@ -186,6 +187,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << " intersected Point: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << std::endl;
 		ECBPoly newPoly;
 		newPoly.materialID = in_TrianglePtr->materialID;
+		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;

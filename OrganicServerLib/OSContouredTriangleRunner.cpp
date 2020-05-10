@@ -519,6 +519,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 
 			ECBPoly newPoly;
 			newPoly.materialID = contouredTrianglePtr->materialID;
+			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 			//fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
 			//

@@ -27,6 +27,9 @@ void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialI
 		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
 		ECBPolyPoint massReferencePoint = triangleStripMRPMap[in_stripID];		// grab the MRP
 		std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
+		//int someDumbVal = 3; 
+		//std::cin >> someDumbVal;
+
 		for (int x = 0; x < numberOfPoints - 1; x++)
 		{
 			//OSContourPoint* contourPointPointer = &PointMap[in_pointIndex];

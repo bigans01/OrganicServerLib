@@ -139,6 +139,7 @@ void BlueprintFillerRunner::insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::Enclav
 	// put the value of the newly added poly into here (when its found)
 	ECBPoly newPoly;
 	newPoly.materialID = contouredTrianglePtr->materialID;
+	newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 	EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[blueprintKey];
 
 	int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
