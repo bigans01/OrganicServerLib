@@ -205,6 +205,7 @@ void OSServer::constructSingleOrganicTest()
 	ECBPolyPoint testPoint_1;
 	ECBPolyPoint testPoint_2;
 
+	
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 48.0f;
@@ -216,7 +217,55 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_2.x = 64.0f;
 	testPoint_2.y = 16.0f;
 	testPoint_2.z = 48.0f;
+	
 
+	// OK.
+	/*
+	testPoint_0.x = 0.0f;
+	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 0.0f;
+
+	testPoint_1.x = 32.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 32.0f;
+
+	testPoint_2.x = 32.0f;
+	testPoint_2.y = 32.0f;
+	testPoint_2.z = 32.0f;
+	*/
+
+	
+	// OK.
+	/*
+	testPoint_0.x = 32.0f;
+	testPoint_0.y = 32.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 32.0f;
+
+	testPoint_1.x = 64.0f;
+	testPoint_1.y = 32.0f;
+	testPoint_1.z = 64.0f;
+
+	testPoint_2.x = 64.0f;
+	testPoint_2.y = 64.0f;
+	testPoint_2.z = 64.0f;
+	*/
+
+
+	// needs fixing/work; related to the border values used when tracing.
+	/*
+	testPoint_0.x = 64.0f;
+	testPoint_0.y = 64.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 64.0f;
+
+	testPoint_1.x = 96.0f;
+	testPoint_1.y = 32.0f;
+	testPoint_1.z = 96.0f;
+
+	testPoint_2.x = 96.0f;
+	testPoint_2.y = 94.0f;
+	testPoint_2.z = 96.0f;
+	*/
+	
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 

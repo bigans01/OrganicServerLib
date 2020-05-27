@@ -71,11 +71,11 @@ void OSContouredTriangleRunner::calibrateTrianglePointKeys()
 		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &contouredTrianglePtr->pointKeys[x];									// get a pointer to the key of the point
 		currentKeyCopy = contouredTrianglePtr->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
 
-		std::cout << std::endl;
-		std::cout << "Key calibration; current key used is: " << currentKeyCopy.x << ", " << currentKeyCopy.y << ", " << currentKeyCopy.z << std::endl;
+		//std::cout << std::endl;
+		//std::cout << "Key calibration; current key used is: " << currentKeyCopy.x << ", " << currentKeyCopy.y << ", " << currentKeyCopy.z << std::endl;
 
 		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
-		std::cout << "################ Calibrating keys for line: " << x << std::endl;
+		//std::cout << "################ Calibrating keys for line: " << x << std::endl;
 		//findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
 	}
 
