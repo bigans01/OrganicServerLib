@@ -75,6 +75,7 @@ public:
 	void constructBlueprintFillTest();
 	void constructMultiMountTest();
 	void constructMissingFillBlueprint3();
+	void constructSingleOrganicTest();
 
 	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void executeDerivedContourPlan(string in_string);

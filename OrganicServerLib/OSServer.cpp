@@ -159,7 +159,7 @@ void OSServer::constructTestBlueprints2()
 	ECBPolyPoint testPoint_4;
 	ECBPolyPoint testPoint_5;
 	testPoint_0.x = 16.5f;
-	testPoint_0.y = 8.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.y = 7.3f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 20.5f;
 
 	testPoint_1.x = 13.5f;
@@ -188,6 +188,38 @@ void OSServer::constructTestBlueprints2()
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_4, testPoint_5, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_5, testPoint_1, mrPoint, 0, 2);
 	executeDerivedContourPlan("plan");
+}
+
+void OSServer::constructSingleOrganicTest()
+{
+	std::cout << "||||||| constructing single poly for OrganicTriangle testing (version 1)...." << std::endl;
+
+	ECBPolyPoint startPoint, mrPoint;
+	startPoint.x = -85.0f;
+	startPoint.y = 80.0f;
+	startPoint.z = 90.0f;
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+
+	testPoint_0.x = 48.0f;
+	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 48.0f;
+
+	testPoint_1.x = 48.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 64.0f;
+
+	testPoint_2.x = 48.0f;
+	testPoint_2.y = 16.0f;
+	testPoint_2.z = 64.0f;
+
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	executeDerivedContourPlan("plan");
+
 }
 
 void OSServer::constructBlueprintFillTest()

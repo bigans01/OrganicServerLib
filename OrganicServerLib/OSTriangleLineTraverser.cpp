@@ -32,7 +32,15 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	blueprintMapRef = in_blueprintMapPtr;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
-	//std::cout << "-->>>> begiging OS Triangle Line Traverser..." << std::endl;
+	std::cout << "-->>>> OSTriangleLineTraverser constructor, blueprint intersection call..." << std::endl;
+	std::cout << "T 0: " << in_TrianglePtr->trianglePoints[0].x << ", " << in_TrianglePtr->trianglePoints[0].y << ", " << in_TrianglePtr->trianglePoints[0].z << std::endl;
+	std::cout << "T 1: " << in_TrianglePtr->trianglePoints[1].x << ", " << in_TrianglePtr->trianglePoints[1].y << ", " << in_TrianglePtr->trianglePoints[1].z << std::endl;
+	std::cout << "T 2: " << in_TrianglePtr->trianglePoints[2].x << ", " << in_TrianglePtr->trianglePoints[2].y << ", " << in_TrianglePtr->trianglePoints[2].z << std::endl;
+
+	std::cout << "Line ID is: " << lineID << std::endl;
+	std::cout << "Begin Key is: " << beginKey.x << ", " << beginKey.y << ", " << beginKey.z << std::endl;
+	std::cout << "End Key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
+
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(beginPoint, endPoint, beginKey, endKey);	// do the initial set up; beginKey will be replaced by currentKey in later function calls
 	nextKeyAdd = resultantIntersect.incrementingKey;					// the next key add will be a result from previous function call
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;		// set the incrementing point
@@ -146,7 +154,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
 
 	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
-	//cout << "current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
+	std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
+	std::cout << "---->  traverseLineOnce intersection call " << std::endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	nextKeyAdd = resultantIntersect.incrementingKey;

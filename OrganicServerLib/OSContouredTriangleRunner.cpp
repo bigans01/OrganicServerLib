@@ -24,19 +24,39 @@ void OSContouredTriangleRunner::performRun()
 
 void OSContouredTriangleRunner::checkForPerfectClamping()
 {
-	if ((contouredTrianglePtr->triangleLines[0].clamped_to_x == 1) && (contouredTrianglePtr->triangleLines[1].clamped_to_x == 1) && (contouredTrianglePtr->triangleLines[2].clamped_to_x == 1))
+	// x clamp check
+	if
+	(
+		(contouredTrianglePtr->triangleLines[0].pointA.x == contouredTrianglePtr->triangleLines[1].pointA.x)
+		&&
+		(contouredTrianglePtr->triangleLines[1].pointA.x == contouredTrianglePtr->triangleLines[2].pointA.x)
+		)
 	{
-		std::cout << "triangle is perfectly clamped to x!" << std::endl;
+		std::cout << "Perfect X-clamp detected! " << std::endl;
 		contouredTrianglePtr->perfect_clamp_x = 1;
 	}
-	if ((contouredTrianglePtr->triangleLines[0].clamped_to_y == 1) && (contouredTrianglePtr->triangleLines[1].clamped_to_y == 1) && (contouredTrianglePtr->triangleLines[2].clamped_to_y == 1))
+
+	// y clamp check
+	if
+	(
+		(contouredTrianglePtr->triangleLines[0].pointA.y == contouredTrianglePtr->triangleLines[1].pointA.y)
+		&&
+		(contouredTrianglePtr->triangleLines[1].pointA.y == contouredTrianglePtr->triangleLines[2].pointA.y)
+	)
 	{
-		std::cout << "triangle is perfectly clamped to y!" << std::endl;
+		//std::cout << "Perfect Y-clamp detected! " << std::endl;
 		contouredTrianglePtr->perfect_clamp_y = 1;
 	}
-	if ((contouredTrianglePtr->triangleLines[0].clamped_to_z == 1) && (contouredTrianglePtr->triangleLines[1].clamped_to_z == 1) && (contouredTrianglePtr->triangleLines[2].clamped_to_z == 1))
+
+	// z clamp check
+	if
+	(
+		(contouredTrianglePtr->triangleLines[0].pointA.z == contouredTrianglePtr->triangleLines[1].pointA.z)
+		&&
+		(contouredTrianglePtr->triangleLines[1].pointA.z == contouredTrianglePtr->triangleLines[2].pointA.z)
+	)
 	{
-		std::cout << "triangle is perfectly clamped to z!" << std::endl;
+		//std::cout << "Perfect Z-clamp detected! " << std::endl;
 		contouredTrianglePtr->perfect_clamp_z = 1;
 	}
 }
@@ -50,7 +70,12 @@ void OSContouredTriangleRunner::calibrateTrianglePointKeys()
 		TriangleLine currentLine = contouredTrianglePtr->triangleLines[x];											// get the line
 		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &contouredTrianglePtr->pointKeys[x];									// get a pointer to the key of the point
 		currentKeyCopy = contouredTrianglePtr->pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
+
+		std::cout << std::endl;
+		std::cout << "Key calibration; current key used is: " << currentKeyCopy.x << ", " << currentKeyCopy.y << ", " << currentKeyCopy.z << std::endl;
+
 		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
+		std::cout << "################ Calibrating keys for line: " << x << std::endl;
 		findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
 	}
 
@@ -63,7 +88,7 @@ void OSContouredTriangleRunner::calibrateTrianglePointKeys()
 		this lies on the border of the blueprints at 0,0,0 and 1,0,0. If it's perfectly flat, we must check the direction of x that the center of the contour line lies in.
 
 		*/
-
+		std::cout << "######################## Perfect clamp detected, for X; attempting adjustment... " << std::endl;
 		TriangleLine tempLine = contouredTrianglePtr->triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
 		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNW.cornerPoint.x)		// check the triangle centroid, compare it to the center of the contour line 
 		{
@@ -155,6 +180,12 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 
 	ECBPolyPoint pointToCheck = in_Line.pointA;
 	//std::cout << "OrganicServerLib, pointToCheck: " << pointToCheck.x << ", " << pointToCheck.y << ", " << pointToCheck.z << ", " << std::endl;
+
+	std::cout << "**** Point A: " << in_Line.pointA.x << ", " << in_Line.pointA.y << ", " << in_Line.pointA.z << std::endl;
+	std::cout << "**** Point B: " << in_Line.pointB.x << ", " << in_Line.pointB.y << ", " << in_Line.pointB.z << std::endl;
+
+	std::cout << "Pointed to key, pre-calc::: " << in_KeyPtr->x << ", " << in_KeyPtr->y << ", " << in_KeyPtr->z << std::endl;
+
 	// NEW CODE BELOW |||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	// First, cycle through all 8 corner points: ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	if (pointToCheck.x == in_borderLineList.corner_LowerNW.cornerPoint.x	&&		pointToCheck.y == in_borderLineList.corner_LowerNW.cornerPoint.y	&&		pointToCheck.z == in_borderLineList.corner_LowerNW.cornerPoint.z)		// Lower NW
@@ -215,6 +246,7 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 			(pointToCheck.x > in_borderLineList.corner_LowerNW.cornerPoint.x	&&		pointToCheck.x < in_borderLineList.corner_LowerNE.cornerPoint.x)	// is x between the LowerNW and LowerNE corners, but not equal to either of them?
 			)
 		{
+			std::cout << "||||||| Lower north matched. " << std::endl;
 			EnclaveKeyDef::EnclaveKey newKey = OrganicUtils::getBorderShiftResult(in_borderLineList.Xaxis_lowerNorth, in_Line.pointA, in_Line.pointB);	// get the shifting key
 			*in_KeyPtr = OrganicUtils::addEnclaveKeys(*in_KeyPtr, newKey);
 		}
@@ -450,10 +482,10 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 		}
 	}
 
-	//cout << "Pointed to key, post-calc::: " << endl;
-	//cout << "x: " << in_KeyPtr->x << endl;
-	//cout << "y: " << in_KeyPtr->y << endl;
-	//cout << "z: " << in_KeyPtr->z << endl;
+	std::cout << "Pointed to key, post-calc::: " << in_KeyPtr->x << ", " << in_KeyPtr->y << ", " << in_KeyPtr->z << std::endl;
+	//std::cout << "x: " << in_KeyPtr->x << std::endl;
+	//std::cout << "y: " << in_KeyPtr->y << std::endl;
+	//std::cout << "z: " << in_KeyPtr->z << std::endl;
 
 	//return calibratedKey;
 }
@@ -521,6 +553,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			newPoly.materialID = contouredTrianglePtr->materialID;
 			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 			//fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
+			OSServerUtils::fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
 			//
 			//&(*blueprintMapRef)[currentKey];
@@ -585,18 +618,6 @@ void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in
 	in_LinePtr->x_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].z_interceptSlope;		// "" z
-}
-
-void OSContouredTriangleRunner::fillPolyWithClampResult(ECBPoly* in_polyPtr)
-{
-	if (contouredTrianglePtr->perfect_clamp_x == 1
-		||
-		contouredTrianglePtr->perfect_clamp_y == 1
-		||
-		contouredTrianglePtr->perfect_clamp_z == 1)
-	{
-		in_polyPtr->isPolyPerfectlyClamped = 1;
-	}
 }
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
