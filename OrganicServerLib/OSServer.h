@@ -97,7 +97,6 @@ private:
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
-	void determineTriangleCentroid(OSContouredTriangle* in_Triangle);
 	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);
 	int checkServerStatus(mutex& in_serverReadWrite);
 	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus);

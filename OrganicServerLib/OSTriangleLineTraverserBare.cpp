@@ -11,6 +11,7 @@ void OSTriangleLineTraverserBare::initialize(PrimaryLineT1* in_lineRef)
 	beginPoint = in_lineRef->beginPointRealXYZ;
 	endPoint = in_lineRef->endPointRealXYZ;
 
+	std::cout << "########## Calling blueprint intersection (traverseLineOnce), Constructor" << std::endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(beginPoint, endPoint, beginKey, endKey);	// do the initial set up; beginKey will be replaced by currentKey in later function calls
 	nextKeyAdd = resultantIntersect.incrementingKey;					// the next key add will be a result from previous function call
 	currentIterationBeginPoint = beginPoint;							// set the initial value of the begin point
@@ -42,6 +43,7 @@ void OSTriangleLineTraverserBare::traverseLineOnce()
 	//std::cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << std::endl;
 	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;													// get a pointer to the current key
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
+	std::cout << "########## Calling blueprint intersection (traverseLineOnce)" << std::endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	nextKeyAdd = resultantIntersect.incrementingKey;

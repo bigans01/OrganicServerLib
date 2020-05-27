@@ -40,7 +40,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	std::cout << "Line ID is: " << lineID << std::endl;
 	std::cout << "Begin Key is: " << beginKey.x << ", " << beginKey.y << ", " << beginKey.z << std::endl;
 	std::cout << "End Key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
-
+	std::cout << "############# OS Triangle Line traverser, constructor, findClosestBlueprintIntersection call " << std::endl;
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(beginPoint, endPoint, beginKey, endKey);	// do the initial set up; beginKey will be replaced by currentKey in later function calls
 	nextKeyAdd = resultantIntersect.incrementingKey;					// the next key add will be a result from previous function call
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;		// set the incrementing point
@@ -156,7 +156,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
 	std::cout << "---->  traverseLineOnce intersection call " << std::endl;
-	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
+	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
+	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey, in_TrianglePtr->centroid, in_TrianglePtr->trianglePoints[0], in_TrianglePtr->trianglePoints[1], in_TrianglePtr->trianglePoints[2]);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	nextKeyAdd = resultantIntersect.incrementingKey;
 	// 1. Do check for the currentIterationEndpoint; it must exist on an axis somewhere.

@@ -76,7 +76,7 @@ void OSContouredTriangleRunner::calibrateTrianglePointKeys()
 
 		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
 		std::cout << "################ Calibrating keys for line: " << x << std::endl;
-		findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
+		//findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
 	}
 
 	// check for perfect clamps; we can use the last iteration of currentKeyCopy for this
