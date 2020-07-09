@@ -63,7 +63,7 @@ bool PrimaryCircuit::checkIfSegmentIsOpenMulti(int in_lineID)
 	{
 		if (primarySegments[x].lineID == in_lineID)
 		{
-			if (primarySegments[x].type == SCircuitSegmentType::OPEN_MULTI)
+			if (primarySegments[x].type == CircuitSegmentType::OPEN_MULTI)
 			{
 				result = true;
 			}

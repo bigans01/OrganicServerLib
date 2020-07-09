@@ -132,7 +132,11 @@ void OSContouredTriangle::determineLineLengths()
 
 void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType)
 {
-	polygonPieceMap[in_Key] = in_pieceType;
+	std::cout << "!! Adding polygon piece: " << in_Key.x << ", " << in_Key.y << ", " << in_Key.z << std::endl;
+	//polygonPieceMap[in_Key] = in_pieceType;
+	polygonPieceMap.emplace(in_Key, in_pieceType);
+	//someVector.push_back(in_pieceType);
+	//polygonPieceMap[in_Key] = 0;
 }
 
 void OSContouredTriangle::determineLineAngles() 
@@ -266,6 +270,8 @@ bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 		//std::cout << "!!!! ContouredTriangle spans multiple blueprints...filling checks required. " << std::endl;
 		result = false;
 	}
+
+	std::cout << "Check if points in same blueprint call complete..." << std::endl;
 	return result;
 }
 

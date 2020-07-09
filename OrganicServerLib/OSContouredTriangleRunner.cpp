@@ -7,9 +7,15 @@ void OSContouredTriangleRunner::performRun()
 	calibrateTrianglePointKeys();		// perform key calibration; adjusts keys if any perfect clamping conditions are met.
 	rayCastTrianglePoints();
 
-	printTracingCounts();
+	//printTracingCounts();
 
+	
+	std::cout << "!!!!!! Calling fillMetaDataInPrimartCircuits... " << std::endl;
 	contouredTrianglePtr->fillMetaDataInPrimaryCircuits();
+
+	std::cout << "!!!!!! Call of fillMetaDataInPrimartCircuits COMPLETED... " << std::endl;
+
+
 	if (contouredTrianglePtr->checkIfPointsAreInSameBlueprint() == false)
 	{
 		runContouredTriangleOriginalDirection();
@@ -20,6 +26,7 @@ void OSContouredTriangleRunner::performRun()
 	// only do the following if all points are NOT in same blueprint
 
 	contouredTrianglePtr->printPrimarySegmentData();
+	
 }
 
 void OSContouredTriangleRunner::checkForPerfectClamping()
@@ -492,14 +499,17 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 
 void OSContouredTriangleRunner::rayCastTrianglePoints()
 {
+	std::cout << "!!! Attempting ray cast. " << std::endl;
 	for (int x = 0; x < 3; x++)		// ray cast each individual line. (there will always be 3 lines -- duh)
 	{
 		tracePointThroughBlueprints(x);		// trace the point (line)
 	}
+	std::cout << "!!! Ray cast complete. " << std::endl;
 }
 
 void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 {
+	std::cout << "!!! Attempting trace. " << std::endl;
 	EnclaveKeyDef::EnclaveKey originPointKey;
 	EnclaveKeyDef::EnclaveKey endPointKey;
 
@@ -515,13 +525,15 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 	}
 
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
+	std::cout << "Incrementing Key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << std::endl;
 
 	if (originPointKey == endPointKey)		// both points exist in same blueprint
 	{
+
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = contouredTrianglePtr->polygonPieceMap.find(incrementingKey);	// check to see if the polygon exists already in the contoured triangle
 		if (polyMapIter != contouredTrianglePtr->polygonPieceMap.end())	// polygon was already found
 		{
-
+			std::cout << "!!! First branch hit. " << std::endl;
 			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
 			//&(*blueprintMapRef)[currentKey];
@@ -549,6 +561,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		else  // polygon wasn't found, it needs to be created
 		{
 
+			std::cout << "!!! Second branch hit. " << std::endl;
 			ECBPoly newPoly;
 			newPoly.materialID = contouredTrianglePtr->materialID;
 			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
@@ -559,29 +572,21 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
+
+			
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
+
+			
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
 			runnerForgedPolyRegistryRef->addToPolyset(incrementingKey, elementID); // Add the new poly to the ForgedPolyRegistry
-			/*
-			if (debugIncremental == 1)
-			{
-				std::cout << "Poly line points: " << std::endl;
-				std::cout << "0: " << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
-				std::cout << "1: " << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
-				std::cout << "2: " << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
-				std::cout << "----Slopes: " << std::endl;
-				std::cout << "X: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
-				std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
-				std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
-			}
-			*/
+			
 			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			contouredTrianglePtr->addPolygonPiece(incrementingKey, elementID);
-
+			
 		}
 
 	}
@@ -622,10 +627,22 @@ void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
 {
-	//std::cout << "########################## Running Original Direction ################################# " << std::endl;
+	//int sillyVal;
+	//std::cout << "enter the silly val. " << std::endl;
+	//std::cin >> sillyVal;
+
+	//int stupid = 3;
+	//while (stupid == 0)
+	//{
+
+	//}
+
+	std::cout << "########################## Running Original Direction ################################# " << std::endl;
 	PrimaryLineT1Array contourLineArray;
 	prepareContouredTriangleData(PolyRunDirection::NORMAL, &contourLineArray);
 	fillBlueprintArea(&contourLineArray);
+
+	std::cout << "!!! Original direction run complete..." << std::endl;
 }
 
 void OSContouredTriangleRunner::runContouredTriangleReverseDirection()
@@ -638,9 +655,15 @@ void OSContouredTriangleRunner::runContouredTriangleReverseDirection()
 
 void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in_direction, PrimaryLineT1Array* in_contourLineArrayRef)
 {
+	//int sillyVal;
+	//std::cout << "enter the silly val. " << std::endl;
+	//std::cin >> sillyVal;
+
 	int perfectClampFlag = isContouredTrianglePerfectlyClamped();		// is the contoured triangle perfectly clamped?
 	for (int x = 0; x < 3; x++)		// go through each line in the contoured triangle.
 	{
+		
+
 		ECBPolyPoint pointA = contouredTrianglePtr->triangleLines[x].pointA;
 		ECBPolyPoint pointB = contouredTrianglePtr->triangleLines[x].pointB;
 		ECBPolyPoint pointC = contouredTrianglePtr->triangleLines[x].pointC;
@@ -674,6 +697,8 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 			newPrimaryLine.calibrateForBlueprintTracingWithInverseChecks(pointC);
 		}
 		in_contourLineArrayRef->addNewPrimaryLine(newPrimaryLine);
+
+		
 	}
 
 	// check for line swap
@@ -682,6 +707,9 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		in_contourLineArrayRef->swapLinesForBlueprintTracing();
 	}
 	//in_contourLineArrayRef->printBlueprintTracingLines();
+
+	std::cout << "!!! prepareContouredTrianglePerfectlyClamped complete..." << std::endl;
+	
 }
 
 void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contourLineArrayRef)

@@ -4,7 +4,7 @@
 #define PRIMARYCIRCUITSEGMENT_H
 
 #include "ECBPolyPoint.h"
-#include "SCircuitSegmentType.h"
+#include "CircuitSegmentType.h"
 #include "ECBBorderLineList.h"
 #include "OrganicUtils.h"
 #include "BorderDataMap.h"
@@ -20,7 +20,7 @@ class PrimaryCircuitSegment
 		ECBPolyPoint targetPoint;	// the target point to compare to; will be the start point of the next segment in the circuit
 		ECBBorderLineList* borderLineListRef;	// a ref to the border line list to help determine the points
 		BorderDataMap* borderDataMapRef;
-		SCircuitSegmentType type = SCircuitSegmentType::NOVAL;
+		CircuitSegmentType type = CircuitSegmentType::NOVAL;
 
 		void determineInitialType();
 };

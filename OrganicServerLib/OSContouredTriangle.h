@@ -36,6 +36,7 @@ public:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> tracedBlueprintCountMap;	// stores blueprint IDs that are a result of tracing the contour lines
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> filledBlueprintMap;		// stores blueprint IDs that were filled 
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, PrimaryCircuit, EnclaveKeyDef::KeyHasher> primarySegmentTrackerMap;
+	std::vector<int> someVector; // test only, debug.
 	OSContouredTriangle();
 	short isTriangleFlat = 0;				// set to 1 if the Triangle is flat (all points on same y level)
 	short materialID = 0;				// what is the material made of? stone, brick, snow, dirt, etc?
