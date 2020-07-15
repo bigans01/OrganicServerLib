@@ -223,7 +223,9 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_3.y = 15.5f;
 	testPoint_3.z = 48.2f;
 
-	// OK.
+	
+	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
+
 	/*
 	testPoint_0.x = 0.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
@@ -236,10 +238,35 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_2.x = 32.0f;
 	testPoint_2.y = 32.0f;
 	testPoint_2.z = 32.0f;
+
+	testPoint_3.x = 0.0f;
+	testPoint_3.y = 32.0f;
+	testPoint_3.z = 0.0f;
 	*/
+	
+	
 
 	
-	// OK.
+	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
+	/*
+	testPoint_0.x = 0.0f;
+	testPoint_0.y = 0.0f;
+	testPoint_0.z = 0.0f;
+
+	testPoint_1.x = 32.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 0.0f;
+
+	testPoint_2.x = 32.0f;
+	testPoint_2.y = 32.0f;
+	testPoint_2.z = 32.0f;
+
+	testPoint_3.x = 0.0f;
+	testPoint_3.y = 32.0f;
+	testPoint_3.z = 32.0f;
+	*/
+	
+	// |||||||||||||||| Needs testing refinement. (7/14/2020)
 	/*
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
