@@ -13,6 +13,7 @@ class BlankContour : public ContourBase
 		void amplifyAllContourLinePoints();
 		void constructStripTriangles(int in_stripID, int in_materialID);
 		void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID);
+		void runMassDrivers();
 	private:
 		
 };

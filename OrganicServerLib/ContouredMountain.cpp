@@ -372,3 +372,8 @@ void ContouredMountain::addContourLine(int line_id, float in_baseDistance, float
 	contourLineMap[line_id] = tempLine;
 	contourLineCount++;
 }
+
+void ContouredMountain::runMassDrivers()
+{
+
+}

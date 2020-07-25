@@ -26,6 +26,7 @@ public:
 	virtual void amplifyAllContourLinePoints() = 0;
 	virtual void constructStripTriangles(int in_stripID, int in_materialID) = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
+	virtual void runMassDrivers() = 0;
 
 	// inherited functions for derived classes
 	void runPolyFracturerForAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);

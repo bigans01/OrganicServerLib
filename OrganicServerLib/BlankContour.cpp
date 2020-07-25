@@ -96,3 +96,8 @@ void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBP
 	triangleStripMap[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
 	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
+
+void BlankContour::runMassDrivers()
+{
+
+}

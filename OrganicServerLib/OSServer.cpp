@@ -209,19 +209,19 @@ void OSServer::constructSingleOrganicTest()
 	
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 48.2f;
+	testPoint_0.z = 48.0f;
 
 	testPoint_1.x = 64.0f;
 	testPoint_1.y = 0.0f;
-	testPoint_1.z = 48.2f;
+	testPoint_1.z = 48.0f;
 
 	testPoint_2.x = 63.5f;
 	testPoint_2.y = 15.5f;
-	testPoint_2.z = 48.2f;
+	testPoint_2.z = 48.0f;
 	
 	testPoint_3.x = 48.0f;
 	testPoint_3.y = 15.5f;
-	testPoint_3.z = 48.2f;
+	testPoint_3.z = 48.0f;
 
 	
 	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
@@ -264,10 +264,10 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_3.x = 0.0f;
 	testPoint_3.y = 32.0f;
 	testPoint_3.z = 32.0f;
-	*/
+	
 	
 	// |||||||||||||||| Needs testing refinement. (7/14/2020)
-	/*
+	
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 32.0f;
@@ -279,6 +279,10 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_2.x = 64.0f;
 	testPoint_2.y = 64.0f;
 	testPoint_2.z = 64.0f;
+
+	testPoint_3.x = 32.0f;
+	testPoint_3.y = 64.0f;
+	testPoint_3.z = 32.0f;
 	*/
 
 
@@ -301,6 +305,117 @@ void OSServer::constructSingleOrganicTest()
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 
+}
+
+void OSServer::constructOrganicRawTest()
+{
+	std::cout << "!!! Running RAW test! " << std::endl;
+
+	ECBPolyPoint startPoint, mrPoint;
+	startPoint.x = -85.0f;
+	startPoint.y = 80.0f;
+	startPoint.z = 90.0f;
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	ECBPolyPoint testPoint_3;
+
+	/*
+	testPoint_0.x = 16.0f;
+	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 16.0f;
+
+	testPoint_1.x = 20.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 16.0f;
+
+	testPoint_2.x = 20.0f;
+	testPoint_2.y = 4.0f;
+	testPoint_2.z = 16.0f;
+	*/
+
+	// a journey into the bizarre below (7/18/2020)
+	
+	/*
+	testPoint_0.x = 54.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 49.0f;
+
+	testPoint_1.x = 50.0f;
+	testPoint_1.y = 16.0f;
+	testPoint_1.z = 49.0f;
+
+	testPoint_2.x = 50.0f;
+	testPoint_2.y = 12.0f;
+	testPoint_2.z = 49.0f;
+
+	testPoint_3.x = 54.0f;
+	testPoint_3.y = 12.0f;
+	testPoint_3.z = 49.0f;
+	*/
+	
+	
+	
+	testPoint_0.x = 50.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 49.0f;
+
+	testPoint_1.x = 48.0f;
+	testPoint_1.y = 16.0f;
+	testPoint_1.z = 49.0f;
+
+	testPoint_2.x = 48.0f;
+	testPoint_2.y = 12.0f;
+	testPoint_2.z = 49.0f;
+
+	testPoint_3.x = 50.0f;
+	testPoint_3.y = 12.0f;
+	testPoint_3.z = 49.0f;
+	
+
+	/*
+	testPoint_0.x = 50.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 49.2f;
+
+	testPoint_1.x = 48.0f;
+	testPoint_1.y = 16.0f;
+	testPoint_1.z = 49.2f;
+
+	testPoint_2.x = 48.0f;
+	testPoint_2.y = 12.0f;
+	testPoint_2.z = 49.2f;
+
+	testPoint_3.x = 50.0f;
+	testPoint_3.y = 12.0f;
+	testPoint_3.z = 49.2f;
+	*/
+	
+
+	/*
+	testPoint_0.x = 52.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 49.2f;
+
+	testPoint_1.x = 48.0f;
+	testPoint_1.y = 16.0f;
+	testPoint_1.z = 49.2f;
+
+	testPoint_2.x = 48.0f;
+	testPoint_2.y = 12.0f;
+	testPoint_2.z = 49.2f;
+
+	testPoint_3.x = 54.0f;
+	testPoint_3.y = 12.0f;
+	testPoint_3.z = 49.2f;
+	*/
+
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	executeDerivedContourPlan("plan");
 }
 
 void OSServer::constructBlueprintFillTest()
@@ -618,6 +733,8 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	
 	// perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
+
+	// run the mass driver for the plan. (if the plan allows for it)
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
