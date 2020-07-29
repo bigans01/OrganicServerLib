@@ -9,6 +9,7 @@
 #include "ECBFaceIntersect.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "OSServerUtils.h"
+#include "BorderDataMap.h"
 
 class OSTriangleLineTraverser
 {
@@ -20,6 +21,7 @@ public:
 	EnclaveKeyDef::EnclaveKey nextKeyAdd;	// how much will be added to currentKey in the next iteration
 	EnclaveKeyDef::EnclaveKey endKey;		// the ending key = the key that point B lies in (will be done when this happens)
 	OSContouredTriangle* contouredTriangleRef;
+	BorderDataMap borderData;
 
 	ECBPolyPoint beginPoint;				// equals point A of line
 	ECBPolyPoint currentIterationEndpoint;	// equals whatever the point is when this line hits an ECB border

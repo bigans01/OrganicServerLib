@@ -67,6 +67,9 @@ class BlueprintFillerRunner
 		// run status flags
 		bool isRunComplete = false;
 
+		// is run valid flag
+		bool isRunValid = true;		// assumes true (will be true 99.99% of the time)
+
 		void initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, OSContouredTriangle* in_osTriangleRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);
 		bool checkIfRunComplete();			// check if the run is complete
 		void traverseToNewBlueprint();

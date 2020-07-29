@@ -154,8 +154,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
 
 	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
-	std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
-	std::cout << "---->  traverseLineOnce intersection call " << std::endl;
+	//std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
+	//std::cout << "---->  traverseLineOnce intersection call " << std::endl;
 	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey, in_TrianglePtr->centroid, in_TrianglePtr->trianglePoints[0], in_TrianglePtr->trianglePoints[1], in_TrianglePtr->trianglePoints[2]);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
@@ -179,6 +179,21 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
+
+		if
+			(
+			(newPolyLine.pointB.x == 1216)
+				&&
+				(newPolyLine.pointB.z == -192)
+				)
+		{
+			std::cout << "+++++++++SPECIAL HALT (3)" << std::endl;
+			int someVal = 3;
+			std::cin >> someVal;
+		}
+
+
+
 		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
@@ -212,17 +227,66 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
-		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
-		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
-		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
-		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
-		//cout << ":::::blueprint ID: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
-		//cout << ":::::elementID: " << elementID << endl;
-		//cout << ":::::lineID: " << lineID << endl;
-		blueprintPtr->primaryPolygonMap[elementID].lineMap[lineID] = newPolyLine;	// add the line to the newly created polygon
-		in_TrianglePtr->addPolygonPiece(currentKey, elementID);					// add the polygon piece to the triangle
-		in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(currentKey, elementID); // Add the new poly to the ForgedPolyRegistry
+		bool validityCheck = OrganicUtils::checkIfBlueprintLineIsValid(newPolyLine, &borderData, currentKey, newPoly.isPolyPerfectlyClamped);
+		/*
+		if
+			(
+			(newPolyLine.pointB.x == 1216)
+				&&
+				(newPolyLine.pointB.z == -192)
+				)
+		{
+			std::cout << "+++++++++SPECIAL HALT (4)" << std::endl;
+			int someVal = 3;
 
+			std::cout << "##### Segment points: " << std::endl;
+			std::cout << "begin :" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+			std::cout << "end   :" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+			std::cout << "C     :" << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+
+			if (validityCheck == false)
+			{
+				std::cout << "!!! Halting for input..." << std::endl;
+				int someVal = 3;
+				std::cin >> someVal;
+			}
+		}
+		*/
+		if
+		(
+			validityCheck == false	
+		)
+		{
+			std::cout << "+++++++++SPECIAL HALT (4)" << std::endl;
+			int someVal = 3;
+
+			std::cout << "##### Segment points: " << std::endl;
+			std::cout << "begin :" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
+			std::cout << "end   :" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
+			std::cout << "C     :" << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
+
+			if (validityCheck == false)
+			{
+				std::cout << "!!! Halting for input..." << std::endl;
+				//int someVal = 3;
+				//std::cin >> someVal;
+			}
+		}
+
+
+		if (validityCheck == true)
+		{
+			in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
+			//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
+			//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
+			//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
+			//cout << ":::::blueprint ID: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
+			//cout << ":::::elementID: " << elementID << endl;
+			//cout << ":::::lineID: " << lineID << endl;
+			blueprintPtr->primaryPolygonMap[elementID].lineMap[lineID] = newPolyLine;	// add the line to the newly created polygon
+			in_TrianglePtr->addPolygonPiece(currentKey, elementID);					// add the polygon piece to the triangle
+			in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(currentKey, elementID); // Add the new poly to the ForgedPolyRegistry
+		}
 	}
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;
 	//cout << "~~~~~~~~~~~~~" << endl;

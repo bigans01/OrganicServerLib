@@ -3,7 +3,7 @@
 
 void OSServerUtils::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle)
 {
-	std::cout << "#######!#############!######### Attempting clamp fill! " << std::endl;
+	//std::cout << "#######!#############!######### Attempting clamp fill! " << std::endl;
 	/*
 	if (in_contouredTriangle->perfect_clamp_x == 1
 		||
@@ -17,7 +17,7 @@ void OSServerUtils::fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTria
 	*/
 	if (in_contouredTriangle->perfect_clamp_x == 1)
 	{
-		std::cout << "Perfectly clamped to X!" << std::endl;
+		//std::cout << "Perfectly clamped to X!" << std::endl;
 		in_polyPtr->isPolyPerfectlyClamped = 1;
 	}
 	else if (in_contouredTriangle->perfect_clamp_y == 1)
