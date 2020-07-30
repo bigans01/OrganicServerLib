@@ -692,6 +692,8 @@ void OSServer::executeDerivedContourPlan(string in_string)
 		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
 		{
 			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
+			std::cout << "(SERVER): Executing plan, " + in_string << ", strip: " << stripMapIterator->first << ", triangle: " << triangleMapIterator->first << std::endl;
+
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
 			// DEBUG ONLY, temporary
 			//if (triangleMapIterator->first == 79)

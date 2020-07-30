@@ -17,8 +17,8 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint i
 	//std::cout << "~~~~~~~~~~~~ Beginning initial fill " << std::endl;
 	//std::cout << "Parent Line point A: " << in_lineRef->beginPointRealXYZ.x << ", " << in_lineRef->beginPointRealXYZ.y << ", " << in_lineRef->beginPointRealXYZ.z << std::endl;
 	//std::cout << "Parent Line point B: " << in_lineRef->endPointRealXYZ.x << ", " << in_lineRef->endPointRealXYZ.y << ", " << in_lineRef->endPointRealXYZ.z << std::endl;
-	std::cout << "(|| SERVER) current segment begin (from constructor) is: " << in_currentSegmentBegin.x << ", " << in_currentSegmentBegin.y << ", " << in_currentSegmentBegin.z << std::endl;
-	std::cout << "(|| SERVER) current segment end   (from constructor) is: " << in_currentSegmentEnd.x << ", " << in_currentSegmentEnd.y << ", " << in_currentSegmentEnd.z << std::endl;
+	//std::cout << "(|| SERVER) current segment begin (from constructor) is: " << in_currentSegmentBegin.x << ", " << in_currentSegmentBegin.y << ", " << in_currentSegmentBegin.z << std::endl;
+	//std::cout << "(|| SERVER) current segment end   (from constructor) is: " << in_currentSegmentEnd.x << ", " << in_currentSegmentEnd.y << ", " << in_currentSegmentEnd.z << std::endl;
 
 	tracedBlueprintCountMapRef = in_tracedBlueprintCountMapRef;
 	filledBlueprintMapRef = in_filledBlueprintMapRef;
@@ -283,16 +283,16 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 		tempStorage.tempFaceList.faceList[2] = borderDataMapRef->cornerMap[currentBeginOrientation.osubtype].linkedFaces[2];
 		tempStorage.numberOfIntercepts = 3;
 	}
-	std::cout << "(SERVER) ::Original primary line begin point: " << in_lineRef->beginPointRealXYZ.x << ", " << in_lineRef->beginPointRealXYZ.y << ", " << in_lineRef->beginPointRealXYZ.z << std::endl;
-	std::cout << "(SERVER) ::Original primary line end point: " << in_lineRef->endPointRealXYZ.x << ", " << in_lineRef->endPointRealXYZ.y << ", " << in_lineRef->endPointRealXYZ.z << std::endl;
-	std::cout << "(SERVER) ::Original primary line third point: " << in_lineRef->thirdPointRealXYZ.x << ", " << in_lineRef->thirdPointRealXYZ.y << ", " << in_lineRef->thirdPointRealXYZ.z << std::endl;
-	std::cout << "(SERVER) ::Original primary line intended faces: " << in_lineRef->intendedFaces.x << ", " << in_lineRef->intendedFaces.y << ", " << in_lineRef->intendedFaces.z << std::endl;
-	std::cout << "(SERVER) ::Initial move vals are: " << moveVals.x << ", " << moveVals.y << "," << moveVals.z << std::endl;
-	std::cout << "(SERVER) ::Orginal Primary X-int: " << in_lineRef->x_int.x << ", " << in_lineRef->x_int.y << ", " << in_lineRef->x_int.z << std::endl;
-	std::cout << "(SERVER) ::Orginal Primary Y-int: " << in_lineRef->y_int.x << ", " << in_lineRef->y_int.y << ", " << in_lineRef->y_int.z << std::endl;
-	std::cout << "(SERVER) ::Orginal Primary Z-int: " << in_lineRef->z_int.x << ", " << in_lineRef->z_int.y << ", " << in_lineRef->z_int.z << std::endl;
+	//std::cout << "(SERVER) ::Original primary line begin point: " << in_lineRef->beginPointRealXYZ.x << ", " << in_lineRef->beginPointRealXYZ.y << ", " << in_lineRef->beginPointRealXYZ.z << std::endl;
+	//std::cout << "(SERVER) ::Original primary line end point: " << in_lineRef->endPointRealXYZ.x << ", " << in_lineRef->endPointRealXYZ.y << ", " << in_lineRef->endPointRealXYZ.z << std::endl;
+	//std::cout << "(SERVER) ::Original primary line third point: " << in_lineRef->thirdPointRealXYZ.x << ", " << in_lineRef->thirdPointRealXYZ.y << ", " << in_lineRef->thirdPointRealXYZ.z << std::endl;
+	//std::cout << "(SERVER) ::Original primary line intended faces: " << in_lineRef->intendedFaces.x << ", " << in_lineRef->intendedFaces.y << ", " << in_lineRef->intendedFaces.z << std::endl;
+	//std::cout << "(SERVER) ::Initial move vals are: " << moveVals.x << ", " << moveVals.y << "," << moveVals.z << std::endl;
+	//std::cout << "(SERVER) ::Orginal Primary X-int: " << in_lineRef->x_int.x << ", " << in_lineRef->x_int.y << ", " << in_lineRef->x_int.z << std::endl;
+	//std::cout << "(SERVER) ::Orginal Primary Y-int: " << in_lineRef->y_int.x << ", " << in_lineRef->y_int.y << ", " << in_lineRef->y_int.z << std::endl;
+	//std::cout << "(SERVER) ::Orginal Primary Z-int: " << in_lineRef->z_int.x << ", " << in_lineRef->z_int.y << ", " << in_lineRef->z_int.z << std::endl;
 
-	std::cout << "(SERVER) determining slope to use for getBlueprintTracingResult..." << std::endl;
+	//std::cout << "(SERVER) determining slope to use for getBlueprintTracingResult..." << std::endl;
 	//std::cout << "(SERVER) current segment begin is    : " << in_currentSegmentBegin.x << ", " << in_currentSegmentBegin.y << ", " << in_currentSegmentBegin.z << std::endl;
 	//std::cout << "(SERVER) current segment end  is: " << in_currentSegmentEnd.x << ", " << in_currentSegmentEnd.y << ", " << in_currentSegmentEnd.z << std::endl;
 
@@ -302,7 +302,7 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 	// an intercept count of 1 will always mean a face is use
 	if (tempStorage.numberOfIntercepts == 1)
 	{
-		std::cout << ">>>>> Face encountered! " << std::endl;
+		//std::cout << ">>>>> Face encountered! " << std::endl;
 		// an intercept count of 1 will always mean a face is used
 		ECBPPOrientations slopeToUse = borderDataMapRef->faceInterceptMap[currentBeginOrientation.osubtype];
 		interceptToUse = getSlopeToUse(slopeToUse);
@@ -312,23 +312,23 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 	// an intercept count of 2 means we need to get the appropriate slope from the line
 	else if (tempStorage.numberOfIntercepts == 2)
 	{
-		std::cout << ">>>>>> Line encountered! " << std::endl;
+		//std::cout << ">>>>>> Line encountered! " << std::endl;
 		// get the first face value
 		ECBPPOrientations face1 = borderDataMapRef->faceInterceptMap[tempStorage.tempFaceList.faceList[0]];
 		ECBPolyPoint intercept1 = getSlopeToUse(face1);
-		std::cout << "intercept 1 is : " << intercept1.x << ", " << intercept1.y << ", " << intercept1.z << std::endl;
+		//std::cout << "intercept 1 is : " << intercept1.x << ", " << intercept1.y << ", " << intercept1.z << std::endl;
 
 		// get the second face value
 		ECBPPOrientations face2 = borderDataMapRef->faceInterceptMap[tempStorage.tempFaceList.faceList[1]];
 		ECBPolyPoint intercept2 = getSlopeToUse(face2);
-		std::cout << "intercept 2 is : " << intercept2.x << ", " << intercept2.y << ", " << intercept2.z << std::endl;
+		//std::cout << "intercept 2 is : " << intercept2.x << ", " << intercept2.y << ", " << intercept2.z << std::endl;
 		interceptToUse = getInterceptToUseFromLine(intercept1, intercept2);
 	}
 
 	// an intercept count of 3 means we need to get the appropriate slope from the corner (in theory, there should only be 1 valid slope ever)
 	else if (tempStorage.numberOfIntercepts == 3)
 	{
-		std::cout << ">>>>>>>> Corner encountered! " << std::endl;
+		//std::cout << ">>>>>>>> Corner encountered! " << std::endl;
 		moveValsToPass = borderDataMapRef->cornerMap[currentBeginOrientation.osubtype].borderLimits;
 		ECBPolyPoint polyPointToPass;
 		polyPointToPass.x = moveValsToPass.x;
@@ -346,14 +346,14 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 		(interceptToUse.z == 0)
 	)
 	{
-		std::cout << "++++WARNING++++ slope is invalid!" << std::endl;
+		//std::cout << "++++WARNING++++ slope is invalid!" << std::endl;
 		isRunValid = false;
 	}
 
 	PrimaryLineT1 newLine;
 	if (isRunValid == true)
 	{
-		std::cout << "(SERVER) calling getBlueprintTracingResult..." << std::endl;
+		//std::cout << "(SERVER) calling getBlueprintTracingResult..." << std::endl;
 		PLTracingResult currentTraceResults = getBlueprintTracingResult(interceptToUse);
 		currentEndPoint = currentTraceResults.resultingEndPoint;
 		//std::cout << "::::::::::::::::::::::::::::::::Resulting endpoint is: " << currentEndPoint.x << ", " << currentEndPoint.y << ", " << currentEndPoint.z << ", " << std::endl;
