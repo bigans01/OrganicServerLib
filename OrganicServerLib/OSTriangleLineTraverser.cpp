@@ -180,20 +180,6 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 
-		if
-			(
-			(newPolyLine.pointB.x == 1216)
-				&&
-				(newPolyLine.pointB.z == -192)
-				)
-		{
-			std::cout << "+++++++++SPECIAL HALT (3)" << std::endl;
-			int someVal = 3;
-			std::cin >> someVal;
-		}
-
-
-
 		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, currentKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
@@ -252,6 +238,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 			}
 		}
 		*/
+		/*
 		if
 		(
 			validityCheck == false	
@@ -272,7 +259,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 				//std::cin >> someVal;
 			}
 		}
-
+		*/
 
 		if (validityCheck == true)
 		{

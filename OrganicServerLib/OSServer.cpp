@@ -359,12 +359,12 @@ void OSServer::constructOrganicRawTest()
 	
 	
 	
-	testPoint_0.x = 50.0f;
-	testPoint_0.y = 16.0f;
+	testPoint_0.x = 49.0f;
+	testPoint_0.y = 13.0f;
 	testPoint_0.z = 49.0f;
 
 	testPoint_1.x = 48.0f;
-	testPoint_1.y = 16.0f;
+	testPoint_1.y = 13.0f;
 	testPoint_1.z = 49.0f;
 
 	testPoint_2.x = 48.0f;
@@ -413,8 +413,8 @@ void OSServer::constructOrganicRawTest()
 	testPoint_3.z = 49.2f;
 	*/
 
-	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
 

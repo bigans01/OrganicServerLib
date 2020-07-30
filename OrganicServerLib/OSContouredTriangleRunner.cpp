@@ -543,18 +543,6 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			fillLineMetaData(&newPolyLine, in_pointID);
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
 
-			if
-			(
-				(newPolyLine.pointB.x == 1216)
-				&&
-				(newPolyLine.pointB.z == -192)
-			)
-			{
-				std::cout << "+++++++++SPECIAL HALT (1)" << std::endl;
-				int someVal = 3;
-				std::cin >> someVal;
-			}
-
 			/*
 			if (debugIncremental == 1)
 			{
@@ -594,21 +582,6 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 
 			
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
-
-			if
-				(
-				(newPolyLine.pointB.x == 1216)
-					&&
-					(newPolyLine.pointB.z == -192)
-					)
-			{
-				std::cout << "+++++++++SPECIAL HALT (2)" << std::endl;
-				int someVal = 3;
-				std::cin >> someVal;
-			}
-
-
-
 
 
 
