@@ -14,7 +14,11 @@ void BlankContour::constructStripTriangles(int in_stripID, int in_materialID)
 {
 
 
-	
+}
+
+void BlankContour::constructBottomStripTriangles(int in_stripID, int in_materialID)
+{
+
 }
 
 void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)

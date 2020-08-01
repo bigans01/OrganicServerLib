@@ -206,27 +206,27 @@ void OSServer::constructSingleOrganicTest()
 	ECBPolyPoint testPoint_2;
 	ECBPolyPoint testPoint_3;
 
-	/*
+	
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 48.0f;
+	testPoint_0.z = 48.2f;
 
 	testPoint_1.x = 64.0f;
 	testPoint_1.y = 0.0f;
-	testPoint_1.z = 48.0f;
+	testPoint_1.z = 48.2f;
 
 	testPoint_2.x = 63.5f;
 	testPoint_2.y = 15.5f;
-	testPoint_2.z = 48.0f;
+	testPoint_2.z = 48.2f;
 	
 	testPoint_3.x = 48.0f;
 	testPoint_3.y = 15.5f;
-	testPoint_3.z = 48.0f;
-	*/
+	testPoint_3.z = 48.2f;
+	
 	
 	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
 
-	
+	/*
 	testPoint_0.x = 0.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 0.0f;
@@ -242,7 +242,7 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_3.x = 0.0f;
 	testPoint_3.y = 32.0f;
 	testPoint_3.z = 0.0f;
-	
+	*/
 	
 	
 
@@ -491,8 +491,102 @@ void OSServer::constructTestBlueprints3()
 	{
 		planRef->constructStripTriangles(x, 2);	// construct an individual layer
 	}
+
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		//planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+
+
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
+}
+
+void OSServer::constructTestBlueprints3Special()
+{
+	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 1002.45;
+	mountainSummit.z = 2.61;
+
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+
+
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlan("mountain");
+}
+
+void OSServer::constructTestDisk()
+{
+	ECBPolyPoint summit1;
+	int numberOfLayers = 35;
+
+	// first mountain
+	summit1.x = 48;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 0, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	executeDerivedContourPlan("summit1");
+}
+
+void OSServer::constructSingleMountTest()
+{
+	ECBPolyPoint summit1, summit2;
+	int numberOfLayers = 3;
+
+	// first mountain
+	summit1.x = 48;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		std::cout << "!!! Calling bottom strips... " << std::endl;
+		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+
+
+	executeDerivedContourPlan("summit1");
 }
 
 void OSServer::constructMultiMountTest()

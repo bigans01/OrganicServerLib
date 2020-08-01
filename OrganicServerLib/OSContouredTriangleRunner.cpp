@@ -499,9 +499,10 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 
 void OSContouredTriangleRunner::rayCastTrianglePoints()
 {
-	//std::cout << "!!! Attempting ray cast. " << std::endl;
+	std::cout << "--------------------------------------------------------------------------------------------------------------------- !!! Attempting ray cast. " << std::endl;
 	for (int x = 0; x < 3; x++)		// ray cast each individual line. (there will always be 3 lines -- duh)
 	{
+		std::cout << "----------------------------------------Ray casting line: " << x << std::endl;
 		tracePointThroughBlueprints(x);		// trace the point (line)
 	}
 	//std::cout << "!!! Ray cast complete. " << std::endl;
@@ -523,6 +524,10 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		originPointKey = contouredTrianglePtr->pointKeys[2];
 		endPointKey = contouredTrianglePtr->pointKeys[0];
 	}
+
+	std::cout << ":::: Begin Key of line: " << originPointKey.x << ", " << originPointKey.y << ", " << originPointKey.z << std::endl;
+	std::cout << ":::: End   Key of line: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
+
 
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
 	//std::cout << "Incrementing Key is: " << incrementingKey.x << ", " << incrementingKey.y << ", " << incrementingKey.z << std::endl;

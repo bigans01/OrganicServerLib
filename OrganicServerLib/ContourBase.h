@@ -18,6 +18,7 @@ public:
 
 	// member variables each derived class should have
 	unordered_map<int, OSContouredTriangleStrip> triangleStripMap;
+	unordered_map<int, OSContouredTriangleStrip> bottomTriangleStripMap;
 	OSContourPlanDirections planDirections;
 	ForgedPolyRegistry planPolyRegistry;
 
@@ -25,6 +26,7 @@ public:
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;
 	virtual void amplifyAllContourLinePoints() = 0;
 	virtual void constructStripTriangles(int in_stripID, int in_materialID) = 0;
+	virtual void constructBottomStripTriangles(int in_stripID, int in_materialID) = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
 	virtual void runMassDrivers() = 0;
 

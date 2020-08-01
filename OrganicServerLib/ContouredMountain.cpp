@@ -4,7 +4,10 @@
 void ContouredMountain::initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
 {
 	planDirections.y_direction = -1;	// for OSPDir::BELOW (MOUNTAIN)
+	numberOfLayers = in_numberOfLayers;
 	setFormationBaseContourPoints(in_startPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
+	setMRPsForBottomLayers();
+	setFormationBottomBaseContourPoints(triangleBottomStripMRPMap[0], in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
 }
 
 void ContouredMountain::amplifyAllContourLinePoints()
@@ -18,6 +21,7 @@ void ContouredMountain::amplifyAllContourLinePoints()
 
 void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialID)
 {
+	/*
 	if (in_stripID == 0)
 	{
 		OSContourLine* firstLineRef = &contourLineMap[0];
@@ -109,6 +113,136 @@ void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialI
 		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint);
 
 	}
+	*/
+	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, in_materialID, &triangleStripMap);
+	//constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, in_materialID, &bottomTriangleStripMap);
+}
+
+void ContouredMountain::constructBottomStripTriangles(int in_stripID, int in_materialID)
+{
+	/*
+	// check for special bottom MRP logic
+	if (numberOfLayers == 1)
+	{
+		triangleBottomStripMRPMap[0] = startPoint;	// if we only have one layer on the top, the MRP of the bottom strip should be equal to the start point.
+	}
+	else
+	{
+		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the last MRP in the first strip.
+	}
+	*/
+	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 2, &bottomTriangleStripMap);
+}
+
+void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>* in_contourLineMapRef, map<int, ECBPolyPoint>* in_triangleStripMRPMapRef, int in_stripID, int in_materialID, unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef)
+{
+	if (in_stripID == 0)
+	{
+		OSContourLine* firstLineRef = &(*in_contourLineMapRef)[0];
+		int numberOfPoints = firstLineRef->numberOfPoints;
+		ECBPolyPoint currentContourCenter = firstLineRef->centerPoint;
+		//std::cout << "MOUNTAIN: number of points: " << numberOfPoints << std::endl;
+		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		ECBPolyPoint massReferencePoint = (*in_triangleStripMRPMapRef)[in_stripID];		// grab the MRP
+		std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
+		//int someDumbVal = 3; 
+		//std::cin >> someDumbVal;
+
+		for (int x = 0; x < numberOfPoints - 1; x++)
+		{
+			//OSContourPoint* contourPointPointer = &PointMap[in_pointIndex];
+
+			// first triangle point
+			OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[x];
+			ECBPolyPoint pointOne;
+			pointOne.x = contourPointPointer->x;
+			pointOne.y = contourPointPointer->y;
+			pointOne.z = contourPointPointer->z;
+
+			//second triangle point
+			contourPointPointer = &firstLineRef->smartContourPoint[x + 1];
+			ECBPolyPoint pointTwo;
+			pointTwo.x = contourPointPointer->x;
+			pointTwo.y = contourPointPointer->y;
+			pointTwo.z = contourPointPointer->z;
+
+			//third triangle point
+			ECBPolyPoint pointThree;
+			pointThree.x = startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
+			pointThree.y = startPoint.y;
+			pointThree.z = startPoint.z;
+
+			//constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+
+			std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
+		}
+		// do the following for the last triangle only
+		int finalPointOne = numberOfPoints - 1;
+
+		OSContourPoint* contourPointPointer = &firstLineRef->smartContourPoint[finalPointOne];
+		ECBPolyPoint pointOne;
+		pointOne.x = contourPointPointer->x;
+		pointOne.y = contourPointPointer->y;
+		pointOne.z = contourPointPointer->z;
+
+		contourPointPointer = &firstLineRef->smartContourPoint[0];
+		ECBPolyPoint pointTwo;
+		pointTwo.x = contourPointPointer->x;
+		pointTwo.y = contourPointPointer->y;
+		pointTwo.z = contourPointPointer->z;
+
+		ECBPolyPoint pointThree;
+		pointThree.x = startPoint.x;
+		pointThree.y = startPoint.y;
+		pointThree.z = startPoint.z;
+
+		//constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+
+		//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
+		std::cout << "First layer triangle created, via new function call...." << endl;
+	}
+	else
+	{
+		OSContourLine* currentLineRef = &(*in_contourLineMapRef)[in_stripID];		// a reference to the current line
+		OSContourLine* previousLineRef = &(*in_contourLineMapRef)[in_stripID - 1];	// a reference to the previous line
+
+		int numberOfPoints = currentLineRef->numberOfPoints;
+		ECBPolyPoint currentContourCenter = currentLineRef->centerPoint;
+		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		ECBPolyPoint massReferencePoint = (*in_triangleStripMRPMapRef)[in_stripID];		// grab the MRP
+		std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
+		//std::cout << "Number of points on this contour line is: " << currentLineRef->numberOfPoints << std::endl;
+
+		int pointsPerQuadrantCurrentLine = (numberOfPoints / 4) + 1;	// get the number of points per quadrant,  for the current line
+		int trianglesForCurrentLine = pointsPerQuadrantCurrentLine - 1;	// the number of triangles in each quadrant is equal to the number of points per quadrant - 1
+
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint);
+		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint);
+
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint);
+		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint);
+
+	}
+}
+
+
+void ContouredMountain::setMRPsForBottomLayers()
+{
+	// check for special bottom MRP logic
+	if (numberOfLayers == 1)
+	{
+		triangleBottomStripMRPMap[0] = startPoint;	// if we only have one layer on the top, the MRP of the bottom strip should be equal to the start point.
+	}
+	else
+	{
+		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the last MRP in the first strip.
+	}
 }
 
 void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)
@@ -180,9 +314,45 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 	std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
+void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)
+{
+	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry);
+	testTriangle.determineLineLengths();
+	testTriangle.determineAxisInterceptDistances();
+	testTriangle.determineAxisInterceptDistances();
+	for (int x = 0; x < 3; x++)
+	{
+		CursorPathTraceContainer x_container, y_container, z_container;
+		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+
+		ECBPolyPoint centroid = OrganicUtils::determineTriangleCentroid(testTriangle.trianglePoints[0], testTriangle.trianglePoints[1], testTriangle.trianglePoints[2]);
+		x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
+		z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
+
+		EnclaveKeyDef::EnclaveKey blueprintKey;
+		blueprintKey.x = x_container.CollectionCoord;
+		blueprintKey.y = y_container.CollectionCoord;
+		blueprintKey.z = z_container.CollectionCoord;
+
+		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
+		//currentTriKey.triKey[x] = blueprintKey;
+		testTriangle.pointKeys[x] = blueprintKey;
+		testTriangle.centroid = centroid;
+	}
+	int baseStripSize = (*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
+	//std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
+	(*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
+	std::cout << "### New size is: " << (*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap.size() << std::endl;
+
+}
+
 void ContouredMountain::amplifyContourLinePoints(int in_lineID)
 {
 	contourLineMap[in_lineID].amplifyAllPoints();
+	bottomContourLineMap[in_lineID].amplifyAllPoints();
 }
 
 
@@ -418,23 +588,41 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 				currentRadius += in_expansionValue;
 				currentNumberOfPoints += 4;
 			}
-			insertMRP(x, mrpToAdd);					// insert the MRP
-			addContourLine(contourLineCount, currentRadius, currentY, currentNumberOfPoints, in_startPoint);
+			insertMRP(&triangleStripMRPMap, &x, mrpToAdd);					// insert the MRP
+			addContourLine(&contourLineMap, &topContourLineCount, currentRadius, currentY, currentNumberOfPoints, in_startPoint);
 
 		}
 		
 }
 
-void ContouredMountain::insertMRP(int in_stripValue, ECBPolyPoint in_polyPoint)
+void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
 {
-	triangleStripMRPMap[in_stripValue] = in_polyPoint;	// insert the MRP for this strip
+	bottomStartPoint = in_startPoint;
+	int currentNumberOfPoints = 4;
+	float currentRadius = in_startRadius;		// set the start radius
+	ECBPolyPoint bottomLayerMRP = triangleBottomStripMRPMap[0];
+	for (int x = 0; x < in_numberOfLayers; x++)
+	{
+		if (x != 0)								// it isn't necessary to add on to the radius for the very first strip
+		{
+			currentRadius += in_expansionValue;
+			currentNumberOfPoints += 4;
+		}
+		insertMRP(&triangleBottomStripMRPMap, &x, bottomLayerMRP);					// insert the MRP
+		addContourLine(&bottomContourLineMap, &bottomContourLineCount, currentRadius, in_startPoint.y, currentNumberOfPoints, in_startPoint);
+	}
 }
 
-void ContouredMountain::addContourLine(int line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)	// adds a contour line, with the map ID of the line equal to contourLineCoun
+void ContouredMountain::insertMRP(map<int, ECBPolyPoint>* in_mrpMapRef, int* in_stripValue, ECBPolyPoint in_polyPoint)
+{
+	(*in_mrpMapRef)[*in_stripValue] = in_polyPoint;	// insert the MRP for this strip
+}
+
+void ContouredMountain::addContourLine(map<int, OSContourLine>* in_contourLineMapRef, int* line_id, float in_baseDistance, float in_contourElevation, int in_numberOfPoints, ECBPolyPoint in_startPoint)	// adds a contour line, with the map ID of the line equal to contourLineCoun
 {
 	OSContourLine tempLine(in_baseDistance, in_contourElevation, in_numberOfPoints, in_startPoint);
-	contourLineMap[line_id] = tempLine;
-	contourLineCount++;
+	(*in_contourLineMapRef)[*line_id] = tempLine;
+	(*line_id)++;									
 }
 
 void ContouredMountain::runMassDrivers()

@@ -66,6 +66,10 @@ public:
 	void constructTestBlueprints();		// CONVERTED 
 	void constructTestBlueprints2();	// CONVERTED
 	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
+	void constructTestBlueprints3Special();	// CONVERTED		// for mountain testing; 
+
+	void constructTestDisk();
+
 	void constructTestBlueprints5();	
 	void constructTestBlueprintsForFracturing();	// CONVERTED	// for fracturing mountain testing (for now)
 	void constructTestBlueprintsForFracturing2();	// CONVERTED	// for fracturing mountain testing (for now)
@@ -73,6 +77,7 @@ public:
 	void constructTestBlueprints4();	// CONVERTED // side testing
 	void constructDebugBlueprint1();	// CONVERTED
 	void constructBlueprintFillTest();
+	void constructSingleMountTest();
 	void constructMultiMountTest();
 	void constructMissingFillBlueprint3();
 	void constructSingleOrganicTest();
