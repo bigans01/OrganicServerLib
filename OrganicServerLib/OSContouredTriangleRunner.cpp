@@ -733,8 +733,9 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		newPrimaryLine.isLineActiveInPoly = 1;
 
 		//EnclaveKeyPair pointBlueprintKeys = getBlueprintKeysForPrimaryLinePoints(x);	// get the CALIBRATED blueprint keys for the points
-		//newPrimaryLine.beginPointBlueprintKey = pointBlueprintKeys.keyA;
-		//newPrimaryLine.endPointBlueprintKey = pointBlueprintKeys.keyB;
+		EnclaveKeyPair pointBlueprintKeys = contouredTrianglePtr->keyPairArray[x].getBeginAndEndKeys();
+		newPrimaryLine.beginPointBlueprintKey = pointBlueprintKeys.keyA;
+		newPrimaryLine.endPointBlueprintKey = pointBlueprintKeys.keyB;
 
 		newPrimaryLine.beginPointRealXYZ = pointA;				// store actual XYZ values of point A
 		newPrimaryLine.endPointRealXYZ = pointB;				// store actual XYZ values of point B
