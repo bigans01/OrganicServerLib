@@ -209,19 +209,19 @@ void OSServer::constructSingleOrganicTest()
 	
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 48.2f;
+	testPoint_0.z = 48.0f;
 
 	testPoint_1.x = 64.0f;
 	testPoint_1.y = 0.0f;
-	testPoint_1.z = 48.2f;
+	testPoint_1.z = 48.0f;
 
 	testPoint_2.x = 63.5f;
 	testPoint_2.y = 15.5f;
-	testPoint_2.z = 48.2f;
+	testPoint_2.z = 48.0f;
 	
 	testPoint_3.x = 48.0f;
 	testPoint_3.y = 15.5f;
-	testPoint_3.z = 48.2f;
+	testPoint_3.z = 48.0f;
 	
 	
 	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
@@ -494,7 +494,7 @@ void OSServer::constructTestBlueprints3()
 
 	for (int x = 0; x < numberOfLayers; x++)
 	{
-		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+		//planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
 	}
 
 
@@ -561,6 +561,60 @@ void OSServer::constructTestDisk()
 	}
 
 	executeDerivedContourPlan("summit1");
+}
+
+void OSServer::constructMiniTestDisk()
+{
+	ECBPolyPoint summit1;
+	int numberOfLayers = 2;
+
+	// first mountain
+	summit1.x = 48;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 0, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	executeDerivedContourPlan("summit1");
+}
+
+void OSServer::constructSingleDebug()
+{
+	std::cout << "!!! SINGLE debug test. " << std::endl;
+
+	ECBPolyPoint startPoint, mrPoint;
+	startPoint.x = -85.0f;
+	startPoint.y = 80.0f;
+	startPoint.z = 90.0f;
+	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
+	ContourBase* planRef = getDerivedContourPlan("plan");
+
+	ECBPolyPoint testPoint_0;
+	ECBPolyPoint testPoint_1;
+	ECBPolyPoint testPoint_2;
+	ECBPolyPoint testPoint_3;
+
+	testPoint_0.x = 57.0f;
+	testPoint_0.y = 16.0f;
+	testPoint_0.z = 16.0f;
+
+	testPoint_1.x = 66.0f;
+	testPoint_1.y = 16.0f;
+	testPoint_1.z = 16.0f;
+
+	testPoint_2.x = 60.73f;
+	testPoint_2.y = 16.0f;
+	testPoint_2.z = 28.73f;
+
+
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	executeDerivedContourPlan("plan");
 }
 
 void OSServer::constructSingleMountTest()

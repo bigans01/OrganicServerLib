@@ -294,13 +294,13 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 		ECBPolyPoint centroid = OrganicUtils::determineTriangleCentroid(testTriangle.trianglePoints[0], testTriangle.trianglePoints[1], testTriangle.trianglePoints[2]);
-		x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
-		y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
-		z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
+		//x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
+		//z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
 
-		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
-		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
-		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 
 		EnclaveKeyDef::EnclaveKey blueprintKey;
@@ -333,13 +333,13 @@ void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unorde
 		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 		ECBPolyPoint centroid = OrganicUtils::determineTriangleCentroid(testTriangle.trianglePoints[0], testTriangle.trianglePoints[1], testTriangle.trianglePoints[2]);
-		x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
-		y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
-		z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
+		//x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
+		//z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
 
-		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
-		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
-		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 		EnclaveKeyDef::EnclaveKey blueprintKey;
 		blueprintKey.x = x_container.CollectionCoord;

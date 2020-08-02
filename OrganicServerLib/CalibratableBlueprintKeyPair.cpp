@@ -19,8 +19,8 @@ void CalibratableBlueprintKeyPair::calibrate()
 	EnclaveKeyDef::EnclaveKey startKeyCopy = startKey;
 	EnclaveKeyDef::EnclaveKey endKeyCopy = endKey;
 
-	std::cout << "Start key is: " << startKey.x << ", " << startKey.y << ", " << startKey.z << std::endl;
-	std::cout << "End key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
+	//std::cout << "Start key is: " << startKey.x << ", " << startKey.y << ", " << startKey.z << std::endl;
+	//std::cout << "End key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
 	isCalibratable(&startKey.x, normalizedSlopeA.x, pointA.x, pointB.x, pointC.x, startKeyCopy.x, endKeyCopy.x);
 	isCalibratable(&startKey.y, normalizedSlopeA.y, pointA.y, pointB.y, pointC.y, startKeyCopy.y, endKeyCopy.y);
 	isCalibratable(&startKey.z, normalizedSlopeA.z, pointA.z, pointB.z, pointC.z, startKeyCopy.z, endKeyCopy.z);
@@ -34,8 +34,8 @@ void CalibratableBlueprintKeyPair::calibrate()
 	isCalibratable(&endKey.y, normalizedSlopeB.y, pointB.y, pointA.y, pointC.y, startKeyCopy.y, endKeyCopy.y);
 	isCalibratable(&endKey.z, normalizedSlopeB.z, pointB.z, pointA.z, pointC.z, startKeyCopy.z, endKeyCopy.z);
 
-	std::cout << "(NEW) Start key is: " << startKey.x << ", " << startKey.y << ", " << startKey.z << std::endl;
-	std::cout << "(NEW) End key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
+	//std::cout << "(NEW) Start key is: " << startKey.x << ", " << startKey.y << ", " << startKey.z << std::endl;
+	//std::cout << "(NEW) End key is: " << endKey.x << ", " << endKey.y << ", " << endKey.z << std::endl;
 }
 
 void CalibratableBlueprintKeyPair::isCalibratable(int* in_blueprintLocationPtr, float in_normalizedSlopeValue, float in_pointAxyz, float in_pointBxyz, float in_pointCxyz, float in_keyAfloat, float in_keyBfloat)

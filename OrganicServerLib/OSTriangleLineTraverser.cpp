@@ -7,7 +7,7 @@
 OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr)
 //OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
 {
-	
+	/*
 	if (in_lineID < 2)
 	{
 		beginKey = in_TrianglePtr->pointKeys[in_lineID];		// set begin key
@@ -29,20 +29,22 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		lineID = 2;
 	}
 	//serverPtr = in_serverPtr;
-	
+	*/
 
 	contouredTriangleRef = in_TrianglePtr;
 
-	//EnclaveKeyPair currentPair = contouredTriangleRef->keyPairArray[in_lineID].getBeginAndEndKeys();
-	//beginKey = currentPair.keyA;
-	//currentKey = currentPair.keyA;
-	//endKey = currentPair.keyB;
-	//beginPoint = contouredTriangleRef->triangleLines[in_lineID].pointA;
-	//endPoint = contouredTriangleRef->triangleLines[in_lineID].pointB;
-
+	EnclaveKeyPair currentPair = contouredTriangleRef->keyPairArray[in_lineID].getBeginAndEndKeys();
+	beginKey = currentPair.keyA;
+	currentKey = currentPair.keyA;
+	endKey = currentPair.keyB;
+	beginPoint = contouredTriangleRef->triangleLines[in_lineID].pointA;
+	endPoint = contouredTriangleRef->triangleLines[in_lineID].pointB;
+	lineID = in_lineID;
 
 	//originPointKey = currentPair.keyA;
 	//endPointKey = currentPair.keyB;
+
+	//std::cout << ">>>>>>>>>>>> OSTriangleLineTraverser; line ID is: " << in_lineID  << std::endl;
 
 
 	blueprintMapRef = in_blueprintMapPtr;
@@ -97,6 +99,21 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, beginKey);
+
+		/*
+		if
+		(
+			(resultantIntersect.originPoint.y == 0)
+			&&
+			(resultantIntersect.intersectedPoint.y == 0)
+		)
+		{
+			std::cout << "+++++++ SPECIAL HALT+++++++++++++ " << std::endl;
+			int someVal = 3;
+			std::cin >> someVal;
+		}
+		*/
+
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
 		//cout << ".....Resultant origin: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << endl;
 		//cout << ".....Resultant intersection: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << endl;
@@ -133,6 +150,23 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
+
+		/*
+		if
+		(
+			(resultantIntersect.originPoint.y == 0)
+			&&
+			(resultantIntersect.intersectedPoint.y == 0)
+		)
+		{
+			std::cout << "+++++++ SPECIAL HALT+++++++++++++ " << std::endl;
+			int someVal = 3;
+			std::cin >> someVal;
+		}
+		*/
+
+
+
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, beginKey);
 		//cout << "|||||||||||||>>>>>>>>>>> X slope values: " << newPolyLine.x_interceptSlope.x << ", " << newPolyLine.x_interceptSlope.y << ", " << newPolyLine.x_interceptSlope.z << std::endl;
@@ -169,7 +203,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;													// get a pointer to the current key
 	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
 
-	cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
+	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	//std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
 	//std::cout << "---->  traverseLineOnce intersection call " << std::endl;
 	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);

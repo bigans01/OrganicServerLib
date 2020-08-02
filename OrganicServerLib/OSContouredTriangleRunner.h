@@ -43,6 +43,7 @@ class OSContouredTriangleRunner
 		void calibrateTrianglePointKeys();	// adjusts the contoured triangle's point EnclaveKeys, in the event that any perfect clamping is detected.
 		void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, TriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 		void rayCastTrianglePoints();		// trace the points (lines) through the blueprints; inner filling of the ContouredTriangle isn't done here (this comes later)
+		void printContourTrianglePointsDebug();
 		void tracePointThroughBlueprints(int in_pointID);
 		void fillLineMetaData(ECBPolyLine* in_LinePtr, int in_pointID);
 		void fillBlueprintArea(PrimaryLineT1Array* in_contourLineArrayRef);

@@ -12,7 +12,7 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	trianglePoints[1] = in_point1;
 	trianglePoints[2] = in_point2;
 
-	//std::cout << "triangle points: -----------" << std::endl;
+	//std::cout << "triangle points: -----------" << std::endl;1
 	//std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
 	//std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
 	//std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
@@ -392,6 +392,17 @@ OSContouredTriangle::OSContouredTriangle()
 void OSContouredTriangle::addNewPrimarySegment(ECBPolyPoint in_lineSegmentPointA, ECBPolyPoint in_lineSegmentPointB, int in_lineID, EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	primarySegmentTrackerMap[in_blueprintKey].insertNewSegment(in_lineSegmentPointA, in_lineSegmentPointB, in_lineID);
+
+	//std::cout << "##### Added new primary segment; line ID: [" << in_lineID << "] (" << in_lineSegmentPointA.x << ", " << in_lineSegmentPointA.y << ", " << in_lineSegmentPointA.z << ") | (" << in_lineSegmentPointB.x << ", " << in_lineSegmentPointB.y << ", " << in_lineSegmentPointB.z << ") " << std::endl;
+
+	/*
+	if (in_lineSegmentPointA.y == 0)
+	{
+		std::cout << "!!!!! WARNING, bad segment found! " << std::endl;
+		int someVal = 3;
+		std::cin >> someVal;
+	}
+	*/
 }
 
 void OSContouredTriangle::fillMetaDataInPrimaryCircuits()
@@ -433,7 +444,7 @@ void OSContouredTriangle::loadAndCalibrateKeyPairArray()
 	{
 		for (int x = 0; x < 3; x++)
 		{
-			std::cout << "############### Calibrating line: " << x << std::endl;
+			//std::cout << "############### Calibrating line: " << x << std::endl;
 			keyPairArray[x].calibrate();
 		}
 	}

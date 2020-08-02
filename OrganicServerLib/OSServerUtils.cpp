@@ -70,4 +70,18 @@ void OSServerUtils::fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangl
 	in_LinePtr->x_interceptSlope = in_Triangle->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = in_Triangle->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = in_Triangle->triangleLines[in_pointID].z_interceptSlope;		// "" z
+
+	if
+	(
+		(in_LinePtr->pointA.y == 0)
+		||
+		(in_LinePtr->pointB.y == 0)
+		||
+		(in_LinePtr->pointC.y == 0)
+	)
+	{
+		//std::cout << "+++++++++SPECIAL HALT " << std::endl;
+		//int someVal = 3;
+		//std::cin >> someVal;
+	}
 }

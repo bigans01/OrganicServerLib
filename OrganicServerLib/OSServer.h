@@ -69,6 +69,8 @@ public:
 	void constructTestBlueprints3Special();	// CONVERTED		// for mountain testing; 
 
 	void constructTestDisk();
+	void constructMiniTestDisk();
+	void constructSingleDebug();		// special case. one triangle.
 
 	void constructTestBlueprints5();	
 	void constructTestBlueprintsForFracturing();	// CONVERTED	// for fracturing mountain testing (for now)

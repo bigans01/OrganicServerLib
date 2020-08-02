@@ -9,17 +9,17 @@ void OSContouredTriangleRunner::performRun()
 	checkForPerfectClamping();			// check for any perfect clamping conditions.
 	calibrateTrianglePointKeys();		// perform key calibration; adjusts keys if any perfect clamping conditions are met.
 
-	contouredTrianglePtr->printKeyPairArray();
-
+	//contouredTrianglePtr->printKeyPairArray();
+	//printContourTrianglePointsDebug();
 	rayCastTrianglePoints();
 
 	//printTracingCounts();
-	std::cout << "##############################  Ray casting complete. " << std::endl;
+	//std::cout << "##############################  Ray casting complete. " << std::endl;
 	
 	//std::cout << "!!!!!! Calling fillMetaDataInPrimartCircuits... " << std::endl;
 	contouredTrianglePtr->fillMetaDataInPrimaryCircuits();
 
-	std::cout << "##############################  Primary circuit fill complete. " << std::endl;
+	//std::cout << "##############################  Primary circuit fill complete. " << std::endl;
 
 	//std::cout << "!!!!!! Call of fillMetaDataInPrimartCircuits COMPLETED... " << std::endl;
 
@@ -508,13 +508,40 @@ void OSContouredTriangleRunner::findTrueKeysForTriangleLinePoints(OSContouredTri
 
 void OSContouredTriangleRunner::rayCastTrianglePoints()
 {
-	std::cout << "--------------------------------------------------------------------------------------------------------------------- !!! Attempting ray cast. " << std::endl;
+	//std::cout << "--------------------------------------------------------------------------------------------------------------------- !!! Attempting ray cast. " << std::endl;
 	for (int x = 0; x < 3; x++)		// ray cast each individual line. (there will always be 3 lines -- duh)
 	{
-		std::cout << "----------------------------------------Ray casting line: " << x << std::endl;
+		//std::cout << "----------------------------------------Ray casting line: " << x << std::endl;
 		tracePointThroughBlueprints(x);		// trace the point (line)
 	}
 	//std::cout << "!!! Ray cast complete. " << std::endl;
+}
+
+void OSContouredTriangleRunner::printContourTrianglePointsDebug()
+{
+	/*
+	if
+	(
+		(contouredTrianglePtr->trianglePoints[0].x == 60.73)
+			||
+			(contouredTrianglePtr->trianglePoints[1].x == 60.73)
+			||
+			(contouredTrianglePtr->trianglePoints[2].x == 60.73)
+	)
+	{
+		std::cout << "!!! Special HALT " << std::endl;
+		int someVal = 3;
+		std::cin >> someVal;
+	}
+	*/
+
+	std::cout << "!! Printing contoured triangle points: " << std::endl;
+	for (int x = 0; x < 3; x++)
+	{
+		std::cout << "[" << x << "] " << contouredTrianglePtr->trianglePoints[x].x << ", " << contouredTrianglePtr->trianglePoints[x].y << ", " << contouredTrianglePtr->trianglePoints[x].z << std::endl;
+	}
+	int someVal = 3;
+	std::cin >> someVal;
 }
 
 void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
@@ -523,7 +550,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 	EnclaveKeyDef::EnclaveKey originPointKey;
 	EnclaveKeyDef::EnclaveKey endPointKey;
 
-	
+	/*
 	if (in_pointID < 2)
 	{
 		originPointKey = contouredTrianglePtr->pointKeys[in_pointID];
@@ -534,14 +561,14 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		originPointKey = contouredTrianglePtr->pointKeys[2];
 		endPointKey = contouredTrianglePtr->pointKeys[0];
 	}
-	
+	*/
 
-	//EnclaveKeyPair currentPair = contouredTrianglePtr->keyPairArray[in_pointID].getBeginAndEndKeys();
-	//originPointKey = currentPair.keyA;
-	//endPointKey = currentPair.keyB;
+	EnclaveKeyPair currentPair = contouredTrianglePtr->keyPairArray[in_pointID].getBeginAndEndKeys();
+	originPointKey = currentPair.keyA;
+	endPointKey = currentPair.keyB;
 
-	std::cout << ":::: Begin Key of line: " << originPointKey.x << ", " << originPointKey.y << ", " << originPointKey.z << std::endl;
-	std::cout << ":::: End   Key of line: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
+	//std::cout << ":::: Begin Key of line: " << originPointKey.x << ", " << originPointKey.y << ", " << originPointKey.z << std::endl;
+	//std::cout << ":::: End   Key of line: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
 
 
 	EnclaveKeyDef::EnclaveKey incrementingKey = originPointKey;		// will constantly increment and/or decrement as it traverses blueprints
@@ -562,6 +589,13 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			ECBPolyLine newPolyLine;												// create a new poly line
 			fillLineMetaData(&newPolyLine, in_pointID);
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
+
+			if (newPolyLine.pointA.x == 43.17)
+			{
+				std::cout << "###### SPECIAL HALT " << std::endl;
+				int someVal = 3;
+				std::cin >> someVal;
+			}
 
 			/*
 			if (debugIncremental == 1)
@@ -648,6 +682,7 @@ void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in
 	in_LinePtr->x_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
 	in_LinePtr->y_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].y_interceptSlope;		// "" y 
 	in_LinePtr->z_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].z_interceptSlope;		// "" z
+
 }
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()
@@ -697,9 +732,9 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		newPrimaryLine.perfectClampValue = perfectClampFlag;
 		newPrimaryLine.isLineActiveInPoly = 1;
 
-		EnclaveKeyPair pointBlueprintKeys = getBlueprintKeysForPrimaryLinePoints(x);	// get the CALIBRATED blueprint keys for the points
-		newPrimaryLine.beginPointBlueprintKey = pointBlueprintKeys.keyA;
-		newPrimaryLine.endPointBlueprintKey = pointBlueprintKeys.keyB;
+		//EnclaveKeyPair pointBlueprintKeys = getBlueprintKeysForPrimaryLinePoints(x);	// get the CALIBRATED blueprint keys for the points
+		//newPrimaryLine.beginPointBlueprintKey = pointBlueprintKeys.keyA;
+		//newPrimaryLine.endPointBlueprintKey = pointBlueprintKeys.keyB;
 
 		newPrimaryLine.beginPointRealXYZ = pointA;				// store actual XYZ values of point A
 		newPrimaryLine.endPointRealXYZ = pointB;				// store actual XYZ values of point B
@@ -747,7 +782,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 		if (traversalController.isLineContainedToOneBlueprint() == false)
 		{
 			//std::cout << "!!!" << std::endl;
-			std::cout << "!!! Beginning traversal for line: " << x << std::endl;
+			//std::cout << "!!! Beginning traversal for line: " << x << std::endl;
 			traversalController.blueprintTraverser.initialize(&in_contourLineArrayRef->linkArray[x]);		// initialize with the line from the primary t1 array
 
 
