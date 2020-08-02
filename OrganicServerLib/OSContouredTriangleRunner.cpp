@@ -3,20 +3,29 @@
 
 void OSContouredTriangleRunner::performRun()
 {
+	// perform blueprint key calibration (not the same as calibrateTrianglePointKeys (yet!))
+	contouredTrianglePtr->checkIfPointsAreInSameBlueprint();
+	contouredTrianglePtr->loadAndCalibrateKeyPairArray();		// load the key pair array.
 	checkForPerfectClamping();			// check for any perfect clamping conditions.
 	calibrateTrianglePointKeys();		// perform key calibration; adjusts keys if any perfect clamping conditions are met.
+
+	contouredTrianglePtr->printKeyPairArray();
+
 	rayCastTrianglePoints();
 
 	//printTracingCounts();
-
+	std::cout << "##############################  Ray casting complete. " << std::endl;
 	
 	//std::cout << "!!!!!! Calling fillMetaDataInPrimartCircuits... " << std::endl;
 	contouredTrianglePtr->fillMetaDataInPrimaryCircuits();
 
+	std::cout << "##############################  Primary circuit fill complete. " << std::endl;
+
 	//std::cout << "!!!!!! Call of fillMetaDataInPrimartCircuits COMPLETED... " << std::endl;
 
-
-	if (contouredTrianglePtr->checkIfPointsAreInSameBlueprint() == false)
+	//containedWithinSameBlueprint = result;
+	//if (contouredTrianglePtr->checkIfPointsAreInSameBlueprint() == false)
+	if (contouredTrianglePtr->containedWithinSameBlueprint == false)
 	{
 		runContouredTriangleOriginalDirection();
 		//runContouredTriangleReverseDirection();
@@ -514,6 +523,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 	EnclaveKeyDef::EnclaveKey originPointKey;
 	EnclaveKeyDef::EnclaveKey endPointKey;
 
+	
 	if (in_pointID < 2)
 	{
 		originPointKey = contouredTrianglePtr->pointKeys[in_pointID];
@@ -524,6 +534,11 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		originPointKey = contouredTrianglePtr->pointKeys[2];
 		endPointKey = contouredTrianglePtr->pointKeys[0];
 	}
+	
+
+	//EnclaveKeyPair currentPair = contouredTrianglePtr->keyPairArray[in_pointID].getBeginAndEndKeys();
+	//originPointKey = currentPair.keyA;
+	//endPointKey = currentPair.keyB;
 
 	std::cout << ":::: Begin Key of line: " << originPointKey.x << ", " << originPointKey.y << ", " << originPointKey.z << std::endl;
 	std::cout << ":::: End   Key of line: " << endPointKey.x << ", " << endPointKey.y << ", " << endPointKey.z << std::endl;
@@ -698,6 +713,8 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 		//std::cout << "pointB: " << pointB.x << ", " << pointB.y << ", " << pointB.z << std::endl;
 		//std::cout << "pointC: " << pointC.x << ", " << pointC.y << ", " << pointC.z << std::endl;
 
+		//newPrimaryLine.calibrateBlueprintKeys(pointC);
+
 		if (in_direction == PolyRunDirection::NORMAL)
 		{
 
@@ -730,7 +747,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 		if (traversalController.isLineContainedToOneBlueprint() == false)
 		{
 			//std::cout << "!!!" << std::endl;
-			// std::cout << "!!! Beginning traversal for line: " << x << std::endl;
+			std::cout << "!!! Beginning traversal for line: " << x << std::endl;
 			traversalController.blueprintTraverser.initialize(&in_contourLineArrayRef->linkArray[x]);		// initialize with the line from the primary t1 array
 
 

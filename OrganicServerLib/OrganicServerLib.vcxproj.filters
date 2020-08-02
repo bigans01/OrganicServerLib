@@ -96,6 +96,9 @@
     <ClInclude Include="PrimaryCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="CalibratableBlueprintKeyPair.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -153,6 +156,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ContourBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="CalibratableBlueprintKeyPair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

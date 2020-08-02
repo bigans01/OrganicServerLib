@@ -131,7 +131,7 @@ void ContouredMountain::constructBottomStripTriangles(int in_stripID, int in_mat
 		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the last MRP in the first strip.
 	}
 	*/
-	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 2, &bottomTriangleStripMap);
+	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 1, &bottomTriangleStripMap);
 }
 
 void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>* in_contourLineMapRef, map<int, ECBPolyPoint>* in_triangleStripMRPMapRef, int in_stripID, int in_materialID, unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef)
@@ -298,6 +298,11 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 		y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
 		z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
 
+		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+
+
 		EnclaveKeyDef::EnclaveKey blueprintKey;
 		blueprintKey.x = x_container.CollectionCoord;
 		blueprintKey.y = y_container.CollectionCoord;
@@ -331,6 +336,10 @@ void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unorde
 		x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
 		y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
 		z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
+
+		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 		EnclaveKeyDef::EnclaveKey blueprintKey;
 		blueprintKey.x = x_container.CollectionCoord;

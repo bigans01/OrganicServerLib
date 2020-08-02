@@ -272,6 +272,7 @@ bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 	}
 
 	//std::cout << "Check if points in same blueprint call complete..." << std::endl;
+	containedWithinSameBlueprint = result;
 	return result;
 }
 
@@ -417,6 +418,33 @@ void OSContouredTriangle::printPrimarySegmentData()
 			//std::cout << "Segment " << x << ":-> Line ID: " << int(trackerMapBegin->second.primarySegments[x].lineID) << " | Point A: " << trackerMapBegin->second.primarySegments[x].beginPoint.x << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.y << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.z << " | Point B: " << trackerMapBegin->second.primarySegments[x].endPoint.x << ", " << trackerMapBegin->second.primarySegments[x].endPoint.y << ", " << trackerMapBegin->second.primarySegments[x].endPoint.z << std::endl;
 		}
 		
+	}
+}
+
+void OSContouredTriangle::loadAndCalibrateKeyPairArray()
+{
+	// load the data
+	keyPairArray[0].initialize(pointKeys[0], pointKeys[1], trianglePoints[0], trianglePoints[1], trianglePoints[2]);		// initialize first line: begin/end keys of points 0 and 1, respectively; point order 0 1 2
+	keyPairArray[1].initialize(pointKeys[1], pointKeys[2], trianglePoints[1], trianglePoints[2], trianglePoints[0]);		// initialize second line: begin/end keys of points 1 and 2, respectively; point order 1 2 0
+	keyPairArray[2].initialize(pointKeys[2], pointKeys[0], trianglePoints[2], trianglePoints[0], trianglePoints[1]);		// initialize second line: begin/end keys of points 1 and 2, respectively; point order 1 2 0
+
+	// calibrate, but only if it isn't contained within the same blueprint.
+	if (containedWithinSameBlueprint == false)
+	{
+		for (int x = 0; x < 3; x++)
+		{
+			std::cout << "############### Calibrating line: " << x << std::endl;
+			keyPairArray[x].calibrate();
+		}
+	}
+}
+
+void OSContouredTriangle::printKeyPairArray()
+{
+	std::cout << "#### Printing key pair array: " << std::endl;
+	for (int x = 0; x < 3; x++)
+	{
+		std::cout << "[" << x << "]: begin (" << keyPairArray[x].startKey.x << ", " << keyPairArray[x].startKey.y << ", " << keyPairArray[x].startKey.z << ") | end (" << keyPairArray[x].endKey.x << ", " << keyPairArray[x].endKey.y << ", " << keyPairArray[x].endKey.z << ") " << std::endl;
 	}
 }
 

@@ -16,6 +16,7 @@
 #include "ForgedPolyRegistry.h"
 #include "EmptyNormalFinder.h"
 #include <glm/glm.hpp>
+#include "CalibratableBlueprintKeyPair.h"
 
 //#include <unordered_set>
 
@@ -28,6 +29,7 @@ public:
 	ECBPolyPoint contouredEmptyNormal;		// stores the empty normal that will be passed on to polys spawned by this contoured triangle; should be calculated during the OSContouredTriangle's instantiation/construction
 	ForgedPolyRegistry* forgedPolyRegistryRef;	// a reference to the forged poly registry that belongs to the parent contour plan (which spawns this contoured triangle)
 	ECBPolyPoint centroid;					// stores the centroid of the triangle.
+	CalibratableBlueprintKeyPair keyPairArray[3];
 
 	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2);
 	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef);
@@ -43,6 +45,8 @@ public:
 	int perfect_clamp_x = 0;			// are all 3 points of this triangle perfectly on x axis?
 	int perfect_clamp_y = 0;			// ...y axis?
 	int perfect_clamp_z = 0;			// ...z axis?
+	bool containedWithinSameBlueprint = false; // set by call to checkIfPointsAreinSameBlueprint
+
 	void addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType);
 	void determineLineLengths();		// gets the length of lines
 	void determineAxisInterceptDistances();
@@ -57,6 +61,8 @@ public:
 	void addNewPrimarySegment(ECBPolyPoint in_lineSegmentPointA, ECBPolyPoint in_lineSegmentPointB, int in_lineID, EnclaveKeyDef::EnclaveKey in_blueprintKey);
 	void fillMetaDataInPrimaryCircuits();
 	void printPrimarySegmentData();
+	void loadAndCalibrateKeyPairArray();
+	void printKeyPairArray();
 };
 
 #endif

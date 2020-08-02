@@ -7,6 +7,7 @@
 OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr)
 //OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
 {
+	
 	if (in_lineID < 2)
 	{
 		beginKey = in_TrianglePtr->pointKeys[in_lineID];		// set begin key
@@ -28,7 +29,22 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		lineID = 2;
 	}
 	//serverPtr = in_serverPtr;
+	
+
 	contouredTriangleRef = in_TrianglePtr;
+
+	//EnclaveKeyPair currentPair = contouredTriangleRef->keyPairArray[in_lineID].getBeginAndEndKeys();
+	//beginKey = currentPair.keyA;
+	//currentKey = currentPair.keyA;
+	//endKey = currentPair.keyB;
+	//beginPoint = contouredTriangleRef->triangleLines[in_lineID].pointA;
+	//endPoint = contouredTriangleRef->triangleLines[in_lineID].pointB;
+
+
+	//originPointKey = currentPair.keyA;
+	//endPointKey = currentPair.keyB;
+
+
 	blueprintMapRef = in_blueprintMapPtr;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point

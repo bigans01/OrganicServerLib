@@ -494,7 +494,7 @@ void OSServer::constructTestBlueprints3()
 
 	for (int x = 0; x < numberOfLayers; x++)
 	{
-		//planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
 	}
 
 
