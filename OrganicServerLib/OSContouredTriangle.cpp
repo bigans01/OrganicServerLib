@@ -19,8 +19,10 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 
 }
 
-OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef)
+OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType)
 {
+	contouredPolyType = in_polyType;
+
 	trianglePoints[0] = in_point0;
 	trianglePoints[1] = in_point1;
 	trianglePoints[2] = in_point2;

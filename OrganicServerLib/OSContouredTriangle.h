@@ -17,6 +17,7 @@
 #include "EmptyNormalFinder.h"
 #include <glm/glm.hpp>
 #include "CalibratableBlueprintKeyPair.h"
+#include "ECBPolyType.h"
 
 //#include <unordered_set>
 
@@ -30,9 +31,10 @@ public:
 	ForgedPolyRegistry* forgedPolyRegistryRef;	// a reference to the forged poly registry that belongs to the parent contour plan (which spawns this contoured triangle)
 	ECBPolyPoint centroid;					// stores the centroid of the triangle.
 	CalibratableBlueprintKeyPair keyPairArray[3];
+	ECBPolyType contouredPolyType = ECBPolyType::FREE;	// default value is FREE, but constructor for triangle should always take in a value to set.
 
 	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2);
-	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef);
+	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType);
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> polygonPieceMap;			// stores the ID of the corresponding ECBPolygon(s) related to this instance of OSContouredTriangle, the ID of which is found in each blueprint.
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBBorderValues, EnclaveKeyDef::KeyHasher> ecbBorderMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> tracedBlueprintCountMap;	// stores blueprint IDs that are a result of tracing the contour lines

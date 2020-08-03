@@ -35,7 +35,7 @@ void OSContouredTriangleRunner::performRun()
 	// only do the following if all points are NOT in same blueprint
 
 	contouredTrianglePtr->printPrimarySegmentData();
-	
+	//std::cout << "##############################  Run complete. " << std::endl;
 }
 
 void OSContouredTriangleRunner::checkForPerfectClamping()

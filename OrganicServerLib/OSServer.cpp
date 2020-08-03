@@ -206,27 +206,27 @@ void OSServer::constructSingleOrganicTest()
 	ECBPolyPoint testPoint_2;
 	ECBPolyPoint testPoint_3;
 
-	
+	/*
 	testPoint_0.x = 48.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 48.0f;
+	testPoint_0.z = 48.2f;
 
 	testPoint_1.x = 64.0f;
 	testPoint_1.y = 0.0f;
-	testPoint_1.z = 48.0f;
+	testPoint_1.z = 48.2f;
 
 	testPoint_2.x = 63.5f;
 	testPoint_2.y = 15.5f;
-	testPoint_2.z = 48.0f;
+	testPoint_2.z = 48.2f;
 	
 	testPoint_3.x = 48.0f;
 	testPoint_3.y = 15.5f;
-	testPoint_3.z = 48.0f;
-	
+	testPoint_3.z = 48.2f;
+	*/
 	
 	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
 
-	/*
+	
 	testPoint_0.x = 0.0f;
 	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
 	testPoint_0.z = 0.0f;
@@ -242,7 +242,7 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_3.x = 0.0f;
 	testPoint_3.y = 32.0f;
 	testPoint_3.z = 0.0f;
-	*/
+	
 	
 	
 
@@ -566,11 +566,11 @@ void OSServer::constructTestDisk()
 void OSServer::constructMiniTestDisk()
 {
 	ECBPolyPoint summit1;
-	int numberOfLayers = 2;
+	int numberOfLayers = 3;
 
 	// first mountain
 	summit1.x = 48;
-	summit1.y = 16;
+	summit1.y = 32;
 	summit1.z = 16;
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 0, 9, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
@@ -599,17 +599,17 @@ void OSServer::constructSingleDebug()
 	ECBPolyPoint testPoint_2;
 	ECBPolyPoint testPoint_3;
 
-	testPoint_0.x = 57.0f;
-	testPoint_0.y = 16.0f;
-	testPoint_0.z = 16.0f;
+	testPoint_0.x = 28.0f;
+	testPoint_0.y = 31.0f;
+	testPoint_0.z = 28.0f;
 
-	testPoint_1.x = 66.0f;
-	testPoint_1.y = 16.0f;
-	testPoint_1.z = 16.0f;
+	testPoint_1.x = 36.0f;
+	testPoint_1.y = 31.0f;
+	testPoint_1.z = 30.0f;
 
-	testPoint_2.x = 60.73f;
-	testPoint_2.y = 16.0f;
-	testPoint_2.z = 28.73f;
+	testPoint_2.x = 30.00f;
+	testPoint_2.y = 31.0f;
+	testPoint_2.z = 36.00f;
 
 
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
@@ -880,6 +880,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	//std::cout << "Blueprint writing complete!!! (2)" << std::endl;
 
 
+	std::cout << "######### Plan execution complete; " << std::endl;
 	
 	// perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);

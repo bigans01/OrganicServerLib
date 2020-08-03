@@ -4,6 +4,7 @@
 #define BLANKCONTOUR_H
 
 #include "ContourBase.h"
+#include "ECBPolyType.h"
 
 class BlankContour : public ContourBase
 {
@@ -13,7 +14,8 @@ class BlankContour : public ContourBase
 		void amplifyAllContourLinePoints();
 		void constructStripTriangles(int in_stripID, int in_materialID);
 		void constructBottomStripTriangles(int in_stripID, int in_materialID);
-		void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID);
+		void constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID, ECBPolyType in_polyType);
+		void constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID);
 		void runMassDrivers();
 	private:
 		

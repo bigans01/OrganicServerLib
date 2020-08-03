@@ -9,6 +9,7 @@
 #include "ForgedPolyRegistry.h"
 #include <map>
 #include "OrganicClient.h"
+#include "ECBPolyType.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)
@@ -27,6 +28,7 @@ public:
 	virtual void amplifyAllContourLinePoints() = 0;
 	virtual void constructStripTriangles(int in_stripID, int in_materialID) = 0;
 	virtual void constructBottomStripTriangles(int in_stripID, int in_materialID) = 0;
+	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID, ECBPolyType in_type) = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
 	virtual void runMassDrivers() = 0;
 
