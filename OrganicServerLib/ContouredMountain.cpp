@@ -256,6 +256,10 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 		blueprintKey.y = y_container.CollectionCoord;
 		blueprintKey.z = z_container.CollectionCoord;
 
+		blueprintKey.x = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].x);
+		blueprintKey.y = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].y);
+		blueprintKey.z = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].z);
+
 		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
 		//currentTriKey.triKey[x] = blueprintKey;
 		testTriangle.pointKeys[x] = blueprintKey;
@@ -294,6 +298,10 @@ void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unorde
 		blueprintKey.x = x_container.CollectionCoord;
 		blueprintKey.y = y_container.CollectionCoord;
 		blueprintKey.z = z_container.CollectionCoord;
+
+		blueprintKey.x = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].x);
+		blueprintKey.y = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].y);
+		blueprintKey.z = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].z);
 
 		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
 		//currentTriKey.triKey[x] = blueprintKey;

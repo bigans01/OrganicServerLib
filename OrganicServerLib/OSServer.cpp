@@ -470,9 +470,9 @@ void OSServer::constructTestBlueprints3()
 	mountainSummit.x = 2;
 	mountainSummit.z = 2;
 
-	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 1002.45;
-	mountainSummit.z = 2.61;
+	mountainSummit.y = 0;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 992;
+	mountainSummit.z = 0;
 
 	// 10 is stable
 	// 6.81 causes anomaly at peak
@@ -569,9 +569,9 @@ void OSServer::constructMiniTestDisk()
 	int numberOfLayers = 3;
 
 	// first mountain
-	summit1.x = 48;
+	summit1.x = 32;
 	summit1.y = 32;
-	summit1.z = 16;
+	summit1.z = 32;
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 0, 9, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();
@@ -599,18 +599,45 @@ void OSServer::constructSingleDebug()
 	ECBPolyPoint testPoint_2;
 	ECBPolyPoint testPoint_3;
 
-	testPoint_0.x = 28.0f;
-	testPoint_0.y = 31.0f;
-	testPoint_0.z = 28.0f;
+	/*
+	testPoint_0.x = 0.0f;
+	testPoint_0.y = 0.0f;
+	testPoint_0.z = 0.0f;
 
-	testPoint_1.x = 36.0f;
-	testPoint_1.y = 31.0f;
-	testPoint_1.z = 30.0f;
+	testPoint_1.x = 32.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 0.0f;
 
-	testPoint_2.x = 30.00f;
-	testPoint_2.y = 31.0f;
-	testPoint_2.z = 36.00f;
+	testPoint_2.x = 0.00f;
+	testPoint_2.y = 0.0f;
+	testPoint_2.z = 32.00f;
+	*/
 
+	testPoint_0.x = 32.0f;
+	testPoint_0.y = 32.0f;
+	testPoint_0.z = 32.0f;
+
+	testPoint_1.x = 41.0f;
+	testPoint_1.y = 32.0f;
+	testPoint_1.z = 32.0f;
+
+	testPoint_2.x = 32.00f;
+	testPoint_2.y = 32.0f;
+	testPoint_2.z = 41.00f;
+
+	/*
+	testPoint_0.x = 64.0f;
+	testPoint_0.y = 64.0f;
+	testPoint_0.z = 64.0f;
+
+	testPoint_1.x = 73.0f;
+	testPoint_1.y = 64.0f;
+	testPoint_1.z = 64.0f;
+
+	testPoint_2.x = 64.00f;
+	testPoint_2.y = 64.0f;
+	testPoint_2.z = 73.00f;
+	*/
 
 	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
@@ -619,7 +646,7 @@ void OSServer::constructSingleDebug()
 
 void OSServer::constructSingleMountTest()
 {
-	ECBPolyPoint summit1, summit2;
+	ECBPolyPoint summit1;
 	int numberOfLayers = 3;
 
 	// first mountain
