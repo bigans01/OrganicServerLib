@@ -142,7 +142,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 void BlueprintFillerRunner::insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	// put the value of the newly added poly into here (when its found)
-	ECBPoly newPoly;
+	ECBPoly newPoly(contouredTrianglePtr->contouredPolyType);
 	newPoly.materialID = contouredTrianglePtr->materialID;
 	newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 	EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[blueprintKey];

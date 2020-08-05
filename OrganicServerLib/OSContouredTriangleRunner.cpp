@@ -587,15 +587,9 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);			// traced blueprint set update (in case it wasn't inserted already.
 			ECBPolyLine newPolyLine;												// create a new poly line
-			fillLineMetaData(&newPolyLine, in_pointID);
+			OSServerUtils::fillLineMetaData(&newPolyLine, contouredTrianglePtr, in_pointID, contouredTrianglePtr->triangleLines[in_pointID].pointA,
+				contouredTrianglePtr->triangleLines[in_pointID].pointB);
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
-
-			if (newPolyLine.pointA.x == 43.17)
-			{
-				std::cout << "###### SPECIAL HALT " << std::endl;
-				int someVal = 3;
-				std::cin >> someVal;
-			}
 
 			/*
 			if (debugIncremental == 1)
@@ -615,37 +609,37 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		}
 		else  // polygon wasn't found, it needs to be created
 		{
-
-			//std::cout << "!!! Second branch hit. " << std::endl;
-			ECBPoly newPoly;
+			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);	--reference this later? come back and look at it...(writing blueprints to disk)
+			// ((INSERTING NEW POLY))
+			ECBPoly newPoly(contouredTrianglePtr->contouredPolyType);
 			newPoly.materialID = contouredTrianglePtr->materialID;
 			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
-			//fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
 			OSServerUtils::fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
-			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;
-			//
-			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
 
 			
+			OSServerUtils::analyzePolyValidityAndInsert(contouredTrianglePtr,
+				contouredTrianglePtr->triangleLines[in_pointID].pointA,
+				contouredTrianglePtr->triangleLines[in_pointID].pointB,
+				in_pointID,
+				incrementingKey,
+				&borderDataMapInstance,
+				blueprintPtr,
+				&newPoly);
+													
+			
+			/*
 			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
-			fillLineMetaData(&newPolyLine, in_pointID);
-
+			OSServerUtils::fillLineMetaData(&newPolyLine, contouredTrianglePtr, in_pointID, contouredTrianglePtr->triangleLines[in_pointID].pointA, contouredTrianglePtr->triangleLines[in_pointID].pointB);
 			
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
-
-
-
-
-			runnerForgedPolyRegistryRef->addToPolyset(incrementingKey, elementID); // Add the new poly to the ForgedPolyRegistry
-			
 			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
-			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 			contouredTrianglePtr->addPolygonPiece(incrementingKey, elementID);
-			
+			runnerForgedPolyRegistryRef->addToPolyset(incrementingKey, elementID); // Add the new poly to the ForgedPolyRegistry
+			*/
 		}
 
 	}
@@ -660,29 +654,6 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 		}
 
 	}
-}
-
-void OSContouredTriangleRunner::fillLineMetaData(ECBPolyLine* in_LinePtr, int in_pointID)
-{
-	//in_LinePtr->lineID = in_pointID;
-	in_LinePtr->pointA = contouredTrianglePtr->triangleLines[in_pointID].pointA;							// set the new line to the pointed-to point A
-	in_LinePtr->pointB = contouredTrianglePtr->triangleLines[in_pointID].pointB;							// set the new line to the pointed-to point B
-	if (in_pointID == 0)																		// set the third point in the line (this will only be used when the line of point A and B is perfectly clamped to an axis)
-	{
-		in_LinePtr->pointC = contouredTrianglePtr->trianglePoints[2];
-	}
-	else if (in_pointID == 1)
-	{
-		in_LinePtr->pointC = contouredTrianglePtr->trianglePoints[0];
-	}
-	else if (in_pointID == 2)
-	{
-		in_LinePtr->pointC = contouredTrianglePtr->trianglePoints[1];
-	}
-	in_LinePtr->x_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].x_interceptSlope;		// assign x-intercept slope values
-	in_LinePtr->y_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].y_interceptSlope;		// "" y 
-	in_LinePtr->z_interceptSlope = contouredTrianglePtr->triangleLines[in_pointID].z_interceptSlope;		// "" z
-
 }
 
 void OSContouredTriangleRunner::runContouredTriangleOriginalDirection()

@@ -242,7 +242,26 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_3.x = 0.0f;
 	testPoint_3.y = 32.0f;
 	testPoint_3.z = 0.0f;
-	
+
+	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
+
+	/*
+	testPoint_0.x = 0.0f;
+	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
+	testPoint_0.z = 0.0f;
+
+	testPoint_1.x = 64.0f;
+	testPoint_1.y = 0.0f;
+	testPoint_1.z = 64.0f;
+
+	testPoint_2.x = 64.0f;
+	testPoint_2.y = 64.0f;
+	testPoint_2.z = 64.0f;
+
+	testPoint_3.x = 0.0f;
+	testPoint_3.y = 64.0f;
+	testPoint_3.z = 0.0f;
+	*/
 	
 	
 

@@ -5,6 +5,8 @@
 
 #include "ECBPoly.h"
 #include "OSContouredTriangle.h"
+#include "EnclaveCollectionBlueprint.h"
+#include "ECBIntersectMeta.h"
 
 class OSServerUtils
 {
@@ -12,6 +14,16 @@ class OSServerUtils
 		static void fillPolyWithClampResult(ECBPoly* in_polyPtr, OSContouredTriangle* in_contouredTriangle);
 		static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID);
 		static void fillLineMetaData(ECBPolyLine* in_LinePtr, OSContouredTriangle* in_Triangle, int in_pointID, ECBPolyPoint in_beginPoint, ECBPolyPoint in_endPoint);
+		static void analyzePolyValidityAndInsert(
+												OSContouredTriangle* in_contouredTriangle, 
+												ECBPolyPoint in_segmentPointA,
+												ECBPolyPoint in_segmentPointB,
+												int in_lineID,
+												EnclaveKeyDef::EnclaveKey in_currentTraceKey,
+												BorderDataMap* in_dataMapRef, 
+												EnclaveCollectionBlueprint* in_blueprintPtr, 
+												ECBPoly* in_polyToInsertRef);
+
 };
 
 #endif

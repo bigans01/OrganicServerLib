@@ -137,7 +137,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	else  // polygon wasn't found, it needs to be created
 	{
 		//cout << "|||| Polygon was NOT found!! " << endl;
-		ECBPoly newPoly;
+		ECBPoly newPoly(in_TrianglePtr->contouredPolyType);
 		newPoly.materialID = in_TrianglePtr->materialID;
 		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
@@ -242,74 +242,29 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	}
 	else  // polygon wasn't found, it needs to be created
 	{
-		//cout << "|||| Polygon was NOT found!! " << endl;
-		//cout << ">>>>> Line data: " << endl;
-		//cout << " origin Point: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << ", " << std::endl;
-		//cout << " intersected Point: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << ", " << std::endl;
-		ECBPoly newPoly;
+		// ((INSERTING NEW POLY))
+		ECBPoly newPoly(in_TrianglePtr->contouredPolyType);
 		newPoly.materialID = in_TrianglePtr->materialID;
 		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
-
-		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
-		//if (!(currentKey == endKey))	// don't update the count if it is the last one.
-		//{
-			in_TrianglePtr->insertTracedBlueprint(currentKey);
-		//}
-		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
+		in_TrianglePtr->insertTracedBlueprint(currentKey);
 
+
+		OSServerUtils::analyzePolyValidityAndInsert(in_TrianglePtr, 
+					resultantIntersect.originPoint, 
+					resultantIntersect.intersectedPoint, 
+					lineID, 
+					currentKey, &borderData, 
+					blueprintPtr, 
+					&newPoly);
+
+		/*
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		bool validityCheck = OrganicUtils::checkIfBlueprintLineIsValid(newPolyLine, &borderData, currentKey, newPoly.isPolyPerfectlyClamped);
-		/*
-		if
-			(
-			(newPolyLine.pointB.x == 1216)
-				&&
-				(newPolyLine.pointB.z == -192)
-				)
-		{
-			std::cout << "+++++++++SPECIAL HALT (4)" << std::endl;
-			int someVal = 3;
-
-			std::cout << "##### Segment points: " << std::endl;
-			std::cout << "begin :" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
-			std::cout << "end   :" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
-			std::cout << "C     :" << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
-
-			if (validityCheck == false)
-			{
-				std::cout << "!!! Halting for input..." << std::endl;
-				int someVal = 3;
-				std::cin >> someVal;
-			}
-		}
-		*/
-		/*
-		if
-		(
-			validityCheck == false	
-		)
-		{
-			std::cout << "+++++++++SPECIAL HALT (4)" << std::endl;
-			int someVal = 3;
-
-			std::cout << "##### Segment points: " << std::endl;
-			std::cout << "begin :" << newPolyLine.pointA.x << ", " << newPolyLine.pointA.y << ", " << newPolyLine.pointA.z << std::endl;
-			std::cout << "end   :" << newPolyLine.pointB.x << ", " << newPolyLine.pointB.y << ", " << newPolyLine.pointB.z << std::endl;
-			std::cout << "C     :" << newPolyLine.pointC.x << ", " << newPolyLine.pointC.y << ", " << newPolyLine.pointC.z << std::endl;
-
-			if (validityCheck == false)
-			{
-				std::cout << "!!! Halting for input..." << std::endl;
-				//int someVal = 3;
-				//std::cin >> someVal;
-			}
-		}
-		*/
 
 		if (validityCheck == true)
 		{
@@ -324,6 +279,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 			in_TrianglePtr->addPolygonPiece(currentKey, elementID);					// add the polygon piece to the triangle
 			in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(currentKey, elementID); // Add the new poly to the ForgedPolyRegistry
 		}
+		*/
+
 	}
 	currentIterationEndpoint = resultantIntersect.intersectedPoint;
 	//cout << "~~~~~~~~~~~~~" << endl;
