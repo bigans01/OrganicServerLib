@@ -112,7 +112,7 @@ void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBP
 	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
-void BlankContour::runMassDrivers()
+void BlankContour::runMassDrivers(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
 
 }

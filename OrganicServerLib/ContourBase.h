@@ -21,7 +21,8 @@ public:
 	unordered_map<int, OSContouredTriangleStrip> triangleStripMap;
 	unordered_map<int, OSContouredTriangleStrip> bottomTriangleStripMap;
 	OSContourPlanDirections planDirections;
-	ForgedPolyRegistry planPolyRegistry;
+	ForgedPolyRegistry planPolyRegistry;			// for any "shell" poly.
+	ForgedPolyRegistry massDriverPolyRegistry;		// only for "shell" polys which will become a mass driver.
 
 	// virtual functions
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;
@@ -30,7 +31,7 @@ public:
 	virtual void constructBottomStripTriangles(int in_stripID, int in_materialID) = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID, ECBPolyType in_type) = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
-	virtual void runMassDrivers() = 0;
+	virtual void runMassDrivers(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef) = 0;
 
 	// inherited functions for derived classes
 	void runPolyFracturerForAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);

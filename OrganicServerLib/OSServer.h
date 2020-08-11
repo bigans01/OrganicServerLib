@@ -67,6 +67,7 @@ public:
 	void constructTestBlueprints2();	// CONVERTED
 	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
 	void constructTestBlueprints3Special();	// CONVERTED		// for mountain testing; 
+	void constructTestBlueprints3Micro();
 
 	void constructTestDisk();
 	void constructMiniTestDisk();

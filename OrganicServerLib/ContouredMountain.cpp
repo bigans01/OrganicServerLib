@@ -575,7 +575,41 @@ void ContouredMountain::addContourLine(map<int, OSContourLine>* in_contourLineMa
 	(*line_id)++;									
 }
 
-void ContouredMountain::runMassDrivers()
+void ContouredMountain::runMassDrivers(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
+	std::cout << "### Running mass drivers for mountain; printing out SHELL_MASSDSRIVER polys: " << std::endl;
+	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
+	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
+	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
+	{
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
+		int foundGroupID = planPolyRegistryBegin->second.groupID;									// grab the group ID we'll be working with.
+		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
+		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
+		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
+		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)
+		{
+			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
+			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
+			{
+				massDriverPolyRegistry.addToPolyset(blueprintKey, *forgedPolySetBegin);
+				//std::cout << "In blueprint, (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << "), polygon with ID: " << *forgedPolySetBegin << std::endl;
+			}
+		}
+	}
 
+	std::cout << "Printing unique blueprint keys from massDriverPolyRegistry: " << std::endl;
+	auto massDriverRegistryBegin = massDriverPolyRegistry.polySetRegistry.begin();
+	auto massDriverRegistryEnd = massDriverPolyRegistry.polySetRegistry.end();
+	for (massDriverRegistryBegin; massDriverRegistryBegin != massDriverRegistryEnd; massDriverRegistryBegin++)
+	{
+		std::cout << "Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
+	}
+
+	std::cout << "### End of mass driver run. " << std::endl;
+
+	int someVal = 3;
+	std::cin >> someVal;
 }

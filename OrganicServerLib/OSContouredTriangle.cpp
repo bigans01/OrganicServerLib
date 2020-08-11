@@ -132,11 +132,11 @@ void OSContouredTriangle::determineLineLengths()
 	//std::cout << "line points::: " << std::endl; 
 }
 
-void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType)
+void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceID)
 {
 	//std::cout << "!! Adding polygon piece: " << in_Key.x << ", " << in_Key.y << ", " << in_Key.z << std::endl;
 	//polygonPieceMap[in_Key] = in_pieceType;
-	polygonPieceMap.emplace(in_Key, in_pieceType);
+	polygonPieceMap.emplace(in_Key, in_pieceID);
 	//someVector.push_back(in_pieceType);
 	//polygonPieceMap[in_Key] = 0;
 }
