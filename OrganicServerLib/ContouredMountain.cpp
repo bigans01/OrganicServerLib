@@ -609,6 +609,7 @@ void ContouredMountain::runMassDrivers(std::unordered_map<EnclaveKeyDef::Enclave
 	}
 
 	std::cout << "### End of mass driver run. " << std::endl;
+	std::cout << "### ContouredMountain summit was:  " << startPoint.x << ", " << startPoint.y << ", " << startPoint.z << std::endl;
 
 	int someVal = 3;
 	std::cin >> someVal;

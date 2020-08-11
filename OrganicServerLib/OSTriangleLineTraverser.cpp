@@ -137,35 +137,28 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	else  // polygon wasn't found, it needs to be created
 	{
 		//cout << "|||| Polygon was NOT found!! " << endl;
+
+
 		ECBPoly newPoly(in_TrianglePtr->contouredPolyType);
 		newPoly.materialID = in_TrianglePtr->materialID;
 		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
-
-		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];
-		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
 		
+		OSServerUtils::analyzePolyValidityAndInsert(contouredTriangleRef,
+			resultantIntersect.originPoint,
+			resultantIntersect.intersectedPoint,
+			lineID,
+			beginKey,
+			&borderData,
+			blueprintPtr,
+			&newPoly);
+
+		/*
 		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
-
-		/*
-		if
-		(
-			(resultantIntersect.originPoint.y == 0)
-			&&
-			(resultantIntersect.intersectedPoint.y == 0)
-		)
-		{
-			std::cout << "+++++++ SPECIAL HALT+++++++++++++ " << std::endl;
-			int someVal = 3;
-			std::cin >> someVal;
-		}
-		*/
-
-
 
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		in_TrianglePtr->addNewPrimarySegment(resultantIntersect.originPoint, resultantIntersect.intersectedPoint, lineID, beginKey);
@@ -189,6 +182,8 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
 		in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(beginKey, elementID); // Add the new poly to the ForgedPolyRegistry
+		*/
+
 
 	}
 
@@ -205,6 +200,28 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	//std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
+
+	bool specialFlag = false;
+	if 
+	(
+		(currentIterationEndpoint.x == 896.00f)
+		&&
+		(currentIterationEndpoint.y == -183.69f)
+		&&
+		(currentIterationEndpoint.z == 224.00f)
+	)
+	{
+		std::cout << "!!!!! Special halt, OSTriangleLineTraverser " << std::endl;
+		std::cout << "Current blueprint is: " << currentKeyPtr->x << ", " << currentKeyPtr->y << ", " << currentKeyPtr->z << std::endl;
+		std::cout << "contoured line begin point: " << beginPoint.x << ", " << beginPoint.y << "," << beginPoint.z << std::endl;
+		std::cout << "contoured line end point: " << endPoint.x << ", " << endPoint.y << "," << endPoint.z << std::endl;
+		std::cout << "current end point: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << std::endl;
+
+		int someVal = 3;
+		std::cin >> someVal;
+		specialFlag = true;
+	}
+
 	//std::cout << "---->  traverseLineOnce intersection call " << std::endl;
 	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
 	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey, in_TrianglePtr->centroid, in_TrianglePtr->trianglePoints[0], in_TrianglePtr->trianglePoints[1], in_TrianglePtr->trianglePoints[2]);
@@ -216,6 +233,12 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 																																								/**/
 	if (polyMapIter != in_TrianglePtr->polygonPieceMap.end())	// polygon was already found
 	{
+		if (specialFlag == true)
+		{
+			std::cout << "Polygon was found already. " << std::endl;
+			int flag1 = 0;
+			std::cin >> flag1;
+		}
 		//cout << "|||| Polygon was found!! " << endl;
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 
@@ -242,6 +265,14 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	}
 	else  // polygon wasn't found, it needs to be created
 	{
+		if (specialFlag == true)
+		{
+			std::cout << "Polygon was NOT found already. " << std::endl;
+			std::cout << "originPoint: " << resultantIntersect.originPoint.x << ", " << resultantIntersect.originPoint.y << ", " << resultantIntersect.originPoint.z << std::endl;
+			std::cout << "intersectedPoint: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
+			int flag1 = 0;
+			std::cin >> flag1;
+		}
 		// ((INSERTING NEW POLY))
 		ECBPoly newPoly(in_TrianglePtr->contouredPolyType);
 		newPoly.materialID = in_TrianglePtr->materialID;

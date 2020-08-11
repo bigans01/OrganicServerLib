@@ -568,7 +568,7 @@ void OSServer::constructTestBlueprints3Micro()
 	std::cout << "||||||| constructing blueprints Micro (version 3)...." << std::endl;
 	ECBPolyPoint mountainSummit;
 	mountainSummit.y = 0.32;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 992.19;
+	mountainSummit.x = 992.25;		// started at 992.19f.
 	mountainSummit.z = 0.67;
 
 	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
