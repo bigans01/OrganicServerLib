@@ -82,20 +82,27 @@ void OSServerUtils::analyzePolyValidityAndInsert(OSContouredTriangle* in_contour
 										 ECBPoly* in_polyToInsertRef)
 {
 	int elementID = in_blueprintPtr->primaryPolygonMap.size();				// get the element ID.
-	in_blueprintPtr->primaryPolygonMap[elementID] = *in_polyToInsertRef;	// always insert the poly first; if the poly becomes degenerate after adding the first line, we'll flag it.
+	//in_blueprintPtr->primaryPolygonMap[elementID] = *in_polyToInsertRef;	// always insert the poly first; if the poly becomes degenerate after adding the first line, we'll flag it.
 	ECBPolyLine newPolyLine;
 	fillLineMetaData(&newPolyLine, in_contouredTriangle, in_lineID, in_segmentPointA, in_segmentPointB);
 	bool validityCheck = OrganicUtils::checkIfBlueprintLineIsValid(newPolyLine, in_dataMapRef, in_currentTraceKey, in_polyToInsertRef->isPolyPerfectlyClamped);		// run the validity check on the new candidate line
 	if (validityCheck == true)
 	{
 		in_contouredTriangle->addNewPrimarySegment(in_segmentPointA, in_segmentPointB, in_lineID, in_currentTraceKey);		// register the valid segment with the contoured triangle
+		in_blueprintPtr->primaryPolygonMap[elementID] = *in_polyToInsertRef;												// insert the new poly data we were going to insert anyway
 		in_blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;																	// insert the valid segment into the poly
 		in_contouredTriangle->addPolygonPiece(in_currentTraceKey, elementID);																			// register the new poly with the contoured triangle, tied to the appropriate blueprint
 		in_contouredTriangle->forgedPolyRegistryRef->addToPolyset(in_currentTraceKey, elementID);														// register the piece with the parent ContourBase-derived class (contour plan)
 	}
 	else if (validityCheck == false)
 	{
-		in_blueprintPtr->primaryPolygonMap[elementID].polyType = ECBPolyType::ROGUE;
+		//std::cout << "!!!! Warning, validity check failed!! In key: (" << in_currentTraceKey.x << ", " << in_currentTraceKey.y << ", " << in_currentTraceKey.z << ") " << std::endl;
+		//std::cout << "!!!! Element ID was: " << elementID << std::endl;
+		//int someVal = 3;
+		//std::cin >> someVal;
+		//in_blueprintPtr->primaryPolygonMap[elementID].polyType = ECBPolyType::ROGUE;
+
+
 	}
 
 }

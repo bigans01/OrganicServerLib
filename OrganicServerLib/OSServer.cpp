@@ -568,7 +568,7 @@ void OSServer::constructTestBlueprints3Micro()
 	std::cout << "||||||| constructing blueprints Micro (version 3)...." << std::endl;
 	ECBPolyPoint mountainSummit;
 	mountainSummit.y = 0.32;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 992.25;		// started at 992.19f.
+	mountainSummit.x = 992.40;		// started at 992.19f.
 	mountainSummit.z = 0.67;
 
 	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
@@ -660,7 +660,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.z = 32.00f;
 	*/
 
-	/*
+	
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;
 	testPoint_0.z = 32.0f;
@@ -672,8 +672,9 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 32.00f;
 	testPoint_2.y = 32.0f;
 	testPoint_2.z = 41.00f;
-	*/
+	
 
+	/*
 	testPoint_0.x = 0.0f;
 	testPoint_0.y = 3.79f;
 	testPoint_0.z = 4;
@@ -686,7 +687,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 4;
 	testPoint_2.y = 1.15;
 	testPoint_2.z = 4;
-
+	*/
 
 	/*
 	testPoint_0.x = 64.0f;
