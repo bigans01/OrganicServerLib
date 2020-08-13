@@ -100,9 +100,9 @@ void OSServerUtils::analyzePolyValidityAndInsert(OSContouredTriangle* in_contour
 		//std::cout << "!!!! Element ID was: " << elementID << std::endl;
 		//int someVal = 3;
 		//std::cin >> someVal;
-		//in_blueprintPtr->primaryPolygonMap[elementID].polyType = ECBPolyType::ROGUE;
 
-
+		// do logic for ROGUE polys here (perhaps, inserting into a ROGUE poly map?)
+		
 	}
 
 }

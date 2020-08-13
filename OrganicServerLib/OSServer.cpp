@@ -568,7 +568,7 @@ void OSServer::constructTestBlueprints3Micro()
 	std::cout << "||||||| constructing blueprints Micro (version 3)...." << std::endl;
 	ECBPolyPoint mountainSummit;
 	mountainSummit.y = 0.32;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 992.40;		// started at 992.19f.
+	mountainSummit.x = 992.45;		// started at 992.19f.
 	mountainSummit.z = 0.67;
 
 	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
@@ -924,6 +924,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
+	// construct the shell
 	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
 	{
 		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
@@ -1161,6 +1162,10 @@ void OSServer::analyzeECBPoly(ECBPoly* in_polyRef)
 void OSServer::setCurrentWorld(std::string in_worldName)
 {
 	currentWorld = in_worldName;
+	std::string worldRootFolderString = "world";
+	OSWinAdapter::ensureFolderExists(worldRootFolderString);		// make sure the world root folder exists.
+	std::string worldFolderString = worldRootFolderString + "/" + in_worldName;
+	OSWinAdapter::ensureFolderExists(worldFolderString);			// make sure the folder for this specific world exists.
 }
 
 OSPDir OSServer::getFormationDirections(OSTerrainFormation in_terrainFormation)
