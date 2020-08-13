@@ -973,6 +973,8 @@ void OSServer::executeDerivedContourPlan(string in_string)
 
 
 	std::cout << "######### Plan execution complete; " << std::endl;
+
+	//OSWinAdapter::clearWorldFolder(currentWorld);
 	
 	// perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
