@@ -661,6 +661,7 @@ void OSServer::constructSingleDebug()
 	*/
 
 	
+	/*
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;
 	testPoint_0.z = 32.0f;
@@ -672,6 +673,20 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 32.00f;
 	testPoint_2.y = 32.0f;
 	testPoint_2.z = 41.00f;
+	*/
+
+	// for reddit question
+	testPoint_0.x = 2.0f;
+	testPoint_0.y = 0.0f;
+	testPoint_0.z = 0.0f;
+
+	testPoint_1.x = 0.0f;
+	testPoint_1.y = 2.0f;
+	testPoint_1.z = 0.0f;
+
+	testPoint_2.x = 0.0f;
+	testPoint_2.y = 0.0f;
+	testPoint_2.z = 2.0f;
 	
 
 	/*
@@ -918,13 +933,15 @@ void OSServer::constructDebugBlueprint1()
 
 void OSServer::executeDerivedContourPlan(string in_string)
 {
+	OSWinAdapter::clearWorldFolder(currentWorld);
+
 	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
 	ContourBase* planPtr = newContourMap[in_string].get();
 	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
-	// construct the shell
+	// 1.) construct the shell
 	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
 	{
 		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
@@ -950,6 +967,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 			//std::cout << "---ending trace-through" << std::endl;
 
 			// write (overwrite) a blueprint file for each blueprint traversed
+			/*
 			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
 			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorEnd = currentTriangle->polygonPieceMap.end();
 			for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
@@ -966,21 +984,21 @@ void OSServer::executeDerivedContourPlan(string in_string)
 				OSWinAdapter::outputBlueprintStats(polyMapRef);
 				//std::cout << ">> Blueprint stats outputted...???" << std::endl;
 			}
+			*/
 		}
-		//std::cout << "Blueprint writing complete!!! (1)" << std::endl;
 	}
-	//std::cout << "Blueprint writing complete!!! (2)" << std::endl;
-
-
 	std::cout << "######### Plan execution complete; " << std::endl;
 
 	//OSWinAdapter::clearWorldFolder(currentWorld);
 	
-	// perform fracturing for affected blueprints.
+	// 2.) perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
 
-	// run the mass driver for the plan. (if the plan allows for it)
+	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	planPtr->runMassDrivers(&blueprintMap);
+
+	// 4.) write updated blueprints to disk
+	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
