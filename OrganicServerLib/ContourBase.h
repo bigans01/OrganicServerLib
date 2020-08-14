@@ -3,6 +3,7 @@
 #ifndef CONTOURBASE_H
 #define CONTOURBASE_H
 
+#include <chrono>
 #include "ECBPolyPoint.h"
 #include "OSContouredTriangleStrip.h"
 #include "OSContourPlanDirections.h"

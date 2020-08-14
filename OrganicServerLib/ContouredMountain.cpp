@@ -578,6 +578,8 @@ void ContouredMountain::addContourLine(map<int, OSContourLine>* in_contourLineMa
 void ContouredMountain::runMassDrivers(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
 	std::cout << "### Running mass drivers for mountain; printing out SHELL_MASSDSRIVER polys: " << std::endl;
+
+	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key).
 	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
 	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
 	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
@@ -600,6 +602,61 @@ void ContouredMountain::runMassDrivers(std::unordered_map<EnclaveKeyDef::Enclave
 		}
 	}
 
+	// Step 2) for each blueprint that contained at least one SHELL_MASSDRIVER, take the original forged poly registry set for that blueprint, and
+	//		   subtract the massDriverPolyRegistry set from it to produce a new set. This new set represents the OrganicTriangles that 
+	//         will have to be traced in the blueprint that the mass driver begins in (but only for that initial blueprint)
+	auto massDriverBlueprintKeysBegin = massDriverPolyRegistry.polySetRegistry.begin();
+	auto massDriverBlueprintKeysEnd = massDriverPolyRegistry.polySetRegistry.end();
+	for (massDriverBlueprintKeysBegin; massDriverBlueprintKeysBegin != massDriverBlueprintKeysEnd; massDriverBlueprintKeysBegin++)
+	{
+	
+		EnclaveKeyDef::EnclaveKey bindingKey = massDriverBlueprintKeysBegin->first;	// get the key
+		std::cout << "#### Performing set subtraction for Blueprint: (" << bindingKey.x << ", " << bindingKey.y << ", " << bindingKey.z << ")" << std::endl;
+
+		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[bindingKey];	// get the original, unaltered set
+		// print original set values
+		/*
+		std::cout << "Original set values: " << std::endl;
+		auto originalSetBegin = originalSet.polySet.begin();
+		auto originalSetEnd = originalSet.polySet.end();
+		for (originalSetBegin; originalSetBegin != originalSetEnd; originalSetBegin++)
+		{
+			std::cout << *originalSetBegin << std::endl;
+		}
+		*/
+
+		ForgedPolySet subtractingSet = massDriverBlueprintKeysBegin->second;		// get the set corresponding to this blueprint that represents the SHELL_MASSDRIVERS
+		/*
+		std::cout << "Subtracting set values: " << std::endl;
+		auto subtractingSetBegin = subtractingSet.polySet.begin();
+		auto subtractingSetEnd = subtractingSet.polySet.end();
+		for (subtractingSetBegin; subtractingSetBegin != subtractingSetEnd; subtractingSetBegin++)
+		{
+			std::cout << *subtractingSetBegin << std::endl;
+		}
+		*/
+
+		ForgedPolySet newSet = originalSet;
+		auto subtractionBegin = subtractingSet.polySet.begin();
+		auto subtractionEnd = subtractingSet.polySet.end();
+		for (subtractionBegin; subtractionBegin != subtractionEnd; subtractionBegin++)
+		{
+			newSet.polySet.erase(*subtractionBegin);
+		}
+
+		/*
+		std::cout << "Resulting set values: " << std::endl;
+		auto newSetBegin = newSet.polySet.begin();
+		auto newSetEnd = newSet.polySet.end();
+		for (newSetBegin; newSetBegin != newSetEnd; newSetBegin++)
+		{
+			std::cout << *newSetBegin << std::endl;
+		}
+		*/
+		//std::set_difference(originalSet.polySet.begin(), originalSet.polySet.end(), subtractingSet.polySet.begin(), subtractingSet.polySet.end(), newSet.begin());
+	}
+
+	// Step 3)
 	std::cout << "Printing unique blueprint keys from massDriverPolyRegistry: " << std::endl;
 	auto massDriverRegistryBegin = massDriverPolyRegistry.polySetRegistry.begin();
 	auto massDriverRegistryEnd = massDriverPolyRegistry.polySetRegistry.end();

@@ -989,10 +989,23 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	}
 	std::cout << "######### Plan execution complete; " << std::endl;
 
+
+
 	//OSWinAdapter::clearWorldFolder(currentWorld);
 	
 	// 2.) perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
+
+	std::cout << "Size of EnclaveBlock: " << sizeof(EnclaveBlock) << std::endl;
+	std::cout << "Size of BBFan: " << sizeof(BBFan) << std::endl;
+	std::cout << "Size of OrganicRawEnclave: " << sizeof(OrganicRawEnclave) << std::endl;
+	//std::cout << "Size of OrganicTriangleSecondary: " << sizeof(OrganicTriangleSecondary) << std::endl;
+	//std::cout << "Size of OrganicTriangleTertiary: " << sizeof(OrganicTriangleTertiary) << std::endl;
+	std::cout << "Size of EnclaveTriangle: " << sizeof(EnclaveTriangle) << std::endl;
+	std::cout << "Size of an ECBPolyLine array of size 3: " << sizeof(ECBPolyLine) * 3 << std::endl;
+
+	int testVal = 3;
+	std::cin >> testVal;
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	planPtr->runMassDrivers(&blueprintMap);
