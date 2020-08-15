@@ -1002,13 +1002,14 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	//std::cout << "Size of OrganicTriangleSecondary: " << sizeof(OrganicTriangleSecondary) << std::endl;
 	//std::cout << "Size of OrganicTriangleTertiary: " << sizeof(OrganicTriangleTertiary) << std::endl;
 	std::cout << "Size of EnclaveTriangle: " << sizeof(EnclaveTriangle) << std::endl;
+	std::cout << "Size of an EnclaveTriangle skeleton: " << sizeof(ECBPolyPoint) * 4 + 4 << std::endl;
 	std::cout << "Size of an ECBPolyLine array of size 3: " << sizeof(ECBPolyLine) * 3 << std::endl;
 
 	int testVal = 3;
 	std::cin >> testVal;
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
-	planPtr->runMassDrivers(&blueprintMap);
+	planPtr->runMassDrivers(&client, &blueprintMap);
 
 	// 4.) write updated blueprints to disk
 	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
