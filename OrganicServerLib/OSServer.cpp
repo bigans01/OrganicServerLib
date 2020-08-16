@@ -661,7 +661,7 @@ void OSServer::constructSingleDebug()
 	*/
 
 	
-	/*
+	
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;
 	testPoint_0.z = 32.0f;
@@ -673,9 +673,10 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 32.00f;
 	testPoint_2.y = 32.0f;
 	testPoint_2.z = 41.00f;
-	*/
+	
 
 	// for reddit question
+	/*
 	testPoint_0.x = 2.0f;
 	testPoint_0.y = 0.0f;
 	testPoint_0.z = 0.0f;
@@ -687,7 +688,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 0.0f;
 	testPoint_2.y = 0.0f;
 	testPoint_2.z = 2.0f;
-	
+	*/
 
 	/*
 	testPoint_0.x = 0.0f;

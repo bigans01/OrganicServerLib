@@ -7,6 +7,8 @@
 #include "OSContouredTriangle.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "ECBIntersectMeta.h"
+#include "BlueprintTransformRefs.h"
+#include "OSWinAdapter.h"
 
 class OSServerUtils
 {
@@ -23,6 +25,9 @@ class OSServerUtils
 												BorderDataMap* in_dataMapRef, 
 												EnclaveCollectionBlueprint* in_blueprintPtr, 
 												ECBPoly* in_polyToInsertRef);
+		static void writeBlueprintToDisk(std::string in_worldName, 
+										EnclaveKeyDef::EnclaveKey in_blueprintKey, 
+										std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);
 
 };
 

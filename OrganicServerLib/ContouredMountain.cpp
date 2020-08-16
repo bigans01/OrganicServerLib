@@ -692,6 +692,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, newSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
 		in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);												// now, update the blueprint we are modifying, by updating it with the 
 																														// OrganicRawEnclaves we created in tempMap or adding them if they don't exist yet.
+
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}
 

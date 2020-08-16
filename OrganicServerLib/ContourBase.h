@@ -11,6 +11,7 @@
 #include <map>
 #include "OrganicClient.h"
 #include "ECBPolyType.h"
+#include "BlueprintTransformRefs.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)

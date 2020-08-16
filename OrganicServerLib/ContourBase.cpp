@@ -27,7 +27,13 @@ void ContourBase::writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef
 		//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
 		EnclaveCollectionBlueprint* blueprintRef = &(*in_blueprintMapRef)[currentFileName];
 		std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;	// values to load to the strucutre that gets passed to the adapter 
-		OSWinAdapter::writeBlueprintPolysToFile(in_worldName, currentFileName, polyMapRef);
+
+		//OSWinAdapter::writeBlueprintPolysToFile(in_worldName, currentFileName, polyMapRef);
+
+		BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, &blueprintRef->fractureResults.fractureResultsContainerMap);
+		OSWinAdapter::writeBlueprintsToFile(in_worldName, currentFileName, transformRefs);
+
+
 		//EnclaveCollectionBlueprint readBackBP;
 		//OSWinAdapter::readBlueprintPolysFromFile(in_worldName, currentFileName, polyMapRef);
 		OSWinAdapter::outputBlueprintStats(polyMapRef);
