@@ -1010,9 +1010,13 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cin >> testVal;
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
-	planPtr->runMassDrivers(&client, &blueprintMap);
+	EnclaveFractureResultsMap tempMap;
+	planPtr->runMassDrivers(&client, &blueprintMap, &tempMap);
 
-	// 4.) write updated blueprints to disk
+	// 4.) update the affected blueprints (aka, update the OrganicRawEnclaves), after all work has been done
+	//planPtr->updateAffectedBlueprints(&client, &blueprintMap, &tempMap);
+
+	// 5.) write updated blueprints to disk
 	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
 }
 
@@ -1159,6 +1163,9 @@ void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 
 void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 {
+	auto organicstart = std::chrono::high_resolution_clock::now();
+
+
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintBegin = blueprintMap.begin();
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintEnd = blueprintMap.end();
 	for (blueprintBegin; blueprintBegin != blueprintEnd; blueprintBegin++)
@@ -1168,6 +1175,13 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 		//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
 		organicSystemPtr->addKeyToRenderList(currentKey);
 	}
+
+	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
+	std::chrono::duration<double> organicelapsed = organicend - organicstart;
+
+	std::cout << "Finished transfering blueprints to local OS. Time: " << organicelapsed.count() << std::endl;
+	int someVal;
+	std::cin >> someVal;
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)

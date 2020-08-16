@@ -30,7 +30,9 @@ void ContourBase::writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef
 
 		//OSWinAdapter::writeBlueprintPolysToFile(in_worldName, currentFileName, polyMapRef);
 
-		BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, &blueprintRef->fractureResults.fractureResultsContainerMap);
+		BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, 
+											 &blueprintRef->fractureResults.fractureResultsContainerMap,
+											 &blueprintRef->polyGroupRangeMap);
 		OSWinAdapter::writeBlueprintsToFile(in_worldName, currentFileName, transformRefs);
 
 
@@ -47,4 +49,19 @@ void ContourBase::writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef
 	std::cout << "Wrote " << writeCount << " blueprints to disk, in " << organicelapsed.count() << " seconds. Continue? " << std::endl;
 	//int continueVal = 3;
 	//std::cin >> continueVal;
+}
+
+void ContourBase::updateAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef)
+{
+	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
+	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
+	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
+	{
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;
+		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];
+		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+		//EnclaveFractureResultsMap tempMap;
+		//in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
+		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
+	}
 }

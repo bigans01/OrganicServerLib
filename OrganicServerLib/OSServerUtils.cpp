@@ -112,6 +112,8 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 										std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
 	EnclaveCollectionBlueprint* blueprintRef = &(*in_blueprintMapRef)[in_blueprintKey];		// get a ref to the blueprint.
-	BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, &blueprintRef->fractureResults.fractureResultsContainerMap);
+	BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, 
+										 &blueprintRef->fractureResults.fractureResultsContainerMap,
+										 &blueprintRef->polyGroupRangeMap);
 	OSWinAdapter::writeBlueprintsToFile(in_worldName, in_blueprintKey, transformRefs);
 }

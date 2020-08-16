@@ -575,18 +575,21 @@ void ContouredMountain::addContourLine(map<int, OSContourLine>* in_contourLineMa
 	(*line_id)++;									
 }
 
-void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
+void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef)
 {
 	std::cout << "### Running mass drivers for mountain; printing out SHELL_MASSDSRIVER polys: " << std::endl;
+	auto organicstart = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
+	//EnclaveFractureResultsMap tempMap;		// the tempMap where all the work will be written to.
 
-	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key).
+	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key). At 
+	//			the same time, in the same loop, generate the raw enclave data for each affected blueprint.
 	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
 	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
 	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
 	{
 		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
 		int foundGroupID = planPolyRegistryBegin->second.groupID;									// grab the group ID we'll be working with.
-		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+		//std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
 		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
@@ -601,102 +604,56 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 			}
 		}
 
-		//ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
-		//EnclaveFractureResultsMap tempMap;
-		//in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		//in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);
+		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+		EnclaveFractureResultsMap tempMap;
+		//in_clientRef->OS->produceRawEnclavesForPolySet(in_fractureResultsMapRef, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
+		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
+		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
+		in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);
 	}
+
 
 	// Step 2) for each blueprint that contained at least one SHELL_MASSDRIVER, take the original forged poly registry set for that blueprint, and
 	//		   subtract the massDriverPolyRegistry set from it to produce a new set. This new set represents the OrganicTriangles that 
 	//         will have to be traced in the blueprint that the mass driver begins in (but only for that initial blueprint)
-	auto massDriverBlueprintKeysBegin = massDriverPolyRegistry.polySetRegistry.begin();
-	auto massDriverBlueprintKeysEnd = massDriverPolyRegistry.polySetRegistry.end();
-	for (massDriverBlueprintKeysBegin; massDriverBlueprintKeysBegin != massDriverBlueprintKeysEnd; massDriverBlueprintKeysBegin++)
-	{
-	
-		EnclaveKeyDef::EnclaveKey bindingKey = massDriverBlueprintKeysBegin->first;	// get the key
-		std::cout << "#### Performing set subtraction for Blueprint: (" << bindingKey.x << ", " << bindingKey.y << ", " << bindingKey.z << ")" << std::endl;
-
-		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[bindingKey];	// get the original, unaltered set
-		// print original set values
-		/*
-		std::cout << "Original set values: " << std::endl;
-		auto originalSetBegin = originalSet.polySet.begin();
-		auto originalSetEnd = originalSet.polySet.end();
-		for (originalSetBegin; originalSetBegin != originalSetEnd; originalSetBegin++)
-		{
-			std::cout << *originalSetBegin << std::endl;
-		}
-		*/
-
-		ForgedPolySet subtractingSet = massDriverBlueprintKeysBegin->second;		// get the set corresponding to this blueprint that represents the SHELL_MASSDRIVERS
-		/*
-		std::cout << "Subtracting set values: " << std::endl;
-		auto subtractingSetBegin = subtractingSet.polySet.begin();
-		auto subtractingSetEnd = subtractingSet.polySet.end();
-		for (subtractingSetBegin; subtractingSetBegin != subtractingSetEnd; subtractingSetBegin++)
-		{
-			std::cout << *subtractingSetBegin << std::endl;
-		}
-		*/
-
-		ForgedPolySet newSet = originalSet;
-		auto subtractionBegin = subtractingSet.polySet.begin();
-		auto subtractionEnd = subtractingSet.polySet.end();
-		for (subtractionBegin; subtractionBegin != subtractionEnd; subtractionBegin++)
-		{
-			newSet.polySet.erase(*subtractionBegin);
-		}
-
-		/*
-		std::cout << "Resulting set values: " << std::endl;
-		auto newSetBegin = newSet.polySet.begin();
-		auto newSetEnd = newSet.polySet.end();
-		for (newSetBegin; newSetBegin != newSetEnd; newSetBegin++)
-		{
-			std::cout << *newSetBegin << std::endl;
-		}
-		*/
-		//std::set_difference(originalSet.polySet.begin(), originalSet.polySet.end(), subtractingSet.polySet.begin(), subtractingSet.polySet.end(), newSet.begin());
-	}
-
-	// Step 3)
-	std::cout << "Printing unique blueprint keys from massDriverPolyRegistry: " << std::endl;
+	//std::cout << "Printing unique blueprint keys from massDriverPolyRegistry: " << std::endl;
 	auto massDriverRegistryBegin = massDriverPolyRegistry.polySetRegistry.begin();
 	auto massDriverRegistryEnd = massDriverPolyRegistry.polySetRegistry.end();
 	for (massDriverRegistryBegin; massDriverRegistryBegin != massDriverRegistryEnd; massDriverRegistryBegin++)
 	{
 		// set up the set to use
-
-		//std::cout << "Debug (1) " << std::endl;
 		EnclaveKeyDef::EnclaveKey blueprintKey = massDriverRegistryBegin->first;
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
-		//std::cout << "Debug (2 1) " << std::endl;
 		ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
-		//std::cout << "Debug (2 2) " << std::endl;
 		ForgedPolySet newSet = originalSet;
-		//std::cout << "Debug (2 3) " << std::endl;
 		auto subtractionBegin = subtractingSet.polySet.begin();
 		auto subtractionEnd = subtractingSet.polySet.end();
-
-		//std::cout << "Debug (3) " << std::endl;
 		for (subtractionBegin; subtractionBegin != subtractionEnd; subtractionBegin++)
 		{
 			newSet.polySet.erase(*subtractionBegin);
 		}
 
-		std::cout << "Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
-		EnclaveFractureResultsMap tempMap;
-		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];
-		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, newSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);												// now, update the blueprint we are modifying, by updating it with the 
-																														// OrganicRawEnclaves we created in tempMap or adding them if they don't exist yet.
+		std::cout << "Mass Driving blueprint Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
+		// now that the shell has been produced in all its affected blueprints, its now time to at last run the mass drivers.
+		// a mass driver should pass:
+
+		// 1.) a reference to the blueprint map
+		// 2.) a reference to the ContourPlan's planPolyRegistry.polySetRegistry
+		// 3.) the blueprint key of the blueprint that the mass driver starts in
+		// 4.) the "newSet" that represents all polygons that a SHELL_MASSDRIVER polygon type may or may NOT hit
+		// 5.) the "subtractingSet" that represents the SHELL_MASSDRIVER polygons
+		//
+		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
+		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
+		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}
 
-	std::cout << "### End of mass driver run. " << std::endl;
+	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
+	std::chrono::duration<double> organicelapsed = organicend - organicstart;
+
+	std::cout << "### End of mass driver run. Time spent:" << organicelapsed.count() << std::endl;
 	std::cout << "### ContouredMountain summit was:  " << startPoint.x << ", " << startPoint.y << ", " << startPoint.z << std::endl;
 
 	int someVal = 3;
