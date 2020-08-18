@@ -127,21 +127,9 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_ma
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
 		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
 
-		/*
-		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)
-		{
-			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
-			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
-			{
-				massDriverPolyRegistry.addToPolyset(blueprintKey, *forgedPolySetBegin);
-				//std::cout << "In blueprint, (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << "), polygon with ID: " << *forgedPolySetBegin << std::endl;
-			}
-		}
-		*/
-
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
 	}
 }

@@ -46,7 +46,7 @@ void ContourBase::writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef
 
 	//std::cout << "Frame time: " << organicelapsed.count() << std::endl;
 
-	std::cout << "Wrote " << writeCount << " blueprints to disk, in " << organicelapsed.count() << " seconds. Continue? " << std::endl;
+	std::cout << "Wrote " << writeCount << " blueprints to disk, in " << organicelapsed.count() << " seconds. " << std::endl;
 	//int continueVal = 3;
 	//std::cin >> continueVal;
 }

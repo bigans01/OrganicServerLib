@@ -609,7 +609,8 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//in_clientRef->OS->produceRawEnclavesForPolySet(in_fractureResultsMapRef, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
 		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		in_clientRef->OS->updateRawEnclaveData(&tempMap, blueprintToCheck);
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+
 	}
 
 
@@ -626,6 +627,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
 		ForgedPolySet newSet = originalSet;
+
 		auto subtractionBegin = subtractingSet.polySet.begin();
 		auto subtractionEnd = subtractingSet.polySet.end();
 		for (subtractionBegin; subtractionBegin != subtractionEnd; subtractionBegin++)

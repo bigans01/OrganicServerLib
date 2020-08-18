@@ -1018,6 +1018,10 @@ void OSServer::executeDerivedContourPlan(string in_string)
 
 	// 5.) write updated blueprints to disk
 	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
+
+	std::cout << "Write to disk complete; press key to transfer blueprints to local OrganicSystem. " << std::endl;
+	int someVal = 3;
+	std::cin >> someVal;
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -1179,7 +1183,7 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
 	std::chrono::duration<double> organicelapsed = organicend - organicstart;
 
-	std::cout << "Finished transfering blueprints to local OS. Time: " << organicelapsed.count() << std::endl;
+	std::cout << "Finished transfering blueprints to local OS. Time: " << organicelapsed.count() << " | Press key to continue. " << std::endl;
 	int someVal;
 	std::cin >> someVal;
 }
