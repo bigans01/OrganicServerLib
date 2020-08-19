@@ -585,7 +585,6 @@ void OSServer::constructTestBlueprints3Micro()
 		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
 	}
 
-
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
 }
@@ -746,6 +745,8 @@ void OSServer::constructSingleMountTest()
 		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
 	}
 
+	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
+	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
 
 	executeDerivedContourPlan("summit1");
 }
@@ -939,6 +940,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
 	ContourBase* planPtr = newContourMap[in_string].get();
 	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
+	std::cout << "Number of strips to execute is: " << numberOfTriangleStrips << std::endl;
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
 	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
@@ -988,6 +990,20 @@ void OSServer::executeDerivedContourPlan(string in_string)
 			*/
 		}
 	}
+
+	auto bottomStripsBegin = planPtr->bottomTriangleStripMap.begin();
+	auto bottomStripsEnd = planPtr->bottomTriangleStripMap.end();
+	for (bottomStripsBegin; bottomStripsBegin != bottomStripsEnd; bottomStripsBegin++)
+	{
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = bottomStripsBegin->second.triangleMap.begin();
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = bottomStripsBegin->second.triangleMap.end();
+		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
+		{
+			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+		}
+	}
+
 	std::cout << "######### Plan execution complete; " << std::endl;
 
 

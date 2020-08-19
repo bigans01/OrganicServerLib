@@ -114,15 +114,18 @@ void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialI
 
 	}
 	*/
-	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, in_materialID, &triangleStripMap, ECBPolyType::SHELL);
+	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, in_materialID, &triangleStripMap, ECBPolyType::SHELL, startPoint);
 }
 
 void ContouredMountain::constructBottomStripTriangles(int in_stripID, int in_materialID)
 {
-	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 1, &bottomTriangleStripMap, ECBPolyType::SHELL_MASSDRIVER);
+	std::cout << "Calling BOTTOM strip construction, for strip: " << in_stripID << std::endl;
+	std::cout << "!! (PRE)  Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
+	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 1, &bottomTriangleStripMap, ECBPolyType::SHELL_MASSDRIVER, bottomStartPoint);
+	std::cout << "!! (POST) Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
 }
 
-void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>* in_contourLineMapRef, map<int, ECBPolyPoint>* in_triangleStripMRPMapRef, int in_stripID, int in_materialID, unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, ECBPolyType in_type)
+void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>* in_contourLineMapRef, map<int, ECBPolyPoint>* in_triangleStripMRPMapRef, int in_stripID, int in_materialID, unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, ECBPolyType in_type, ECBPolyPoint in_startPoint)
 {
 	if (in_stripID == 0)
 	{
@@ -156,12 +159,12 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 
 			//third triangle point
 			ECBPolyPoint pointThree;
-			pointThree.x = startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
-			pointThree.y = startPoint.y;
-			pointThree.z = startPoint.z;
+			pointThree.x = in_startPoint.x;						// make the center point equal to the "peak" of the contour plan, whatever that may be 
+			pointThree.y = in_startPoint.y;
+			pointThree.z = in_startPoint.z;
 
-			//constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
-			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
+			//constructSingleContouredTriangle(in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
 
 			std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
 		}
@@ -181,12 +184,12 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 		pointTwo.z = contourPointPointer->z;
 
 		ECBPolyPoint pointThree;
-		pointThree.x = startPoint.x;
-		pointThree.y = startPoint.y;
-		pointThree.z = startPoint.z;
+		pointThree.x = in_startPoint.x;
+		pointThree.y = in_startPoint.y;
+		pointThree.z = in_startPoint.z;
 
-		//constructSingleContouredTriangle(startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
-		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
+		//constructSingleContouredTriangle(in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
+		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
 
 		//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
 		std::cout << "First layer triangle created, via new function call...." << endl;
@@ -206,15 +209,15 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 		int pointsPerQuadrantCurrentLine = (numberOfPoints / 4) + 1;	// get the number of points per quadrant,  for the current line
 		int trianglesForCurrentLine = pointsPerQuadrantCurrentLine - 1;	// the number of triangles in each quadrant is equal to the number of points per quadrant - 1
 
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructOuterQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructOuterQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructOuterQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructOuterQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructOuterQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint, in_type);
 
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint, in_type);
-		constructInnerQuadrantShell(currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructInnerQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 0, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructInnerQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 1, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructInnerQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 2, in_stripID, in_materialID, massReferencePoint, in_type);
+		constructInnerQuadrantShell(in_osContouredTriangleStripRef,currentLineRef, previousLineRef, pointsPerQuadrantCurrentLine, 3, in_stripID, in_materialID, massReferencePoint, in_type);
 
 	}
 }
@@ -325,7 +328,7 @@ void ContouredMountain::amplifyContourLinePoints(int in_lineID)
 
 
 
-void ContouredMountain::constructOuterQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, ECBPolyPoint in_mrp, ECBPolyType in_type)
+void ContouredMountain::constructOuterQuadrantShell(unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, ECBPolyPoint in_mrp, ECBPolyType in_type)
 {
 	if (in_quadrantID != 3)		// don't do this for the last quadrant
 	{
@@ -358,7 +361,8 @@ void ContouredMountain::constructOuterQuadrantShell(OSContourLine* in_currentLin
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -393,7 +397,8 @@ void ContouredMountain::constructOuterQuadrantShell(OSContourLine* in_currentLin
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -419,11 +424,12 @@ void ContouredMountain::constructOuterQuadrantShell(OSContourLine* in_currentLin
 		thirdPoint.y = thirdContourPoint->y;
 		thirdPoint.z = thirdContourPoint->z;
 
-		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+		//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 	}
 }
 
-void ContouredMountain::constructInnerQuadrantShell(OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, ECBPolyPoint in_mrp, ECBPolyType in_type)
+void ContouredMountain::constructInnerQuadrantShell(unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, OSContourLine* in_currentLine, OSContourLine* in_previousLine, int in_pointsPerQuadrant, int in_quadrantID, int in_triangleStripID, int in_materialID, ECBPolyPoint in_mrp, ECBPolyType in_type)
 {
 	if (in_quadrantID != 3)		// don't do this for the last quadrant
 	{
@@ -451,7 +457,8 @@ void ContouredMountain::constructInnerQuadrantShell(OSContourLine* in_currentLin
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -488,7 +495,8 @@ void ContouredMountain::constructInnerQuadrantShell(OSContourLine* in_currentLin
 			thirdPoint.y = thirdContourPoint->y;
 			thirdPoint.z = thirdContourPoint->z;
 
-			constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 
 			basePointForPreviousLine++;		// iterate the base points
 			basePointForCurrentLine++;		// ""
@@ -514,7 +522,8 @@ void ContouredMountain::constructInnerQuadrantShell(OSContourLine* in_currentLin
 		thirdPoint.y = thirdContourPoint->y;
 		thirdPoint.z = thirdContourPoint->z;
 
-		constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+		//constructSingleContouredTriangle(firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
+		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, firstPoint, secondPoint, thirdPoint, in_mrp, in_triangleStripID, in_materialID, in_type);
 
 	}
 	
@@ -542,7 +551,7 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 			addContourLine(&contourLineMap, &topContourLineCount, currentRadius, currentY, currentNumberOfPoints, in_startPoint);
 
 		}
-		
+		std::cout << ">>> Top contour line count is: " << topContourLineCount << std::endl;
 }
 
 void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
@@ -561,6 +570,7 @@ void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_star
 		insertMRP(&triangleBottomStripMRPMap, &x, bottomLayerMRP);					// insert the MRP
 		addContourLine(&bottomContourLineMap, &bottomContourLineCount, currentRadius, in_startPoint.y, currentNumberOfPoints, in_startPoint);
 	}
+	std::cout << ">>> Bottom contour line count is: " << bottomContourLineCount << std::endl;
 }
 
 void ContouredMountain::insertMRP(map<int, ECBPolyPoint>* in_mrpMapRef, int* in_stripValue, ECBPolyPoint in_polyPoint)
