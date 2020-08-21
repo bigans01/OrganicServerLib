@@ -19,6 +19,8 @@ void OSContouredTriangleRunner::performRun()
 	//std::cout << "!!!!!! Calling fillMetaDataInPrimartCircuits... " << std::endl;
 	contouredTrianglePtr->fillMetaDataInPrimaryCircuits();
 
+	//std::cout << "##############################  Fill circuits complete. " << std::endl;
+
 	//std::cout << "##############################  Primary circuit fill complete. " << std::endl;
 
 	//std::cout << "!!!!!! Call of fillMetaDataInPrimartCircuits COMPLETED... " << std::endl;
@@ -778,6 +780,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 				if (traceCount == 1)
 				{
 					// spawn a new primary line from THIS primary line; see "PrimaryLineT2IsolatedTracer" for reference in OrganicPolyOperationsLib.
+					//std::cout << "Initialized runner, for trace count 1 " << std::endl;
 					BlueprintFillerRunner fillerRunner;
 					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
 				}
@@ -799,6 +802,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 						if (circuitRef->checkIfSegmentIsOpenMulti(in_contourLineArrayRef->linkArray[x].IDofLine) == true)
 						{
 							//std::cout << "This line is OPEN_MULTI!!! " << std::endl;
+							//std::cout << "Initialized runner, for trace count 2 " << std::endl;
 							BlueprintFillerRunner fillerRunner;
 							fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
 						}

@@ -46,6 +46,7 @@ class BlueprintFillerRunner
 
 		// blueprint key
 		EnclaveKeyDef::EnclaveKey blueprintKey;	// the current blueprint key for the runner.
+		EnclaveKeyDef::EnclaveKey baseKey;		// the very first key.
 
 		// primary line to use, and associated slope
 		PrimaryLineT1 fillerRunnerPrimaryLine;
@@ -77,6 +78,7 @@ class BlueprintFillerRunner
 		void applyMovementToBlueprintKey(ECBPolyPoint in_moveVals);
 		void insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::EnclaveKey in_blueprintKey);
 		bool checkIfBlueprintWasTraced(EnclaveKeyDef::EnclaveKey in_blueprintKey);
+		void printTracedBlueprintsFromRef();
 		bool checkIfBlueprintWasFilled(EnclaveKeyDef::EnclaveKey in_blueprintKey);
 		void fillECBPolyLineWithPrimary(ECBPolyLine* in_polyLineRef);
 		PrimaryLineT1 constructFillerPrimaryInitial(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey);	// construct, and return the newly spawned primary line that this runner instance will use.

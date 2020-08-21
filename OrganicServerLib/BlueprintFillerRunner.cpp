@@ -23,6 +23,9 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint i
 	tracedBlueprintCountMapRef = in_tracedBlueprintCountMapRef;
 	filledBlueprintMapRef = in_filledBlueprintMapRef;
 	contouredTrianglePtr = in_osTriangleRef;
+
+	baseKey = in_currentSegmentBlueprintKey;
+
 	blueprintMapRef = in_blueprintMapRef;
 	fillerRunnerPrimaryLine = constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);	// assign the primary line
 	primaryLineSlope = OrganicUtils::findSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);							
@@ -81,6 +84,22 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 		ECBPolyPoint resultantMoveVals = OrganicUtils::findCommonMoveValues(commonValsToFind, normalizedPrimaryLineSlope);
 		//std::cout << "!! Move vals for this iteration are: << " << resultantMoveVals.x << ", " << resultantMoveVals.y << ", " << resultantMoveVals.z << std::endl;
 		applyMovementToBlueprintKey(resultantMoveVals);					// shift the blueprint key we will go into
+
+
+		if
+			(
+			(baseKey.x == -2)
+				&&
+				(baseKey.y == -3)
+				&&
+				(baseKey.z == 4)
+				)
+		{
+			printTracedBlueprintsFromRef();
+		}
+
+
+
 		bool wasTraced = checkIfBlueprintWasTraced(blueprintKey);		// check if the new key was actually traced by the contoured triangle
 
 		if (wasTraced == false)
@@ -93,12 +112,17 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 
 				fillerRunnerPrimaryLine.beginPointRealXYZ = fillerRunnerPrimaryLine.endPointRealXYZ;	// load the endpoint into the begin point.
 				ECBIntersectMeta intersectData = OrganicUtils::findClosestBlueprintIntersectionFromSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, primaryLineSlope, blueprintKey); // get the intersect data
+				
+				std::cout << "Primary line slope was: " << primaryLineSlope.x << ", " << primaryLineSlope.y << ", " << primaryLineSlope.z << std::endl;
+
 				fillerRunnerPrimaryLine.endPointRealXYZ = intersectData.intersectedPoint;			// load the new point into the line.
 				currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);           // set the new border lines based on the new blueprint key value.
 
-				//std::cout << "!!! new value of beginPointRealXYZ: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
-				//std::cout << "!!! new value of endPointRealXYZ: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
-				//std::cout << "!!! new blueprint key value: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+
+
+				std::cout << "##!!! new value of beginPointRealXYZ: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
+				std::cout << "##!!! new value of endPointRealXYZ: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
+				std::cout << "!!! new blueprint key value: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 
 				// check if current blueprint was filled
 				bool wasBlueprintFilled = checkIfBlueprintWasFilled(blueprintKey);
@@ -128,9 +152,33 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 				{
 					// std::cout << "!!! current blueprint was found as traced by the contour! >> (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 				}
+
+				//std::cout << "Continuing while... " << std::endl;
+				std::cout << "Continuing while, from base key: " << baseKey.x << ", " << baseKey.y << ", " << baseKey.z << std::endl;
+
+				if
+					(
+					(baseKey.x == -2)
+						&&
+						(baseKey.y == -3)
+						&&
+						(baseKey.z == 4)
+						)
+				{
+					int someVal = 3;
+
+					std::cout << "Resultant move vals are: " << resultantMoveVals.x << ", " << resultantMoveVals.y << ", " << resultantMoveVals.z << std::endl;
+					std::cout << "Checked blueprint key was: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+
+					std::cout << "Special halt...continue? " << std::endl;
+					std::cin >> someVal;
+				}
+
 			}
 		}
 	}
+
+	//std::cout << "Traversing to next blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 	/*
 	if (wasTraced == true)
 	{
@@ -172,6 +220,8 @@ void BlueprintFillerRunner::fillECBPolyLineWithPrimary(ECBPolyLine* in_polyLineR
 
 void BlueprintFillerRunner::applyMovementToBlueprintKey(ECBPolyPoint in_moveVals)
 {
+	// OLD: 8/19/2020 and previous:
+	/*
 	if (in_moveVals.x != 0)
 	{
 		blueprintKey.x += in_moveVals.x;
@@ -184,13 +234,42 @@ void BlueprintFillerRunner::applyMovementToBlueprintKey(ECBPolyPoint in_moveVals
 	{
 		blueprintKey.z += in_moveVals.z;
 	}
+	*/
+
+	// New, updated function: 8/20/2020;
+	// for the fix caused by:
+	//		constructMountainAtpoint(-32.12, 32.3, 32.73)
+
+
+	EnclaveKeyDef::EnclaveKey blueprintKeyCopy = blueprintKey; // before modifying the blueprint key, get its copy.
+	if (in_moveVals.x != 0)
+	{
+		EnclaveKeyDef::EnclaveKey x_complete = blueprintKeyCopy;
+		x_complete.x += in_moveVals.x;
+		checkIfBlueprintWasTraced(x_complete);
+		blueprintKey.x += in_moveVals.x;
+	}
+	if (in_moveVals.y != 0)
+	{
+		EnclaveKeyDef::EnclaveKey y_complete = blueprintKeyCopy;
+		y_complete.y += in_moveVals.y;
+		checkIfBlueprintWasTraced(y_complete);
+		blueprintKey.y += in_moveVals.y;
+	}
+	if (in_moveVals.z != 0)
+	{
+		EnclaveKeyDef::EnclaveKey z_complete = blueprintKeyCopy;
+		z_complete.z += in_moveVals.z;
+		checkIfBlueprintWasTraced(z_complete);
+		blueprintKey.z += in_moveVals.z;
+	}
 }
 
 bool BlueprintFillerRunner::checkIfBlueprintWasTraced(EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	//bool result = false;
 	auto keySearchResult = tracedBlueprintCountMapRef->find(in_blueprintKey);
-	//std::cout << "Checking if key " << in_blueprintKey.x << ", " << in_blueprintKey.y << ", " << in_blueprintKey.z << " was traced by the triangle..." << std::endl;
+	//std::cout << "Checking if key " << in_blueprintKey.x << ", " << in_blueprintKey.y << ", " << in_blueprintKey.z << " was traced by the triangle..." << std::endl;f
 	if (keySearchResult != tracedBlueprintCountMapRef->end())
 	{
 		//std::cout << ">>> Key was FOUND! " << std::endl;
@@ -203,6 +282,17 @@ bool BlueprintFillerRunner::checkIfBlueprintWasTraced(EnclaveKeyDef::EnclaveKey 
 	}
 	//return result;
 	return isRunComplete;
+}
+
+void BlueprintFillerRunner::printTracedBlueprintsFromRef()
+{
+	auto tracedBegin = tracedBlueprintCountMapRef->begin();
+	auto tracedEnd = tracedBlueprintCountMapRef->end();
+	std::cout << "Printing trace blueprint keys from ref..." << std::endl;
+	for (; tracedBegin != tracedEnd; tracedBegin++)
+	{
+		std::cout << tracedBegin->first.x << ", " << tracedBegin->first.y << ", " << tracedBegin->first.z << std::endl;
+	}
 }
 
 bool BlueprintFillerRunner::checkIfBlueprintWasFilled(EnclaveKeyDef::EnclaveKey in_blueprintKey)

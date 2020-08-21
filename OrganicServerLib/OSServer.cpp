@@ -521,6 +521,30 @@ void OSServer::constructTestBlueprints3()
 	executeDerivedContourPlan("mountain");
 }
 
+void OSServer::constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int in_numberOfLayers)
+{
+	std::cout << "||||||| Constructing Mountain at point, with " << in_numberOfLayers << " layers. " << std::endl;
+	ECBPolyPoint mountainSummit;
+	mountainSummit.x = in_summitX;
+	mountainSummit.y = in_summitY;
+	mountainSummit.z = in_summitZ;
+	int numberOfLayers = in_numberOfLayers;
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlan("mountain");
+}
+
 void OSServer::constructTestBlueprints3Special()
 {
 	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
@@ -687,6 +711,37 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 0.0f;
 	testPoint_2.y = 0.0f;
 	testPoint_2.z = 2.0f;
+	*/
+
+	// caused bug on 8/20/2020, at ~32000.12, 32000.3, 32000.73.
+	// fails when edgeThreshold = .0001 (8/21/2020)
+
+	testPoint_0.x = 0;
+	testPoint_0.y = 1.61;
+	testPoint_0.z = 3.06;
+
+	testPoint_1.x = 4;
+	testPoint_1.y = 1.54;
+	testPoint_1.z = 4;
+
+	testPoint_2.x = 4;
+	testPoint_2.y = 0.8;
+	testPoint_2.z = 2.98;
+
+	// fails when edgeThreshold = .00015 (8/21/2020)
+	
+	/*
+	testPoint_0.x = 3.42;
+	testPoint_0.y = 0.59;
+	testPoint_0.z = 0;
+
+	testPoint_1.x = 0.88;
+	testPoint_1.y = 4;
+	testPoint_1.z = 4;
+
+	testPoint_2.x = 0;
+	testPoint_2.y = 4;
+	testPoint_2.z = 2.83;
 	*/
 
 	/*

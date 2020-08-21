@@ -66,6 +66,7 @@ public:
 	void constructTestBlueprints();		// CONVERTED 
 	void constructTestBlueprints2();	// CONVERTED
 	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
+	void constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int numberOfLayers);
 	void constructTestBlueprints3Special();	// CONVERTED		// for mountain testing; 
 	void constructTestBlueprints3Micro();
 

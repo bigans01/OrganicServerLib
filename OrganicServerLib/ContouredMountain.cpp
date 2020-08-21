@@ -243,25 +243,25 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0,
 	testTriangle.determineAxisInterceptDistances();
 	for (int x = 0; x < 3; x++)
 	{
-		CursorPathTraceContainer x_container, y_container, z_container;
+		//CursorPathTraceContainer x_container, y_container, z_container;
 		ECBPolyPoint centroid = OrganicUtils::determineTriangleCentroid(testTriangle.trianglePoints[0], testTriangle.trianglePoints[1], testTriangle.trianglePoints[2]);
-		//x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
+		//x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox (THIS IS OBSOLETE, DO NOT USE)
 		//y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
 		//z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
 
-		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
-		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
-		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates
+		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 
 		EnclaveKeyDef::EnclaveKey blueprintKey;
-		blueprintKey.x = x_container.CollectionCoord;
-		blueprintKey.y = y_container.CollectionCoord;
-		blueprintKey.z = z_container.CollectionCoord;
+		//blueprintKey.x = x_container.CollectionCoord;
+		//blueprintKey.y = y_container.CollectionCoord;
+		//blueprintKey.z = z_container.CollectionCoord;
 
-		blueprintKey.x = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].x);
-		blueprintKey.y = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].y);
-		blueprintKey.z = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].z);
+		blueprintKey.x = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].x);
+		blueprintKey.y = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].y);
+		blueprintKey.z = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].z);
 
 		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
 		//currentTriKey.triKey[x] = blueprintKey;
@@ -287,24 +287,24 @@ void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unorde
 	testTriangle.determineAxisInterceptDistances();
 	for (int x = 0; x < 3; x++)
 	{
-		CursorPathTraceContainer x_container, y_container, z_container;
+		//CursorPathTraceContainer x_container, y_container, z_container;
 		ECBPolyPoint centroid = OrganicUtils::determineTriangleCentroid(testTriangle.trianglePoints[0], testTriangle.trianglePoints[1], testTriangle.trianglePoints[2]);
 		//x_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].x, centroid, 0);			// get precise accurate coordinates, relative to blueprint orthodox
 		//y_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].y, centroid, 1);
 		//z_container = OrganicUtils::getPreciseCoordinateForBlueprint(testTriangle.trianglePoints[x].z, centroid, 2);
 
-		x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
-		y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
-		z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
+		//x_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].x);			// get precise accurate coordinates, relative to blueprint orthodox
+		//y_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].y);
+		//z_container = OrganicUtils::getPreciseCoordinate(testTriangle.trianglePoints[x].z);
 
 		EnclaveKeyDef::EnclaveKey blueprintKey;
-		blueprintKey.x = x_container.CollectionCoord;
-		blueprintKey.y = y_container.CollectionCoord;
-		blueprintKey.z = z_container.CollectionCoord;
+		//blueprintKey.x = x_container.CollectionCoord;
+		//blueprintKey.y = y_container.CollectionCoord;
+		//blueprintKey.z = z_container.CollectionCoord;
 
-		blueprintKey.x = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].x);
-		blueprintKey.y = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].y);
-		blueprintKey.z = OrganicUtils::getPreciseCoordinateForBlueprintV2(testTriangle.trianglePoints[x].z);
+		blueprintKey.x = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].x);
+		blueprintKey.y = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].y);
+		blueprintKey.z = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(testTriangle.trianglePoints[x].z);
 
 		//currentTriPoint.triPoints[x] = testTriangle.trianglePoints[x];		// add this point and its assumed precise blueprint key
 		//currentTriKey.triKey[x] = blueprintKey;
@@ -657,7 +657,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//
 		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
 		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
-		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
+		//in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}
