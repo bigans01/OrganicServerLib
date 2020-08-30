@@ -716,6 +716,7 @@ void OSServer::constructSingleDebug()
 	// caused bug on 8/20/2020, at ~32000.12, 32000.3, 32000.73.
 	// fails when edgeThreshold = .0001 (8/21/2020)
 
+	
 	testPoint_0.x = 0;
 	testPoint_0.y = 1.61;
 	testPoint_0.z = 3.06;
@@ -727,6 +728,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 4;
 	testPoint_2.y = 0.8;
 	testPoint_2.z = 2.98;
+	
 
 	// fails when edgeThreshold = .00015 (8/21/2020)
 	
@@ -1123,6 +1125,15 @@ void OSServer::runPolyFracturerForAllBlueprints()
 	}
 }
 
+void OSServer::constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey)
+{
+	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_blueprintKey]; // fetch a pointer to the blueprint
+	BlueprintTransformRefs  transformRefs(&blueprintRef->primaryPolygonMap,
+										  &blueprintRef->fractureResults.fractureResultsContainerMap,
+										  &blueprintRef->polyGroupRangeMap);
+	OSWinAdapter::readBlueprintPolysFromFile(in_worldName, in_blueprintKey, transformRefs);
+}
+
 void OSServer::constructTestBlueprintsForContourBaseTesting()
 {
 	std::cout << "||||||| constructing blueprints for FRACTURING test.... (NEW ContourBase testing)" << std::endl;
@@ -1232,6 +1243,8 @@ void OSServer::constructTestBlueprintsForFracturing2()
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
 	transferBlueprintToLocalOS(in_key);
+
+	//std::cout  << "----> Sending blueprint to OrganicSystem: " << in_key.x << ", " << in_key.y << ", " << in_key.z << std::endl;
 	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
 	organicSystemPtr->addKeyToRenderList(in_key);
 }
@@ -1246,6 +1259,14 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	for (blueprintBegin; blueprintBegin != blueprintEnd; blueprintBegin++)
 	{
 		EnclaveKeyDef::EnclaveKey currentKey = blueprintBegin->first;
+
+		//std::cout << "----> Sending blueprint to OrganicSystem: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
+
+		//std::cout << "Poly groupRange size: " << blueprintBegin->second.polyGroupRangeMap.size() << std::endl;
+		//std::cout << "Poly map size: " << blueprintBegin->second.primaryPolygonMap.size() << std::endl;
+		//std::cout << "Raw enclave size: " << blueprintBegin->second.fractureResults.fractureResultsContainerMap.size() << std::endl;
+		//std::cout << "Skeleton container size: " << blueprintBegin->second.fractureResults.ske.size() << std::endl;
+
 		transferBlueprintToLocalOS(currentKey);
 		//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
 		organicSystemPtr->addKeyToRenderList(currentKey);

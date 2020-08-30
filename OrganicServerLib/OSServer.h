@@ -96,6 +96,8 @@ public:
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
 	void runPolyFracturerForAllBlueprints();
+
+	void constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey);
 private:
 	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
