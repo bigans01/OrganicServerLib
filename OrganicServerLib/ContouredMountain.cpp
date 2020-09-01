@@ -593,6 +593,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 
 	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key). At 
 	//			the same time, in the same loop, generate the raw enclave data for each affected blueprint.
+	/*
 	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
 	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
 	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
@@ -622,7 +623,42 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
 
 	}
+	*/
 
+	
+	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
+	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
+	//auto planPolyRegistryBeginV2 = 
+	auto adherenceListBegin = adherenceData.adherenceOrder.begin();
+	auto adherenceListEnd = adherenceData.adherenceOrder.end();
+	for (; adherenceListBegin != adherenceListEnd; adherenceListBegin++)
+	{
+		auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.find(*adherenceListBegin);	// find the blueprint
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
+		int foundGroupID = planPolyRegistryBegin->second.groupID;
+		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
+		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
+		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
+		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)
+		{
+			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
+			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
+			{
+				massDriverPolyRegistry.addToPolyset(blueprintKey, *forgedPolySetBegin);
+				//std::cout << "In blueprint, (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << "), polygon with ID: " << *forgedPolySetBegin << std::endl;
+			}
+		}
+
+		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+		EnclaveFractureResultsMap tempMap;
+		//in_clientRef->OS->produceRawEnclavesForPolySet(in_fractureResultsMapRef, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
+		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
+		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
+		OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &tempMap);
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+	}
+	
 
 	// Step 2) for each blueprint that contained at least one SHELL_MASSDRIVER, take the original forged poly registry set for that blueprint, and
 	//		   subtract the massDriverPolyRegistry set from it to produce a new set. This new set represents the OrganicTriangles that 

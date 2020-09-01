@@ -13,6 +13,7 @@
 #include "ECBPolyType.h"
 #include "BlueprintTransformRefs.h"
 #include "EnclaveFractureResultsMap.h"
+#include "PointAdherenceOrder.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)
@@ -26,6 +27,7 @@ public:
 	OSContourPlanDirections planDirections;
 	ForgedPolyRegistry planPolyRegistry;			// for any "shell" poly.
 	ForgedPolyRegistry massDriverPolyRegistry;		// only for "shell" polys which will become a mass driver.
+	PointAdherenceOrder adherenceData;
 
 	// virtual functions
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;

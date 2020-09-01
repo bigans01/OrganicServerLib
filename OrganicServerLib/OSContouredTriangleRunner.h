@@ -18,6 +18,7 @@
 #include "BlueprintFillerRunner.h"
 #include "BorderDataMap.h"
 #include "ForgedPolyRegistry.h"
+#include "PointAdherenceOrder.h"
 
 class OSContouredTriangleRunner
 {
@@ -25,15 +26,17 @@ class OSContouredTriangleRunner
 		OSContouredTriangleRunner(OSContouredTriangle* in_trianglePtr, 
 			OSContourPlanDirections in_contourPlanDirections, 
 			std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
-			ForgedPolyRegistry* in_forgedPolyRegistryRef
+			ForgedPolyRegistry* in_forgedPolyRegistryRef,
+			PointAdherenceOrder* in_adherenceOrderRef
 		) 
-			: contouredTrianglePtr(in_trianglePtr), planDirections(in_contourPlanDirections), blueprintMapRef(in_blueprintMapRef), runnerForgedPolyRegistryRef(in_forgedPolyRegistryRef) {}
+			: contouredTrianglePtr(in_trianglePtr), planDirections(in_contourPlanDirections), blueprintMapRef(in_blueprintMapRef), runnerForgedPolyRegistryRef(in_forgedPolyRegistryRef), adherenceOrderRef(in_adherenceOrderRef) {}
 
 		OSContouredTriangle* contouredTrianglePtr = NULL;	// initialize to null; set in initializer list anyway
 		OSContourPlanDirections planDirections;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
 		BorderDataMap borderDataMapInstance;
-		ForgedPolyRegistry* runnerForgedPolyRegistryRef;
+		ForgedPolyRegistry* runnerForgedPolyRegistryRef = NULL;	// set on constructor initialization
+		PointAdherenceOrder* adherenceOrderRef = NULL;			// ""
 
 		//PrimaryLineT1Array contourLineArray;
 

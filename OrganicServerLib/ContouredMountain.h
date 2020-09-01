@@ -9,6 +9,7 @@
 #include "OSContourLine.h"
 #include "CursorPathTraceContainer.h"
 #include "EnclaveFractureResultsMap.h"
+#include "OSServerUtils.h"
 #include <map>
 
 class ContouredMountain : public ContourBase

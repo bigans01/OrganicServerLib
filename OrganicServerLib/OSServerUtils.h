@@ -9,6 +9,7 @@
 #include "ECBIntersectMeta.h"
 #include "BlueprintTransformRefs.h"
 #include "OSWinAdapter.h"
+#include "PointAdherenceOrder.h"
 
 class OSServerUtils
 {
@@ -28,7 +29,7 @@ class OSServerUtils
 		static void writeBlueprintToDisk(std::string in_worldName, 
 										EnclaveKeyDef::EnclaveKey in_blueprintKey, 
 										std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);
-
+		static void runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, EnclaveKeyDef::EnclaveKey in_blueprintKey, EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef);
 };
 
 #endif

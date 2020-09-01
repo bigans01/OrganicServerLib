@@ -32,6 +32,7 @@
 #include "ContourBase.h"
 #include "ContouredMountain.h"
 #include "BlankContour.h"
+#include "PointAdherenceOrder.h"
 
 
 
@@ -105,7 +106,7 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 
-	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions);		// constructs primary polygon lines for each line of the contoured triangle that the 
+	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);

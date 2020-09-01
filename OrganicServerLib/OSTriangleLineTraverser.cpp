@@ -4,7 +4,7 @@
 #include "ECBIntersectMeta.h"
 #include "OSServer.h"
 
-OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr)
+OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr, PointAdherenceOrder* in_pointAdherenceOrderRef)
 //OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
 {
 	/*
@@ -32,6 +32,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	*/
 
 	contouredTriangleRef = in_TrianglePtr;
+	adherenceOrderRef = in_pointAdherenceOrderRef;
 
 	EnclaveKeyPair currentPair = contouredTriangleRef->keyPairArray[in_lineID].getBeginAndEndKeys();
 	beginKey = currentPair.keyA;
@@ -93,6 +94,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
+		adherenceOrderRef->attemptAdherentInsertion(beginKey);
 
 		ECBPolyLine newPolyLine;												// create a new poly line
 		//EnclaveCollectionBlueprint* testPtr = &(*blueprintMapRef)[beginKey];
@@ -145,6 +147,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
+		adherenceOrderRef->attemptAdherentInsertion(beginKey);
 		
 		OSServerUtils::analyzePolyValidityAndInsert(contouredTriangleRef,
 			resultantIntersect.originPoint,
@@ -247,6 +250,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//if (!(currentKey == endKey))	// don't update the count if it is the last one.
 		//{
 			in_TrianglePtr->insertTracedBlueprint(currentKey);
+			adherenceOrderRef->attemptAdherentInsertion(currentKey);
 		//}
 		//EnclaveCollectionBlueprint* blueprintPtr = &serverPtr->blueprintMap[currentKey];
 
@@ -280,6 +284,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
 		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
 		in_TrianglePtr->insertTracedBlueprint(currentKey);
+		adherenceOrderRef->attemptAdherentInsertion(currentKey);
 
 
 		OSServerUtils::analyzePolyValidityAndInsert(in_TrianglePtr, 

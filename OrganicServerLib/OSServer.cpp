@@ -1015,7 +1015,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 			// DEBUG ONLY, temporary
 			//if (triangleMapIterator->first == 79)
 			//{
-				traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+				traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
 				//std::cout << "###### Debug triangle points: " << std::endl;
 				//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << ", " << currentTriangle->trianglePoints[0].z << std::endl;
 				//std::cout << "1: " << currentTriangle->trianglePoints[1].x << ", " << currentTriangle->trianglePoints[1].y << ", " << currentTriangle->trianglePoints[1].z << std::endl;
@@ -1057,13 +1057,14 @@ void OSServer::executeDerivedContourPlan(string in_string)
 		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
 		{
 			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections);
+			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
 		}
 	}
 
 	std::cout << "######### Plan execution complete; " << std::endl;
 
-
+	//planPtr->ad
+	//planPtr->adherenceData.printAdherentData();		// testing only, for now.
 
 	//OSWinAdapter::clearWorldFolder(currentWorld);
 	
@@ -1280,11 +1281,11 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	std::cin >> someVal;
 }
 
-void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions)
+void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
 	//calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
 	//determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
-	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap, in_Triangle->forgedPolyRegistryRef);
+	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap, in_Triangle->forgedPolyRegistryRef, in_orderRef);
 	runner.performRun();
 }
 

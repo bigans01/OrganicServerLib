@@ -588,6 +588,8 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			//&(*blueprintMapRef)[currentKey];
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);			// traced blueprint set update (in case it wasn't inserted already.
+			adherenceOrderRef->attemptAdherentInsertion(incrementingKey);
+
 			ECBPolyLine newPolyLine;												// create a new poly line
 			OSServerUtils::fillLineMetaData(&newPolyLine, contouredTrianglePtr, in_pointID, contouredTrianglePtr->triangleLines[in_pointID].pointA,
 				contouredTrianglePtr->triangleLines[in_pointID].pointB);
@@ -618,8 +620,9 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 			OSServerUtils::fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
 			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
-			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
 
+			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
+			adherenceOrderRef->attemptAdherentInsertion(incrementingKey);
 			
 			OSServerUtils::analyzePolyValidityAndInsert(contouredTrianglePtr,
 				contouredTrianglePtr->triangleLines[in_pointID].pointA,
@@ -647,7 +650,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 	}
 	else								// points do not exist in same blueprint; run a OSTriangleLineTraverser
 	{
-		OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef);
+		OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef, adherenceOrderRef);
 		OSTriangleLineTraverser* lineRef = &lineTraverser;
 		while (!(lineRef->currentKey == lineRef->endKey))
 		{
@@ -782,7 +785,15 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 					// spawn a new primary line from THIS primary line; see "PrimaryLineT2IsolatedTracer" for reference in OrganicPolyOperationsLib.
 					//std::cout << "Initialized runner, for trace count 1 " << std::endl;
 					BlueprintFillerRunner fillerRunner;
-					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
+					fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], 
+						                    traversalController.blueprintTraverser.currentIterationBeginPoint, 
+											traversalController.blueprintTraverser.currentIterationEndpoint, 
+											currentKey, 
+											&contouredTrianglePtr->tracedBlueprintCountMap,
+											&contouredTrianglePtr->filledBlueprintMap, 
+											contouredTrianglePtr, 
+											blueprintMapRef,
+											adherenceOrderRef);
 				}
 				else if (traceCount == 2)
 				{
@@ -804,7 +815,15 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 							//std::cout << "This line is OPEN_MULTI!!! " << std::endl;
 							//std::cout << "Initialized runner, for trace count 2 " << std::endl;
 							BlueprintFillerRunner fillerRunner;
-							fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], traversalController.blueprintTraverser.currentIterationBeginPoint, traversalController.blueprintTraverser.currentIterationEndpoint, currentKey, &contouredTrianglePtr->tracedBlueprintCountMap, &contouredTrianglePtr->filledBlueprintMap, contouredTrianglePtr, blueprintMapRef);
+							fillerRunner.initialize(&in_contourLineArrayRef->linkArray[x], 
+													traversalController.blueprintTraverser.currentIterationBeginPoint, 
+													traversalController.blueprintTraverser.currentIterationEndpoint, 
+													currentKey, 
+													&contouredTrianglePtr->tracedBlueprintCountMap, 
+													&contouredTrianglePtr->filledBlueprintMap, 
+													contouredTrianglePtr, 
+													blueprintMapRef,
+													adherenceOrderRef);
 						}
 					}
 				}

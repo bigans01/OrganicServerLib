@@ -117,3 +117,8 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 										 &blueprintRef->polyGroupRangeMap);
 	OSWinAdapter::writeBlueprintsToFile(in_worldName, in_blueprintKey, transformRefs);
 }
+
+ void OSServerUtils::runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, EnclaveKeyDef::EnclaveKey in_blueprintKey, EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef)
+{
+	 // adherence code starts here
+}

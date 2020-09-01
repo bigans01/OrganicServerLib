@@ -10,17 +10,19 @@
 #include "EnclaveCollectionBlueprint.h"
 #include "OSServerUtils.h"
 #include "BorderDataMap.h"
+#include "PointAdherenceOrder.h"
 
 class OSTriangleLineTraverser
 {
 public:
 	//OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr);
-	OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr);
+	OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr, PointAdherenceOrder* in_pointAdherenceOrderRef);
 	EnclaveKeyDef::EnclaveKey beginKey;		// the beginning key = the key that point A lies in
 	EnclaveKeyDef::EnclaveKey currentKey;	// the current key value
 	EnclaveKeyDef::EnclaveKey nextKeyAdd;	// how much will be added to currentKey in the next iteration
 	EnclaveKeyDef::EnclaveKey endKey;		// the ending key = the key that point B lies in (will be done when this happens)
 	OSContouredTriangle* contouredTriangleRef;
+	PointAdherenceOrder* adherenceOrderRef;
 	BorderDataMap borderData;
 
 	ECBPolyPoint beginPoint;				// equals point A of line

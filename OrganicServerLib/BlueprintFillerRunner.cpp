@@ -1,7 +1,15 @@
 #include "stdafx.h"
 #include "BlueprintFillerRunner.h"
 
-void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint in_currentSegmentBegin, ECBPolyPoint in_currentSegmentEnd, EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, OSContouredTriangle* in_osTriangleRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
+void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, 
+									ECBPolyPoint in_currentSegmentBegin, 
+									ECBPolyPoint in_currentSegmentEnd, 
+									EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey, 
+									std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, 
+									std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, 
+									OSContouredTriangle* in_osTriangleRef, 
+									std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
+									PointAdherenceOrder* in_adherenceOrderRef)
 {
 	// get the intercept point of the referenced line
 	//ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
@@ -25,6 +33,7 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef, ECBPolyPoint i
 	contouredTrianglePtr = in_osTriangleRef;
 
 	baseKey = in_currentSegmentBlueprintKey;
+	adherenceOrderRef = in_adherenceOrderRef;
 
 	blueprintMapRef = in_blueprintMapRef;
 	fillerRunnerPrimaryLine = constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);	// assign the primary line
@@ -131,6 +140,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 					// fill the blueprint
 					//std::cout << "!! >>> Blueprint not found as filled, filling... (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << ") " << std::endl;
 					insertKeyAsFilledAndCreatePoly(blueprintKey);
+					adherenceOrderRef->attemptAdherentInsertion(blueprintKey);
 
 				}
 				else if (wasBlueprintFilled == true)
