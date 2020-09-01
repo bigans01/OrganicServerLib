@@ -118,7 +118,104 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 	OSWinAdapter::writeBlueprintsToFile(in_worldName, in_blueprintKey, transformRefs);
 }
 
- void OSServerUtils::runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, EnclaveKeyDef::EnclaveKey in_blueprintKey, EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef)
+ void OSServerUtils::runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, EnclaveKeyDef::EnclaveKey in_blueprintKey, EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef,
+	 std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveFractureResultsMap, EnclaveKeyDef::KeyHasher>* in_fractureResultsMapMap)
 {
 	 // adherence code starts here
+	 NeighboringBlueprints blueprintNeighborsToCheck(in_blueprintKey);																	// 1.) get NeighboringBlueprint list
+	 std::vector<AdherentDataList> candidateBlueprints = findAdherableBlueprints(in_pointAdherenceOrderRef, blueprintNeighborsToCheck);	// 2.) get the blueprints that we will have to check adherence for
+	 AdhesiveRunner adhesive(in_blueprintKey, candidateBlueprints, in_fractureResultsMapMap);											// 3.) start the adhesive runner
 }
+
+ std::vector<AdherentDataList> OSServerUtils::findAdherableBlueprints(PointAdherenceOrder* in_pointAdherenceOrderRef, NeighboringBlueprints in_neighboringBlueprints)
+ {
+
+	 std::vector<AdherentDataList> returnVector;
+
+
+
+	// std::cout << "----------Finding adherents of blueprint: " << in_neighboringBlueprints.originalKey.x << ", " << in_neighboringBlueprints.originalKey.y << ", " << in_neighboringBlueprints.originalKey.z << std::endl;
+
+	 // order of current blueprint
+	 int currentOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.originalKey];
+
+	 // check east blueprint
+	 auto east = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.eastKey);
+	 if (east != in_pointAdherenceOrderRef->adherenceRelationships.end())	// was the east found? OK, time to check its order.
+	 {
+		 int eastOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.eastKey];
+		 if (currentOrder > eastOrder)		// the blueprint we're checking must adhere to the east.
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::POS_X, in_neighboringBlueprints.eastKey, eastOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the EAST blueprint! (" << in_neighboringBlueprints.eastKey.x << ", " << in_neighboringBlueprints.eastKey.y << ", " << in_neighboringBlueprints.eastKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 // check north blueprint
+	 auto north = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.northKey);
+	 if (north != in_pointAdherenceOrderRef->adherenceRelationships.end())
+	 {
+		 int northOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.northKey];
+		 if (currentOrder > northOrder)
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::POS_Z, in_neighboringBlueprints.northKey, northOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the NORTH blueprint! (" << in_neighboringBlueprints.northKey.x << ", " << in_neighboringBlueprints.northKey.y << ", " << in_neighboringBlueprints.northKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 // check west blueprint
+	 auto west = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.westKey);
+	 if (west != in_pointAdherenceOrderRef->adherenceRelationships.end())
+	 {
+		 int westOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.westKey];
+		 if (currentOrder > westOrder)
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::NEG_X, in_neighboringBlueprints.westKey, westOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the WEST blueprint! (" << in_neighboringBlueprints.westKey.x << ", " << in_neighboringBlueprints.westKey.y << ", " << in_neighboringBlueprints.westKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 // check south blueprint
+	 auto south = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.southKey);
+	 if (south != in_pointAdherenceOrderRef->adherenceRelationships.end())
+	 {
+		 int southOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.southKey];
+		 if (currentOrder > southOrder)
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::NEG_Z, in_neighboringBlueprints.southKey, southOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the SOUTH blueprint! (" << in_neighboringBlueprints.southKey.x << ", " << in_neighboringBlueprints.southKey.y << ", " << in_neighboringBlueprints.southKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 // check above blueprint
+	 auto above = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.aboveKey);
+	 if (above != in_pointAdherenceOrderRef->adherenceRelationships.end())
+	 {
+		 int aboveOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.aboveKey];
+		 if (currentOrder > aboveOrder)
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::POS_Y, in_neighboringBlueprints.aboveKey, aboveOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the ABOVE blueprint! (" << in_neighboringBlueprints.aboveKey.x << ", " << in_neighboringBlueprints.aboveKey.y << ", " << in_neighboringBlueprints.aboveKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 // check below blueprint
+	 auto below = in_pointAdherenceOrderRef->adherenceRelationships.find(in_neighboringBlueprints.belowKey);
+	 if (below != in_pointAdherenceOrderRef->adherenceRelationships.end())
+	 {
+		 int belowOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.belowKey];
+		 if (currentOrder > belowOrder)
+		 {
+			 AdherentDataList adherentData(EuclideanDirection3D::NEG_Y, in_neighboringBlueprints.belowKey, belowOrder);
+			 returnVector.push_back(adherentData);
+			 //std::cout << "This blueprint adheres to the BELOW blueprint! (" << in_neighboringBlueprints.belowKey.x << ", " << in_neighboringBlueprints.belowKey.y << ", " << in_neighboringBlueprints.belowKey.z << ") " << std::endl;
+		 }
+	 }
+
+	 return returnVector;
+ }

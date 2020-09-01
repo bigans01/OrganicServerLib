@@ -13,8 +13,8 @@ class PointAdherenceOrder
 		void attemptAdherentInsertion(EnclaveKeyDef::EnclaveKey in_adherentKey);
 		void printAdherentData();
 		std::vector<EnclaveKeyDef::EnclaveKey> adherenceOrder;
-	private:
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> adherenceRelationships;
+	private:
 		int currentAdherentID = 0;
 };
 

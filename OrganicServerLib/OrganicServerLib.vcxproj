@@ -146,6 +146,8 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AdherentDataList.h" />
+    <ClInclude Include="AdhesiveRunner.h" />
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="CalibratableBlueprintKeyPair.h" />
@@ -176,6 +178,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AdhesiveRunner.cpp" />
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="BlueprintFillerRunner.cpp" />
     <ClCompile Include="CalibratableBlueprintKeyPair.cpp" />
