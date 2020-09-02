@@ -31,17 +31,27 @@ class AdhesiveRunner
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveFractureResultsMap, EnclaveKeyDef::KeyHasher>* enclaveFractureResultsMapMapRef;
 
 	private:
-		struct AdherentData	// struct for this class only
+		struct AdherentData	// struct for this class only (needs better description)
 		{
 			EuclideanDirection3D adherentDirection;			// direction
 			EnclaveKeyDef::EnclaveKey adherentBlueprintKey;	// blueprint key of the adherent
 		};
-		std::map<int, AdherentData> adherentDataMap;	
+
+		struct DiscoveredORELocation	// stores the location of a discovered, valid ORE in another blueprint
+		{
+			EnclaveKeyDef::EnclaveKey neighboringBlueprintKey;		// key of the neighboring blueprint the ORE was found in 
+			EnclaveKeyDef::EnclaveKey keyInNeighboringBlueprint;	// the key of the ORE in the neighboring blueprint
+		};
+
+		std::map<int, AdherentData> adherentDataMap;	// stores what directions we will be scanning against
+		std::unordered_map<EuclideanDirection3D, AdherentDataList> directionLookup;		// a lookup to check against when we performing the point calibration in each OrganicRawEnclave; used so that we may look up the order later.
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, OrganicRawEnclaveAdhesives, EnclaveKeyDef::KeyHasher> adhesiveRawEnclavesMap;
 
 		void performAdhesion();
 		void scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D in_euclideanDirection);
 		void insertAdhesiveData(EnclaveKeyDef::EnclaveKey in_adhesiveEnclaveKey, OrganicRawEnclave* in_organicRawEnclaveRef, EuclideanDirection3D in_euclideanDirection);
+		void runPointAdhesions();
+		EnclaveKeyDef::EnclaveKey findBorderingOrganicRawEnclaveToCompareAgainst(EuclideanDirection3D in_euclideanDirection, EnclaveKeyDef::EnclaveKey in_currentOrganicRawEnclaveKey);
 
 };
 

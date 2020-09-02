@@ -9,6 +9,7 @@
 class AdherentDataList
 {
 	public:
+		AdherentDataList() {};
 		AdherentDataList(EuclideanDirection3D in_adherentDirection, EnclaveKeyDef::EnclaveKey in_adherentBlueprintKey, int in_adherentOrder) : adherentDirection(in_adherentDirection), adherentBlueprintKey(in_adherentBlueprintKey), adherentOrder(in_adherentOrder) {}
 		EuclideanDirection3D adherentDirection;			// direction
 		EnclaveKeyDef::EnclaveKey adherentBlueprintKey;	// blueprint key of the adherent
