@@ -108,6 +108,9 @@
     <ClInclude Include="AdhesiveRunner.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OrganicRawEnclaveAdhesives.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

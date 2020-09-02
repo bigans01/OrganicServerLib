@@ -658,12 +658,13 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
 
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
+		containerMapMap[blueprintKey] = tempMap;
 		if (currentAdherenceIndex > 0)																						// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
-			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &tempMap, &containerMapMap);				// 2.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
+			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 2.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
-		containerMapMap[blueprintKey] = tempMap;																			// 3.) Copy the EnclaveFractureResultsMap into the temporary map, after we've done adherence
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// 4.) spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+		//containerMapMap[blueprintKey] = tempMap;																			// 3.) Copy the EnclaveFractureResultsMap into the temporary map, after we've done adherence
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&containerMapMap[blueprintKey], blueprintToCheck);					// 4.) spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
 		currentAdherenceIndex++;
 	}
 	

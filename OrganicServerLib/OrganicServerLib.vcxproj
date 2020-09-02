@@ -153,6 +153,7 @@
     <ClInclude Include="CalibratableBlueprintKeyPair.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
+    <ClInclude Include="OrganicRawEnclaveAdhesives.h" />
     <ClInclude Include="OSBlueprintTraversalController.h" />
     <ClInclude Include="OSCommandDirector.h" />
     <ClInclude Include="OSContouredTriangleRunner.h" />
