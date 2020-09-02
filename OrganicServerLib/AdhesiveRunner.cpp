@@ -53,7 +53,7 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan for east
 	if (in_euclideanDirection == EuclideanDirection3D::POS_X)
 	{
-		std::cout << "Scanning pos X..." << std::endl;
+		//std::cout << "Scanning pos X..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 			// to qualify as an adhesive to the blueprint border at +X, the X value of the OrganicRawEnclave's key must be 7.
@@ -67,7 +67,7 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan for north
 	if (in_euclideanDirection == EuclideanDirection3D::POS_Z)
 	{
-		std::cout << "Scanning pos Z..." << std::endl;
+		//std::cout << "Scanning pos Z..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 			// to qualify as an adhesive to the blueprint border at +Z, the Z value of the OrganicRawEnclave's key must be 7.
@@ -81,7 +81,7 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan for west
 	if (in_euclideanDirection == EuclideanDirection3D::NEG_X)
 	{
-		std::cout << "Scanning neg X..." << std::endl;
+		//std::cout << "Scanning neg X..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 			// to qualify as an adhesive to the blueprint border at -X, the X value of the OrganicRawEnclave's key must be 0.
@@ -95,7 +95,7 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan south
 	if (in_euclideanDirection == EuclideanDirection3D::NEG_Z)
 	{
-		std::cout << "Scanning neg Z..." << std::endl;
+		//std::cout << "Scanning neg Z..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 			// to qualify as an adhesive to the blueprint border at -Z, the Z value of the OrganicRawEnclave's key must be 0.
@@ -109,13 +109,13 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan above
 	if (in_euclideanDirection == EuclideanDirection3D::POS_Y)
 	{
-		std::cout << "Scanning pos Y..." << std::endl;
+		//std::cout << "Scanning pos Y..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 			// to qualify as an adhesive to the blueprint border at +Y, the Y value of the OrganicRawEnclave's key must be 7.
 			if (originalResultsBegin->first.y == 7)
 			{
-				std::cout << "Adherent found: " << originalResultsBegin->first.x << ", " << originalResultsBegin->first.y << ", " << originalResultsBegin->first.z << std::endl;
+				//std::cout << "Adherent found: " << originalResultsBegin->first.x << ", " << originalResultsBegin->first.y << ", " << originalResultsBegin->first.z << std::endl;
 				insertAdhesiveData(originalResultsBegin->first, &originalResultsBegin->second, in_euclideanDirection);
 			}
 		}
@@ -124,7 +124,7 @@ void AdhesiveRunner::scanForOrganicRawEnclavesViaDirection(EuclideanDirection3D 
 	// scan below
 	if (in_euclideanDirection == EuclideanDirection3D::NEG_Y)
 	{
-		std::cout << "Scanning neg Y..." << std::endl;
+		//std::cout << "Scanning neg Y..." << std::endl;
 		for (; originalResultsBegin != originalResultsEnd; originalResultsBegin++)
 		{
 
@@ -169,36 +169,22 @@ void AdhesiveRunner::runPointAdhesions()
 		for (; directionsBegin != directionsEnd; directionsBegin++)
 		{
 			// use the direction value to get the blueprint key to lookup against
-			EnclaveKeyDef::EnclaveKey blueprintKeyToCompareTo = directionLookup[*directionsBegin].adherentBlueprintKey;
-
-			// check to see if it exists in the enclaveFractureResultsMapMapRef
-			/*
-			std::string found = "NOT FOUND";	// should get changed below
-			auto wereResultsFound = enclaveFractureResultsMapMapRef->find(blueprintKeyToCompareTo);
-			if (wereResultsFound != enclaveFractureResultsMapMapRef->end())	// it was found, which is what we want
-			{
-				found = "FOUND";
-			}
-
-			std::cout << "Neighboring Fracture results at (" << blueprintKeyToCompareTo.x << ", " << blueprintKeyToCompareTo.y << ", " << blueprintKeyToCompareTo.z << ") were " << found << std::endl;
-			*/
-
+			EnclaveKeyDef::EnclaveKey blueprintKeyToCompareTo = directionLookup[*directionsBegin].adherentBlueprintKey;								// fetch the EnclaveFractureResultsMap of the blueprint we're comparing against
 			EnclaveFractureResultsMap* neighboringResultsMapRef = &enclaveFractureResultsMapMapRef->find(blueprintKeyToCompareTo)->second;
 			EnclaveKeyDef::EnclaveKey neighboringOrganicRawEnclaveKey = findBorderingOrganicRawEnclaveToCompareAgainst(*directionsBegin, adhesiveRawEnclavesMapBegin->first);
 
 			// ensure the neighboring OrganicRawEnclave exists; if it does, we'll put it into the new direction list. If it doesn't exist, don't bother comparing against it.
 			std::string neighborRawEnclaveFound = "NOT FOUND";
-			bool wasFoundInNeighboringEnclave = false;
 			auto wasNeighboringRawEnclaveFound = neighboringResultsMapRef->fractureResultsContainerMap.find(neighboringOrganicRawEnclaveKey);
 			if (wasNeighboringRawEnclaveFound != neighboringResultsMapRef->fractureResultsContainerMap.end())
 			{
 				neighborRawEnclaveFound = "FOUND";
 				DiscoveredORELocation oreLocation;
-				oreLocation.neighboringBlueprintKey = blueprintKeyToCompareTo;
-				oreLocation.keyInNeighboringBlueprint = neighboringOrganicRawEnclaveKey;
-				validCheckableDirections[directionLookup[*directionsBegin].adherentOrder] = oreLocation;	// the key value of this map is equal to the order of the direction we looked at. This is 
+				oreLocation.direction = *directionsBegin;													// store the euclidean direction		
+				oreLocation.neighboringBlueprintKey = blueprintKeyToCompareTo;								// the key of the EnclaveFractureResultsMap to look in 
+				oreLocation.keyInNeighboringBlueprint = neighboringOrganicRawEnclaveKey;					// the key of the OrganicRawEnclave in the neighboring EnclaveFractureResultsMap
+				validCheckableDirections[directionLookup[*directionsBegin].adherentOrder] = oreLocation;	// the key value of this map is equal to the order of the direction we looked at. This is 																						
 																											// done so that we perform the point adhesion in the appropriate order, since std::map orders automatically.
-				wasFoundInNeighboringEnclave = true;
 			}
 
 			// cycle through the validCheckableDirections map, and use the value in each iteration for a function call to perform the point adhesion.

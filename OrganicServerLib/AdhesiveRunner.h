@@ -39,6 +39,7 @@ class AdhesiveRunner
 
 		struct DiscoveredORELocation	// stores the location of a discovered, valid ORE in another blueprint
 		{
+			EuclideanDirection3D direction;
 			EnclaveKeyDef::EnclaveKey neighboringBlueprintKey;		// key of the neighboring blueprint the ORE was found in 
 			EnclaveKeyDef::EnclaveKey keyInNeighboringBlueprint;	// the key of the ORE in the neighboring blueprint
 		};
