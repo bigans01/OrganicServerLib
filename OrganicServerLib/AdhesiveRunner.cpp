@@ -3,7 +3,7 @@
 
 void AdhesiveRunner::performAdhesion()
 {
-	std::cout << "++++++running adhesion for blueprint: " << originalBlueprintKey.x << ", " << originalBlueprintKey.y << ", " << originalBlueprintKey.z << std::endl;
+	//std::cout << "++++++running adhesion for blueprint: " << originalBlueprintKey.x << ", " << originalBlueprintKey.y << ", " << originalBlueprintKey.z << std::endl;
 
 	// load the adherent data map
 	auto adherentListBegin = adherentDataListVector.begin();
@@ -158,7 +158,7 @@ void AdhesiveRunner::runPointAdhesions()
 	auto adhesiveRawEnclavesMapEnd = adhesiveRawEnclavesMap.end();
 	for (; adhesiveRawEnclavesMapBegin != adhesiveRawEnclavesMapEnd; adhesiveRawEnclavesMapBegin++)
 	{
-		std::cout << "Performing point adhesion for OrganicRawEnclave with key: " << adhesiveRawEnclavesMapBegin->first.x << ", " << adhesiveRawEnclavesMapBegin->first.y << ", " << adhesiveRawEnclavesMapBegin->first.z << std::endl;
+		//std::cout << "Performing point adhesion for OrganicRawEnclave with key: " << adhesiveRawEnclavesMapBegin->first.x << ", " << adhesiveRawEnclavesMapBegin->first.y << ", " << adhesiveRawEnclavesMapBegin->first.z << std::endl;
 
 		// the vector where we will store the actual directions to compare against, once we've checked that an OrganicRawEnclave exists that we can check against.
 		std::map<int, DiscoveredORELocation> validCheckableDirections;	// will automatically order these for us
@@ -181,27 +181,342 @@ void AdhesiveRunner::runPointAdhesions()
 				neighborRawEnclaveFound = "FOUND";
 				DiscoveredORELocation oreLocation;
 				oreLocation.direction = *directionsBegin;													// store the euclidean direction		
+				oreLocation.enclaveFractureResultsMapRef = neighboringResultsMapRef;
 				oreLocation.neighboringBlueprintKey = blueprintKeyToCompareTo;								// the key of the EnclaveFractureResultsMap to look in 
 				oreLocation.keyInNeighboringBlueprint = neighboringOrganicRawEnclaveKey;					// the key of the OrganicRawEnclave in the neighboring EnclaveFractureResultsMap
 				validCheckableDirections[directionLookup[*directionsBegin].adherentOrder] = oreLocation;	// the key value of this map is equal to the order of the direction we looked at. This is 																						
 																											// done so that we perform the point adhesion in the appropriate order, since std::map orders automatically.
 			}
 
-			// cycle through the validCheckableDirections map, and use the value in each iteration for a function call to perform the point adhesion.
-			auto validsBegin = validCheckableDirections.begin();
-			auto validsEnd = validCheckableDirections.end();
-			for (; validsBegin != validsEnd; validsBegin++)
-			{
-
-			}
+			
 
 			//std::cout << "Check for the neighboring OrganicRawEnclave at (" << neighboringOrganicRawEnclaveKey.x << ", " << neighboringOrganicRawEnclaveKey.y << ", " << neighboringOrganicRawEnclaveKey.z
 			//	<< "), in blueprint (" << blueprintKeyToCompareTo.x << ", " << blueprintKeyToCompareTo.y << ", " << blueprintKeyToCompareTo.z << ") "
-			//	<< " was " << neighborRawEnclaveFound << std::endl;
+				//<< " was " << neighborRawEnclaveFound << std::endl;
 		}
 
+		// cycle through the validCheckableDirections map, and use the value in each iteration for a function call to perform the point adhesion.
+		//auto validsBegin = validCheckableDirections.begin();
+		//auto validsEnd = validCheckableDirections.end();
+		//for (; validsBegin != validsEnd; validsBegin++)
+		//{
+		
+		//}
+
+		applyAdhesions(adhesiveRawEnclavesMapBegin->first, adhesiveRawEnclavesMapBegin->second.organicRawEnclaveRef, validCheckableDirections);		// the enclave key parameter here is for testing only; it can be removed later (9/3/2020)
 		//std::cout << "++ Number of valids to compare against is: " << validCheckableDirections.size() << std::endl;
+
+		// ************************testing only
+		if
+		(
+			(adhesiveRawEnclavesMapBegin->first.x == 0)
+			&&
+			(adhesiveRawEnclavesMapBegin->first.y == 7)
+			&&
+			(adhesiveRawEnclavesMapBegin->first.z == 7)
+		)
+		{
+			//std::cout << "##### setting to TRUE" << std::endl;
+			//testOutput = true;
+
+			//std::cout << "Testing halt, enter number to continue. " << std::endl;
+			//int someVal = 3;
+			//std::cin >> someVal;
+		}
 	}
+}
+
+void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations)
+{
+	//std::cout << "+++ passed in original key is: " << in_originalRawEnclaveKey.x << ", " << in_originalRawEnclaveKey.y << ", " << in_originalRawEnclaveKey.z << std::endl;
+	bool testOutput = false;
+	if
+	(
+		(in_originalRawEnclaveKey.x == 0)
+		&&
+		(in_originalRawEnclaveKey.y == 7)
+		&&
+		(in_originalRawEnclaveKey.z == 7)
+	)
+	{
+		//std::cout << "##### setting to TRUE" << std::endl;
+		testOutput = true;
+	}
+
+	// for each direction in the oreLocations map, get the localized values (that is, how the points in the neighboring ORE would appear in the original ORE) of the points in the OrganicRawEnclave that the direction is associated with
+	auto locationsBegin = in_oreLocations.begin();
+	auto locationsEnd = in_oreLocations.end();
+	//std::cout << "Size of passed-in OreLocations: " << in_oreLocations.size() << std::endl;
+	
+	for (; locationsBegin != locationsEnd; locationsBegin++)
+	{
+		//std::cout << "## Running location " << std::endl;
+		std::vector<ECBPolyPoint> localizedPoints = acquireLocalizedPointsFromDiscoveredORELocation(locationsBegin->second);
+
+		// ************************testing only
+		/*
+		if (testOutput == true)
+		{
+			// output the direction we acquired from
+			if (locationsBegin->second.direction == EuclideanDirection3D::POS_X)
+			{
+				std::cout << "Acquiried the following from the EAST: " << std::endl;
+			}
+			else if (locationsBegin->second.direction == EuclideanDirection3D::POS_Z)
+			{
+				std::cout << "Acquiried the following from the NORTH: " << std::endl;
+			}
+			else if (locationsBegin->second.direction == EuclideanDirection3D::NEG_X)
+			{
+				std::cout << "Acquiried the following from the WEST: " << std::endl;
+			}
+			else if (locationsBegin->second.direction == EuclideanDirection3D::NEG_Z)
+			{
+				std::cout << "Acquiried the following from the SOUTH: " << std::endl;
+			}
+			else if (locationsBegin->second.direction == EuclideanDirection3D::POS_Y)
+			{
+				std::cout << "Acquiried the following from the ABOVE: " << std::endl;
+			}
+			else if (locationsBegin->second.direction == EuclideanDirection3D::NEG_Y)
+			{
+				std::cout << "Acquiried the following from the BELOW: " << std::endl;
+			}
+
+
+			auto localizedPointsBegin = localizedPoints.begin();
+			auto localizedPointsEnd = localizedPoints.end();
+			for (; localizedPointsBegin != localizedPointsEnd; localizedPointsBegin++)
+			{
+				std::cout << "Localized new point: " << localizedPointsBegin->x << ", " << localizedPointsBegin->y << ", " << localizedPointsBegin->z << std::endl;
+			}
+		}
+		*/
+		//std::cout << "## Finished running location. " << std::endl;
+	}
+	
+
+	// cycle through the enclave triangle containers in the OrganicRawEnclave, and have each go through the oreLocations map.
+	
+
+	// test the ref
+	//int someVal = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.size();
+	//std::cout << "### Test size: " << someVal;
+
+	
+	auto enclaveTriangleContainersBegin = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.begin();
+	auto enclaveTriangleContainersEnd = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.end();
+	for (; enclaveTriangleContainersBegin != enclaveTriangleContainersEnd; enclaveTriangleContainersBegin++)
+	{
+		// for each triangle in the container, apply the oreLocations
+		auto currentEnclaveTriangleBegin = enclaveTriangleContainersBegin->second.triangles.begin();
+		auto currentEnclaveTriangleEnd = enclaveTriangleContainersBegin->second.triangles.end();
+		for (; currentEnclaveTriangleBegin != currentEnclaveTriangleEnd; currentEnclaveTriangleBegin++)
+		{
+
+			// ***************************** testing only
+			/*
+			if (testOutput == true)
+			{
+				std::cout << "------Points for original ORE triangle " << std::endl;
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
+					std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
+				}
+			}
+			*/
+		}
+	}
+	
+}
+
+std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation)
+{
+	std::vector<ECBPolyPoint> returnVector;
+	UniquePointVector uniquePoints;
+	if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_X)		// if we're looking towards the EAST, points lying in the neighboring OrganicRawEnclave must lie on the WEST face of the OrganicRawEnlave (x must be = 0); the localized X value of each of these points will be 4
+	{
+		//std::cout << "Entered POS_X" << std::endl;
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.x == 0.0f) // it is on the WEST border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.x = 4.0f;				    // then translate to localized coordinates, making it on the EAST border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+	}
+
+	else if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_Z)	// if we're looking towards the NORTH, points lying in the neighboring OrganicRawEnclave must lie on the SOUTH face of the OrganicRawEnclave (z must be = 0); the localized Z value of each of these points will be 4
+	{
+		//std::cout << "Entered POS_Z" << std::endl;
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.z == 0.0f) // it is on the SOUTH border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.z = 4.0f;				    // then translate to localized coordinates, making it on the NORTH border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+	}
+
+	else if (in_discoveredORELocation.direction == EuclideanDirection3D::NEG_X) // if we're looking towards the WEST, points lying in the neighboring OrganicRawEnclave must lie on the EAST face of the OrganicRawEnclave (x must be = 4); the localized X value of each of these points will be 0
+	{
+		//std::cout << "Entered NEG_X" << std::endl;
+
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.x == 4.0f) // it is on the EAST border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.x = 0.0f;				    // then translate to localized coordinates, making it on the WEST border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+
+		//std::cout << "finished NEG_X" << std::endl;
+	}
+
+	else if (in_discoveredORELocation.direction == EuclideanDirection3D::NEG_Z) // if we're looking towards the SOUTH, points lying in the neighboring OrganicRawEnclave must lie on the NORTH face of the OrganicRawEnclave (z must be = 4); the localized X value of each of these points will be 0
+	{
+		//std::cout << "Entered NEG_Z" << std::endl;
+
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.z == 4.0f) // it is on the NORTH border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.z = 0.0f;				    // then translate to localized coordinates, making it on the SOUTH border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+	}
+
+	else if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_Y) // if we're looking towards the ABOVE, points lying in the neighboring OrganicRawEnclave must lie on the BELOW face of the OrganicRawEnclave (y must be = 0); the localized Y value of each of these points will be 4
+	{
+		//std::cout << "Entered POS_Y" << std::endl;
+
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.y == 0.0f) // it is on the BELOW border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.y = 4.0f;				    // then translate to localized coordinates, making it on the ABOVE border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+	}
+
+	else if (in_discoveredORELocation.direction == EuclideanDirection3D::NEG_Y)	// if we're looking towards the BELOW, points lying in the neighboring OrganicRawEnclave must lie on the ABOVE face of the OrganicRawEnclave (y must be = 4); the localized Y value of each of these points will be 0
+	{
+		//std::cout << "Entered NEG_Y" << std::endl;
+
+
+		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
+		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
+		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		{
+			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			{
+				// cycle through each point in the triangle, via point A in its lineArray
+				for (int x = 0; x < 3; x++)
+				{
+					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (currentPoint.y == 4.0f) // it is on the ABOVE border in the neighboring ORE
+					{
+						ECBPolyPoint localizedPoint = currentPoint; // copy, 
+						localizedPoint.y = 0.0f;				    // then translate to localized coordinates, making it on the BELOW border of the target ORE we're modifying
+						uniquePoints.insertPoint(localizedPoint);
+					}
+				}
+			}
+		}
+	}
+
+	returnVector = uniquePoints.points;	// store the result, then return
+	return returnVector;
 }
 
 EnclaveKeyDef::EnclaveKey AdhesiveRunner::findBorderingOrganicRawEnclaveToCompareAgainst(EuclideanDirection3D in_euclideanDirection, EnclaveKeyDef::EnclaveKey in_currentOrganicRawEnclaveKey)

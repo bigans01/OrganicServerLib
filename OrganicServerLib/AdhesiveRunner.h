@@ -11,6 +11,7 @@
 #include <EnclaveFractureResultsMap.h>
 #include "OrganicRawEnclave.h"
 #include "OrganicRawEnclaveAdhesives.h"
+#include "UniquePointVector.h"
 
 
 class AdhesiveRunner
@@ -39,7 +40,9 @@ class AdhesiveRunner
 
 		struct DiscoveredORELocation	// stores the location of a discovered, valid ORE in another blueprint
 		{
+			//OrganicRawEnclave* orginalRawEnclaveRef = NULL;
 			EuclideanDirection3D direction;
+			EnclaveFractureResultsMap* enclaveFractureResultsMapRef;
 			EnclaveKeyDef::EnclaveKey neighboringBlueprintKey;		// key of the neighboring blueprint the ORE was found in 
 			EnclaveKeyDef::EnclaveKey keyInNeighboringBlueprint;	// the key of the ORE in the neighboring blueprint
 		};
@@ -53,6 +56,8 @@ class AdhesiveRunner
 		void insertAdhesiveData(EnclaveKeyDef::EnclaveKey in_adhesiveEnclaveKey, OrganicRawEnclave* in_organicRawEnclaveRef, EuclideanDirection3D in_euclideanDirection);
 		void runPointAdhesions();
 		EnclaveKeyDef::EnclaveKey findBorderingOrganicRawEnclaveToCompareAgainst(EuclideanDirection3D in_euclideanDirection, EnclaveKeyDef::EnclaveKey in_currentOrganicRawEnclaveKey);
+		void applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations);
+		std::vector<ECBPolyPoint> acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation);
 
 };
 

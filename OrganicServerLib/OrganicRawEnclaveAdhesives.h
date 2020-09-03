@@ -14,13 +14,14 @@ class OrganicRawEnclaveAdhesives
 		OrganicRawEnclaveAdhesives() {}
 		OrganicRawEnclaveAdhesives(OrganicRawEnclave* in_organicRawEnclaveRef, EuclideanDirection3D in_euclideanDirection) //: organicRawEnclaveRef(in_organicRawEnclaveRef)
 		{
+			organicRawEnclaveRef = in_organicRawEnclaveRef;
 			adhesiveDirections.push_back(in_euclideanDirection);	// when initialize, push back the first value.
 		}
 		void insertDirection(EuclideanDirection3D in_euclideanDirection)
 		{
 			adhesiveDirections.push_back(in_euclideanDirection);
 		}
-		OrganicRawEnclave* organicRawEnclaveRef;
+		OrganicRawEnclave* organicRawEnclaveRef;						// the original ORE that will be compared with its neighbors
 		std::vector<EuclideanDirection3D> adhesiveDirections;
 	private:
 		//OrganicRawEnclave* organicRawEnclaveRef;
