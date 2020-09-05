@@ -211,9 +211,9 @@ void AdhesiveRunner::runPointAdhesions()
 		(
 			(adhesiveRawEnclavesMapBegin->first.x == 0)
 			&&
-			(adhesiveRawEnclavesMapBegin->first.y == 7)
+			(adhesiveRawEnclavesMapBegin->first.y == 0)
 			&&
-			(adhesiveRawEnclavesMapBegin->first.z == 7)
+			(adhesiveRawEnclavesMapBegin->first.z == 0)
 		)
 		{
 			//std::cout << "##### setting to TRUE" << std::endl;
@@ -234,9 +234,9 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	(
 		(in_originalRawEnclaveKey.x == 0)
 		&&
-		(in_originalRawEnclaveKey.y == 7)
+		(in_originalRawEnclaveKey.y == 0)
 		&&
-		(in_originalRawEnclaveKey.z == 7)
+		(in_originalRawEnclaveKey.z == 0)
 	)
 	{
 		//std::cout << "##### setting to TRUE" << std::endl;
@@ -247,14 +247,25 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	auto locationsBegin = in_oreLocations.begin();
 	auto locationsEnd = in_oreLocations.end();
 	//std::cout << "Size of passed-in OreLocations: " << in_oreLocations.size() << std::endl;
-	
+
+	std::map<int, LocalizedPointsMetaData> metaDataMap;
 	for (; locationsBegin != locationsEnd; locationsBegin++)
 	{
 		//std::cout << "## Running location " << std::endl;
 		std::vector<ECBPolyPoint> localizedPoints = acquireLocalizedPointsFromDiscoveredORELocation(locationsBegin->second);
 
+		// if there were points found in the vector, then we know there is at least 1 normalized point.
+		if (!localizedPoints.empty())
+		{
+
+			// store the resulting, newly localized points into a map
+			int currentOrder = directionLookup[locationsBegin->second.direction].adherentOrder;
+			LocalizedPointsMetaData currentMetaData(locationsBegin->second.direction, localizedPoints);
+			metaDataMap[currentOrder] = currentMetaData;
+		}
+
 		// ************************testing only
-		/*
+		
 		if (testOutput == true)
 		{
 			// output the direction we acquired from
@@ -288,10 +299,10 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 			auto localizedPointsEnd = localizedPoints.end();
 			for (; localizedPointsBegin != localizedPointsEnd; localizedPointsBegin++)
 			{
-				std::cout << "Localized new point: " << localizedPointsBegin->x << ", " << localizedPointsBegin->y << ", " << localizedPointsBegin->z << std::endl;
+				//std::cout << "Localized new point: " << localizedPointsBegin->x << ", " << localizedPointsBegin->y << ", " << localizedPointsBegin->z << std::endl;
 			}
 		}
-		*/
+		
 		//std::cout << "## Finished running location. " << std::endl;
 	}
 	
@@ -315,20 +326,36 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 		{
 
 			// ***************************** testing only
-			/*
+			
 			if (testOutput == true)
 			{
-				std::cout << "------Points for original ORE triangle " << std::endl;
+				//std::cout << "------Points for original ORE triangle [container: " << enclaveTriangleContainersBegin->first << "][triangle index: " << currentEnclaveTriangleBegin->first << "]" << std::endl;
 				for (int x = 0; x < 3; x++)
 				{
 					ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
-					std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
+					//std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
 				}
 			}
-			*/
+			
+			adhereEnclaveTriangleToLocalizedPoints(metaDataMap, &currentEnclaveTriangleBegin->second);
+			// run the metadata map through each enclave triangle
+
 		}
 	}
 	
+}
+
+void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef)
+{
+	AdhesiveResults results(in_enclaveTriangleRef->lineArray[0].pointA, in_enclaveTriangleRef->lineArray[1].pointA, in_enclaveTriangleRef->lineArray[2].pointA);
+	results.applyMetaDataMap(in_localizedPointsMetaDataMap);
+	if (results.scanResults() == true)
+	{
+		//std::cout << "###++++ NOTICE: this enclave triangle requires reform!! " << std::endl;
+
+		// initialize reform...
+		in_enclaveTriangleRef->reform(results.pointData[0].currentMatchedPointValue, results.pointData[1].currentMatchedPointValue, results.pointData[2].currentMatchedPointValue);
+	}
 }
 
 std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation)

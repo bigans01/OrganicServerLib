@@ -12,6 +12,8 @@
 #include "OrganicRawEnclave.h"
 #include "OrganicRawEnclaveAdhesives.h"
 #include "UniquePointVector.h"
+#include "LocalizedPointsMetaData.h"
+#include "AdhesiveResults.h"
 
 
 class AdhesiveRunner
@@ -58,6 +60,7 @@ class AdhesiveRunner
 		EnclaveKeyDef::EnclaveKey findBorderingOrganicRawEnclaveToCompareAgainst(EuclideanDirection3D in_euclideanDirection, EnclaveKeyDef::EnclaveKey in_currentOrganicRawEnclaveKey);
 		void applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations);
 		std::vector<ECBPolyPoint> acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation);
+		void adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef);
 
 };
 

@@ -111,6 +111,12 @@
     <ClInclude Include="OrganicRawEnclaveAdhesives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="LocalizedPointsMetaData.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AdhesiveResults.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -177,6 +183,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AdhesiveRunner.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AdhesiveResults.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

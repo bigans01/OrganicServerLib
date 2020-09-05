@@ -147,12 +147,14 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AdherentDataList.h" />
+    <ClInclude Include="AdhesiveResults.h" />
     <ClInclude Include="AdhesiveRunner.h" />
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="CalibratableBlueprintKeyPair.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
+    <ClInclude Include="LocalizedPointsMetaData.h" />
     <ClInclude Include="OrganicRawEnclaveAdhesives.h" />
     <ClInclude Include="OSBlueprintTraversalController.h" />
     <ClInclude Include="OSCommandDirector.h" />
@@ -179,6 +181,7 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AdhesiveResults.cpp" />
     <ClCompile Include="AdhesiveRunner.cpp" />
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="BlueprintFillerRunner.cpp" />
