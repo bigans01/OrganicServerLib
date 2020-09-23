@@ -703,7 +703,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//
 		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
 		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
-		//in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
+		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}

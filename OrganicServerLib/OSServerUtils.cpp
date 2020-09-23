@@ -134,7 +134,7 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 
 
 
-	// std::cout << "----------Finding adherents of blueprint: " << in_neighboringBlueprints.originalKey.x << ", " << in_neighboringBlueprints.originalKey.y << ", " << in_neighboringBlueprints.originalKey.z << std::endl;
+	//std::cout << "----------Finding adherents of blueprint: " << in_neighboringBlueprints.originalKey.x << ", " << in_neighboringBlueprints.originalKey.y << ", " << in_neighboringBlueprints.originalKey.z << std::endl;
 
 	 // order of current blueprint
 	 int currentOrder = in_pointAdherenceOrderRef->adherenceRelationships[in_neighboringBlueprints.originalKey];

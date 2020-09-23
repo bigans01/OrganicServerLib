@@ -33,13 +33,13 @@
 #include "ContouredMountain.h"
 #include "BlankContour.h"
 #include "PointAdherenceOrder.h"
-
+#include "MessageCable.h"
 
 
 class OSServer
 {
 public:
-
+	MessageCable serverMessages;
 	OrganicClient client;
 	std::shared_ptr<OrganicSystem> organicSystemPtr;
 	OrganicStemcellManager OSCManager;

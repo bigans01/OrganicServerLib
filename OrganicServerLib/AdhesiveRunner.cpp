@@ -160,6 +160,39 @@ void AdhesiveRunner::runPointAdhesions()
 	{
 		//std::cout << "Performing point adhesion for OrganicRawEnclave with key: " << adhesiveRawEnclavesMapBegin->first.x << ", " << adhesiveRawEnclavesMapBegin->first.y << ", " << adhesiveRawEnclavesMapBegin->first.z << std::endl;
 
+		bool debugTarget = false;
+		/*
+		if
+		(
+			(originalBlueprintKey.x == -1009)
+			&&
+			(originalBlueprintKey.y == 993)
+			&&
+			(originalBlueprintKey.z == 998)
+		)
+		{
+			
+			if
+			(
+				(adhesiveRawEnclavesMapBegin->first.x == 1)
+				&&
+				(adhesiveRawEnclavesMapBegin->first.y == 1)
+				&&
+				(adhesiveRawEnclavesMapBegin->first.z == 7)
+			)
+			
+			{
+				//std::cout << "##### setting to TRUE" << std::endl;
+				//testOutput = true;
+
+				//std::cout << "Testing halt, enter number to continue. " << std::endl;
+				//int someVal = 3;
+				//std::cin >> someVal;
+				debugTarget = true;
+			}
+		}
+		*/
+
 		// the vector where we will store the actual directions to compare against, once we've checked that an OrganicRawEnclave exists that we can check against.
 		std::map<int, DiscoveredORELocation> validCheckableDirections;	// will automatically order these for us
 
@@ -189,10 +222,12 @@ void AdhesiveRunner::runPointAdhesions()
 			}
 
 			
-
-			//std::cout << "Check for the neighboring OrganicRawEnclave at (" << neighboringOrganicRawEnclaveKey.x << ", " << neighboringOrganicRawEnclaveKey.y << ", " << neighboringOrganicRawEnclaveKey.z
-			//	<< "), in blueprint (" << blueprintKeyToCompareTo.x << ", " << blueprintKeyToCompareTo.y << ", " << blueprintKeyToCompareTo.z << ") "
-				//<< " was " << neighborRawEnclaveFound << std::endl;
+			if (debugTarget == true)
+			{
+				std::cout << "Check for the neighboring OrganicRawEnclave at (" << neighboringOrganicRawEnclaveKey.x << ", " << neighboringOrganicRawEnclaveKey.y << ", " << neighboringOrganicRawEnclaveKey.z
+					<< "), in blueprint (" << blueprintKeyToCompareTo.x << ", " << blueprintKeyToCompareTo.y << ", " << blueprintKeyToCompareTo.z << ") "
+					<< " was " << neighborRawEnclaveFound << std::endl;
+			}
 		}
 
 		// cycle through the validCheckableDirections map, and use the value in each iteration for a function call to perform the point adhesion.
@@ -203,44 +238,57 @@ void AdhesiveRunner::runPointAdhesions()
 		
 		//}
 
-		applyAdhesions(adhesiveRawEnclavesMapBegin->first, adhesiveRawEnclavesMapBegin->second.organicRawEnclaveRef, validCheckableDirections);		// the enclave key parameter here is for testing only; it can be removed later (9/3/2020)
+		applyAdhesions(adhesiveRawEnclavesMapBegin->first, adhesiveRawEnclavesMapBegin->second.organicRawEnclaveRef, validCheckableDirections, debugTarget);		// the enclave key parameter here is for testing only; it can be removed later (9/3/2020)
 		//std::cout << "++ Number of valids to compare against is: " << validCheckableDirections.size() << std::endl;
 
 		// ************************testing only
+		/*
 		if
 		(
-			(adhesiveRawEnclavesMapBegin->first.x == 0)
+			(originalBlueprintKey.x == -1009)
 			&&
-			(adhesiveRawEnclavesMapBegin->first.y == 0)
+			(originalBlueprintKey.y == 993)
 			&&
-			(adhesiveRawEnclavesMapBegin->first.z == 0)
+			(originalBlueprintKey.z == 998)
 		)
 		{
-			//std::cout << "##### setting to TRUE" << std::endl;
-			//testOutput = true;
+			if
+			(
+				(adhesiveRawEnclavesMapBegin->first.x == 1)
+				&&
+				(adhesiveRawEnclavesMapBegin->first.y == 1)
+				&&
+				(adhesiveRawEnclavesMapBegin->first.z == 7)
+			)
+			{
+				//std::cout << "##### setting to TRUE" << std::endl;
+				//testOutput = true;
 
-			//std::cout << "Testing halt, enter number to continue. " << std::endl;
-			//int someVal = 3;
-			//std::cin >> someVal;
+				//std::cout << "Testing halt, enter number to continue. " << std::endl;
+				//int someVal = 3;
+				//std::cin >> someVal;
+			}
 		}
+		*/
 	}
 }
 
-void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations)
+void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations, bool in_debugFlag)
 {
 	//std::cout << "+++ passed in original key is: " << in_originalRawEnclaveKey.x << ", " << in_originalRawEnclaveKey.y << ", " << in_originalRawEnclaveKey.z << std::endl;
-	bool testOutput = false;
+	//bool testOutput = false;
+	bool testOutput = in_debugFlag;
 	if
 	(
 		(in_originalRawEnclaveKey.x == 0)
 		&&
-		(in_originalRawEnclaveKey.y == 0)
+		(in_originalRawEnclaveKey.y == 7)
 		&&
-		(in_originalRawEnclaveKey.z == 0)
+		(in_originalRawEnclaveKey.z == 7)
 	)
 	{
 		//std::cout << "##### setting to TRUE" << std::endl;
-		testOutput = true;
+		//testOutput = true;
 	}
 
 	// for each direction in the oreLocations map, get the localized values (that is, how the points in the neighboring ORE would appear in the original ORE) of the points in the OrganicRawEnclave that the direction is associated with
@@ -252,7 +300,7 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	for (; locationsBegin != locationsEnd; locationsBegin++)
 	{
 		//std::cout << "## Running location " << std::endl;
-		std::vector<ECBPolyPoint> localizedPoints = acquireLocalizedPointsFromDiscoveredORELocation(locationsBegin->second);
+		std::vector<ECBPolyPoint> localizedPoints = acquireLocalizedPointsFromDiscoveredORELocation(locationsBegin->second, in_debugFlag);
 
 		// if there were points found in the vector, then we know there is at least 1 normalized point.
 		if (!localizedPoints.empty())
@@ -299,7 +347,7 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 			auto localizedPointsEnd = localizedPoints.end();
 			for (; localizedPointsBegin != localizedPointsEnd; localizedPointsBegin++)
 			{
-				//std::cout << "Localized new point: " << localizedPointsBegin->x << ", " << localizedPointsBegin->y << ", " << localizedPointsBegin->z << std::endl;
+				std::cout << "Localized new point: " << localizedPointsBegin->x << ", " << localizedPointsBegin->y << ", " << localizedPointsBegin->z << std::endl;
 			}
 		}
 		
@@ -329,15 +377,15 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 			
 			if (testOutput == true)
 			{
-				//std::cout << "------Points for original ORE triangle [container: " << enclaveTriangleContainersBegin->first << "][triangle index: " << currentEnclaveTriangleBegin->first << "]" << std::endl;
+				std::cout << "------Points for original ORE triangle [container: " << enclaveTriangleContainersBegin->first << "][triangle index: " << currentEnclaveTriangleBegin->first << "]" << std::endl;
 				for (int x = 0; x < 3; x++)
 				{
 					ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
-					//std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
+					std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
 				}
 			}
 			
-			adhereEnclaveTriangleToLocalizedPoints(metaDataMap, &currentEnclaveTriangleBegin->second);
+			adhereEnclaveTriangleToLocalizedPoints(metaDataMap, &currentEnclaveTriangleBegin->second, in_debugFlag);
 			// run the metadata map through each enclave triangle
 
 		}
@@ -345,20 +393,22 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	
 }
 
-void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef)
+void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef, bool in_debugFlag)
 {
 	AdhesiveResults results(in_enclaveTriangleRef->lineArray[0].pointA, in_enclaveTriangleRef->lineArray[1].pointA, in_enclaveTriangleRef->lineArray[2].pointA);
 	results.applyMetaDataMap(in_localizedPointsMetaDataMap);
 	if (results.scanResults() == true)
 	{
-		//std::cout << "###++++ NOTICE: this enclave triangle requires reform!! " << std::endl;
-
+		if (in_debugFlag == true)
+		{
+			std::cout << "###++++ NOTICE: this enclave triangle requires reform!! " << std::endl;
+		}
 		// initialize reform...
 		in_enclaveTriangleRef->reform(results.pointData[0].currentMatchedPointValue, results.pointData[1].currentMatchedPointValue, results.pointData[2].currentMatchedPointValue);
 	}
 }
 
-std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation)
+std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation, bool in_debugFlag)
 {
 	std::vector<ECBPolyPoint> returnVector;
 	UniquePointVector uniquePoints;
@@ -381,6 +431,7 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 				{
 					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
 					if (currentPoint.x == 0.0f) // it is on the WEST border in the neighboring ORE
+
 					{
 						ECBPolyPoint localizedPoint = currentPoint; // copy, 
 						localizedPoint.x = 4.0f;				    // then translate to localized coordinates, making it on the EAST border of the target ORE we're modifying
@@ -393,8 +444,10 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 	else if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_Z)	// if we're looking towards the NORTH, points lying in the neighboring OrganicRawEnclave must lie on the SOUTH face of the OrganicRawEnclave (z must be = 0); the localized Z value of each of these points will be 4
 	{
-		//std::cout << "Entered POS_Z" << std::endl;
-
+		if (in_debugFlag == true)
+		{
+			std::cout << "Entered POS_Z" << std::endl;
+		}
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
 		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
 		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
@@ -406,9 +459,22 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 			{
 				// cycle through each point in the triangle, via point A in its lineArray
+				if (in_debugFlag == true)
+				{
+					if (currentNeighborTriangleBegin->second.isTriangleValid == false)
+					{
+						std::cout << "Warning, comparing against an INVALID triangle! " << std::endl;
+					}
+					std::cout << "> Empty normal is: " << currentNeighborTriangleBegin->second.emptyNormal.x << ", " << currentNeighborTriangleBegin->second.emptyNormal.y << ", " << currentNeighborTriangleBegin->second.emptyNormal.z << std::endl;
+				}
+
 				for (int x = 0; x < 3; x++)
 				{
 					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					if (in_debugFlag == true)
+					{
+						std::cout << "> Current point is: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.x << std::endl;
+					}
 					if (currentPoint.z == 0.0f) // it is on the SOUTH border in the neighboring ORE
 					{
 						ECBPolyPoint localizedPoint = currentPoint; // copy, 

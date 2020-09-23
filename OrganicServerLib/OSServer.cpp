@@ -716,7 +716,7 @@ void OSServer::constructSingleDebug()
 	// caused bug on 8/20/2020, at ~32000.12, 32000.3, 32000.73.
 	// fails when edgeThreshold = .0001 (8/21/2020)
 
-	
+	/*
 	testPoint_0.x = 0;
 	testPoint_0.y = 1.61;
 	testPoint_0.z = 3.06;
@@ -728,7 +728,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 4;
 	testPoint_2.y = 0.8;
 	testPoint_2.z = 2.98;
-	
+	*/
 
 	// fails when edgeThreshold = .00015 (8/21/2020)
 	

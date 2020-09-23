@@ -58,9 +58,9 @@ class AdhesiveRunner
 		void insertAdhesiveData(EnclaveKeyDef::EnclaveKey in_adhesiveEnclaveKey, OrganicRawEnclave* in_organicRawEnclaveRef, EuclideanDirection3D in_euclideanDirection);
 		void runPointAdhesions();
 		EnclaveKeyDef::EnclaveKey findBorderingOrganicRawEnclaveToCompareAgainst(EuclideanDirection3D in_euclideanDirection, EnclaveKeyDef::EnclaveKey in_currentOrganicRawEnclaveKey);
-		void applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations);
-		std::vector<ECBPolyPoint> acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation);
-		void adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef);
+		void applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEnclaveKey, OrganicRawEnclave* in_originalOrganicRawEnclaveRef, std::map<int, DiscoveredORELocation> in_oreLocations, bool in_debugFlag);
+		std::vector<ECBPolyPoint> acquireLocalizedPointsFromDiscoveredORELocation(DiscoveredORELocation in_discoveredORELocation, bool in_debugFlag);
+		void adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef, bool in_debugFlag);
 
 };
 
