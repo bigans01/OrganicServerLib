@@ -1464,6 +1464,6 @@ ContourBase* OSServer::getDerivedContourPlan(string in_string)
 
 void OSServer::checkClientMessages()
 {
-	client.transferRequestMessages(&serverMessages);		// retrieve the messages from the client
-	messageInterpreter.interpretRequests();					// interpret (and optionally, process) the messages
+	client.transferRequestMessages(&serverMessages);		// retrieve incoming messages from the client
+	messageInterpreter.interpretIncomingRequestsFromClient();					// interpret (and optionally, process) the messages
 }

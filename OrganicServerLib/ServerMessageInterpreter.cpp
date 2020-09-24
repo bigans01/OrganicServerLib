@@ -8,7 +8,7 @@ void ServerMessageInterpreter::initialize(OSServer* in_organicSystemServerRef, M
 	messageCableRef = in_messageCableRef;
 }
 
-void ServerMessageInterpreter::interpretRequests()
+void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for interpreting inbound requests from a client
 {
 	while (!messageCableRef->incomingMessages.empty())
 	{
@@ -16,11 +16,14 @@ void ServerMessageInterpreter::interpretRequests()
 		switch (currentMessage.messageType)											
 		{
 			
+			// ###################
+			// Calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
+			//
 			// uses a BlueprintScanningCuboid that is constructed based off the client's current center collection key, to scan for existing blueprints. The blueprints are then sent the client.
 			//
 			//
 			//
-			case MessageType::REQUEST_BLUEPRINTS_FOR_OGLMBUFFERMANAGER :
+			case MessageType::REQUEST_FROM_CLIENT_BLUEPRINTS_FOR_OGLMBUFFERMANAGER :
 			{
 				std::cout << "Switched case found! " << std::endl;
 				insertResponseToPending(currentMessage);			// insert into pending
@@ -59,7 +62,11 @@ void ServerMessageInterpreter::interpretRequests()
 				}
 
 				// now, tell the client to render everything in the list.
-				serverPtr->client.callMaterializeAllCollectionsInRenderListFromMessage();
+				//serverPtr->client.callMaterializeAllCollectionsInRenderListFromMessage();
+
+				// version 2.0
+				Message responseMessage(currentMessage.messageID, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
+				serverPtr->client.insertResponseMessage(responseMessage);
 
 				moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
 				messageCableRef->incomingMessages.pop();
@@ -69,4 +76,9 @@ void ServerMessageInterpreter::interpretRequests()
 			// other cases follow here...
 		}
 	}
+}
+
+void ServerMessageInterpreter::interpretIncomingResponsesFromClient()
+{
+
 }

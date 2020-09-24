@@ -16,7 +16,10 @@ class ServerMessageInterpreter : public MessageInterpreter
 		OSServer* serverPtr = NULL;
 		MessageCable* messageCableRef = NULL;
 		void initialize(OSServer* in_organicSystemServerRef, MessageCable* in_messageCableRef);
-		void interpretRequests();
+
+		// client request and response
+		void interpretIncomingRequestsFromClient();
+		void interpretIncomingResponsesFromClient();
 };
 
 #endif
