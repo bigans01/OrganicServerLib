@@ -14,6 +14,7 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverSlaves);			// signal for server mode, 2 threads
 	OSdirector.initialize(this);
+	messageInterpreter.initialize(this, &serverMessages);
 }
 
 OSServer::OSServer()
@@ -35,6 +36,7 @@ OSServer::OSServer()
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverProperties.serverSlaves);			// signal for server mode, 2 threads
 	OSdirector.initialize(this);
+	messageInterpreter.initialize(this, &serverMessages);
 }
 
 OSServer::~OSServer()
@@ -1462,5 +1464,6 @@ ContourBase* OSServer::getDerivedContourPlan(string in_string)
 
 void OSServer::checkClientMessages()
 {
-	client.transferRequestMessages(&serverMessages);
+	client.transferRequestMessages(&serverMessages);		// retrieve the messages from the client
+	messageInterpreter.interpretRequests();					// interpret (and optionally, process) the messages
 }

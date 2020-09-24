@@ -34,11 +34,13 @@
 #include "BlankContour.h"
 #include "PointAdherenceOrder.h"
 #include "MessageCable.h"
+#include "ServerMessageInterpreter.h"
 
 
 class OSServer
 {
 public:
+	ServerMessageInterpreter messageInterpreter;
 	MessageCable serverMessages;
 	OrganicClient client;
 	std::shared_ptr<OrganicSystem> organicSystemPtr;
