@@ -6,6 +6,8 @@
 #include "MessageCable.h"
 #include "MessageInterpreter.h"
 #include <iostream>
+#include "EnclaveKeyDef.h"
+#include "BlueprintScanningCuboid.h"
 
 class OSServer;	
 class ServerMessageInterpreter : public MessageInterpreter

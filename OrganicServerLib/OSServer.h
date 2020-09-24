@@ -104,6 +104,7 @@ public:
 	void checkClientMessages();
 private:
 	friend class OSTriangleLineTraverser;
+	friend class ServerMessageInterpreter;
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
