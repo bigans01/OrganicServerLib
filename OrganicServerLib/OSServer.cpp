@@ -1342,7 +1342,8 @@ void OSServer::runServer()
 	{
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0) // ""
 		{
-			organicSystemPtr->runOrganicTick();
+			checkClientMessages();					// check for requests sent by client
+			organicSystemPtr->runOrganicTick();		// run core loop
 		}
 		organicSystemPtr->glCleanup();
 	}
@@ -1457,4 +1458,9 @@ OSContourPlan* OSServer::getContourPlan(string in_string)
 ContourBase* OSServer::getDerivedContourPlan(string in_string)
 {
 	return newContourMap[in_string].get();	// get a reference to the smart pointer
+}
+
+void OSServer::checkClientMessages()
+{
+	client.transferRequestMessages(&serverMessages);
 }

@@ -99,6 +99,7 @@ public:
 	void runPolyFracturerForAllBlueprints();
 
 	void constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey);
+	void checkClientMessages();
 private:
 	friend class OSTriangleLineTraverser;
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
