@@ -12,13 +12,14 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 {
 	while (!messageCableRef->incomingMessages.empty())
 	{
+		//std::cout << "Checking incoming requests from client: " << std::endl;
 		Message currentMessage = messageCableRef->incomingMessages.front();
 		currentMessage.open();					// open the message for reading (sets the iterators)
 		switch (currentMessage.messageType)											
 		{
 			
 			// ###################
-			// PREVIOUS CALL/MESSAGE: Calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
+			// PREVIOUS CALL/MESSAGE: Message spawned by calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
 			//
 			// uses a BlueprintScanningCuboid that is constructed based off the client's current center collection key, to scan for existing blueprints. The blueprints are then sent the client.
 			//
@@ -61,6 +62,61 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 				Message responseMessage(currentMessage.messageID, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
 				serverPtr->client.insertResponseMessage(responseMessage);
 
+				moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
+				messageCableRef->incomingMessages.pop();
+				break;
+			}
+
+			// ###################
+			// PREVIOUS CALL/MESSAGE: Message spawned by calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestT1Blueprint(EnclaveKeyDef::EnclaveKey in_key)
+			//
+			// checks to see if the blueprint specified in the message exists, and if it does, it sends the blueprint data back to the client along with a message indicating it existed.
+			//
+			//
+			//
+			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T1 :
+			{
+				insertResponseToPending(currentMessage);			// insert into pending
+				EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
+
+				// do work here
+				int checkResult = serverPtr->checkIfBlueprintExists(extractedKey);
+				if (checkResult == 1)
+				{
+					serverPtr->transferBlueprintToLocalOS(extractedKey);
+					Message responseMessage(currentMessage.messageID, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T1_FOUND);
+					responseMessage.insertEnclaveKey(extractedKey);
+					serverPtr->client.insertResponseMessage(responseMessage);
+				}
+				
+				moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
+				messageCableRef->incomingMessages.pop();
+				break;
+			}
+
+
+			// ###################
+			// PREVIOUS CALL/MESSAGE: Message spawned by calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestT2Blueprint(EnclaveKeyDef::EnclaveKey in_key)
+			//
+			// checks to see if the blueprint specified in the message exists, and if it does, it sends the blueprint data back to the client along with a message indicating it existed.
+			//
+			//
+			//
+			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T2:
+			{
+				insertResponseToPending(currentMessage);			// insert into pending
+				EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
+				
+				// do work here
+				int checkResult = serverPtr->checkIfBlueprintExists(extractedKey);
+				if (checkResult == 1)
+				{
+					serverPtr->transferBlueprintToLocalOS(extractedKey);
+					Message responseMessage(currentMessage.messageID, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T2_FOUND);
+					std::cout << "SERVER: found T2 blueprint (" << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << ") " << std::endl;
+					responseMessage.insertEnclaveKey(extractedKey);
+					serverPtr->client.insertResponseMessage(responseMessage);
+				}
 				moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
 				messageCableRef->incomingMessages.pop();
 				break;
