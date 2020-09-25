@@ -13,11 +13,12 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 	while (!messageCableRef->incomingMessages.empty())
 	{
 		Message currentMessage = messageCableRef->incomingMessages.front();
+		currentMessage.open();					// open the message for reading (sets the iterators)
 		switch (currentMessage.messageType)											
 		{
 			
 			// ###################
-			// Calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
+			// PREVIOUS CALL/MESSAGE: Calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
 			//
 			// uses a BlueprintScanningCuboid that is constructed based off the client's current center collection key, to scan for existing blueprints. The blueprints are then sent the client.
 			//
@@ -32,17 +33,9 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 				// ...
 
 				// extract the data
-				auto intVectorBegin = currentMessage.intVector.begin();
-				EnclaveKeyDef::EnclaveKey extractedKey;				// we will put the extracted key from the message into this.
-				extractedKey.x = *intVectorBegin;
-				intVectorBegin++;
-				extractedKey.y = *intVectorBegin;
-				intVectorBegin++;
-				extractedKey.z = *intVectorBegin;
-				intVectorBegin++;
+				EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
+				int cuboidDimension = currentMessage.readInt();
 
-				// get the cuboid dimension
-				int cuboidDimension = *intVectorBegin;	// get the dimension of the cuboid
 
 				std::cout << "Message key is: " << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << std::endl;
 				std::cout << "Message cuboid dimension is: " << cuboidDimension << std::endl;
