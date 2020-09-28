@@ -4,6 +4,7 @@
 #define SERVERMESSAGEINTERPRETER_H
 
 #include "MessageCable.h"
+#include "MessageLocality.h"
 #include "MessageInterpreter.h"
 #include <iostream>
 #include "EnclaveKeyDef.h"
