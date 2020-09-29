@@ -120,6 +120,15 @@
     <ClInclude Include="ServerMessageInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServerJobManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerThreadDesignation.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerThreadDesignationMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -192,6 +201,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerMessageInterpreter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerThreadDesignationMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -35,6 +35,7 @@
 #include "PointAdherenceOrder.h"
 #include "MessageCable.h"
 #include "ServerMessageInterpreter.h"
+#include "ServerJobManager.h"
 
 
 class OSServer
@@ -44,6 +45,7 @@ public:
 	MessageCable serverMessages;
 	OrganicClient client;
 	std::shared_ptr<OrganicSystem> organicSystemPtr;
+	ServerJobManager serverJobManager;
 	OrganicStemcellManager OSCManager;
 	OSCommandDirector OSdirector;
 	short isServerActive = 1;			// flag for determining server
@@ -105,6 +107,7 @@ public:
 private:
 	friend class OSTriangleLineTraverser;
 	friend class ServerMessageInterpreter;
+	friend class ServerJobManager;
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
@@ -114,7 +117,9 @@ private:
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
-	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);
+	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);		// may be deprecated eventually, replaced by runCommandLineV3. Deprecation validity tests began 9/29/2020.
+	int runCommandLineV2(mutex& in_serverReadWrite, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);													// may be deprecated eventually, replaced by runCommandLineV3. Deprecation validity tests began 9/29/2020.
+	void runCommandLineV3();
 	int checkServerStatus(mutex& in_serverReadWrite);
 	void setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int* in_commandLineStatus);
 	void signalCommandLineShutdown(mutex& in_serverReadWrite, int in_valueToSet, int* in_clShutdownFlag);

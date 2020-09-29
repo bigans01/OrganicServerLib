@@ -13,6 +13,7 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverSlaves);			// signal for server mode, 2 threads
+	serverJobManager.initialize(this);
 	OSdirector.initialize(this);
 	messageInterpreter.initialize(this, &serverMessages);
 }
@@ -35,6 +36,7 @@ OSServer::OSServer()
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
 	OSCManager.initialize(1, serverProperties.serverSlaves);			// signal for server mode, 2 threads
+	serverJobManager.initialize(this);
 	OSdirector.initialize(this);
 	messageInterpreter.initialize(this, &serverMessages);
 }
@@ -1353,9 +1355,11 @@ void OSServer::runServer()
 
 void OSServer::executeCommandLine()
 {
-	int* commandLineRunningRef = &isCommandLineRunning;
-	int* clShutdownStatus = &isCommandLineShutDown;
-	std::future<int> testFuture2 = OSCManager.stemcellMap[0].threadPtr->submit(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
+	//int* commandLineRunningRef = &isCommandLineRunning;
+	//int* clShutdownStatus = &isCommandLineShutDown;
+	//std::future<int> testFuture2 = OSCManager.stemcellMap[0].threadPtr->submit(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
+
+	serverJobManager.startCommandLine();
 }
 
 int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus)
@@ -1374,6 +1378,39 @@ int OSServer::runCommandLine(mutex& in_serverReadWrite, std::condition_variable&
 	signalCommandLineShutdown(std::ref(in_serverReadWrite), 1, std::ref(is_commandLineShutDownStatus));
 	int returnVal = 5;
 	return returnVal;
+}
+
+int OSServer::runCommandLineV2(mutex& in_serverReadWrite, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus)
+{
+	std::cout << ">> Job submission begin..." << std::endl;
+	int* isCommandLineRunningPtr = &in_commandLineRunningStatus;
+	while (*isCommandLineRunningPtr == 1)
+	{
+		std::cout << "Waiting for command...." << std::endl;
+		int input_value;
+		std::cout << "> ";
+		std::cin >> input_value;
+		setServerStatus(std::ref(in_serverReadWrite), input_value, std::ref(isCommandLineRunningPtr));
+	}
+	signalServerShutdown(std::ref(in_serverReadWrite));
+	signalCommandLineShutdown(std::ref(in_serverReadWrite), 1, std::ref(is_commandLineShutDownStatus));
+	int returnVal = 5;
+	return returnVal;
+}
+
+void OSServer::runCommandLineV3()
+{
+	std::cout << ">> Job submission begin..." << std::endl;
+	while (isCommandLineRunning == 1)
+	{
+		std::cout << "Waiting for command...." << std::endl;
+		int input_value;
+		std::cout << "> ";
+		std::cin >> input_value;
+		setServerStatus(serverReadWrite, input_value, &isCommandLineRunning);
+	}
+	signalServerShutdown(serverReadWrite);
+	signalCommandLineShutdown(serverReadWrite, 1, &isCommandLineShutDown);
 }
 
 int OSServer::checkServerStatus(mutex& in_serverReadWrite)
