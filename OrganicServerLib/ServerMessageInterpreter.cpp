@@ -13,9 +13,9 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 	while (!messageCableRef->incomingMessages.empty())
 	{
 		//std::cout << "Checking incoming requests from client: " << std::endl;
-		Message currentMessage = messageCableRef->incomingMessages.front();
-		currentMessage.open();					// open the message for reading (sets the iterators)
-		switch (currentMessage.messageType)											
+		Message* currentMessage = &messageCableRef->incomingMessages.front();
+		currentMessage->open();					// open the message for reading (sets the iterators)
+		switch (currentMessage->messageType)											
 		{
 			
 			// ###################
@@ -27,21 +27,21 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 			//
 			case MessageType::REQUEST_FROM_CLIENT_BLUEPRINTS_FOR_OGLMBUFFERMANAGER :
 			{
-				switch (currentMessage.messageLocality)
+				switch (currentMessage->messageLocality)
 				{
 					// ****************************************************************** LOCAL LOGIC
 					case MessageLocality::LOCAL :
 
 					{
 						std::cout << "Switched case found! " << std::endl;
-						insertResponseToPending(currentMessage);			// insert into pending
+						insertResponseToPending(*currentMessage);			// insert into pending
 						// do stuff here
 						// ...
 						// ...
 
 						// extract the data
-						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
-						int cuboidDimension = currentMessage.readInt();
+						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage->readEnclaveKey();
+						int cuboidDimension = currentMessage->readInt();
 
 
 						std::cout << "Message key is: " << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << std::endl;
@@ -65,11 +65,11 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 						//serverPtr->client.callMaterializeAllCollectionsInRenderListFromMessage();
 
 						// version 2.0
-						Message responseMessage(currentMessage.messageID, currentMessage.messageLocality, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
+						Message responseMessage(currentMessage->messageID, currentMessage->messageLocality, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
 						serverPtr->client.insertResponseMessage(responseMessage);
 
-						moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
-						messageCableRef->incomingMessages.pop();
+						moveResponseToCompleted(currentMessage->messageID);	// indicate that its done (if we completed, of course)
+						//messageCableRef->incomingMessages.pop();
 						break;
 					}
 
@@ -91,26 +91,26 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 			//
 			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T1 :
 			{
-				switch (currentMessage.messageLocality)
+				switch (currentMessage->messageLocality)
 				{
 					// ****************************************************************** LOCAL LOGIC
 					case MessageLocality::LOCAL:
 					{
-						insertResponseToPending(currentMessage);			// insert into pending
-						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
+						insertResponseToPending(*currentMessage);			// insert into pending
+						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage->readEnclaveKey();
 
 						// do work here
 						int checkResult = serverPtr->checkIfBlueprintExists(extractedKey);
 						if (checkResult == 1)
 						{
 							serverPtr->transferBlueprintToLocalOS(extractedKey);
-							Message responseMessage(currentMessage.messageID, currentMessage.messageLocality, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T1_FOUND);
+							Message responseMessage(currentMessage->messageID, currentMessage->messageLocality, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T1_FOUND);
 							responseMessage.insertEnclaveKey(extractedKey);
 							serverPtr->client.insertResponseMessage(responseMessage);
 						}
 
-						moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
-						messageCableRef->incomingMessages.pop();
+						moveResponseToCompleted(currentMessage->messageID);	// indicate that its done (if we completed, of course)
+						//messageCableRef->incomingMessages.pop();
 						break;
 					}
 
@@ -133,26 +133,26 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 			//
 			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T2:
 			{
-				switch (currentMessage.messageLocality)
+				switch (currentMessage->messageLocality)
 				{
 					// ****************************************************************** LOCAL LOGIC
 					case MessageLocality::LOCAL:
 					{
-						insertResponseToPending(currentMessage);			// insert into pending
-						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage.readEnclaveKey();
+						insertResponseToPending(*currentMessage);			// insert into pending
+						EnclaveKeyDef::EnclaveKey extractedKey = currentMessage->readEnclaveKey();
 
 						// do work here
 						int checkResult = serverPtr->checkIfBlueprintExists(extractedKey);
 						if (checkResult == 1)
 						{
 							serverPtr->transferBlueprintToLocalOS(extractedKey);
-							Message responseMessage(currentMessage.messageID, currentMessage.messageLocality, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T2_FOUND);
+							Message responseMessage(currentMessage->messageID, currentMessage->messageLocality, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T2_FOUND);
 							std::cout << "SERVER: found T2 blueprint (" << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << ") " << std::endl;
 							responseMessage.insertEnclaveKey(extractedKey);
 							serverPtr->client.insertResponseMessage(responseMessage);
 						}
-						moveResponseToCompleted(currentMessage.messageID);	// indicate that its done (if we completed, of course)
-						messageCableRef->incomingMessages.pop();
+						moveResponseToCompleted(currentMessage->messageID);	// indicate that its done (if we completed, of course)
+						//messageCableRef->incomingMessages.pop();
 						break;
 					}
 					// ****************************************************************** REMOTE LOGIC
@@ -165,7 +165,30 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 			}
 
 			// other cases follow here...
+			// ###################
+			// PREVIOUS CALL/MESSAGE: client requests a contour plan via button click in ImGui.
+			//
+			//
+			//
+			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN:
+			{
+				switch (currentMessage->messageLocality)
+				{
+					case MessageLocality::LOCAL:
+					{
+						std::cout << "!! Found contour map request. " << std::endl;
+						serverPtr->serverJobManager.messageQueue.insertMessage(std::move(*currentMessage));		//  move the request to the server job manager.
+						break;
+					}
+					case MessageLocality::REMOTE:
+					{
+						break;
+					}
+				}
+				break;
+			}
 		}
+		messageCableRef->incomingMessages.pop();
 	}
 }
 

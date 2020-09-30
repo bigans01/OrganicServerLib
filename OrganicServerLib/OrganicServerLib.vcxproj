@@ -178,6 +178,7 @@
     <ClInclude Include="PrimaryCircuit.h" />
     <ClInclude Include="PrimaryCircuitSegment.h" />
     <ClInclude Include="ServerJobManager.h" />
+    <ClInclude Include="ServerJobMessageQueue.h" />
     <ClInclude Include="ServerJobsIntContainer.h" />
     <ClInclude Include="ServerJobUpdateInt.h" />
     <ClInclude Include="ServerJobUpdateIntQueue.h" />

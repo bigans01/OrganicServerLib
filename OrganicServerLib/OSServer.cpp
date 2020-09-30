@@ -1347,6 +1347,7 @@ void OSServer::runServer()
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0) // ""
 		{
 			checkClientMessages();					// check for requests sent by client
+			serverJobManager.checkForMessages();	// have the job manager check for messages to process.
 			organicSystemPtr->runOrganicTick();		// run core loop
 		}
 		organicSystemPtr->glCleanup();
@@ -1501,6 +1502,6 @@ ContourBase* OSServer::getDerivedContourPlan(string in_string)
 
 void OSServer::checkClientMessages()
 {
-	client.transferRequestMessages(&serverMessages);		// retrieve incoming messages from the client
+	client.transferRequestMessages(&serverMessages);							// retrieve incoming messages from the client (via std::move)
 	messageInterpreter.interpretIncomingRequestsFromClient();					// interpret (and optionally, process) the messages
 }

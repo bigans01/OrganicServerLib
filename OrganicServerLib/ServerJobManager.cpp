@@ -29,3 +29,21 @@ void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		//
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
 	intJobsContainer.insertJob(&job, in_message);
 }
+
+void ServerJobManager::checkForMessages()
+{
+	while (!messageQueue.isEmpty())
+	{
+		Message* currentMessageRef = messageQueue.getMessageRefFromFront();		// get a ref to the message
+		currentMessageRef->open();												// open the message
+		switch (currentMessageRef->messageType)
+		{
+			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN :
+			{
+				std::cout << "SERVER: JobManager found contour plan request. " << std::endl;
+				break;
+			}
+		}
+		messageQueue.safePopQueue();
+	}
+}

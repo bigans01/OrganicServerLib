@@ -10,6 +10,7 @@
 #include "SPJRunSingleMountTest.h"
 #include "ServerJobsIntContainer.h"
 #include "ServerJobUpdateIntQueue.h"
+#include "ServerJobMessageQueue.h"
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.
@@ -35,7 +36,13 @@ class ServerJobManager
 		// job insertion calls
 		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.
 
-		// job update containers (each one should have built in mutex for lock_guarding); these are for STEP 3 described above.
+		// STEP 1: Read messages 
+		ServerJobMessageQueue messageQueue;
+
+		// STEP 2: insert jobs based into the appropraite containers, based on the message.
+		void checkForMessages();
+
+		// STEP 3: job update containers (each one should have built in mutex for lock_guarding); 
 		ServerJobUpdateIntQueue updatesViaInt;
 };
 
