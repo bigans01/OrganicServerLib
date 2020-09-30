@@ -178,9 +178,14 @@
     <ClInclude Include="PrimaryCircuit.h" />
     <ClInclude Include="PrimaryCircuitSegment.h" />
     <ClInclude Include="ServerJobManager.h" />
+    <ClInclude Include="ServerJobsIntContainer.h" />
+    <ClInclude Include="ServerJobUpdateInt.h" />
+    <ClInclude Include="ServerJobUpdateIntQueue.h" />
     <ClInclude Include="ServerMessageInterpreter.h" />
+    <ClInclude Include="ServerPhasedJobBase.h" />
     <ClInclude Include="ServerThreadDesignation.h" />
     <ClInclude Include="ServerThreadDesignationMap.h" />
+    <ClInclude Include="SPJRunSingleMountTest.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
@@ -209,7 +214,9 @@
     <ClCompile Include="PrimaryCircuitSegment.cpp" />
     <ClCompile Include="ServerJobManager.cpp" />
     <ClCompile Include="ServerMessageInterpreter.cpp" />
+    <ClCompile Include="ServerPhasedJobBase.cpp" />
     <ClCompile Include="ServerThreadDesignationMap.cpp" />
+    <ClCompile Include="SPJRunSingleMountTest.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

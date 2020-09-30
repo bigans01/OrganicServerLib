@@ -129,6 +129,21 @@
     <ClInclude Include="ServerThreadDesignationMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServerPhasedJobBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJRunSingleMountTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobsIntContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobUpdateInt.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobUpdateIntQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -207,6 +222,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerThreadDesignationMap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerPhasedJobBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJRunSingleMountTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

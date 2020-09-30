@@ -23,3 +23,9 @@ void ServerJobManager::startCommandLine()
 	//targetThread->submit(&OSServer::runCommandLineV2, server, std::ref(server->serverReadWrite), std::ref(server->isCommandLineRunning), std::ref(clShutdownStatus));
 	targetThread->submit(&OSServer::runCommandLineV3, server);
 }
+
+void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
+{
+	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
+	intJobsContainer.insertJob(&job, in_message);
+}
