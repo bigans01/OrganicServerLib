@@ -812,6 +812,34 @@ void OSServer::constructSingleMountTest()
 	executeDerivedContourPlan("summit1");
 }
 
+void OSServer::constructSingleMountTestNoInput()
+{
+	ECBPolyPoint summit1;
+	int numberOfLayers = 3;
+
+	// first mountain
+	summit1.x = 48;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		std::cout << "!!! Calling bottom strips... " << std::endl;
+		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
+	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
+
+	executeDerivedContourPlanNoInput("summit1");
+}
+
 void OSServer::constructMultiMountTest()
 {
 	ECBPolyPoint summit1, summit2;
@@ -1100,6 +1128,112 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cout << "Write to disk complete; press key to transfer blueprints to local OrganicSystem. " << std::endl;
 	int someVal = 3;
 	std::cin >> someVal;
+}
+
+void OSServer::executeDerivedContourPlanNoInput(string in_string)
+{
+	OSWinAdapter::clearWorldFolder(currentWorld);
+
+	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
+	ContourBase* planPtr = newContourMap[in_string].get();
+	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
+	std::cout << "Number of strips to execute is: " << numberOfTriangleStrips << std::endl;
+	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
+	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
+
+	// 1.) construct the shell
+	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
+	{
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = stripMapIterator->second.triangleMap.end();
+		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
+		{
+			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
+			std::cout << "(SERVER): Executing plan, " + in_string << ", strip: " << stripMapIterator->first << ", triangle: " << triangleMapIterator->first << std::endl;
+
+			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			// DEBUG ONLY, temporary
+			//if (triangleMapIterator->first == 79)
+			//{
+			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
+			//std::cout << "###### Debug triangle points: " << std::endl;
+			//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << ", " << currentTriangle->trianglePoints[0].z << std::endl;
+			//std::cout << "1: " << currentTriangle->trianglePoints[1].x << ", " << currentTriangle->trianglePoints[1].y << ", " << currentTriangle->trianglePoints[1].z << std::endl;
+			//std::cout << "2: " << currentTriangle->trianglePoints[2].x << ", " << currentTriangle->trianglePoints[2].y << ", " << currentTriangle->trianglePoints[2].z << std::endl;
+
+			//int someVal = 3;
+			//std::cin >> someVal;
+		//}
+		//std::cout << "---ending trace-through" << std::endl;
+
+		// write (overwrite) a blueprint file for each blueprint traversed
+		/*
+		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
+		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorEnd = currentTriangle->polygonPieceMap.end();
+		for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
+		{
+			EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
+			//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
+			EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
+			std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;
+			//std::map<int, ECBPoly> sillyPolys;
+			//polyMapRef = &sillyPolys;
+			OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, polyMapRef);
+			EnclaveCollectionBlueprint readBackBP;
+			OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, polyMapRef);
+			OSWinAdapter::outputBlueprintStats(polyMapRef);
+			//std::cout << ">> Blueprint stats outputted...???" << std::endl;
+		}
+		*/
+		}
+	}
+
+	auto bottomStripsBegin = planPtr->bottomTriangleStripMap.begin();
+	auto bottomStripsEnd = planPtr->bottomTriangleStripMap.end();
+	for (bottomStripsBegin; bottomStripsBegin != bottomStripsEnd; bottomStripsBegin++)
+	{
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = bottomStripsBegin->second.triangleMap.begin();
+		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = bottomStripsBegin->second.triangleMap.end();
+		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
+		{
+			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
+			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
+		}
+	}
+
+	std::cout << "######### Plan execution complete; " << std::endl;
+
+	//planPtr->ad
+	//planPtr->adherenceData.printAdherentData();		// testing only, for now.
+
+	//OSWinAdapter::clearWorldFolder(currentWorld);
+
+	// 2.) perform fracturing for affected blueprints.
+	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
+
+	//std::cout << "Size of EnclaveBlock: " << sizeof(EnclaveBlock) << std::endl;
+	//std::cout << "Size of BBFan: " << sizeof(BBFan) << std::endl;
+	//std::cout << "Size of OrganicRawEnclave: " << sizeof(OrganicRawEnclave) << std::endl;
+	//std::cout << "Size of OrganicTriangleSecondary: " << sizeof(OrganicTriangleSecondary) << std::endl;
+	//std::cout << "Size of OrganicTriangleTertiary: " << sizeof(OrganicTriangleTertiary) << std::endl;
+	//std::cout << "Size of EnclaveTriangle: " << sizeof(EnclaveTriangle) << std::endl;
+	//std::cout << "Size of an EnclaveTriangle skeleton: " << sizeof(ECBPolyPoint) * 4 + 4 << std::endl;
+	//std::cout << "Size of an ECBPolyLine array of size 3: " << sizeof(ECBPolyLine) * 3 << std::endl;
+
+	//int testVal = 3;
+	//std::cin >> testVal;
+
+	// 3.) run the mass driver for the plan. (if the plan allows for it)
+	EnclaveFractureResultsMap tempMap;
+	planPtr->runMassDrivers(&client, &blueprintMap, &tempMap);
+
+	// 4.) update the affected blueprints (aka, update the OrganicRawEnclaves), after all work has been done
+	//planPtr->updateAffectedBlueprints(&client, &blueprintMap, &tempMap);
+
+	// 5.) write updated blueprints to disk
+	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
+
+	std::cout << "SERVER: completed contour plan run." << std::endl;
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)

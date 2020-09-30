@@ -94,6 +94,7 @@ public:
 
 	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void executeDerivedContourPlan(string in_string);
+	void executeDerivedContourPlanNoInput(string in_string);	// run the plan without waiting for input afterwards.
 
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
@@ -108,6 +109,8 @@ private:
 	friend class OSTriangleLineTraverser;
 	friend class ServerMessageInterpreter;
 	friend class ServerJobManager;
+	friend class ServerJobProxy;
+
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
@@ -126,6 +129,9 @@ private:
 	int getCommandLineShutdownValue(mutex& in_serverReadWrite);
 	void signalServerShutdown(mutex& in_serverMutex);
 	OSPDir getFormationDirections(OSTerrainFormation in_terrainFormation);
+
+	// test run jobs for ServerJobManager
+	void constructSingleMountTestNoInput();
 };
 
 #endif

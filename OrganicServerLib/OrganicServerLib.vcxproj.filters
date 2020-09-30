@@ -147,6 +147,9 @@
     <ClInclude Include="ServerJobMessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServerJobProxy.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -231,6 +234,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SPJRunSingleMountTest.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobProxy.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

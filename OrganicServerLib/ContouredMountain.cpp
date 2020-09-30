@@ -715,6 +715,6 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	std::cout << "### End of mass driver run. Time spent:" << organicelapsed.count() << std::endl;
 	std::cout << "### ContouredMountain summit was:  " << startPoint.x << ", " << startPoint.y << ", " << startPoint.z << std::endl;
 
-	int someVal = 3;
-	std::cin >> someVal;
+	//int someVal = 3;
+	//std::cin >> someVal;
 }

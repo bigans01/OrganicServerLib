@@ -32,3 +32,10 @@ OrganicThread* ServerThreadDesignationMap::getCommandLineThread()
 	int keyToLookup = designations[ServerThreadDesignation::COMMAND_LINE];	// fetch the key that uses the command line
 	return organicStemcellManagerRef->stemcellMap[keyToLookup].threadPtr.get();	// fetch the thread, return it
 }
+
+OrganicThread* ServerThreadDesignationMap::getFirstAvailableThread()		// for testing, name may change soon.
+{
+	auto firstUndesignated = unDesignatedPool.begin();
+	std::cout << "Retrieved thread ID: " << firstUndesignated->first;
+	return organicStemcellManagerRef->stemcellMap[firstUndesignated->first].threadPtr.get();	// fetch the thread, return it
+}

@@ -179,6 +179,7 @@
     <ClInclude Include="PrimaryCircuitSegment.h" />
     <ClInclude Include="ServerJobManager.h" />
     <ClInclude Include="ServerJobMessageQueue.h" />
+    <ClInclude Include="ServerJobProxy.h" />
     <ClInclude Include="ServerJobsIntContainer.h" />
     <ClInclude Include="ServerJobUpdateInt.h" />
     <ClInclude Include="ServerJobUpdateIntQueue.h" />
@@ -214,6 +215,7 @@
     <ClCompile Include="PrimaryCircuit.cpp" />
     <ClCompile Include="PrimaryCircuitSegment.cpp" />
     <ClCompile Include="ServerJobManager.cpp" />
+    <ClCompile Include="ServerJobProxy.cpp" />
     <ClCompile Include="ServerMessageInterpreter.cpp" />
     <ClCompile Include="ServerPhasedJobBase.cpp" />
     <ClCompile Include="ServerThreadDesignationMap.cpp" />

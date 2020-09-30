@@ -20,6 +20,7 @@ class ServerThreadDesignationMap
 		void removeFromUndesignatedPool(int in_key);
 		void designateCommandLineThread(int in_key);
 		OrganicThread* getCommandLineThread();
+		OrganicThread* getFirstAvailableThread();
 };
 
 #endif

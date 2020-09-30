@@ -11,6 +11,7 @@
 #include "ServerJobsIntContainer.h"
 #include "ServerJobUpdateIntQueue.h"
 #include "ServerJobMessageQueue.h"
+#include "ServerJobProxy.h"
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.

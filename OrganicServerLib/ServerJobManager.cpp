@@ -41,6 +41,8 @@ void ServerJobManager::checkForMessages()
 			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN :
 			{
 				std::cout << "SERVER: JobManager found contour plan request. " << std::endl;
+				OrganicThread* targetThread = designations.getFirstAvailableThread();
+				targetThread->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server);
 				break;
 			}
 		}
