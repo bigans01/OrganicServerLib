@@ -29,6 +29,7 @@ public:
 	}
 	Message* getMessageRefFromFront()
 	{
+		std::lock_guard<std::mutex> lock(queueGuard);
 		return &messageQueue.front();
 	}
 };

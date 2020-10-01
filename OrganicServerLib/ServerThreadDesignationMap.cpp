@@ -36,6 +36,6 @@ OrganicThread* ServerThreadDesignationMap::getCommandLineThread()
 OrganicThread* ServerThreadDesignationMap::getFirstAvailableThread()		// for testing, name may change soon.
 {
 	auto firstUndesignated = unDesignatedPool.begin();
-	std::cout << "Retrieved thread ID: " << firstUndesignated->first;
+	std::cout << "Retrieved thread ID: " << firstUndesignated->first << std::endl;
 	return organicStemcellManagerRef->stemcellMap[firstUndesignated->first].threadPtr.get();	// fetch the thread, return it
 }

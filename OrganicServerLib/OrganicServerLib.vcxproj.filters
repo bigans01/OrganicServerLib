@@ -141,9 +141,6 @@
     <ClInclude Include="ServerJobUpdateInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerJobUpdateIntQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ServerJobMessageQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -160,6 +157,27 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ContourPlanStateContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobContainerType.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobBase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobPhase.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunSingleMountTest.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobUpdateQueue.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ReadyJobSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -249,6 +267,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerJobProxy.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobPhase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobBase.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunSingleMountTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

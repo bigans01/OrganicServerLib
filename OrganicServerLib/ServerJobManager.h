@@ -9,10 +9,11 @@
 #include "ServerPhasedJobBase.h"
 #include "SPJRunSingleMountTest.h"
 #include "ServerJobsIntContainer.h"
-#include "ServerJobUpdateIntQueue.h"
+#include "ServerJobUpdateQueue.h"
 #include "ServerJobMessageQueue.h"
 #include "ServerJobProxy.h"
 #include "ServerJobBlockingFlagsSet.h"
+#include "ReadyJobSearch.h"
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.
@@ -40,19 +41,25 @@ class ServerJobManager
 		ServerJobBlockingFlagsSet jobBlockingFlags;
 
 		// STEP 3: job update containers (each one should have built in mutex for lock_guarding); 
-		ServerJobUpdateIntQueue updatesViaInt;	
+		ServerJobUpdateQueue updateMessages;
 
 		void initialize(OSServer* in_serverPtr);
 		void startCommandLine();
 
 		// STEP 2: insert jobs based into the appropraite containers, based on the message.
-		void checkForMessages();
+		void checkForUpdateMessages();  // 2.1: check for messages that would be updates to existing jobs.
+		void checkForMessages();		// 2.2: check the messages that would spawn new jobs.
+		void runJobScan();				// 2.3: look for jobs to execute.
+		void removeCompletedPhasedJobs();
 
 		// message handling calls
 		void handleContourPlanRequest(Message in_message);
 
 		// job insertion calls
 		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.
+
+		// phase checking
+		void checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr);
 };
 
 #endif

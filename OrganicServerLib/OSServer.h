@@ -134,6 +134,7 @@ private:
 
 	// test run jobs for ServerJobManager
 	void constructSingleMountTestNoInput();
+	void jobSendUpdateMessageToJobManager(Message in_message);
 };
 
 #endif
