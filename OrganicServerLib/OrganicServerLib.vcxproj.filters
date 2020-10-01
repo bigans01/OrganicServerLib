@@ -150,6 +150,18 @@
     <ClInclude Include="ServerJobProxy.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServerJobBlockingFlags.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobBlockingFlagsSet.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContourPlanState.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ContourPlanStateContainer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

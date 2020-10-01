@@ -36,6 +36,7 @@
 #include "MessageCable.h"
 #include "ServerMessageInterpreter.h"
 #include "ServerJobManager.h"
+#include "ContourPlanStateContainer.h"
 
 
 class OSServer
@@ -115,6 +116,7 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
+	ContourPlanStateContainer planStateContainer;
 
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
