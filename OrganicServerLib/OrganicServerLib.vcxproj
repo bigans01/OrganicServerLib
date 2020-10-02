@@ -146,6 +146,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AcquiredServerThread.h" />
     <ClInclude Include="AdherentDataList.h" />
     <ClInclude Include="AdhesiveResults.h" />
     <ClInclude Include="AdhesiveRunner.h" />
@@ -196,6 +197,8 @@
     <ClInclude Include="ServerPhasedJobBase.h" />
     <ClInclude Include="ServerThreadDesignation.h" />
     <ClInclude Include="ServerThreadDesignationMap.h" />
+    <ClInclude Include="ServerThreadWorkloadMonitor.h" />
+    <ClInclude Include="ServerThreadWorkloadUpdate.h" />
     <ClInclude Include="SJRunSingleMountTest.h" />
     <ClInclude Include="SPJRunSingleMountTest.h" />
     <ClInclude Include="stdafx.h" />

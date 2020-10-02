@@ -21,3 +21,9 @@ void ServerJobBase::setServerPtr(OSServer* in_serverPtr)
 {
 	server = in_serverPtr;
 }
+
+void ServerJobBase::appendMatchedThreadAndWorkLoadToMessage(int in_threadMonitorID)
+{
+	completionMessage.insertInt(in_threadMonitorID);
+	completionMessage.insertFloat(estimatedWorkLoad);		// should be calculated by the call to the virtual function ServerJobBase::runPreChecks()
+}

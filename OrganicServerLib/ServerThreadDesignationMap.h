@@ -7,20 +7,27 @@
 #include "ServerThreadDesignation.h"
 #include "OrganicStemcellManager.h"
 #include "OrganicThread.h"
+#include "ServerThreadWorkloadMonitor.h"
+#include "AcquiredServerThread.h"
 
 class ServerThreadDesignationMap
 {
 	public:
 		OrganicStemcellManager* organicStemcellManagerRef = NULL;
 		std::map<ServerThreadDesignation, int> designations;
-		std::map<int, int> unDesignatedPool;
+		//std::map<int, int> unDesignatedPool;
+		std::map<int, ServerThreadWorkloadMonitor> unDesignatedPool;
 
 		void initialize(OrganicStemcellManager* in_organicStemcellManagerRef);
 		void buildInitialUndesignatedPool();
 		void removeFromUndesignatedPool(int in_key);
 		void designateCommandLineThread(int in_key);
 		OrganicThread* getCommandLineThread();
-		OrganicThread* getFirstAvailableThread();
+		//OrganicThread* getFirstAvailableThread();
+		AcquiredServerThread getFirstAvailableThread();
+		void incrementWorkload(int in_monitorID, float in_workload);
+		void decrementWorkload(int in_monitorID, float in_workload);
+		//void resetWorkload(int in_monitorID);
 };
 
 #endif

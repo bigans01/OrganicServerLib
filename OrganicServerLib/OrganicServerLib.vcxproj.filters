@@ -180,6 +180,15 @@
     <ClInclude Include="ReadyJobSearch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="ServerThreadWorkloadMonitor.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AcquiredServerThread.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerThreadWorkloadUpdate.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

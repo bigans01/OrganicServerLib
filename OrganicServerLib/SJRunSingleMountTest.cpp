@@ -4,7 +4,7 @@
 
 void SJRunSingleMountTest::runPrechecks() 
 {
-
+	estimatedWorkLoad = 11.5f;		// hardcoded test.
 }
 
 void SJRunSingleMountTest::runJob(OrganicThread* in_threadToRunOn) 

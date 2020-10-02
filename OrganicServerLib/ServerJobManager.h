@@ -14,6 +14,7 @@
 #include "ServerJobProxy.h"
 #include "ServerJobBlockingFlagsSet.h"
 #include "ReadyJobSearch.h"
+#include "ServerThreadWorkloadUpdate.h"
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.
@@ -60,6 +61,8 @@ class ServerJobManager
 
 		// phase checking
 		void checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr);
+
+		ServerThreadWorkloadUpdate readUpdateDataFromMessage(Message* in_messageRef);
 };
 
 #endif

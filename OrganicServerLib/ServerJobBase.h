@@ -22,8 +22,10 @@ class ServerJobBase
 		void setCompletionMessage(Message in_message);
 		void setServerJobState(ServerJobState in_serverJobState);
 		void setServerPtr(OSServer* in_serverPtr);
+		void appendMatchedThreadAndWorkLoadToMessage(int in_threadMonitorID);
 
 		OSServer* server = NULL;
+		float estimatedWorkLoad = 0.0f;		// the estimated work load produced by the runPrechecks call
 		Message startMessage;
 		Message completionMessage;		// the message that must always be submitted as an additional packaged_task, once the main packaged_task called from runJob() is complete.
 		ServerJobState currentJobState = ServerJobState::WAITING_TO_EXECUTE;		// always initialized with waiting to execute

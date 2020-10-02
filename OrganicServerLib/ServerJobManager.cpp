@@ -5,11 +5,8 @@
 void ServerJobManager::initialize(OSServer* in_serverPtr)
 {
 	server = in_serverPtr;
-
 	intJobsContainer.server = server;
-
 	designations.initialize(&server->OSCManager);
-	//designations.buildInitialUndesignatedPool(&server->OSCManager);
 	designations.buildInitialUndesignatedPool();
 	designations.designateCommandLineThread(0);							// thread 0 from the pool should be the command line thread.
 }
@@ -19,7 +16,7 @@ void ServerJobManager::startCommandLine()
 	OrganicThread* targetThread = designations.getCommandLineThread();
 
 	//int commandLineRunning = server->isCommandLineRunning;
-	int* clShutdownStatus = &server->isCommandLineShutDown;
+	//int* clShutdownStatus = &server->isCommandLineShutDown;
 	//std::future<int> testFuture2 = OSCManager.stemcellMap[0].threadPtr->submit(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
 	//targetThread->submit(&OSServer::runCommandLine, server, std::ref(server->serverReadWrite), std::ref(server->commandLineCV), std::ref(commandLineRunningRef), std::ref(clShutdownStatus));
 	//targetThread->submit(&OSServer::runCommandLineV2, server, std::ref(server->serverReadWrite), std::ref(server->isCommandLineRunning), std::ref(clShutdownStatus));
@@ -29,21 +26,20 @@ void ServerJobManager::startCommandLine()
 void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
 {
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
-	intJobsContainer.insertJob(&job, in_message);
+	intJobsContainer.insertJob(&job, std::move(in_message));
 }
 
 void ServerJobManager::checkForUpdateMessages()
 {
 	while (!updateMessages.isEmpty())
 	{
-		//std::cout << " !! Found update message...continue? " << std::endl;
-
-		//int someVal = 3;
-		//std::cin >> someVal;
-
 		Message* currentMessageRef = updateMessages.getMessageRefFromFront();
-		Message tempCopy = *currentMessageRef;
 		currentMessageRef->open();
+
+		// after opening the message, read the update data.
+		ServerThreadWorkloadUpdate updateData = readUpdateDataFromMessage(currentMessageRef);
+		//std::cout << "---> Job update updateData workload to update is: " << updateData.workload << std::endl;
+
 		switch (currentMessageRef->messageType)
 		{
 			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :
@@ -51,28 +47,29 @@ void ServerJobManager::checkForUpdateMessages()
 				int parentJobID = currentMessageRef->readInt();
 				int phaseID = currentMessageRef->readInt();
 				int jobID = currentMessageRef->readInt();
-
-				/*
-				std::cout << "Parent job ID is: " << parentJobID << std::endl;
-				int someVal = 3;
-
-				auto findParentJobID = intJobsContainer.serverJobs.find(parentJobID);
-				if (findParentJobID == intJobsContainer.serverJobs.end())
-				{
-					std::cout << "!!! Warning, parent job not found! " << std::endl;
-				}
-
-				std::cin >> someVal;
-				*/
-
-				//intJobsContainer.serverJobs[parentJobID]->interpretMessage(std::move(*currentMessageRef));
-				//intJobsContainer.serverJobs[parentJobID]->interpretMessage(*currentMessageRef);
-				intJobsContainer.serverJobs[parentJobID]->interpretMessage(tempCopy);
+				intJobsContainer.serverJobs[parentJobID]->interpretMessage(std::move(*currentMessageRef));
 				break;
 			}
 		}
+
+		// decrement the workload, based on what we read from the message.
+		designations.decrementWorkload(updateData.threadID, updateData.workload);
+
 		updateMessages.safePopQueue();
 	}
+}
+
+ServerThreadWorkloadUpdate ServerJobManager::readUpdateDataFromMessage(Message* in_messageRef)
+{
+	// read the int
+	auto targetThread = in_messageRef->intVector.rbegin();
+	auto workload = in_messageRef->floatVector.rbegin();
+
+	ServerThreadWorkloadUpdate update;
+	update.threadID = *targetThread;
+	update.workload = *workload;
+
+	return update;
 }
 
 void ServerJobManager::checkForMessages()
@@ -108,8 +105,7 @@ void ServerJobManager::checkForMessages()
 		currentMessageRef->open();												// open the message
 		switch (currentMessageRef->messageType)
 		{
-			//case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN : {  handleContourPlanRequest(std::move(*currentMessageRef));  break;  }
-		case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN: {  handleContourPlanRequest(*currentMessageRef);  break;  }
+			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN : {  handleContourPlanRequest(std::move(*currentMessageRef));  break;  }
 		}
 		messageQueue.safePopQueue();
 	}
@@ -123,15 +119,20 @@ void ServerJobManager::runJobScan()
 		auto intServerJobsEnd = intJobsContainer.serverJobs.end();
 		for (; intServerJobsBegin != intServerJobsEnd; intServerJobsBegin++)
 		{
-			//std::cout << "!!! ----------- Found existing job " << std::endl;
 			checkCurrentJobPhaseSetup(&intServerJobsBegin->second);
-			//intServerJobsBegin->second->getCurrentPhaseState();
-			// get the phase state again, to see if any jobs were added.
-			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();
+			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();		// don't run jobs that are already executing.
 			if (searchForAvailableJobInCurrentPhase.wasJobFound == true)
 			{
-				OrganicThread* targetThread = designations.getFirstAvailableThread();						// temporary: run in thread.
-				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(targetThread);
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runPrechecks();									// calculate the work load.
+				float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
+
+				std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
+
+				AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
+				designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
+
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);										// finally, run the job.
 			}
 		}
 	}
@@ -146,7 +147,7 @@ void ServerJobManager::removeCompletedPhasedJobs()
 void ServerJobManager::checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr)
 {
 	bool isInProgress = (*in_phasePtr)->checkIfCurrentPhaseIsInProgress();
-	if (isInProgress == false)		// if the phase isn't in progress, start it
+	if (isInProgress == false)															// if the phase isn't in progress, start it
 	{
 		(*in_phasePtr)->initializeCurrentPhase();										// initialize FIRST, then...
 	}
@@ -161,11 +162,8 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 	bool wasContouredPlanFound = server->planStateContainer.checkIfStateExistsForPlan(planName);	// check if the plan has a state; if it does, we won't run this plan (because of the rule: a single contour plan may only run once.)
 	if (wasContouredPlanFound == false)																// it wasn't found as having a state, lets run it.
 	{
-		//insertPhasedJobRunSingleMountTest(std::move(in_message));									// move the message into the job.	
-		insertPhasedJobRunSingleMountTest(in_message);									// move the message into the job.	
+		insertPhasedJobRunSingleMountTest(std::move(in_message));									// move the message into the job.	
 		server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
-		//OrganicThread* targetThread = designations.getFirstAvailableThread();						// temporary: run in thread.
-		//targetThread->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server);				// ""
 	}
 	else if (wasContouredPlanFound == true)															// drop the job request.
 	{
