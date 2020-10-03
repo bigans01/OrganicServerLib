@@ -8,9 +8,7 @@ void SJSendRequestForOGLMRMCBlueprints::runPrechecks()
 
 void SJSendRequestForOGLMRMCBlueprints::runJob(OrganicThread* in_threadToRunOn)
 {
-	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.
-	//in_threadToRunOn->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server);									// main work
-	//in_threadToRunOn->submit(&ServerJobProxy::callServerJobRunBigMountTest, server);									// main work
+	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.							// main work
 	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendRequestToSendOGLMCubeFromClient, server);									// main work
 	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendUpdateMessageToJobManager, server, completionMessage);	// required: job completion message
 }

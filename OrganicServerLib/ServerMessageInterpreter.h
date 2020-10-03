@@ -21,6 +21,12 @@ class ServerMessageInterpreter : public MessageInterpreter
 		// client request and response
 		void interpretIncomingMessagesFromClient();
 		void interpretOutgoingMessagesToClient();
+
+		// message handling functions
+		void handleRequestFromClientForOGLMRMCBlueprints(Message in_message);
+		void handleRequestFromClientGetBlueprintForT1(Message in_message);
+		void handleRequestFromClientGetBlueprintForT2(Message in_message);
+		void handleRequestFromClientRunContourPlan(Message in_message);
 };
 
 #endif
