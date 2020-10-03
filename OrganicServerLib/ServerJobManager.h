@@ -18,10 +18,11 @@
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.
-// 2. The job is run on an available thread; at the end of the job, a job update is sent back to the ServerJobManager; there are no CVs or waits for the jobs to complete -- they are done when they are done, and they 
+// 2. Sub-Jobs, phases, and Jobs that were completed are removed.
+// 3. Messages that generate new jobs are checked, and if the check passes a new job is created.
+// 4. The job is run on an available thread; at the end of the job, a job update is sent back to the ServerJobManager; there are no CVs or waits for the jobs to complete -- they are done when they are done, and they 
 //    send a job update message to the ServerJobManager instance whenever something is complete (or fails). It should be noted, that this instance of ServerJobManager may receive
 //    job updates from another server, for example in the event of a job being completed on another server. However, in this case, the job ID in the job update must already exist in this instance.
-// 3. In the next tick, the server reads from the job updates and updates jobs appropriately, based off the appropriate ServerJobUpdateQueue(int, string) setc)
 
 class OSServer;
 class ServerJobManager
@@ -48,10 +49,10 @@ class ServerJobManager
 		void startCommandLine();
 
 		// STEP 2: insert jobs based into the appropraite containers, based on the message.
-		void checkForUpdateMessages();  // 2.1: check for messages that would be updates to existing jobs.
-		void checkForMessages();		// 2.2: check the messages that would spawn new jobs.
-		void runJobScan();				// 2.3: look for jobs to execute.
-		void removeCompletedPhasedJobs();
+		void checkForUpdateMessages();		// 1: check for messages that would be updates to existing jobs.
+		void removeCompletedPhasedJobs();   // 2: remove jobs flagged as completed in the phases they are in; remove ServerPhasedJobs that have been completed
+		void checkForMessages();			// 3: check the messages that would spawn new jobs.
+		void runJobScan();					// 4: look for jobs to execute.
 
 		// message handling calls
 		void handleContourPlanRequest(Message in_message);

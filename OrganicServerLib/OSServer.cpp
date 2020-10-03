@@ -840,9 +840,58 @@ void OSServer::constructSingleMountTestNoInput()
 	executeDerivedContourPlanNoInput("summit1");
 }
 
+void OSServer::constructBigMountTestNoInput()
+{
+	std::cout << "||||||| constructing blueprints (version 3)...." << std::endl;
+	ECBPolyPoint mountainSummit;
+	// 2, 10, 2 = error (1/15/2019)
+	mountainSummit.y = 7;
+	mountainSummit.x = 2;
+	mountainSummit.z = 2;
+
+	mountainSummit.y = 0;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
+	mountainSummit.x = 23.59;
+	mountainSummit.z = 0;
+
+	// 10 is stable
+	// 6.81 causes anomaly at peak
+
+	// Tested values for layer y difference	: 6.81 (PASS, fixed by F-001)
+	//										: 3.81 (PASS, fixed by F-002)
+	//										: 2.81 (PASS)
+	//										: 1.81 (PASS)
+	//										: 0.81 (PASS)
+
+	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+
+
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlanNoInput("mountain");
+}
+
 void OSServer::jobSendUpdateMessageToJobManager(Message in_message)
 {
 	serverJobManager.updateMessages.insertUpdate(in_message);
+}
+
+void OSServer::jobSendRequestToSendOGLMCubeFromClient()
+{
+	Message outgoingRequest;
+	outgoingRequest.messageType = MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER;
+	//serverMessages.outgoingMessages.push(std::move(outgoingRequest));
+	client.insertResponseMessage(outgoingRequest);
 }
 
 void OSServer::constructMultiMountTest()
@@ -1649,5 +1698,5 @@ ContourBase* OSServer::getDerivedContourPlan(string in_string)
 void OSServer::checkClientMessages()
 {
 	client.transferRequestMessages(&serverMessages);							// retrieve incoming messages from the client (via std::move)
-	messageInterpreter.interpretIncomingRequestsFromClient();					// interpret (and optionally, process) the messages
+	messageInterpreter.interpretIncomingMessagesFromClient();					// interpret (and optionally, process) the messages
 }

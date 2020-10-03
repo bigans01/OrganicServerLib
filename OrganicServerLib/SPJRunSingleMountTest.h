@@ -5,6 +5,7 @@
 
 #include "ServerPhasedJobBase.h"
 #include "SJRunSingleMountTest.h"
+#include "SJSendRequestForOGLMRMCBlueprints.h"
 
 class SPJRunSingleMountTest : public ServerPhasedJobBase
 {

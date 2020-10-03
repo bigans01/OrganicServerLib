@@ -8,12 +8,14 @@ void ServerMessageInterpreter::initialize(OSServer* in_organicSystemServerRef, M
 	messageCableRef = in_messageCableRef;
 }
 
-void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for interpreting inbound requests from a client
+void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for interpreting inbound requests from a client
 {
-	while (!messageCableRef->incomingMessages.empty())
+	//while (!messageCableRef->incomingMessages.empty())
+	while (!messageCableRef->isIncomingQueueEmpty())
 	{
 		//std::cout << "Checking incoming requests from client: " << std::endl;
-		Message* currentMessage = &messageCableRef->incomingMessages.front();
+		//Message* currentMessage = &messageCableRef->incomingMessages.front();
+		Message* currentMessage = messageCableRef->getIncomingMessageRefFromFront();
 		currentMessage->open();					// open the message for reading (sets the iterators)
 		switch (currentMessage->messageType)											
 		{
@@ -188,11 +190,12 @@ void ServerMessageInterpreter::interpretIncomingRequestsFromClient()	// for inte
 				break;
 			}
 		}
-		messageCableRef->incomingMessages.pop();
+		//messageCableRef->incomingMessages.pop();
+		messageCableRef->popIncomingQueue();
 	}
 }
 
-void ServerMessageInterpreter::interpretIncomingResponsesFromClient()
+void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
 {
 
 }

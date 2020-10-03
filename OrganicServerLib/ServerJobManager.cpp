@@ -45,17 +45,13 @@ void ServerJobManager::checkForUpdateMessages()
 			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :
 			{
 				int parentJobID = currentMessageRef->readInt();
-				int phaseID = currentMessageRef->readInt();
-				int jobID = currentMessageRef->readInt();
 				intJobsContainer.serverJobs[parentJobID]->interpretMessage(std::move(*currentMessageRef));
 				break;
 			}
 		}
 
-		// decrement the workload, based on what we read from the message.
-		designations.decrementWorkload(updateData.threadID, updateData.workload);
-
-		updateMessages.safePopQueue();
+		designations.decrementWorkload(updateData.threadID, updateData.workload);		// decrement the workload, based on what we read from the message.
+		updateMessages.safePopQueue();													// pop the message
 	}
 }
 

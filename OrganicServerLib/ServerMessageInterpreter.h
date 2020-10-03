@@ -19,8 +19,8 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void initialize(OSServer* in_organicSystemServerRef, MessageCable* in_messageCableRef);
 
 		// client request and response
-		void interpretIncomingRequestsFromClient();
-		void interpretIncomingResponsesFromClient();
+		void interpretIncomingMessagesFromClient();
+		void interpretOutgoingMessagesToClient();
 };
 
 #endif
