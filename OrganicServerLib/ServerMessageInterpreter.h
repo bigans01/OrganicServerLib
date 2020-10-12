@@ -27,6 +27,7 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void handleRequestFromClientGetBlueprintForT1(Message in_message);
 		void handleRequestFromClientGetBlueprintForT2(Message in_message);
 		void handleRequestFromClientRunContourPlan(Message in_message);
+		void handleRequestToClientSetWorldDirection(Message in_message);
 };
 
 #endif

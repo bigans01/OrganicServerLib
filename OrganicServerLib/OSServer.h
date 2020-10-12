@@ -99,6 +99,8 @@ public:
 
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
+	void setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ);
+
 	ContourBase* getDerivedContourPlan(string in_string);
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
@@ -135,6 +137,7 @@ private:
 	// test run jobs for ServerJobManager
 	void constructSingleMountTestNoInput();
 	void constructBigMountTestNoInput();
+	void jobSendSetWorldDirectionToClient(Message in_message);
 	void jobSendUpdateMessageToJobManager(Message in_message);
 	void jobSendRequestToSendOGLMCubeFromClient();
 

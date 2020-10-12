@@ -26,6 +26,16 @@ void ServerJobManager::startCommandLine()
 void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
 {
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
+	//std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
+	intJobsContainer.insertJob(&job, std::move(in_message));
+}
+
+void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
+{
+	//std::cout << "############# Inserted set direction job..." << std::endl;
+	std::shared_ptr<ServerPhasedJobBase> job(new (SPJSendWorldDirectionToClient));
+	Message directionMessage = in_message;
+	job->insertStringedMessage("direction", directionMessage);
 	intJobsContainer.insertJob(&job, std::move(in_message));
 }
 
@@ -101,7 +111,10 @@ void ServerJobManager::checkForMessages()
 		currentMessageRef->open();												// open the message
 		switch (currentMessageRef->messageType)
 		{
+			//std::cout << "!!! Message found. " << std::endl;
 			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN : {  handleContourPlanRequest(std::move(*currentMessageRef));  break;  }
+			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION: { handleSetDirectionRequest(std::move(*currentMessageRef)); break; }
+
 		}
 		messageQueue.safePopQueue();
 	}
@@ -115,6 +128,8 @@ void ServerJobManager::runJobScan()
 		auto intServerJobsEnd = intJobsContainer.serverJobs.end();
 		for (; intServerJobsBegin != intServerJobsEnd; intServerJobsBegin++)
 		{
+			//std::cout << "!!! Found job to run. " << std::endl;
+
 			checkCurrentJobPhaseSetup(&intServerJobsBegin->second);
 			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();		// don't run jobs that are already executing.
 			if (searchForAvailableJobInCurrentPhase.wasJobFound == true)
@@ -122,7 +137,7 @@ void ServerJobManager::runJobScan()
 				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runPrechecks();									// calculate the work load.
 				float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
 
-				std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
+				// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
 
 				AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
 				designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
@@ -165,4 +180,14 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 	{
 		std::cout << "SERVER: plan " << planName << "already has a state; will not insert job. " << std::endl;
 	}
+}
+
+void ServerJobManager::handleSetDirectionRequest(Message in_message)
+{
+	//std::cout << "#(((((((((((((( handling set direction request... " << std::endl;
+
+	// LOCAL message logic
+	insertPhasedJobSetWorldDirection(in_message);
+
+	// REMOTE message logic
 }

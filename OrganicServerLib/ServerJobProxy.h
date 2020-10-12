@@ -14,6 +14,8 @@ class ServerJobProxy
 		static void callServerJobRunBigMountTest(OSServer* in_serverRef);
 		static void callServerJobSendUpdateMessageToJobManager(OSServer* in_serverRef, Message in_message);
 		static void callServerJobSendRequestToSendOGLMCubeFromClient(OSServer* in_serverRef);
+		static void callServerJobSendSetWorldDirectionToClient(OSServer* in_serverRef, Message in_message);
+
 
 };
 

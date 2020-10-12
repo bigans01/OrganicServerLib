@@ -8,6 +8,7 @@
 #include <mutex>
 #include "ServerPhasedJobBase.h"
 #include "SPJRunSingleMountTest.h"
+#include "SPJSendWorldDirectionToClient.h"
 #include "ServerJobsIntContainer.h"
 #include "ServerJobUpdateQueue.h"
 #include "ServerJobMessageQueue.h"
@@ -56,9 +57,11 @@ class ServerJobManager
 
 		// message handling calls
 		void handleContourPlanRequest(Message in_message);
+		void handleSetDirectionRequest(Message in_message);
 
 		// job insertion calls
 		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.
+		void insertPhasedJobSetWorldDirection(Message in_message);
 
 		// phase checking
 		void checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr);

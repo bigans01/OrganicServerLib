@@ -25,6 +25,21 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 	}
 }
 
+void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
+{
+	while (!messageCableRef->isOutgoingQueueEmpty())
+	{
+		std::cout << "############### Interpreting outbound messages... " << std::endl;
+		Message* currentMessage = messageCableRef->getOutgoingMessageRefFromFront();
+		currentMessage->open();
+		switch (currentMessage->messageType)
+		{
+			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION :					{ handleRequestToClientSetWorldDirection(std::move(*currentMessage)); break; }
+		}
+		messageCableRef->popOutgoingQueue();
+	}
+}
+
 void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Message in_message)
 {
 
@@ -195,7 +210,28 @@ void ServerMessageInterpreter::handleRequestFromClientRunContourPlan(Message in_
 	}
 }
 
-void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
+void ServerMessageInterpreter::handleRequestToClientSetWorldDirection(Message in_message)
 {
+	// other cases follow here...
+	// ###################
+	// PREVIOUS CALL/MESSAGE: client requests a contour plan via button click in ImGui.
+	//
+	//
+	//
 
+	switch (in_message.messageLocality)
+	{
+	case MessageLocality::LOCAL:
+	{
+		std::cout << "SERVER: sending request to client to set world direction" << std::endl;
+		//serverPtr->serverJobManager.messageQueue.insertMessage(std::move(in_message));		//  move the request to the server job manager.
+		serverPtr->client.insertResponseMessage(in_message);
+		break;
+	}
+	case MessageLocality::REMOTE:
+	{
+		break;
+	}
+	}
 }
+

@@ -19,6 +19,11 @@ void ServerPhasedJobBase::insertParentContainerStringKey(std::string in_parentCo
 	parentContainerStringKey = in_parentContainerStringKey;
 }
 
+void ServerPhasedJobBase::insertStringedMessage(std::string in_stringName, Message in_message)
+{
+	stringedMessageMap[in_stringName] = in_message;
+}
+
 JobPhaseState ServerPhasedJobBase::getCurrentPhaseState()
 {
 	return currentPhaseIter->second->calculateAndReturnPhaseState();

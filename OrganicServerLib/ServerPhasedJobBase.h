@@ -10,6 +10,7 @@
 #include "ServerJobState.h"
 #include <string>
 #include <map>
+#include <unordered_map>
 #include <mutex>
 #include "ReadyJobSearch.h"
 
@@ -24,6 +25,7 @@ class ServerPhasedJobBase
 
 		std::map<int, std::shared_ptr<ServerJobPhase>> phaseMap;
 		std::map<int, std::shared_ptr<ServerJobPhase>>::iterator currentPhaseIter;
+		std::unordered_map<std::string, Message> stringedMessageMap;
 
 		OSServer* server;
 		ServerJobContainerType parentContainerType = ServerJobContainerType::NOVAL;
@@ -33,6 +35,7 @@ class ServerPhasedJobBase
 		void initializeBaseClass(OSServer* in_serverPtr, MessageLocality in_locality, ServerJobContainerType in_parentContainerType);
 		void insertParentContainerIntKey(int in_parentContainerIntKey);
 		void insertParentContainerStringKey(std::string in_parentContainerStringKey);
+		void insertStringedMessage(std::string in_stringName, Message in_message);
 
 		// parent key values
 		int parentContainerIntKey = 0;

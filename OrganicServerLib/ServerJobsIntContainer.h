@@ -25,6 +25,7 @@ class ServerJobsIntContainer
 			serverJobs[currentIndex]->initializeBaseClass(server, in_initialMessage.messageLocality, containerType);
 			serverJobs[currentIndex]->insertParentContainerIntKey(currentIndex);
 			serverJobs[currentIndex]->initialize();
+			currentIndex++;
 		}
 
 		void cleanupJobsInPhasedJobs()

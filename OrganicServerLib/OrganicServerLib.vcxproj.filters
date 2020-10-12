@@ -192,6 +192,12 @@
     <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SPJSendWorldDirectionToClient.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SJBuildAndSendWorldDirection.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -291,6 +297,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJSendWorldDirectionToClient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SJBuildAndSendWorldDirection.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

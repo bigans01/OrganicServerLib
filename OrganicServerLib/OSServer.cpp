@@ -881,6 +881,19 @@ void OSServer::constructBigMountTestNoInput()
 	executeDerivedContourPlanNoInput("mountain");
 }
 
+void OSServer::jobSendSetWorldDirectionToClient(Message in_message)
+{
+	ECBPolyPoint direction;
+	Message tempInBoundMessage = in_message;
+	tempInBoundMessage.open();
+	direction = tempInBoundMessage.readPoint();
+
+	Message outgoingRequest;
+	outgoingRequest.messageType = MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION;
+	outgoingRequest.insertPoint(direction);
+	messageInterpreter.messageCableRef->insertOutgoingMessage(outgoingRequest);	// prep for output to client.
+}
+
 void OSServer::jobSendUpdateMessageToJobManager(Message in_message)
 {
 	serverJobManager.updateMessages.insertUpdate(in_message);
@@ -1473,6 +1486,19 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	std::cin >> someVal;
 }
 
+void OSServer::setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ)
+{
+	ECBPolyPoint direction;
+	direction.x = in_directionX;
+	direction.y = in_directionY;
+	direction.z = in_directionZ;
+	Message newMessage;
+	newMessage.messageType = MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION;
+	newMessage.insertPoint(direction);
+	//serverJobManager.insertPhasedJobSetWorldDirection(newMessage);
+	serverJobManager.messageQueue.insertMessage(newMessage);
+}
+
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
 	//calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
@@ -1699,4 +1725,5 @@ void OSServer::checkClientMessages()
 {
 	client.transferRequestMessages(&serverMessages);							// retrieve incoming messages from the client (via std::move)
 	messageInterpreter.interpretIncomingMessagesFromClient();					// interpret (and optionally, process) the messages
+	messageInterpreter.interpretOutgoingMessagesToClient();
 }
