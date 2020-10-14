@@ -1488,21 +1488,15 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 
 void OSServer::setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ)
 {
-	ECBPolyPoint direction;
-	direction.x = in_directionX;
-	direction.y = in_directionY;
-	direction.z = in_directionZ;
+	ECBPolyPoint direction(in_directionX, in_directionY, in_directionZ);
 	Message newMessage;
 	newMessage.messageType = MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION;
 	newMessage.insertPoint(direction);
-	//serverJobManager.insertPhasedJobSetWorldDirection(newMessage);
-	serverJobManager.messageQueue.insertMessage(newMessage);
+	serverJobManager.messageQueue.insertMessage(newMessage);		// insert the job into the ServerJobManager
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
-	//calibrateAndRunContouredTriangle(in_Triangle, in_Directions);		// perform calibrations on this single contoured triangle, so that points of the triangle are in the appropriate EnclaveKey
-	//determineTriangleType2and3Lines(in_Triangle);		// T-4 cycle through triangle border polys
 	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap, in_Triangle->forgedPolyRegistryRef, in_orderRef);
 	runner.performRun();
 }
@@ -1577,10 +1571,6 @@ void OSServer::runServer()
 
 void OSServer::executeCommandLine()
 {
-	//int* commandLineRunningRef = &isCommandLineRunning;
-	//int* clShutdownStatus = &isCommandLineShutDown;
-	//std::future<int> testFuture2 = OSCManager.stemcellMap[0].threadPtr->submit(&OSServer::runCommandLine, this, std::ref(serverReadWrite), std::ref(commandLineCV), std::ref(isCommandLineRunning), std::ref(clShutdownStatus));
-
 	serverJobManager.startCommandLine();
 }
 

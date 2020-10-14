@@ -635,14 +635,18 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	int currentAdherenceIndex = 0;														// iterate every loop; the very first blueprint doesn't need to do adherence.
 	for (; adherenceListBegin != adherenceListEnd; adherenceListBegin++)
 	{
-		auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.find(*adherenceListBegin);	// find the blueprint
+		// #############################################################################################################################
+		// STEP 1.1): find the SHELL_MASSDRIVER polys that this ContourPlan produced, 
+		// which are a subset of the ForgedPolySet, in each blueprint that the ContourPlan touched.
+
+		auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.find(*adherenceListBegin); // find the forged poly set, for the current blueprint we're looking at
+																								 // in the vector. For example, a ForgedPolySet might have a range of polys between 0 and 7 (8 total).
 		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
-		int foundGroupID = planPolyRegistryBegin->second.groupID;
 		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
 		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
-		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
-		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
-		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)
+		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
+		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();					// ""
+		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)	// check for SHELL_MASSDRIVER polys, and add them appropriately.
 		{
 			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
 			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
@@ -652,19 +656,20 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 			}
 		}
 
+		// #############################################################################################################################
+		// STEP 1.2): use all the values from each ForgedPolySet -- which represent the IDs of ECBPolys that this ContourPlan added -- for each blueprint, and 
+		// then spawn the resulting EnclaveTriangles in the OREs (OrganicRawEnclaves) into the tempMap. When this is done, add the results to the containerMapMap.
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
-		//in_clientRef->OS->produceRawEnclavesForPolySet(in_fractureResultsMapRef, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
-
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
-		containerMapMap[blueprintKey] = tempMap;
+		containerMapMap[blueprintKey] = tempMap;																			// 2.) Copy the results, before reunning adherence
 		if (currentAdherenceIndex > 0)																						// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
-			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 2.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
+			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 3.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
-		//containerMapMap[blueprintKey] = tempMap;																			// 3.) Copy the EnclaveFractureResultsMap into the temporary map, after we've done adherence
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&containerMapMap[blueprintKey], blueprintToCheck);					// 4.) spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&containerMapMap[blueprintKey], blueprintToCheck);					// 4.) for each blueprint in the adherence list, 
+																																				// spawn the EnclaveTriangleSkeletonContainers from the corresponding EnclaveFractureResultsMap for that blueprint; 
+																																				// then append the results to the target blueprint to update.				
 		currentAdherenceIndex++;
 	}
 	
