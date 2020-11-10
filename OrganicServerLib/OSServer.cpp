@@ -913,7 +913,7 @@ void OSServer::constructMultiMountTest()
 	int numberOfLayers = 3;
 
 	// first mountain
-	summit1.x = 48;
+	summit1.x = 36;
 	summit1.y = 16;
 	summit1.z = 16;
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
@@ -938,6 +938,48 @@ void OSServer::constructMultiMountTest()
 		summit2Ref->constructStripTriangles(x, 2);	// construct an individual layer
 	}
 	executeDerivedContourPlan("summit2");
+}
+
+void OSServer::constructMultiMountTestWithElevator()
+{
+	ECBPolyPoint summit1, summit2;
+	int numberOfLayers = 3;
+
+	// first mountain
+	summit1.x = 28;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+	executeDerivedContourPlan("summit1");
+
+	
+	// second mountain
+	summit2.x = 4;
+	summit2.y = 16;
+	summit2.z = 16;
+	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit2Ref = getDerivedContourPlan("summit2");
+	summit2Ref->amplifyAllContourLinePoints();
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit2Ref->constructStripTriangles(x, 2);	// construct an individual layer
+	}
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		summit2Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
+	}
+	executeDerivedContourPlan("summit2");
+	
 }
 
 void OSServer::constructMissingFillBlueprint3()

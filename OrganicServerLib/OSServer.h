@@ -89,6 +89,7 @@ public:
 	void constructBlueprintFillTest();
 	void constructSingleMountTest();
 	void constructMultiMountTest();
+	void constructMultiMountTestWithElevator();
 	void constructMissingFillBlueprint3();
 	void constructSingleOrganicTest();
 	void constructOrganicRawTest();

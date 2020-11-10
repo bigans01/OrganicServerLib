@@ -667,7 +667,9 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		{
 			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 3.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&containerMapMap[blueprintKey], blueprintToCheck);					// 4.) for each blueprint in the adherence list, 
+
+		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], blueprintToCheck);					// 4.) for each blueprint in the adherence list, 
 																																				// spawn the EnclaveTriangleSkeletonContainers from the corresponding EnclaveFractureResultsMap for that blueprint; 
 																																				// then append the results to the target blueprint to update.				
 		currentAdherenceIndex++;
@@ -686,14 +688,15 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		// set up the set to use
 		EnclaveKeyDef::EnclaveKey blueprintKey = massDriverRegistryBegin->first;
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
-		ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
-		ForgedPolySet newSet = originalSet;
+		//ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
+		ForgedPolySet massDriverSet = massDriverRegistryBegin->second;				// the set that represents the polys identified as SHELL_MASSDRIVER type.
+		ForgedPolySet startingFloorTerminatingSet = originalSet;
 
-		auto subtractionBegin = subtractingSet.polySet.begin();
-		auto subtractionEnd = subtractingSet.polySet.end();
+		auto subtractionBegin = massDriverSet.polySet.begin();
+		auto subtractionEnd = massDriverSet.polySet.end();
 		for (subtractionBegin; subtractionBegin != subtractionEnd; subtractionBegin++)
 		{
-			newSet.polySet.erase(*subtractionBegin);
+			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
 		std::cout << "Mass Driving blueprint Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
@@ -708,7 +711,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//
 		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
 		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
-		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, newSet, subtractingSet);
+		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, startingFloorTerminatingSet, massDriverSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}

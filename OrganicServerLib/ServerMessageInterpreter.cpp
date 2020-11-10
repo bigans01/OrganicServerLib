@@ -170,7 +170,7 @@ void ServerMessageInterpreter::handleRequestFromClientGetBlueprintForT2(Message 
 			{
 				serverPtr->transferBlueprintToLocalOS(extractedKey);
 				Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_BLUEPRINT_T2_FOUND);
-				std::cout << "SERVER: found T2 blueprint (" << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << ") " << std::endl;
+				//std::cout << "SERVER: found T2 blueprint (" << extractedKey.x << ", " << extractedKey.y << ", " << extractedKey.z << ") " << std::endl;
 				responseMessage.insertEnclaveKey(extractedKey);
 				serverPtr->client.insertResponseMessage(responseMessage);
 			}
