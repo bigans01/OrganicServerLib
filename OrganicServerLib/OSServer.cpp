@@ -964,6 +964,7 @@ void OSServer::constructMultiMountTestWithElevator()
 
 	
 	// second mountain
+
 	summit2.x = 4;
 	summit2.y = 16;
 	summit2.z = 16;
@@ -1596,16 +1597,20 @@ void OSServer::runServer()
 	{
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0) // ""
 		{
+			//std::cout << "Looping...." << std::endl;
+
 			checkClientMessages();					// check for requests sent by client
 
-			serverJobManager.checkForUpdateMessages();		// 2.1: check for messages that would be updates to existing jobs, from the previous tick.
+			serverJobManager.checkForUpdateMessages();		// 2.1: check for messages that would be updates to existing jobs, from the previous tick
 			serverJobManager.removeCompletedPhasedJobs();	// 2.2: with the updates applied, check to see if there are any jobs to remove.
 			serverJobManager.checkForMessages();			// 2.3: check the messages that would spawn new jobs.
 			serverJobManager.runJobScan();					// 2.4: look for jobs to execute.
 			//serverJobManager.removeCompletedPhasedJobs();
 
 			//serverJobManager.checkForMessages();	// have the job manager check for messages to process.
+			//std::cout << ">>>> Running organic tick. " << std::endl;
 			organicSystemPtr->runOrganicTick();		// run core loop
+			//std::cout << ">>>> Organic tick done. " << std::endl;
 		}
 		organicSystemPtr->glCleanup();
 	}

@@ -362,7 +362,7 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	//int someVal = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.size();
 	//std::cout << "### Test size: " << someVal;
 
-	
+	/*
 	auto enclaveTriangleContainersBegin = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.begin();
 	auto enclaveTriangleContainersEnd = in_originalOrganicRawEnclaveRef->enclaveTriangleContainerMap.end();
 	for (; enclaveTriangleContainersBegin != enclaveTriangleContainersEnd; enclaveTriangleContainersBegin++)
@@ -390,7 +390,40 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 
 		}
 	}
+	*/
 	
+	auto etcMapBegin = in_originalOrganicRawEnclaveRef->etcMap.begin();
+	auto etcMapEnd = in_originalOrganicRawEnclaveRef->etcMap.end();
+	for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+	{
+		auto enclaveTriangleContainersBegin = etcMapBegin->second.containerMap.begin();
+		auto enclaveTriangleContainersEnd = etcMapBegin->second.containerMap.end();
+		for (; enclaveTriangleContainersBegin != enclaveTriangleContainersEnd; enclaveTriangleContainersBegin++)
+		{
+			// for each triangle in the container, apply the oreLocations
+			auto currentEnclaveTriangleBegin = enclaveTriangleContainersBegin->second.triangles.begin();
+			auto currentEnclaveTriangleEnd = enclaveTriangleContainersBegin->second.triangles.end();
+			for (; currentEnclaveTriangleBegin != currentEnclaveTriangleEnd; currentEnclaveTriangleBegin++)
+			{
+
+				// ***************************** testing only
+
+				if (testOutput == true)
+				{
+					std::cout << "------Points for original ORE triangle [container: " << enclaveTriangleContainersBegin->first << "][triangle index: " << currentEnclaveTriangleBegin->first << "]" << std::endl;
+					for (int x = 0; x < 3; x++)
+					{
+						ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
+						std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
+					}
+				}
+
+				adhereEnclaveTriangleToLocalizedPoints(metaDataMap, &currentEnclaveTriangleBegin->second, in_debugFlag);
+				// run the metadata map through each enclave triangle
+
+			}
+		}
+	}
 }
 
 void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef, bool in_debugFlag)
@@ -415,8 +448,9 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 	if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_X)		// if we're looking towards the EAST, points lying in the neighboring OrganicRawEnclave must lie on the WEST face of the OrganicRawEnlave (x must be = 0); the localized X value of each of these points will be 4
 	{
 		//std::cout << "Entered POS_X" << std::endl;
-
+		
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
+		/*
 		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
 		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
 		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
@@ -440,6 +474,35 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 				}
 			}
 		}
+		*/
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		{
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+			{
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+				{
+					// cycle through each point in the triangle, via point A in its lineArray
+					for (int x = 0; x < 3; x++)
+					{
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (currentPoint.x == 0.0f) // it is on the WEST border in the neighboring ORE
+
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.x = 4.0f;				    // then translate to localized coordinates, making it on the EAST border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
+					}
+				}
+			}
+		}
 	}
 
 	else if (in_discoveredORELocation.direction == EuclideanDirection3D::POS_Z)	// if we're looking towards the NORTH, points lying in the neighboring OrganicRawEnclave must lie on the SOUTH face of the OrganicRawEnclave (z must be = 0); the localized Z value of each of these points will be 4
@@ -449,37 +512,42 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 			std::cout << "Entered POS_Z" << std::endl;
 		}
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				if (in_debugFlag == true)
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 				{
-					if (currentNeighborTriangleBegin->second.isTriangleValid == false)
-					{
-						std::cout << "Warning, comparing against an INVALID triangle! " << std::endl;
-					}
-					std::cout << "> Empty normal is: " << currentNeighborTriangleBegin->second.emptyNormal.x << ", " << currentNeighborTriangleBegin->second.emptyNormal.y << ", " << currentNeighborTriangleBegin->second.emptyNormal.z << std::endl;
-				}
-
-				for (int x = 0; x < 3; x++)
-				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+					// cycle through each point in the triangle, via point A in its lineArray
 					if (in_debugFlag == true)
 					{
-						std::cout << "> Current point is: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.x << std::endl;
+						if (currentNeighborTriangleBegin->second.isTriangleValid == false)
+						{
+							std::cout << "Warning, comparing against an INVALID triangle! " << std::endl;
+						}
+						std::cout << "> Empty normal is: " << currentNeighborTriangleBegin->second.emptyNormal.x << ", " << currentNeighborTriangleBegin->second.emptyNormal.y << ", " << currentNeighborTriangleBegin->second.emptyNormal.z << std::endl;
 					}
-					if (currentPoint.z == 0.0f) // it is on the SOUTH border in the neighboring ORE
+
+					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.z = 4.0f;				    // then translate to localized coordinates, making it on the NORTH border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (in_debugFlag == true)
+						{
+							std::cout << "> Current point is: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.x << std::endl;
+						}
+						if (currentPoint.z == 0.0f) // it is on the SOUTH border in the neighboring ORE
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.z = 4.0f;				    // then translate to localized coordinates, making it on the NORTH border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
 					}
 				}
 			}
@@ -492,24 +560,29 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				for (int x = 0; x < 3; x++)
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
-					if (currentPoint.x == 4.0f) // it is on the EAST border in the neighboring ORE
+					// cycle through each point in the triangle, via point A in its lineArray
+					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.x = 0.0f;				    // then translate to localized coordinates, making it on the WEST border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (currentPoint.x == 4.0f) // it is on the EAST border in the neighboring ORE
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.x = 0.0f;				    // then translate to localized coordinates, making it on the WEST border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
 					}
 				}
 			}
@@ -524,24 +597,29 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				for (int x = 0; x < 3; x++)
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
-					if (currentPoint.z == 4.0f) // it is on the NORTH border in the neighboring ORE
+					// cycle through each point in the triangle, via point A in its lineArray
+					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.z = 0.0f;				    // then translate to localized coordinates, making it on the SOUTH border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (currentPoint.z == 4.0f) // it is on the NORTH border in the neighboring ORE
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.z = 0.0f;				    // then translate to localized coordinates, making it on the SOUTH border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
 					}
 				}
 			}
@@ -554,24 +632,29 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				for (int x = 0; x < 3; x++)
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
-					if (currentPoint.y == 0.0f) // it is on the BELOW border in the neighboring ORE
+					// cycle through each point in the triangle, via point A in its lineArray
+					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.y = 4.0f;				    // then translate to localized coordinates, making it on the ABOVE border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (currentPoint.y == 0.0f) // it is on the BELOW border in the neighboring ORE
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.y = 4.0f;				    // then translate to localized coordinates, making it on the ABOVE border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
 					}
 				}
 			}
@@ -584,24 +667,29 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
+		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
+		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
+			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				for (int x = 0; x < 3; x++)
+				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
+				auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
+				auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
+				for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
 				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
-					if (currentPoint.y == 4.0f) // it is on the ABOVE border in the neighboring ORE
+					// cycle through each point in the triangle, via point A in its lineArray
+					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.y = 0.0f;				    // then translate to localized coordinates, making it on the BELOW border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						if (currentPoint.y == 4.0f) // it is on the ABOVE border in the neighboring ORE
+						{
+							ECBPolyPoint localizedPoint = currentPoint; // copy, 
+							localizedPoint.y = 0.0f;				    // then translate to localized coordinates, making it on the BELOW border of the target ORE we're modifying
+							uniquePoints.insertPoint(localizedPoint);
+						}
 					}
 				}
 			}

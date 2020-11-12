@@ -17,6 +17,7 @@ void ServerJobProxy::callServerJobSendUpdateMessageToJobManager(OSServer* in_ser
 {
 	std::cout << "!!! calling send update... " << std::endl;
 	in_serverRef->serverJobManager.updateMessages.insertUpdate(in_message);
+	//std::cout << "######## update inserted successfully. " << std::endl;
 }
 
 void ServerJobProxy::callServerJobSendSetWorldDirectionToClient(OSServer* in_serverRef, Message in_message)
