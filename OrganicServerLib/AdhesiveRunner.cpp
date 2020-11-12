@@ -392,12 +392,12 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 	}
 	*/
 	
-	auto etcMapBegin = in_originalOrganicRawEnclaveRef->etcMap.begin();
-	auto etcMapEnd = in_originalOrganicRawEnclaveRef->etcMap.end();
-	for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+	auto etcSGMBegin = in_originalOrganicRawEnclaveRef->etcSGM.begin();
+	auto etcSGMEnd = in_originalOrganicRawEnclaveRef->etcSGM.end();
+	for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 	{
-		auto enclaveTriangleContainersBegin = etcMapBegin->second.containerMap.begin();
-		auto enclaveTriangleContainersEnd = etcMapBegin->second.containerMap.end();
+		auto enclaveTriangleContainersBegin = etcSGMBegin->second.containerMap.begin();
+		auto enclaveTriangleContainersEnd = etcSGMBegin->second.containerMap.end();
 		for (; enclaveTriangleContainersBegin != enclaveTriangleContainersEnd; enclaveTriangleContainersBegin++)
 		{
 			// for each triangle in the container, apply the oreLocations
@@ -450,37 +450,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 		//std::cout << "Entered POS_X" << std::endl;
 		
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		/*
-		auto neighborTrianglesBegin = neighborRawEnclaveRef->enclaveTriangleContainerMap.begin();	// cycle through each EnclaveTriangleContainer
-		auto neighborTrianglesEnd = neighborRawEnclaveRef->enclaveTriangleContainerMap.end();
-		for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
-			auto currentNeighborTriangleBegin = neighborTrianglesBegin->second.triangles.begin();
-			auto currentNeighborTriangleEnd = neighborTrianglesBegin->second.triangles.end();
-			for (; currentNeighborTriangleBegin != currentNeighborTriangleEnd; currentNeighborTriangleBegin++)
-			{
-				// cycle through each point in the triangle, via point A in its lineArray
-				for (int x = 0; x < 3; x++)
-				{
-					ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
-					if (currentPoint.x == 0.0f) // it is on the WEST border in the neighboring ORE
-
-					{
-						ECBPolyPoint localizedPoint = currentPoint; // copy, 
-						localizedPoint.x = 4.0f;				    // then translate to localized coordinates, making it on the EAST border of the target ORE we're modifying
-						uniquePoints.insertPoint(localizedPoint);
-					}
-				}
-			}
-		}
-		*/
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
-		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
@@ -512,12 +487,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 			std::cout << "Entered POS_Z" << std::endl;
 		}
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
@@ -560,12 +535,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
@@ -597,12 +572,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
@@ -632,12 +607,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
@@ -667,12 +642,12 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 
 		OrganicRawEnclave* neighborRawEnclaveRef = &in_discoveredORELocation.enclaveFractureResultsMapRef->fractureResultsContainerMap[in_discoveredORELocation.keyInNeighboringBlueprint];	// get a ref to the ORE to compare against
-		auto etcMapBegin = neighborRawEnclaveRef->etcMap.begin();
-		auto etcMapEnd = neighborRawEnclaveRef->etcMap.end();
-		for (; etcMapBegin != etcMapEnd; etcMapBegin++)
+		auto etcSGMBegin = neighborRawEnclaveRef->etcSGM.begin();
+		auto etcSGMEnd = neighborRawEnclaveRef->etcSGM.end();
+		for (; etcSGMBegin != etcSGMEnd; etcSGMBegin++)
 		{
-			auto neighborTrianglesBegin = etcMapBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
-			auto neighborTrianglesEnd = etcMapBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesBegin = etcSGMBegin->second.containerMap.begin();	// cycle through each EnclaveTriangleContainer
+			auto neighborTrianglesEnd = etcSGMBegin->second.containerMap.end();	// cycle through each EnclaveTriangleContainer
 			for (; neighborTrianglesBegin != neighborTrianglesEnd; neighborTrianglesBegin++)
 			{
 				// cycle through each EnclaveTriangle in the EnclaveTriangleContainer
