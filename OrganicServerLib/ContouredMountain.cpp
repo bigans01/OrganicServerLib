@@ -629,6 +629,9 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
 	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
 	//auto planPolyRegistryBeginV2 = 
+
+	//std::cout << "!!!! MassDriving: Running step 1. " << std::endl;
+
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveFractureResultsMap, EnclaveKeyDef::KeyHasher> containerMapMap;
 	auto adherenceListBegin = adherenceData.adherenceOrder.begin();
 	auto adherenceListEnd = adherenceData.adherenceOrder.end();
@@ -661,12 +664,17 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		// then spawn the resulting EnclaveTriangles in the OREs (OrganicRawEnclaves) into the tempMap. When this is done, add the results to the containerMapMap.
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
+
+		//std::cout << "!!! Step 1.1, attempting production of produceRawEnclaves..." << std::endl;
+
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
 		containerMapMap[blueprintKey] = tempMap;																			// 2.) Copy the results, before reunning adherence
 		if (currentAdherenceIndex > 0)																						// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
 			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 3.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
+
+		//std::cout << "!!! Step 1.2, attempting production of produceRawEnclaves..." << std::endl;
 
 		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], blueprintToCheck);					// 4.) for each blueprint in the adherence list, 
@@ -675,7 +683,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		currentAdherenceIndex++;
 	}
 	
-
+	//std::cout << "Step 1 pass.... " << std::endl;
 
 	// Step 2) for each blueprint that contained at least one SHELL_MASSDRIVER, take the original forged poly registry set for that blueprint, and
 	//		   subtract the massDriverPolyRegistry set from it to produce a new set. This new set represents the OrganicTriangles that 
