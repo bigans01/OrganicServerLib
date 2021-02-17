@@ -1586,7 +1586,7 @@ OSPDir OSServer::getFormationDirections(OSTerrainFormation in_terrainFormation)
 
 void OSServer::runServer()
 {
-	if (serverRunMode == 0)				// server would be alone, with no instance of an OrganicSystem (prototype only, uncertain of use)
+	if (serverRunMode == 0)				// (prototype only, uncertain of use; still needs to be tested as of 2/17/2021) )
 	{
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0)	// run until the command line is shutdown
 		{
@@ -1599,7 +1599,12 @@ void OSServer::runServer()
 		{
 			//std::cout << "Looping...." << std::endl;
 
-			checkClientMessages();					// check for requests sent by client
+			checkClientMessages();							// Does 3 things: 
+															// 1. Move messages coming in from the local client (the underlying OrganicClient on this host), into the messageInterpreter.
+															// 2. the messageInterpreter (ServerMessageInterpreter) reads the messsages from local/remote clients, creates the jobs.
+															// 3. outgoing messages meant to be sent to the local/remote clients are transferred from the messageInterpreter to their appropriate
+															//    MessageCable
+													
 
 			serverJobManager.checkForUpdateMessages();		// 2.1: check for messages that would be updates to existing jobs, from the previous tick
 			serverJobManager.removeCompletedPhasedJobs();	// 2.2: with the updates applied, check to see if there are any jobs to remove.
@@ -1761,6 +1766,6 @@ ContourBase* OSServer::getDerivedContourPlan(string in_string)
 void OSServer::checkClientMessages()
 {
 	client.transferRequestMessages(&serverMessages);							// retrieve incoming messages from the client (via std::move)
-	messageInterpreter.interpretIncomingMessagesFromClient();					// interpret (and optionally, process) the messages
-	messageInterpreter.interpretOutgoingMessagesToClient();
+	messageInterpreter.interpretIncomingMessagesFromClient();					// interpret (and optionally, process) the messages from local and/or remote clients
+	messageInterpreter.interpretOutgoingMessagesToClient();						// send outgoing messages to local and/or remote clients
 }

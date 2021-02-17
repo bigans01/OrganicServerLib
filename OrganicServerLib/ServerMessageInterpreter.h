@@ -22,7 +22,7 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void interpretIncomingMessagesFromClient();
 		void interpretOutgoingMessagesToClient();
 
-		// message handling functions
+		// message handling functions; each function below should have logic for handling LOCAL and REMOTE message types.
 		void handleRequestFromClientForOGLMRMCBlueprints(Message in_message);
 		void handleRequestFromClientGetBlueprintForT1(Message in_message);
 		void handleRequestFromClientGetBlueprintForT2(Message in_message);
