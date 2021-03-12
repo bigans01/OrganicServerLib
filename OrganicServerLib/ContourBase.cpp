@@ -66,3 +66,12 @@ void ContourBase::updateAffectedBlueprints(OrganicClient* in_clientRef, std::uno
 		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
 	}
 }
+
+ECBPolyPoint ContourBase::roundContourPointToHundredths(ECBPolyPoint in_contourPoint)
+{
+	ECBPolyPoint returnPoint;
+	returnPoint.x = (floor(in_contourPoint.x * 100)) / 100;
+	returnPoint.y = (floor(in_contourPoint.y * 100)) / 100;
+	returnPoint.z = (floor(in_contourPoint.z * 100)) / 100;
+	return returnPoint;
+}

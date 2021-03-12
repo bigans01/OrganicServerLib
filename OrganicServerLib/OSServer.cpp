@@ -688,7 +688,7 @@ void OSServer::constructSingleDebug()
 	*/
 
 	
-	
+	/*
 	testPoint_0.x = 32.0f;
 	testPoint_0.y = 32.0f;
 	testPoint_0.z = 32.0f;
@@ -700,6 +700,20 @@ void OSServer::constructSingleDebug()
 	testPoint_2.x = 32.00f;
 	testPoint_2.y = 32.0f;
 	testPoint_2.z = 41.00f;
+	*/
+
+	// for strange behavior detected  on 3/11/2021
+	testPoint_0.x = 1;
+	testPoint_0.y = 3.57;
+	testPoint_0.z = 4;
+
+	testPoint_1.x = 1.75;
+	testPoint_1.y = 3.57;
+	testPoint_1.z = 1.19;
+
+	testPoint_2.x = 0.8f;
+	testPoint_2.y = 3.57;
+	testPoint_2.z = 0;
 	
 
 	// for reddit question
@@ -815,7 +829,7 @@ void OSServer::constructSingleMountTest()
 void OSServer::constructSingleMountTestNoInput()
 {
 	ECBPolyPoint summit1;
-	int numberOfLayers = 3;
+	int numberOfLayers = 35;
 
 	// first mountain
 	summit1.x = 48;
@@ -964,7 +978,7 @@ void OSServer::constructMultiMountTestWithElevator()
 
 	
 	// second mountain
-
+	
 	summit2.x = 4;
 	summit2.y = 16;
 	summit2.z = 16;
@@ -980,7 +994,7 @@ void OSServer::constructMultiMountTestWithElevator()
 		summit2Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
 	}
 	executeDerivedContourPlan("summit2");
-	
+
 }
 
 void OSServer::constructMissingFillBlueprint3()
@@ -1202,7 +1216,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
 		}
 	}
-
+	
 	std::cout << "######### Plan execution complete; " << std::endl;
 
 	//planPtr->ad

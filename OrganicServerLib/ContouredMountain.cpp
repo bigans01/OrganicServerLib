@@ -232,7 +232,7 @@ void ContouredMountain::setMRPsForBottomLayers()
 	}
 	else
 	{
-		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the last MRP in the first strip.
+		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the MRP in the last strip.
 	}
 }
 
@@ -542,13 +542,16 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 			ECBPolyPoint mrpToAdd;					// set up the MRP to insert for this triangle strip
 			mrpToAdd = startPoint;					// "" 
 			mrpToAdd.y = currentY;					// ""
+			mrpToAdd = roundContourPointToHundredths(mrpToAdd);	// MRP must be rounded before anything is done with it; this is due to the fact
+																// that there is no guarantee the float of currentY will be at a rounded-hundredth value 
+																
 			if (x != 0)								// it isn't necessary to add on to the radius for the very first strip
 			{
 				currentRadius += in_expansionValue;
 				currentNumberOfPoints += 4;
 			}
 			insertMRP(&triangleStripMRPMap, &x, mrpToAdd);					// insert the MRP
-			addContourLine(&contourLineMap, &topContourLineCount, currentRadius, currentY, currentNumberOfPoints, in_startPoint);
+			addContourLine(&contourLineMap, &topContourLineCount, currentRadius, mrpToAdd.y, currentNumberOfPoints, in_startPoint);
 
 		}
 		std::cout << ">>> Top contour line count is: " << topContourLineCount << std::endl;

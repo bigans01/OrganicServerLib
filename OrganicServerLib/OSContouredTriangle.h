@@ -65,6 +65,7 @@ public:
 	void printPrimarySegmentData();
 	void loadAndCalibrateKeyPairArray();
 	void printKeyPairArray();
+	ECBPolyPoint roundPointToHundredths(ECBPolyPoint in_polyPointToRound);
 };
 
 #endif

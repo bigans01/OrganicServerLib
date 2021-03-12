@@ -12,11 +12,24 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	trianglePoints[1] = in_point1;
 	trianglePoints[2] = in_point2;
 
-	//std::cout << "triangle points: -----------" << std::endl;1
-	//std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
-	//std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
-	//std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
+	/*
+	std::cout << std::setprecision(7) << std::endl;
+	std::cout << "triangle points: -----------" << std::endl;
+	std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
+	std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
+	std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
+	int waitVal = 3;
+	std::cin >> waitVal;
+	*/
+}
 
+ECBPolyPoint OSContouredTriangle::roundPointToHundredths(ECBPolyPoint in_polyPointToRound)
+{
+	ECBPolyPoint roundedPoint;
+	roundedPoint.x = (floor(in_polyPointToRound.x * 100)) / 100;
+	roundedPoint.y = (floor(in_polyPointToRound.y * 100)) / 100;
+	roundedPoint.z = (floor(in_polyPointToRound.z * 100)) / 100;
+	return roundedPoint;
 }
 
 OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType)
@@ -53,6 +66,15 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	contouredEmptyNormal.y = normalFinder.calculatedNormal.y;
 	contouredEmptyNormal.z = normalFinder.calculatedNormal.z;
 
+	/*
+	std::cout << std::setprecision(7) << std::endl;
+	std::cout << "triangle points: -----------" << std::endl;
+	std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
+	std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
+	std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
+	int waitVal = 3;
+	std::cin >> waitVal;
+	*/
 }
 
 void OSContouredTriangle::determineLineLengths()
