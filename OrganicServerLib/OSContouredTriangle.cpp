@@ -6,30 +6,10 @@
 #include "PolyUtils.cpp"
 #define PI 3.14159265f
 
-OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2)
-{
-	trianglePoints[0] = in_point0;
-	trianglePoints[1] = in_point1;
-	trianglePoints[2] = in_point2;
 
-	/*
-	std::cout << std::setprecision(7) << std::endl;
-	std::cout << "triangle points: -----------" << std::endl;
-	std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
-	std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
-	std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
-	int waitVal = 3;
-	std::cin >> waitVal;
-	*/
-}
-
-ECBPolyPoint OSContouredTriangle::roundPointToHundredths(ECBPolyPoint in_polyPointToRound)
+OSContouredTriangle::OSContouredTriangle()
 {
-	ECBPolyPoint roundedPoint;
-	roundedPoint.x = (floor(in_polyPointToRound.x * 100)) / 100;
-	roundedPoint.y = (floor(in_polyPointToRound.y * 100)) / 100;
-	roundedPoint.z = (floor(in_polyPointToRound.z * 100)) / 100;
-	return roundedPoint;
+	// for adding to unordered_map
 }
 
 OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType)
@@ -39,6 +19,16 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	trianglePoints[0] = in_point0;
 	trianglePoints[1] = in_point1;
 	trianglePoints[2] = in_point2;
+
+	TriangleLine line0(trianglePoints[0], trianglePoints[1], trianglePoints[2]);
+	TriangleLine line1(trianglePoints[1], trianglePoints[2], trianglePoints[0]);
+	TriangleLine line2(trianglePoints[2], trianglePoints[0], trianglePoints[1]);
+
+	triangleLines[0] = line0;
+	triangleLines[1] = line1;
+	triangleLines[2] = line2;
+
+
 	materialID = in_materialID;
 	massReferencePoint = in_massReferencePoint;
 	forgedPolyRegistryRef = in_forgedPolyRegistryRef;
@@ -66,92 +56,69 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	contouredEmptyNormal.y = normalFinder.calculatedNormal.y;
 	contouredEmptyNormal.z = normalFinder.calculatedNormal.z;
 
-	/*
-	std::cout << std::setprecision(7) << std::endl;
-	std::cout << "triangle points: -----------" << std::endl;
-	std::cout << "point 0: " << trianglePoints[0].x << ", " << trianglePoints[0].y << ", " << trianglePoints[0].z << std::endl;
-	std::cout << "point 1: " << trianglePoints[1].x << ", " << trianglePoints[1].y << ", " << trianglePoints[1].z << std::endl;
-	std::cout << "point 2: " << trianglePoints[2].x << ", " << trianglePoints[2].y << ", " << trianglePoints[2].z << std::endl;
-	int waitVal = 3;
-	std::cin >> waitVal;
-	*/
+	determineLineSlopes();				// determine the X/Y/Z slopes for each TriangleLine
+	determineCentroid();				// find centroid of the contoured triangle
+	determinePointKeys();				// determine the point keys
+	checkIfPointsAreInSameBlueprint();	// checks if points are in same blueprint; a OSContouredTriangleRunner will NOT call runContouredTriangleOriginalDirection(); if this is true.
+	loadAndCalibrateKeyPairArray();		// calibrates, or adjusts the point keys of the ContouredTriangle 
+										//-- i.e, if X = 32, we need to determine if we are in the blueprint having a Blueprint key X value of 0 or 1. 
+										// (because 32 is shared between these)
+	checkForPerfectClamping();			// sets the value of contouredTrianglePerfectClampValue
 }
 
-void OSContouredTriangle::determineLineLengths()
+void OSContouredTriangle::determineCentroid()
 {
-	// calc line 1, aka "0"
-	//std::cout << "Determining line lengths, points..." << std::endl;
-	TriangleLine* triangleLineRef_0 = &triangleLines[0];
-	ECBPolyPoint* point_A_ref = &trianglePoints[0];
-	ECBPolyPoint* point_B_ref = &trianglePoints[1];
-	ECBPolyPoint* point_C_ref = &trianglePoints[2];
-	
-	//triangleLineRef_0->pointA.x = point_A_ref->x;
-	//triangleLineRef_0->pointA.y = point_A_ref->y;
-	//triangleLineRef_0->pointA.z = point_A_ref->z;
-	//triangleLineRef_0->pointB.x = point_B_ref->x;
-	//triangleLineRef_0->pointB.y = point_B_ref->y;
-	//triangleLineRef_0->pointB.z = point_B_ref->z;
+	centroid = OrganicUtils::determineTriangleCentroid(trianglePoints[0], trianglePoints[1], trianglePoints[2]);
+}
+void OSContouredTriangle::determinePointKeys()
+{
+	for (int x = 0; x < 3; x++)
+	{
+		EnclaveKeyDef::EnclaveKey blueprintKey;
+		blueprintKey.x = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(trianglePoints[x].x);
+		blueprintKey.y = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(trianglePoints[x].y);
+		blueprintKey.z = OrganicUtils::getWorldCoordinateBlueprintDimensionValue(trianglePoints[x].z);
+		pointKeys[x] = blueprintKey;
+	}
+}
 
-	triangleLineRef_0->pointA = *point_A_ref;
-	triangleLineRef_0->pointB = *point_B_ref;
-	triangleLineRef_0->pointC = *point_C_ref;
+void OSContouredTriangle::checkForPerfectClamping()
+{
+	// x clamp check
+	if
+	(
+		(triangleLines[0].pointA.x == triangleLines[1].pointA.x)
+		&&
+		(triangleLines[1].pointA.x == triangleLines[2].pointA.x)
+	)
+	{
+		//std::cout << "Perfect X-clamp detected! " << std::endl;
+		contouredTrianglePerfectClampValue = 1;			// 1 == clamped to X
+	}
 
+	// y clamp check
+	if
+	(
+		(triangleLines[0].pointA.y == triangleLines[1].pointA.y)
+		&&
+		(triangleLines[1].pointA.y == triangleLines[2].pointA.y)
+	)
+	{
+		//std::cout << "Perfect Y-clamp detected! " << std::endl;
+		contouredTrianglePerfectClampValue = 2;			// 2 == clamped to X
+	}
 
-	float x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
-	float y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
-	float z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
-	triangleLineRef_0->lineLength = sqrt(x_pow + y_pow + z_pow);
-	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
-
-	// calc line 2, aka "1"
-	TriangleLine* triangleLineRef_1 = &triangleLines[1];
-	point_A_ref = &trianglePoints[1];
-	point_B_ref = &trianglePoints[2];
-	point_C_ref = &trianglePoints[0];
-	//triangleLineRef_1->pointA.x = point_A_ref->x;
-	//triangleLineRef_1->pointA.y = point_A_ref->y;
-	//triangleLineRef_1->pointA.z = point_A_ref->z;
-	//triangleLineRef_1->pointB.x = point_B_ref->x;
-	//triangleLineRef_1->pointB.y = point_B_ref->y;
-	//triangleLineRef_1->pointB.z = point_B_ref->z;
-	triangleLineRef_1->pointA = *point_A_ref;
-	triangleLineRef_1->pointB = *point_B_ref;
-	triangleLineRef_1->pointC = *point_C_ref;
-
-	x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
-	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
-	z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
-	triangleLineRef_1->lineLength = sqrt(x_pow + y_pow + z_pow);
-	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
-
-	// calc line 2, aka "3"
-	TriangleLine* triangleLineRef_2 = &triangleLines[2];
-	point_A_ref = &trianglePoints[2];
-	point_B_ref = &trianglePoints[0];
-	point_C_ref = &trianglePoints[1];
-	//triangleLineRef_2->pointA.x = point_A_ref->x;
-	//triangleLineRef_2->pointA.y = point_A_ref->y;
-	//triangleLineRef_2->pointA.z = point_A_ref->z;
-	//triangleLineRef_2->pointB.x = point_B_ref->x;
-	//triangleLineRef_2->pointB.y = point_B_ref->y;
-	//triangleLineRef_2->pointB.z = point_B_ref->z;
-	triangleLineRef_2->pointA = *point_A_ref;
-	triangleLineRef_2->pointB = *point_B_ref;
-	triangleLineRef_2->pointC = *point_C_ref;
-
-	x_pow = pow((point_B_ref->x - point_A_ref->x), 2.0f);	// pythagorean theorem calcs
-	y_pow = pow((point_B_ref->y - point_A_ref->y), 2.0f);
-	z_pow = pow((point_B_ref->z - point_A_ref->z), 2.0f);
-	triangleLineRef_2->lineLength = sqrt(x_pow + y_pow + z_pow);
-	//std::cout << point_B_ref->x << ", " << point_B_ref->y << ", " << point_B_ref->z << std::endl;
-	//float point_B_ref->yx_pow = pow((triangleLineRef_1->pointB.x))
-	//std::cout << "line lengths: " << std::endl;
-	//std::cout << triangleLineRef_0->lineLength << std::endl;
-	//std::cout << triangleLineRef_1->lineLength << std::endl;
-	//std::cout << triangleLineRef_2->lineLength << std::endl;
-
-	//std::cout << "line points::: " << std::endl; 
+	// z clamp check
+	if
+	(
+		(triangleLines[0].pointA.z == triangleLines[1].pointA.z)
+		&&
+		(triangleLines[1].pointA.z == triangleLines[2].pointA.z)
+	)
+	{
+		//std::cout << "Perfect Z-clamp detected! " << std::endl;
+		contouredTrianglePerfectClampValue = 3;			// 3 == clamped to X
+	}
 }
 
 void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceID)
@@ -161,103 +128,6 @@ void OSContouredTriangle::addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int 
 	polygonPieceMap.emplace(in_Key, in_pieceID);
 	//someVector.push_back(in_pieceType);
 	//polygonPieceMap[in_Key] = 0;
-}
-
-void OSContouredTriangle::determineLineAngles() 
-{
-	// determine Y angle for point 0 to point 1
-
-	for (int x = 0; x < 3; x++)
-	{
-
-
-		TriangleLine* line0 = &triangleLines[x];
-		//std::cout << "line pointA.y: " << line0->pointA.x << ", " <<  line0->pointA.y << ", " <<  line0->pointA.z << std::endl;
-		//std::cout << "line pointB.y: " << line0->pointB.x << ", " <<  line0->pointB.y << ", " <<  line0->pointB.z << std::endl;
-		//std::cout << "line length: " << line0->lineLength << std::endl;
-
-
-
-		if (line0->pointA.y == line0->pointB.y)		// both points are 0 (perfect contour line on y axis)
-		{
-			line0->angleToYaxis = 0.0f;	// set angle to 0
-			std::cout << "cos test" << (acos(1.0f / 1.44f) * (180 / PI)) << std::endl;
-		}
-		else
-		{
-			if (line0->pointA.y > line0->pointB.y)		// elevation of A is greater than B
-			{
-				OSTrianglePoint newPoint, newPoint2;			// new point has same Y as A, but has B's x/z
-				newPoint.x = line0->pointB.x;
-				newPoint.y = line0->pointA.y;
-				newPoint.z = line0->pointA.z;		// if viewing from Z-axis, this needs to be the same as point A.
-
-				newPoint2.x = line0->pointB.x;
-				newPoint2.y = line0->pointB.y;
-				newPoint2.z = line0->pointA.z;
-
-				float zViewAdjacentLine_Xpow = pow((newPoint.x - line0->pointA.x), 2.0f);
-				float zViewAdjacentLine_Ypow = pow((newPoint.y - line0->pointA.y), 2.0f);
-				float zViewAdjacentLine_Zpow = pow((newPoint.z - line0->pointA.z), 2.0f);
-				float zViewAdjacentLine = sqrt(zViewAdjacentLine_Xpow + zViewAdjacentLine_Ypow + zViewAdjacentLine_Zpow);
-
-				float zViewHypotenuseLine_Xpow = pow((newPoint2.x - line0->pointA.x), 2.0f);
-				float zViewHypotenuseLine_Ypow = pow((newPoint2.y - line0->pointA.y), 2.0f);
-				float zViewHypotenuseLine_Zpow = pow((newPoint2.z - line0->pointA.z), 2.0f);
-				float zViewHypotenuseLine = sqrt(zViewHypotenuseLine_Xpow + zViewHypotenuseLine_Ypow + zViewHypotenuseLine_Zpow);
-
-
-
-				// get distance between A and the new point
-				//float x_pow = pow((newPoint.x - line0->pointA.x), 2.0f);
-				//float y_pow = pow((newPoint.y - line0->pointA.y), 2.0f);
-				//float z_pow = pow((newPoint.z - line0->pointA.z), 2.0f);
-				//float newLineLength = sqrt(x_pow + y_pow + z_pow);
-
-				//line0->angleToYaxis = acos(newLineLength / line0->lineLength) * (180 / PI);		// convert to degrees
-				line0->angleToYaxis = acos(zViewAdjacentLine / zViewHypotenuseLine) * (180 / PI);
-
-				std::cout << "A is greater, Angle is: " << line0->angleToYaxis << std::endl;
-				std::cout << "Performing rotation on z-axis..." << std::endl;
-				//rotateTriangleFromZAxis(x);
-			}
-			else if (line0->pointA.y < line0->pointB.y)	// elevation of A is less than B
-			{
-				OSTrianglePoint newPoint, newPoint2;			// new point has same Y as B, but has A's x/z
-				newPoint.x = line0->pointA.x;
-				newPoint.y = line0->pointB.y;
-				newPoint.z = line0->pointB.z;
-
-				newPoint2.x = line0->pointA.x;
-				newPoint2.y = line0->pointA.y;
-				newPoint2.z = line0->pointB.z;
-
-				float zViewAdjacentLine_Xpow = pow((newPoint.x - line0->pointB.x), 2.0f);
-				float zViewAdjacentLine_Ypow = pow((newPoint.y - line0->pointB.y), 2.0f);
-				float zViewAdjacentLine_Zpow = pow((newPoint.z - line0->pointB.z), 2.0f);
-				float zViewAdjacentLine = sqrt(zViewAdjacentLine_Xpow + zViewAdjacentLine_Ypow + zViewAdjacentLine_Zpow);
-
-				float zViewHypotenuseLine_Xpow = pow((newPoint2.x - line0->pointB.x), 2.0f);
-				float zViewHypotenuseLine_Ypow = pow((newPoint2.y - line0->pointB.y), 2.0f);
-				float zViewHypotenuseLine_Zpow = pow((newPoint2.z - line0->pointB.z), 2.0f);
-				float zViewHypotenuseLine = sqrt(zViewHypotenuseLine_Xpow + zViewHypotenuseLine_Ypow + zViewHypotenuseLine_Zpow);
-
-				// get distance between A and the new point
-				//float x_pow = pow((newPoint.x - line0->pointB.x), 2.0f);
-				//float y_pow = pow((newPoint.y - line0->pointB.y), 2.0f);
-				//float z_pow = pow((newPoint.z - line0->pointB.z), 2.0f);
-				//float newLineLength = sqrt(x_pow + y_pow + z_pow);
-				std::cout << "adjacent length: " << zViewAdjacentLine << std::endl;
-				std::cout << "hypotenuse length: " << zViewHypotenuseLine << std::endl;
-
-				line0->angleToYaxis = acos(zViewAdjacentLine / zViewHypotenuseLine) * (180 / PI);
-				std::cout << "B is greater, Angle is: " << line0->angleToYaxis << std::endl;
-				std::cout << "Performing rotation on z-axis..." << std::endl;
-				//rotateTriangleFromZAxis(x);
-			}
-		}
-
-	}
 }
 
 void OSContouredTriangle::insertTracedBlueprint(EnclaveKeyDef::EnclaveKey in_key)
@@ -300,99 +170,13 @@ bool OSContouredTriangle::checkIfPointsAreInSameBlueprint()
 	return result;
 }
 
-void OSContouredTriangle::determineType2and3Lines()
-{
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyIter = polygonPieceMap.begin();
-	for (polyIter; polyIter != polygonPieceMap.end(); polyIter++)
-	{
-		EnclaveKeyDef::EnclaveKey currentBlueprintKey = polyIter->first;
-		int currentBlueprintPoly = polyIter->second;
-		ECBPoly* polyPtr;
-	}
-}
-
-void OSContouredTriangle::rotateTriangleFromZAxis(int in_Point)
-{
-	if (in_Point == 0) // first point, index 0 (line is also 0)
-	{
-		ECBPolyPoint pointToShiftTo0 = trianglePoints[0];
-		ECBPolyPoint point2 = trianglePoints[1];
-		ECBPolyPoint point3 = trianglePoints[2];
-		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
-		float yShiftValue = pointToShiftTo0.y;				
-		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
-		pointToShiftTo0.y -= pointToShiftTo0.y;
-		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
-		point2.y -= pointToShiftTo0.y;
-		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
-		point3.y -= pointToShiftTo0.y;
-
-		float rotationAngle = triangleLines[0].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
-		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
-		// begin rotation calculations
-		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
-		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
-
-		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
-		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
-
-	}
-	else if (in_Point == 1) // second point, index 1
-	{
-		ECBPolyPoint pointToShiftTo0 = trianglePoints[1];
-		ECBPolyPoint point2 = trianglePoints[2];
-		ECBPolyPoint point3 = trianglePoints[0];
-		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
-		float yShiftValue = pointToShiftTo0.y;
-		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
-		pointToShiftTo0.y -= pointToShiftTo0.y;
-		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
-		point2.y -= pointToShiftTo0.y;
-		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
-		point3.y -= pointToShiftTo0.y;
-
-		float rotationAngle = triangleLines[1].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
-		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
-		// begin rotation calculations
-		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
-		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
-
-		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
-		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
-	}
-	else if (in_Point == 2) // third point, index 2
-	{
-		ECBPolyPoint pointToShiftTo0 = trianglePoints[2];
-		ECBPolyPoint point2 = trianglePoints[1];
-		ECBPolyPoint point3 = trianglePoints[0];
-		float xShiftValue = pointToShiftTo0.x;		// get shifting values from pointToShift0
-		float yShiftValue = pointToShiftTo0.y;
-		pointToShiftTo0.x -= pointToShiftTo0.x;		// set the x to 0.0f;
-		pointToShiftTo0.y -= pointToShiftTo0.y;
-		point2.x -= pointToShiftTo0.x;		// do the same for the 2nd point
-		point2.y -= pointToShiftTo0.y;
-		point3.x -= pointToShiftTo0.x;		// "" "" the 3rd point
-		point3.y -= pointToShiftTo0.y;
-
-		float rotationAngle = triangleLines[2].angleToYaxis;	// grab the y axis rotation angle (viewed from z)
-		float radianAngle = OrganicUtils::degreesToPiRads(rotationAngle);
-		// begin rotation calculations
-		point2.x = ((cos(radianAngle)*point2.x) + (sin(radianAngle)*point2.y));
-		point2.y = (-(sin(radianAngle)*point2.x) + (cos(radianAngle)*point2.y));
-
-		point3.x = ((cos(radianAngle)*point3.x) + (sin(radianAngle)*point3.y));
-		point3.y = (-(sin(radianAngle)*point3.x) + (cos(radianAngle)*point3.y));
-	}
-}
-
-void OSContouredTriangle::determineAxisInterceptDistances()
+void OSContouredTriangle::determineLineSlopes()
 {
 	//determineLineAxisIntercept(&triangleLines[0], trianglePoints[2]);
 	//determineLineAxisIntercept(&triangleLines[1], trianglePoints[0]);
 	//determineLineAxisIntercept(&triangleLines[2], trianglePoints[1]);
 
 	PolyUtils::determineLineInterceptSlopes(&triangleLines[0], trianglePoints[2]);
-	//PolyUtils::sillyTest();
 	PolyUtils::determineLineInterceptSlopes(&triangleLines[1], trianglePoints[0]);
 	PolyUtils::determineLineInterceptSlopes(&triangleLines[2], trianglePoints[1]);
 }
@@ -408,25 +192,9 @@ void OSContouredTriangle::determineAxisInterceptDistancesDebug()
 	PolyUtils::determineLineInterceptSlopesDebug(&triangleLines[2], trianglePoints[1], 2);
 }
 
-OSContouredTriangle::OSContouredTriangle()
-{
-	// for adding to unordered_map
-}
-
 void OSContouredTriangle::addNewPrimarySegment(ECBPolyPoint in_lineSegmentPointA, ECBPolyPoint in_lineSegmentPointB, int in_lineID, EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	primarySegmentTrackerMap[in_blueprintKey].insertNewSegment(in_lineSegmentPointA, in_lineSegmentPointB, in_lineID);
-
-	//std::cout << "##### Added new primary segment; line ID: [" << in_lineID << "] (" << in_lineSegmentPointA.x << ", " << in_lineSegmentPointA.y << ", " << in_lineSegmentPointA.z << ") | (" << in_lineSegmentPointB.x << ", " << in_lineSegmentPointB.y << ", " << in_lineSegmentPointB.z << ") " << std::endl;
-
-	/*
-	if (in_lineSegmentPointA.y == 0)
-	{
-		std::cout << "!!!!! WARNING, bad segment found! " << std::endl;
-		int someVal = 3;
-		std::cin >> someVal;
-	}
-	*/
 }
 
 void OSContouredTriangle::fillMetaDataInPrimaryCircuits()
@@ -445,14 +213,12 @@ void OSContouredTriangle::printPrimarySegmentData()
 	auto trackerMapBegin = primarySegmentTrackerMap.begin();
 	auto trackerMapEnd = primarySegmentTrackerMap.end();
 	for (trackerMapBegin; trackerMapBegin != trackerMapEnd; trackerMapBegin++)
-	{
-		
+	{		
 		//std::cout << ":: Blueprint (" << trackerMapBegin->first.x << ", " << trackerMapBegin->first.y << ", " << trackerMapBegin->first.z << ") " << std::endl;
 		for (int x = 0; x < trackerMapBegin->second.currentSegmentCount; x++)
 		{
 			//std::cout << "Segment " << x << ":-> Line ID: " << int(trackerMapBegin->second.primarySegments[x].lineID) << " | Point A: " << trackerMapBegin->second.primarySegments[x].beginPoint.x << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.y << ", " << trackerMapBegin->second.primarySegments[x].beginPoint.z << " | Point B: " << trackerMapBegin->second.primarySegments[x].endPoint.x << ", " << trackerMapBegin->second.primarySegments[x].endPoint.y << ", " << trackerMapBegin->second.primarySegments[x].endPoint.z << std::endl;
-		}
-		
+		}		
 	}
 }
 
@@ -483,3 +249,138 @@ void OSContouredTriangle::printKeyPairArray()
 	}
 }
 
+int OSContouredTriangle::isPerfectlyClamped()
+{
+	int result = 0;
+	if (contouredTrianglePerfectClampValue != 0)	// if this triangle is clamped to ANYTHING, return 1.
+	{
+		result = 1;
+	}
+	return result;
+}
+
+int OSContouredTriangle::getPerfectClampValue()
+{
+	return contouredTrianglePerfectClampValue;
+}
+
+void OSContouredTriangle::adjustPointKeysIfPerfectlyAlignedToECBBorders()
+{
+	EnclaveKeyDef::EnclaveKey currentKeyCopy;
+	ECBBorderLineList currentBorderLineList;
+	for (int x = 0; x < 3; x++)
+	{
+		TriangleLine currentLine = triangleLines[x];											// get the line
+		EnclaveKeyDef::EnclaveKey* currentKeyPtr = &pointKeys[x];									// get a pointer to the key of the point
+		currentKeyCopy = pointKeys[x];									// get a copy to the key of the point, to determine the original ECBBorderLineList from the pre-modified EnclaveKey of the point
+
+		//std::cout << std::endl;
+		//std::cout << "Key calibration; current key used is: " << currentKeyCopy.x << ", " << currentKeyCopy.y << ", " << currentKeyCopy.z << std::endl;
+
+		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
+		//std::cout << "################ Calibrating keys for line: " << x << std::endl;
+		//findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
+	}
+
+	// check for perfect clamps; we can use the last iteration of currentKeyCopy for this
+	if (contouredTrianglePerfectClampValue == 1)		// if perfectly clamped to X... do this
+	{
+		/*
+
+		The below logic is needed, because of the 32 = next rule in the blueprint system; For example, if the x of the points in question is 32, then
+		this lies on the border of the blueprints at 0,0,0 and 1,0,0. If it's perfectly flat, we must check the direction of x that the center of the contour line lies in.
+
+		*/
+		std::cout << "######################## Perfect clamp detected, for X; attempting adjustment... " << std::endl;
+		TriangleLine tempLine = triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		if (tempLine.pointA.x == currentBorderLineList.corner_LowerNW.cornerPoint.x)		// check the triangle centroid, compare it to the center of the contour line 
+		{
+			/*
+			if (planDirections.x_direction == -1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].x -= 1;
+					std::cout << "Key altered as a result of perfect clamping (X NEGATIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+		else if (tempLine.pointA.x == currentBorderLineList.corner_LowerNE.cornerPoint.x)
+		{
+			/*
+			if (planDirections.x_direction == 1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].x += 1;
+					std::cout << "Key altered as a result of perfect clamping (X POSITIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+	}
+
+	else if (contouredTrianglePerfectClampValue == 2)	// if perfectly clamped to Y... do this
+	{
+		TriangleLine tempLine = triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
+		if (tempLine.pointA.y == currentBorderLineList.corner_LowerNW.cornerPoint.y)		// triangle is at very bottom
+		{
+			/*
+			if (planDirections.y_direction == -1)	// if the clamped triangle is at the very bottom and plan direction is BELOW, shift all points by -1
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].y -= 1;
+					std::cout << "Key altered as a result of perfect clamping (Y NEGATIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+		else if (tempLine.pointA.y == currentBorderLineList.corner_UpperNW.cornerPoint.y)	// triangle is at very top
+		{
+			/*
+			if (planDirections.y_direction == 1)		// if the clamped triangle is at the very top and plan direction is ABOVE, shift all points by 1
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].y += 1;
+					std::cout << "Key altered as a result of perfect clamping (Y POSITIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+	}
+
+	else if (contouredTrianglePerfectClampValue == 3)		// if perfectly clamped to Z... do this
+	{
+		TriangleLine tempLine = triangleLines[0];
+		if (tempLine.pointA.z == currentBorderLineList.corner_LowerNW.cornerPoint.z)		// triangle is at very bottom
+		{
+			/*
+			if (planDirections.z_direction == -1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].z -= 1;
+					std::cout << "Key altered as a result of perfect clamping (Z NEGATIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+		else if (tempLine.pointA.z == currentBorderLineList.corner_LowerSW.cornerPoint.z)
+		{
+			/*
+			if (planDirections.z_direction == 1)
+			{
+				for (int a = 0; a < 3; a++)
+				{
+					pointKeys[a].z += 1;
+					std::cout << "Key altered as a result of perfect clamping (Z POSITIVE): " << pointKeys[a].x << ", " << pointKeys[a].y << ", " << pointKeys[a].z << std::endl;
+				}
+			}
+			*/
+		}
+	}
+
+}

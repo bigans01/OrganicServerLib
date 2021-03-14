@@ -36,9 +36,6 @@
     <ClInclude Include="OSAmpField.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OSContourPlan.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OSContouredTriangle.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -213,9 +210,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSAmpField.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="OSContourPlan.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSContouredTriangle.cpp">

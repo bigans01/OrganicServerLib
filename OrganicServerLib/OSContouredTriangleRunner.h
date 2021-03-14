@@ -42,9 +42,9 @@ class OSContouredTriangleRunner
 
 		void performRun();	// run the contoured triangle; perform filling
 	private:
-		void checkForPerfectClamping();		// checks to see if the contoured triangle is perfectly clamped.
-		void calibrateTrianglePointKeys();	// adjusts the contoured triangle's point EnclaveKeys, in the event that any perfect clamping is detected.
-		void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, TriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
+		//void checkForPerfectClamping();		// checks to see if the contoured triangle is perfectly clamped.
+		//void calibrateTrianglePointKeys();	// adjusts the contoured triangle's point EnclaveKeys, in the event that any perfect clamping is detected.
+		//void findTrueKeysForTriangleLinePoints(OSContouredTriangle* in_Triangle, TriangleLine in_Line, EnclaveKeyDef::EnclaveKey* in_KeyPtr, ECBBorderLineList in_borderLineList);
 		void rayCastTrianglePoints();		// trace the points (lines) through the blueprints; inner filling of the ContouredTriangle isn't done here (this comes later)
 		void printContourTrianglePointsDebug();
 		void tracePointThroughBlueprints(int in_pointID);
@@ -53,7 +53,7 @@ class OSContouredTriangleRunner
 		void runContouredTriangleOriginalDirection();
 		void runContouredTriangleReverseDirection();
 		bool checkIfPointIsOnBlueprintBorder(ECBPolyPoint in_point, EnclaveKeyDef::EnclaveKey in_blueprintKey);
-		int isContouredTrianglePerfectlyClamped();
+		//int isContouredTrianglePerfectlyClamped();
 		void printTracingCounts();
 		EnclaveKeyPair getBlueprintKeysForPrimaryLinePoints(int in_lineID);
 };

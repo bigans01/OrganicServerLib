@@ -3,7 +3,6 @@
 #define OSSERVER_H
 #include <iostream>
 #include "OrganicSystem.h"
-#include "OSContourPlan.h"
 #include "OSTrianglePoint.h"
 #include "OSTriangleLineTraverser.h"
 #include "OSTerrainFormation.h"
