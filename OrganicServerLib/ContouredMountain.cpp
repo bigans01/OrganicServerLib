@@ -21,14 +21,16 @@ void ContouredMountain::amplifyAllContourLinePoints()
 
 void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialID)
 {
-	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, in_materialID, &triangleStripMap, ECBPolyType::SHELL, startPoint);
+	// construct triangles that use the "top layer" preferred material.
+	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, getPreferredMaterialAtIndex(0), &triangleStripMap, ECBPolyType::SHELL, startPoint);
 }
 
 void ContouredMountain::constructBottomStripTriangles(int in_stripID, int in_materialID)
 {
+	// construct triangles that use the "bottom layer" preferred material.
 	std::cout << "Calling BOTTOM strip construction, for strip: " << in_stripID << std::endl;
 	std::cout << "!! (PRE)  Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
-	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, 1, &bottomTriangleStripMap, ECBPolyType::SHELL_MASSDRIVER, bottomStartPoint);
+	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, getPreferredMaterialAtIndex(1), &bottomTriangleStripMap, ECBPolyType::SHELL_MASSDRIVER, bottomStartPoint);
 	std::cout << "!! (POST) Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
 }
 

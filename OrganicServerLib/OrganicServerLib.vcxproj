@@ -175,6 +175,8 @@
     <ClInclude Include="OSTriangleLine.h" />
     <ClInclude Include="OSTriangleLineTraverser.h" />
     <ClInclude Include="OSTriangleLineTraverserBare.h" />
+    <ClInclude Include="OSTriangleMaterial.h" />
+    <ClInclude Include="OSTriangleMaterialLookup.h" />
     <ClInclude Include="OSTrianglePoint.h" />
     <ClInclude Include="PointAdherenceOrder.h" />
     <ClInclude Include="PrimaryCircuit.h" />
@@ -225,6 +227,7 @@
     <ClCompile Include="OSServerUtils.cpp" />
     <ClCompile Include="OSTriangleLineTraverser.cpp" />
     <ClCompile Include="OSTriangleLineTraverserBare.cpp" />
+    <ClCompile Include="OSTriangleMaterialLookup.cpp" />
     <ClCompile Include="PointAdherenceOrder.cpp" />
     <ClCompile Include="PrimaryCircuit.cpp" />
     <ClCompile Include="PrimaryCircuitSegment.cpp" />

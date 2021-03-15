@@ -966,6 +966,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	for (int x = 0; x < numberOfLayers; x++)
 	{
 		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer

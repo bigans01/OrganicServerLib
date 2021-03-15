@@ -14,20 +14,30 @@
 #include "BlueprintTransformRefs.h"
 #include "EnclaveFractureResultsMap.h"
 #include "PointAdherenceOrder.h"
+#include "OSTriangleMaterialLookup.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)
 class ContourBase
 {
 public:
+	// template function for inserting preferred materials
+	template<typename FirstMaterial, typename ...RemainingMaterials> void insertMaterials(FirstMaterial && first, RemainingMaterials && ...remaining)
+	{
+		insertPreferredMaterial(OSTriangleMaterialLookup::findMaterialID(std::forward<FirstMaterial>(first)));
+		insertMaterials(std::forward<RemainingMaterials>(remaining)...);
+	}
+	void insertMaterials() {};
 
 	// member variables each derived class should have
-	unordered_map<int, OSContouredTriangleStrip> triangleStripMap;
-	unordered_map<int, OSContouredTriangleStrip> bottomTriangleStripMap;
+	std::unordered_map<int, OSContouredTriangleStrip> triangleStripMap;
+	std::unordered_map<int, OSContouredTriangleStrip> bottomTriangleStripMap;
 	OSContourPlanDirections planDirections;
 	ForgedPolyRegistry planPolyRegistry;			// for any "shell" poly.
 	ForgedPolyRegistry massDriverPolyRegistry;		// only for "shell" polys which will become a mass driver.
 	PointAdherenceOrder adherenceData;
+	std::map<int, int> preferredMaterialLookup;		// a lookup map for specific materials that a Contour plan expects; each contour plan may look at this map
+													// for materials to use, how they look it up is up to each plan.
 
 	// virtual functions
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;
@@ -43,6 +53,8 @@ public:
 	void writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, std::string in_worldName);
 	void updateAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef);
 	ECBPolyPoint roundContourPointToHundredths(ECBPolyPoint in_contourPoint);
+	void insertPreferredMaterial(int in_materialID);
+	int getPreferredMaterialAtIndex(int in_indexToLookup);
 };
 
 #endif

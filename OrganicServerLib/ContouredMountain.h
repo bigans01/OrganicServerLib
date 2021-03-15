@@ -3,6 +3,13 @@
 #ifndef CONTOUREDMOUNTAIN_H
 #define CONTOUREDMOUNTAIN_H
 
+
+// General notes:
+// usage of preferredMaterialLookup
+//
+// index 0 -> material for "top layers" of mountain
+// index 1 -> material for bottom layer strips
+
 #include "ContourBase.h"
 #include "ECBPolyPoint.h"
 #include "OSTerrainFormation.h"

@@ -75,3 +75,19 @@ ECBPolyPoint ContourBase::roundContourPointToHundredths(ECBPolyPoint in_contourP
 	returnPoint.z = (floor(in_contourPoint.z * 100)) / 100;
 	return returnPoint;
 }
+
+void ContourBase::insertPreferredMaterial(int in_materialID)
+{
+	int currentLookupSize = preferredMaterialLookup.size();
+	preferredMaterialLookup[currentLookupSize] = in_materialID;
+}
+
+int ContourBase::getPreferredMaterialAtIndex(int in_indexToLookup)
+{
+	int returnMaterialID = 1;	// 1, which is DIRT -- should be returned if nothing is found.
+	if (auto materialFinder = preferredMaterialLookup.find(in_indexToLookup); materialFinder != preferredMaterialLookup.end())
+	{
+		returnMaterialID = materialFinder->second;
+	}
+	return returnMaterialID;
+}

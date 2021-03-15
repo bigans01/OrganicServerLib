@@ -195,6 +195,12 @@
     <ClInclude Include="SJBuildAndSendWorldDirection.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="OSTriangleMaterial.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OSTriangleMaterialLookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -297,6 +303,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SJBuildAndSendWorldDirection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="OSTriangleMaterialLookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
