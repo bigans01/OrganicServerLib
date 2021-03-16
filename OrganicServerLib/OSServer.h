@@ -68,30 +68,17 @@ public:
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
 
 	// blueprint testing functions
-	void constructTestBlueprints();		// CONVERTED 
-	void constructTestBlueprints2();	// CONVERTED
-	void constructTestBlueprints3();	// CONVERTED		// for mountain testing; 
-	void constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int numberOfLayers);
-	void constructTestBlueprints3Special();	// CONVERTED		// for mountain testing; 
-	void constructTestBlueprints3Micro();
-
-	void constructTestDisk();
-	void constructMiniTestDisk();
-	void constructSingleDebug();		// special case. one triangle.
-
-	void constructTestBlueprints5();	
-	void constructTestBlueprintsForFracturing();	// CONVERTED	// for fracturing mountain testing (for now)
-	void constructTestBlueprintsForFracturing2();	// CONVERTED	// for fracturing mountain testing (for now)
-	void constructTestBlueprintsForContourBaseTesting();	// CONVERTED, for fracturing mountain testing (for now)
-	void constructTestBlueprints4();	// CONVERTED // side testing
-	void constructDebugBlueprint1();	// CONVERTED
 	void constructBlueprintFillTest();
+	void constructMissingFillBlueprint3();
+
+	void constructSingleDebug();		// special case. one triangle.
+	void constructSingleOrganicTest();
+	void constructOrganicRawTest();
+
 	void constructSingleMountTest();
 	void constructMultiMountTest();
 	void constructMultiMountTestWithElevator();
-	void constructMissingFillBlueprint3();
-	void constructSingleOrganicTest();
-	void constructOrganicRawTest();
+	void constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int numberOfLayers);
 
 	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
 	void executeDerivedContourPlan(string in_string);
