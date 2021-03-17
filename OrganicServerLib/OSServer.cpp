@@ -230,7 +230,7 @@ void OSServer::constructOrganicRawTest()
 
 	// a journey into the bizarre below (7/18/2020)
 	
-	/*
+	
 	testPoint_0.x = 54.0f;
 	testPoint_0.y = 16.0f;
 	testPoint_0.z = 49.0f;
@@ -246,10 +246,10 @@ void OSServer::constructOrganicRawTest()
 	testPoint_3.x = 54.0f;
 	testPoint_3.y = 12.0f;
 	testPoint_3.z = 49.0f;
-	*/
 	
 	
 	
+	/*
 	testPoint_0.x = 49.0f;
 	testPoint_0.y = 13.0f;
 	testPoint_0.z = 49.0f;
@@ -265,7 +265,7 @@ void OSServer::constructOrganicRawTest()
 	testPoint_3.x = 50.0f;
 	testPoint_3.y = 12.0f;
 	testPoint_3.z = 49.0f;
-	
+	*/
 
 	/*
 	testPoint_0.x = 50.0f;
@@ -352,29 +352,6 @@ void OSServer::constructBlueprintFillTest()
 	executeDerivedContourPlan("plan");
 }
 
-void OSServer::constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int in_numberOfLayers)
-{
-	std::cout << "||||||| Constructing Mountain at point, with " << in_numberOfLayers << " layers. " << std::endl;
-	ECBPolyPoint mountainSummit;
-	mountainSummit.x = in_summitX;
-	mountainSummit.y = in_summitY;
-	mountainSummit.z = in_summitZ;
-	int numberOfLayers = in_numberOfLayers;
-	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* planRef = getDerivedContourPlan("mountain");
-	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		planRef->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
-	executeDerivedContourPlan("mountain");
-}
 
 void OSServer::constructSingleDebug()
 {
@@ -517,6 +494,23 @@ void OSServer::constructSingleDebug()
 	executeDerivedContourPlan("plan");
 }
 
+void OSServer::constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int in_numberOfLayers)
+{
+	std::cout << "||||||| Constructing Mountain at point, with " << in_numberOfLayers << " layers. " << std::endl;
+	ECBPolyPoint mountainSummit;
+	mountainSummit.x = in_summitX;
+	mountainSummit.y = in_summitY;
+	mountainSummit.z = in_summitZ;
+	int numberOfLayers = in_numberOfLayers;
+	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* planRef = getDerivedContourPlan("mountain");
+	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	planRef->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	planRef->buildContouredTriangles();
+	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
+	executeDerivedContourPlan("mountain");
+}
+
 void OSServer::constructSingleMountTest()
 {
 	ECBPolyPoint summit1;
@@ -529,20 +523,43 @@ void OSServer::constructSingleMountTest()
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		std::cout << "!!! Calling bottom strips... " << std::endl;
-		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-
+	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	summit1Ref->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
 
 	executeDerivedContourPlan("summit1");
+}
+
+
+void OSServer::constructMultiMountTestWithElevator()
+{
+	ECBPolyPoint summit1, summit2;
+	int numberOfLayers = 3;
+
+	// first mountain
+	summit1.x = 28;
+	summit1.y = 16;
+	summit1.z = 16;
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
+	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
+	summit1Ref->buildContouredTriangles();
+	executeDerivedContourPlan("summit1");
+
+	
+	// second mountain
+	
+	summit2.x = 4;
+	summit2.y = 16;
+	summit2.z = 16;
+	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	ContourBase* summit2Ref = getDerivedContourPlan("summit2");
+	summit2Ref->amplifyAllContourLinePoints();
+	summit2Ref->buildContouredTriangles();
+	executeDerivedContourPlan("summit2");
+
 }
 
 void OSServer::constructSingleMountTestNoInput()
@@ -557,16 +574,8 @@ void OSServer::constructSingleMountTestNoInput()
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		std::cout << "!!! Calling bottom strips... " << std::endl;
-		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-
+	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	summit1Ref->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
 
@@ -599,16 +608,8 @@ void OSServer::constructBigMountTestNoInput()
 	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* planRef = getDerivedContourPlan("mountain");
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		planRef->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		planRef->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-
+	planRef->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
+	planRef->buildContouredTriangles();
 
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlanNoInput("mountain");
@@ -638,83 +639,6 @@ void OSServer::jobSendRequestToSendOGLMCubeFromClient()
 	outgoingRequest.messageType = MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER;
 	//serverMessages.outgoingMessages.push(std::move(outgoingRequest));
 	client.insertResponseMessage(outgoingRequest);
-}
-
-void OSServer::constructMultiMountTest()
-{
-	ECBPolyPoint summit1, summit2;
-	int numberOfLayers = 3;
-
-	// first mountain
-	summit1.x = 36;
-	summit1.y = 16;
-	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
-	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	executeDerivedContourPlan("summit1");
-
-
-	// second mountain
-	summit2.x = -16;
-	summit2.y = 16;
-	summit2.z = 16;
-	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit2Ref = getDerivedContourPlan("summit2");
-	summit2Ref->amplifyAllContourLinePoints();
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit2Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	executeDerivedContourPlan("summit2");
-}
-
-void OSServer::constructMultiMountTestWithElevator()
-{
-	ECBPolyPoint summit1, summit2;
-	int numberOfLayers = 3;
-
-	// first mountain
-	summit1.x = 28;
-	summit1.y = 16;
-	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
-	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit1Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit1Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-	executeDerivedContourPlan("summit1");
-
-	
-	// second mountain
-	
-	summit2.x = 4;
-	summit2.y = 16;
-	summit2.z = 16;
-	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit2Ref = getDerivedContourPlan("summit2");
-	summit2Ref->amplifyAllContourLinePoints();
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit2Ref->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	for (int x = 0; x < numberOfLayers; x++)
-	{
-		summit2Ref->constructBottomStripTriangles(x, 2);	// construct an individual layer
-	}
-	executeDerivedContourPlan("summit2");
-
 }
 
 void OSServer::constructMissingFillBlueprint3()
@@ -1282,13 +1206,6 @@ int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 	//cout << "Blueprint does not exist at: " << in_Key.x << ", " << in_Key.y << ", " << in_Key.z << endl;
 	return 0;
 }
-
-/*
-OSContourPlan* OSServer::getContourPlan(string in_string)
-{
-	return &contourPlanMap[in_string];		// return a pointer to the plan
-}
-*/
 
 ContourBase* OSServer::getDerivedContourPlan(string in_string)
 {

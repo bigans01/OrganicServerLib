@@ -10,28 +10,6 @@ void BlankContour::amplifyAllContourLinePoints()
 
 }
 
-void BlankContour::constructStripTriangles(int in_stripID, int in_materialID)
-{
-
-
-}
-
-void BlankContour::constructBottomStripTriangles(int in_stripID, int in_materialID)
-{
-
-}
-
-void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID, ECBPolyType in_polyType)
-{
-	planDirections.y_direction = -1;	// DEFAULT, can be changed later.
-
-	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry, ECBPolyType::FREE);
-	int baseStripSize = triangleStripMap[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
-	//std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
-	triangleStripMap[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
-	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
-}
-
 void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)
 {
 	planDirections.y_direction = -1;	// DEFAULT, can be changed later.
@@ -62,4 +40,9 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_ma
 		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
 		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
 	}
+}
+
+void BlankContour::buildContouredTriangles()
+{
+
 }

@@ -19,13 +19,25 @@ void ContouredMountain::amplifyAllContourLinePoints()
 	}
 }
 
-void ContouredMountain::constructStripTriangles(int in_stripID, int in_materialID)
+void ContouredMountain::buildContouredTriangles()
+{
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		constructMountainTopStripTriangles(x);
+	}
+	for (int x = 0; x < numberOfLayers; x++)
+	{
+		constructMountainBottomStripTriangles(x);
+	}
+}
+
+void ContouredMountain::constructMountainTopStripTriangles(int in_stripID)
 {
 	// construct triangles that use the "top layer" preferred material.
 	constructStripTrianglesForLayer(&contourLineMap, &triangleStripMRPMap, in_stripID, getPreferredMaterialAtIndex(0), &triangleStripMap, ECBPolyType::SHELL, startPoint);
 }
 
-void ContouredMountain::constructBottomStripTriangles(int in_stripID, int in_materialID)
+void ContouredMountain::constructMountainBottomStripTriangles(int in_stripID)
 {
 	// construct triangles that use the "bottom layer" preferred material.
 	std::cout << "Calling BOTTOM strip construction, for strip: " << in_stripID << std::endl;
@@ -111,15 +123,6 @@ void ContouredMountain::setMRPsForBottomLayers()
 	{
 		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the MRP in the last strip.
 	}
-}
-
-void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID, ECBPolyType in_type)
-{
-	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry, in_type);
-	int baseStripSize = triangleStripMap[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
-	//std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
-	triangleStripMap[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
-	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
 void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)

@@ -41,22 +41,9 @@
 class OSServer
 {
 public:
-	ServerMessageInterpreter messageInterpreter;
-	MessageCable serverMessages;
-	OrganicClient client;
 	std::shared_ptr<OrganicSystem> organicSystemPtr;
-	ServerJobManager serverJobManager;
-	OrganicStemcellManager OSCManager;
-	OSCommandDirector OSdirector;
-	short isServerActive = 1;			// flag for determining server
-	short numberOfSlaves = 0;			// number of slave threads
+	OrganicClient client;
 	int serverRunMode = 0;				// will be set in constructor
-	int isCommandLineRunning = 1;
-	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
-	std::string currentWorld;
-	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
-	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
-	std::condition_variable commandLineCV;
 
 	OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCubeSize, int windowWidth, int windowHeight, int serverMode, int serverSlaves);		// manual startup specification
 	OSServer();							// will read from server properties file to start
@@ -64,7 +51,6 @@ public:
 
 	void runServer();					// runs the server, after the command line has been set up.
 	void executeCommandLine();			// runs the command line
-	void addDerivedContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	int checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key);									// returns 1 if blueprint exists (requires heap mutex)
 
 	// blueprint testing functions
@@ -76,26 +62,28 @@ public:
 	void constructOrganicRawTest();
 
 	void constructSingleMountTest();
-	void constructMultiMountTest();
 	void constructMultiMountTestWithElevator();
 	void constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int numberOfLayers);
 
-	//void executeContourPlan(string in_string);	// executes operations for all triangle strips in a triangle plan
-	void executeDerivedContourPlan(string in_string);
-	void executeDerivedContourPlanNoInput(string in_string);	// run the plan without waiting for input afterwards.
 
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	void setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ);
 
-	ContourBase* getDerivedContourPlan(string in_string);
-	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
-	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
-	void runPolyFracturerForAllBlueprints();
-
-	void constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey);
-	void checkClientMessages();
 private:
+	ServerMessageInterpreter messageInterpreter;
+	MessageCable serverMessages;
+	ServerJobManager serverJobManager;
+	OrganicStemcellManager OSCManager;
+	OSCommandDirector OSdirector;
+	short isServerActive = 1;			// flag for determining server
+	short numberOfSlaves = 0;			// number of slave threads
+	int isCommandLineRunning = 1;
+	int isCommandLineShutDown = 0;		// is the commandLine shutdown?
+	std::string currentWorld;
+	std::mutex serverReadWrite;			// the server's mutex for reading/writing into it's variables
+	std::mutex commandLineRunningMutex;	// mutex for when the command line runs
+	std::condition_variable commandLineCV;
 	friend class OSTriangleLineTraverser;
 	friend class ServerMessageInterpreter;
 	friend class ServerJobManager;
@@ -107,8 +95,18 @@ private:
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	ContourPlanStateContainer planStateContainer;
 
+	ContourBase* getDerivedContourPlan(string in_string);
+	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
+	void runPolyFracturerForAllBlueprints();
+
+	void constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey);
+	void checkClientMessages();
+	void addDerivedContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void executeDerivedContourPlan(string in_string);
+	void executeDerivedContourPlanNoInput(string in_string);	// run the plan without waiting for input afterwards.
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
+	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void analyzeECBPoly(ECBPoly* in_polyRef);
 	void setCurrentWorld(std::string in_worldName);
 	int runCommandLine(mutex& in_serverReadWrite, std::condition_variable& in_conditionVariable, int in_commandLineRunningStatus, int* is_commandLineShutDownStatus);		// may be deprecated eventually, replaced by runCommandLineV3. Deprecation validity tests began 9/29/2020.
