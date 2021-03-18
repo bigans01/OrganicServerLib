@@ -122,16 +122,16 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 				fillerRunnerPrimaryLine.beginPointRealXYZ = fillerRunnerPrimaryLine.endPointRealXYZ;	// load the endpoint into the begin point.
 				ECBIntersectMeta intersectData = OrganicUtils::findClosestBlueprintIntersectionFromSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, primaryLineSlope, blueprintKey); // get the intersect data
 				
-				std::cout << "Primary line slope was: " << primaryLineSlope.x << ", " << primaryLineSlope.y << ", " << primaryLineSlope.z << std::endl;
+				//std::cout << "Primary line slope was: " << primaryLineSlope.x << ", " << primaryLineSlope.y << ", " << primaryLineSlope.z << std::endl;
 
 				fillerRunnerPrimaryLine.endPointRealXYZ = intersectData.intersectedPoint;			// load the new point into the line.
 				currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);           // set the new border lines based on the new blueprint key value.
 
 
 
-				std::cout << "##!!! new value of beginPointRealXYZ: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
-				std::cout << "##!!! new value of endPointRealXYZ: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
-				std::cout << "!!! new blueprint key value: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+				//std::cout << "##!!! new value of beginPointRealXYZ: " << fillerRunnerPrimaryLine.beginPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.beginPointRealXYZ.z << std::endl;
+				//std::cout << "##!!! new value of endPointRealXYZ: " << fillerRunnerPrimaryLine.endPointRealXYZ.x << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.y << ", " << fillerRunnerPrimaryLine.endPointRealXYZ.z << std::endl;
+				//std::cout << "!!! new blueprint key value: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 
 				// check if current blueprint was filled
 				bool wasBlueprintFilled = checkIfBlueprintWasFilled(blueprintKey);
@@ -164,25 +164,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 				}
 
 				//std::cout << "Continuing while... " << std::endl;
-				std::cout << "Continuing while, from base key: " << baseKey.x << ", " << baseKey.y << ", " << baseKey.z << std::endl;
-
-				if
-					(
-					(baseKey.x == -2)
-						&&
-						(baseKey.y == -3)
-						&&
-						(baseKey.z == 4)
-						)
-				{
-					int someVal = 3;
-
-					std::cout << "Resultant move vals are: " << resultantMoveVals.x << ", " << resultantMoveVals.y << ", " << resultantMoveVals.z << std::endl;
-					std::cout << "Checked blueprint key was: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-
-					std::cout << "Special halt...continue? " << std::endl;
-					std::cin >> someVal;
-				}
+				//std::cout << "Continuing while, from base key: " << baseKey.x << ", " << baseKey.y << ", " << baseKey.z << std::endl;
 
 			}
 		}

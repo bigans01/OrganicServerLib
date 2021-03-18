@@ -46,3 +46,21 @@ void BlankContour::buildContouredTriangles()
 {
 
 }
+
+std::vector<OSContouredTriangle*> BlankContour::getProcessableContouredTriangles()
+{
+	std::vector<OSContouredTriangle*> returnRefVector;
+	// push top strip contoured triangles into vector
+	auto topTrianglesStripsBegin = triangleStripMap.begin();
+	auto topTrianglesStripsEnd = triangleStripMap.end();
+	for (; topTrianglesStripsBegin != topTrianglesStripsEnd; topTrianglesStripsBegin++)
+	{
+		auto currentTopTrianglesBegin = topTrianglesStripsBegin->second.triangleMap.begin();
+		auto currentTopTrianglesEnd = topTrianglesStripsBegin->second.triangleMap.end();
+		for (; currentTopTrianglesBegin != currentTopTrianglesEnd; currentTopTrianglesBegin++)
+		{
+			returnRefVector.push_back(&currentTopTrianglesBegin->second);
+		}
+	}
+	return returnRefVector;
+}

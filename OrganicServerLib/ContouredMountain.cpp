@@ -31,6 +31,38 @@ void ContouredMountain::buildContouredTriangles()
 	}
 }
 
+std::vector<OSContouredTriangle*> ContouredMountain::getProcessableContouredTriangles()
+{
+	std::vector<OSContouredTriangle*> returnRefVector;
+
+	// push top strip contoured triangles into vector
+	auto topTrianglesStripsBegin = triangleStripMap.begin();
+	auto topTrianglesStripsEnd = triangleStripMap.end();
+	for (; topTrianglesStripsBegin != topTrianglesStripsEnd; topTrianglesStripsBegin++)
+	{
+		auto currentTopTrianglesBegin = topTrianglesStripsBegin->second.triangleMap.begin();
+		auto currentTopTrianglesEnd = topTrianglesStripsBegin->second.triangleMap.end();
+		for (; currentTopTrianglesBegin != currentTopTrianglesEnd; currentTopTrianglesBegin++)
+		{
+			returnRefVector.push_back(&currentTopTrianglesBegin->second);
+		}
+	}
+
+	// push bottom layer contoured triangles into vector
+	auto bottomTrianglesStripsBegin = bottomTriangleStripMap.begin();
+	auto bottomTrianglesStripsEnd = bottomTriangleStripMap.end();
+	for (; bottomTrianglesStripsBegin != bottomTrianglesStripsEnd; bottomTrianglesStripsBegin++)
+	{
+		auto currentBottomTrianglesBegin = bottomTrianglesStripsBegin->second.triangleMap.begin();
+		auto currentBottomTrianglesEnd = bottomTrianglesStripsBegin->second.triangleMap.end();
+		for (; currentBottomTrianglesBegin != currentBottomTrianglesEnd; currentBottomTrianglesBegin++)
+		{
+			returnRefVector.push_back(&currentBottomTrianglesBegin->second);
+		}
+	}
+	return returnRefVector;
+}
+
 void ContouredMountain::constructMountainTopStripTriangles(int in_stripID)
 {
 	// construct triangles that use the "top layer" preferred material.
@@ -40,10 +72,10 @@ void ContouredMountain::constructMountainTopStripTriangles(int in_stripID)
 void ContouredMountain::constructMountainBottomStripTriangles(int in_stripID)
 {
 	// construct triangles that use the "bottom layer" preferred material.
-	std::cout << "Calling BOTTOM strip construction, for strip: " << in_stripID << std::endl;
-	std::cout << "!! (PRE)  Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
+	//std::cout << "Calling BOTTOM strip construction, for strip: " << in_stripID << std::endl;
+	//std::cout << "!! (PRE)  Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
 	constructStripTrianglesForLayer(&bottomContourLineMap, &triangleBottomStripMRPMap, in_stripID, getPreferredMaterialAtIndex(1), &bottomTriangleStripMap, ECBPolyType::SHELL_MASSDRIVER, bottomStartPoint);
-	std::cout << "!! (POST) Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
+	//std::cout << "!! (POST) Current bottom strip map size is: " << bottomTriangleStripMap.size() << std::endl;
 }
 
 void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>* in_contourLineMapRef, map<int, ECBPolyPoint>* in_triangleStripMRPMapRef, int in_stripID, int in_materialID, unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, ECBPolyType in_type, ECBPolyPoint in_startPoint)
@@ -54,9 +86,9 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 		int numberOfPoints = firstLineRef->numberOfPoints;
 		ECBPolyPoint currentContourCenter = firstLineRef->centerPoint;
 		//std::cout << "MOUNTAIN: number of points: " << numberOfPoints << std::endl;
-		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		//std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
 		ECBPolyPoint massReferencePoint = (*in_triangleStripMRPMapRef)[in_stripID];		// grab the MRP
-		std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
+		//std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
 		//int someDumbVal = 3; 
 		//std::cin >> someDumbVal;
 
@@ -69,7 +101,7 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 			//constructSingleContouredTriangle(in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID);
 			contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
 
-			std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
+			//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
 		}
 		// do the following for the last triangle only
 		int finalPointOne = numberOfPoints - 1;
@@ -81,7 +113,7 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 		contouredMountainConstructSingleContouredTriangle(in_osContouredTriangleStripRef, in_startPoint, pointOne, pointTwo, massReferencePoint, 0, in_materialID, in_type);
 
 		//std::cout << "Current Points: " << pointOne.x << ", " << pointOne.y << ", " << pointOne.z << std::endl;
-		std::cout << "First layer triangle created, via new function call...." << endl;
+		//std::cout << "First layer triangle created, via new function call...." << endl;
 	}
 	else
 	{
@@ -90,9 +122,9 @@ void ContouredMountain::constructStripTrianglesForLayer(map<int, OSContourLine>*
 
 		int numberOfPoints = currentLineRef->numberOfPoints;
 		ECBPolyPoint currentContourCenter = currentLineRef->centerPoint;
-		std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
+		//std::cout << "+++++++++++++++++Contour line center point is: " << currentContourCenter.x << ", " << currentContourCenter.y << ", " << currentContourCenter.z << ", " << std::endl;
 		ECBPolyPoint massReferencePoint = (*in_triangleStripMRPMapRef)[in_stripID];		// grab the MRP
-		std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
+		//std::cout << "+++++++++++++++++++++MRP is: " << massReferencePoint.x << ", " << massReferencePoint.y << ", " << massReferencePoint.z << std::endl;
 		//std::cout << "Number of points on this contour line is: " << currentLineRef->numberOfPoints << std::endl;
 
 		int pointsPerQuadrantCurrentLine = (numberOfPoints / 4) + 1;	// get the number of points per quadrant,  for the current line
@@ -283,7 +315,7 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 			addContourLine(&contourLineMap, &topContourLineCount, currentRadius, mrpToAdd.y, currentNumberOfPoints, in_startPoint);
 
 		}
-		std::cout << ">>> Top contour line count is: " << topContourLineCount << std::endl;
+		//std::cout << ">>> Top contour line count is: " << topContourLineCount << std::endl;
 }
 
 void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
@@ -302,7 +334,7 @@ void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_star
 		insertMRP(&triangleBottomStripMRPMap, &x, bottomLayerMRP);					// insert the MRP
 		addContourLine(&bottomContourLineMap, &bottomContourLineCount, currentRadius, in_startPoint.y, currentNumberOfPoints, in_startPoint);
 	}
-	std::cout << ">>> Bottom contour line count is: " << bottomContourLineCount << std::endl;
+	//std::cout << ">>> Bottom contour line count is: " << bottomContourLineCount << std::endl;
 }
 
 void ContouredMountain::insertMRP(map<int, ECBPolyPoint>* in_mrpMapRef, int* in_stripValue, ECBPolyPoint in_polyPoint)

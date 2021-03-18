@@ -700,92 +700,20 @@ void OSServer::executeDerivedContourPlan(string in_string)
 
 	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
 	ContourBase* planPtr = newContourMap[in_string].get();
-	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
-	std::cout << "Number of strips to execute is: " << numberOfTriangleStrips << std::endl;
-	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
-	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
-	// 1.) construct the shell
-	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
+	// 1. ) Execute all processable OSContouredTriangles in the plan.
+	auto processableList = planPtr->getProcessableContouredTriangles();
+	auto processableListBegin = processableList.begin();
+	auto processableListEnd = processableList.end();
+	for (; processableListBegin != processableListEnd; processableListBegin++)
 	{
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = stripMapIterator->second.triangleMap.end();
-		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
-		{
-			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
-			std::cout << "(SERVER): Executing plan, " + in_string << ", strip: " << stripMapIterator->first << ", triangle: " << triangleMapIterator->first << std::endl;
-
-			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			// DEBUG ONLY, temporary
-			//if (triangleMapIterator->first == 79)
-			//{
-				traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
-				//std::cout << "###### Debug triangle points: " << std::endl;
-				//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << ", " << currentTriangle->trianglePoints[0].z << std::endl;
-				//std::cout << "1: " << currentTriangle->trianglePoints[1].x << ", " << currentTriangle->trianglePoints[1].y << ", " << currentTriangle->trianglePoints[1].z << std::endl;
-				//std::cout << "2: " << currentTriangle->trianglePoints[2].x << ", " << currentTriangle->trianglePoints[2].y << ", " << currentTriangle->trianglePoints[2].z << std::endl;
-
-				//int someVal = 3;
-				//std::cin >> someVal;
-			//}
-			//std::cout << "---ending trace-through" << std::endl;
-
-			// write (overwrite) a blueprint file for each blueprint traversed
-			/*
-			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
-			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorEnd = currentTriangle->polygonPieceMap.end();
-			for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
-			{
-				EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
-				//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
-				EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
-				std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;
-				//std::map<int, ECBPoly> sillyPolys;
-				//polyMapRef = &sillyPolys;
-				OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, polyMapRef);
-				EnclaveCollectionBlueprint readBackBP;
-				OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, polyMapRef);
-				OSWinAdapter::outputBlueprintStats(polyMapRef);
-				//std::cout << ">> Blueprint stats outputted...???" << std::endl;
-			}
-			*/
-		}
-	}
-
-	auto bottomStripsBegin = planPtr->bottomTriangleStripMap.begin();
-	auto bottomStripsEnd = planPtr->bottomTriangleStripMap.end();
-	for (bottomStripsBegin; bottomStripsBegin != bottomStripsEnd; bottomStripsBegin++)
-	{
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = bottomStripsBegin->second.triangleMap.begin();
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = bottomStripsBegin->second.triangleMap.end();
-		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
-		{
-			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
-		}
+		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
 	}
 	
 	std::cout << "######### Plan execution complete; " << std::endl;
 
-	//planPtr->ad
-	//planPtr->adherenceData.printAdherentData();		// testing only, for now.
-
-	//OSWinAdapter::clearWorldFolder(currentWorld);
-	
 	// 2.) perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
-
-	//std::cout << "Size of EnclaveBlock: " << sizeof(EnclaveBlock) << std::endl;
-	//std::cout << "Size of BBFan: " << sizeof(BBFan) << std::endl;
-	//std::cout << "Size of OrganicRawEnclave: " << sizeof(OrganicRawEnclave) << std::endl;
-	//std::cout << "Size of OrganicTriangleSecondary: " << sizeof(OrganicTriangleSecondary) << std::endl;
-	//std::cout << "Size of OrganicTriangleTertiary: " << sizeof(OrganicTriangleTertiary) << std::endl;
-	//std::cout << "Size of EnclaveTriangle: " << sizeof(EnclaveTriangle) << std::endl;
-	//std::cout << "Size of an EnclaveTriangle skeleton: " << sizeof(ECBPolyPoint) * 4 + 4 << std::endl;
-	//std::cout << "Size of an ECBPolyLine array of size 3: " << sizeof(ECBPolyLine) * 3 << std::endl;
-
-	//int testVal = 3;
-	//std::cin >> testVal;
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	EnclaveFractureResultsMap tempMap;
@@ -808,92 +736,20 @@ void OSServer::executeDerivedContourPlanNoInput(string in_string)
 
 	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
 	ContourBase* planPtr = newContourMap[in_string].get();
-	int numberOfTriangleStrips = planPtr->triangleStripMap.size();
-	std::cout << "Number of strips to execute is: " << numberOfTriangleStrips << std::endl;
-	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapIterator = planPtr->triangleStripMap.begin();
-	unordered_map<int, OSContouredTriangleStrip>::iterator stripMapEnd = planPtr->triangleStripMap.end();
 
-	// 1.) construct the shell
-	for (stripMapIterator; stripMapIterator != stripMapEnd; stripMapIterator++)
+	// 1. ) Execute all processable OSContouredTriangles in the plan.
+	auto processableList = planPtr->getProcessableContouredTriangles();
+	auto processableListBegin = processableList.begin();
+	auto processableListEnd = processableList.end();
+	for (; processableListBegin != processableListEnd; processableListBegin++)
 	{
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = stripMapIterator->second.triangleMap.begin();
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = stripMapIterator->second.triangleMap.end();
-		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
-		{
-			//cout << "Current triangle ID: " << triangleMapIterator->first << endl;
-			std::cout << "(SERVER): Executing plan, " + in_string << ", strip: " << stripMapIterator->first << ", triangle: " << triangleMapIterator->first << std::endl;
-
-			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			// DEBUG ONLY, temporary
-			//if (triangleMapIterator->first == 79)
-			//{
-			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
-			//std::cout << "###### Debug triangle points: " << std::endl;
-			//std::cout << "0: " << currentTriangle->trianglePoints[0].x << ", " << currentTriangle->trianglePoints[0].y << ", " << currentTriangle->trianglePoints[0].z << std::endl;
-			//std::cout << "1: " << currentTriangle->trianglePoints[1].x << ", " << currentTriangle->trianglePoints[1].y << ", " << currentTriangle->trianglePoints[1].z << std::endl;
-			//std::cout << "2: " << currentTriangle->trianglePoints[2].x << ", " << currentTriangle->trianglePoints[2].y << ", " << currentTriangle->trianglePoints[2].z << std::endl;
-
-			//int someVal = 3;
-			//std::cin >> someVal;
-		//}
-		//std::cout << "---ending trace-through" << std::endl;
-
-		// write (overwrite) a blueprint file for each blueprint traversed
-		/*
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorBegin = currentTriangle->polygonPieceMap.begin();
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator keyIteratorEnd = currentTriangle->polygonPieceMap.end();
-		for (keyIteratorBegin; keyIteratorBegin != keyIteratorEnd; keyIteratorBegin++)
-		{
-			EnclaveKeyDef::EnclaveKey currentFileName = keyIteratorBegin->first;	// get the blueprint traversed
-			//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
-			EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[currentFileName];
-			std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;
-			//std::map<int, ECBPoly> sillyPolys;
-			//polyMapRef = &sillyPolys;
-			OSWinAdapter::writeBlueprintPolysToFile(currentWorld, currentFileName, polyMapRef);
-			EnclaveCollectionBlueprint readBackBP;
-			OSWinAdapter::readBlueprintPolysFromFile(currentWorld, currentFileName, polyMapRef);
-			OSWinAdapter::outputBlueprintStats(polyMapRef);
-			//std::cout << ">> Blueprint stats outputted...???" << std::endl;
-		}
-		*/
-		}
-	}
-
-	auto bottomStripsBegin = planPtr->bottomTriangleStripMap.begin();
-	auto bottomStripsEnd = planPtr->bottomTriangleStripMap.end();
-	for (bottomStripsBegin; bottomStripsBegin != bottomStripsEnd; bottomStripsBegin++)
-	{
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapIterator = bottomStripsBegin->second.triangleMap.begin();
-		unordered_map<int, OSContouredTriangle>::iterator triangleMapEnd = bottomStripsBegin->second.triangleMap.end();
-		for (triangleMapIterator; triangleMapIterator != triangleMapEnd; triangleMapIterator++)
-		{
-			OSContouredTriangle* currentTriangle = &triangleMapIterator->second;
-			traceTriangleThroughBlueprints(currentTriangle, planPtr->planDirections, &planPtr->adherenceData);
-		}
+		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
 	}
 
 	std::cout << "######### Plan execution complete; " << std::endl;
 
-	//planPtr->ad
-	//planPtr->adherenceData.printAdherentData();		// testing only, for now.
-
-	//OSWinAdapter::clearWorldFolder(currentWorld);
-
 	// 2.) perform fracturing for affected blueprints.
 	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
-
-	//std::cout << "Size of EnclaveBlock: " << sizeof(EnclaveBlock) << std::endl;
-	//std::cout << "Size of BBFan: " << sizeof(BBFan) << std::endl;
-	//std::cout << "Size of OrganicRawEnclave: " << sizeof(OrganicRawEnclave) << std::endl;
-	//std::cout << "Size of OrganicTriangleSecondary: " << sizeof(OrganicTriangleSecondary) << std::endl;
-	//std::cout << "Size of OrganicTriangleTertiary: " << sizeof(OrganicTriangleTertiary) << std::endl;
-	//std::cout << "Size of EnclaveTriangle: " << sizeof(EnclaveTriangle) << std::endl;
-	//std::cout << "Size of an EnclaveTriangle skeleton: " << sizeof(ECBPolyPoint) * 4 + 4 << std::endl;
-	//std::cout << "Size of an ECBPolyLine array of size 3: " << sizeof(ECBPolyLine) * 3 << std::endl;
-
-	//int testVal = 3;
-	//std::cin >> testVal;
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	EnclaveFractureResultsMap tempMap;

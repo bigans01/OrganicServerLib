@@ -15,6 +15,7 @@ class BlankContour : public ContourBase
 		void constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID);
 		void runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef);
 		void buildContouredTriangles();
+		std::vector<OSContouredTriangle*> getProcessableContouredTriangles();
 	private:
 		
 };

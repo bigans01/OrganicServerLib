@@ -15,6 +15,7 @@
 #include "EnclaveFractureResultsMap.h"
 #include "PointAdherenceOrder.h"
 #include "OSTriangleMaterialLookup.h"
+#include <vector>
 
 
 // base class for all future contour plans (will eventually replace old contour plan)
@@ -45,6 +46,7 @@ public:
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
 	virtual void runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;
 	virtual void buildContouredTriangles() = 0;
+	virtual std::vector<OSContouredTriangle*> getProcessableContouredTriangles() = 0;
 
 	// inherited functions for derived classes
 	void runPolyFracturerForAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);
