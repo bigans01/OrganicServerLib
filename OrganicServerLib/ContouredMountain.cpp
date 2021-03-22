@@ -7,7 +7,14 @@ void ContouredMountain::initialize(ECBPolyPoint in_startPoint, int in_numberOfLa
 	numberOfLayers = in_numberOfLayers;
 	setFormationBaseContourPoints(in_startPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
 	setMRPsForBottomLayers();
-	setFormationBottomBaseContourPoints(triangleBottomStripMRPMap[0], in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
+	//std::cout << "(1) first of bottom MRP is: " << triangleBottomStripMRPMap[0].x << ", " << triangleBottomStripMRPMap[0].y << ", " << triangleBottomStripMRPMap[0].z << std::endl;
+	//std::cout << "(::1::) bottom MRP start point is: " << bottomStartPoint.x << ", " << bottomStartPoint.y << ", " << bottomStartPoint.z << std::endl;
+	//setFormationBottomBaseContourPoints(triangleBottomStripMRPMap[0], in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
+	setFormationBottomBaseContourPoints(bottomStartPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
+	//std::cout << "(2) first of bottom MRP is: " << triangleBottomStripMRPMap[0].x << ", " << triangleBottomStripMRPMap[0].y << ", " << triangleBottomStripMRPMap[0].z << std::endl;
+	//std::cout << "!! Ended call of set bottom base contour points. " << std::endl;
+	//int someVal = 3;
+	//std::cin >> someVal;
 }
 
 void ContouredMountain::amplifyAllContourLinePoints()
@@ -29,6 +36,7 @@ void ContouredMountain::buildContouredTriangles()
 	{
 		constructMountainBottomStripTriangles(x);
 	}
+	//std::cout << "(ContouredMountain): finished constructing ContouredTriangles. " << std::endl;
 }
 
 std::vector<OSContouredTriangle*> ContouredMountain::getProcessableContouredTriangles()
@@ -153,7 +161,10 @@ void ContouredMountain::setMRPsForBottomLayers()
 	}
 	else
 	{
-		triangleBottomStripMRPMap[0] = triangleStripMRPMap.rbegin()->second;	// otherwise, the MRP of all the bottom strips can just be the MRP in the last strip.
+		// we need to get the next to last MRP from the top layer triangles, so use rbegin and increment it once, to store that value as the MRP that will be used for bottom layers.
+		auto endMinusOne = triangleStripMRPMap.rbegin();
+		endMinusOne++;
+		triangleBottomStripMRPMap[0] = endMinusOne->second;
 	}
 }
 
@@ -167,8 +178,12 @@ void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unorde
 	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry, in_type);
 	int baseStripSize = (*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0
 	//std::cout << "### Adding new triangle with ID " << baseStripSize << std::endl;
+	//std::cout << "New triangle has outward facing empty normal of: " << testTriangle.contouredEmptyNormal.x << ", " << testTriangle.contouredEmptyNormal.y << ", " << testTriangle.contouredEmptyNormal.z 
+	//	   << " | MRP: " << in_massReferencePoint.x << ", " << in_massReferencePoint.y << ", " << in_massReferencePoint.z << std::endl;
+	//std::cout << "!! Points of the new triangle are: " << in_point0.x << ", " << in_point0.y << ", " << in_point0.z << std::endl;
 	(*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap[baseStripSize] = testTriangle;
 	//std::cout << "### New size is: " << (*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap.size() << std::endl;
+
 
 }
 
@@ -305,6 +320,7 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 			mrpToAdd.y = currentY;					// ""
 			mrpToAdd = roundContourPointToHundredths(mrpToAdd);	// MRP must be rounded before anything is done with it; this is due to the fact
 																// that there is no guarantee the float of currentY will be at a rounded-hundredth value 
+			bottomStartPoint = mrpToAdd;			// will be used when we set bottom strip triangles. (3/21/2021)
 																
 			if (x != 0)								// it isn't necessary to add on to the radius for the very first strip
 			{
@@ -320,10 +336,11 @@ void ContouredMountain::setFormationBaseContourPoints(ECBPolyPoint in_startPoint
 
 void ContouredMountain::setFormationBottomBaseContourPoints(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue)
 {
-	bottomStartPoint = in_startPoint;
+	//bottomStartPoint = in_startPoint;
 	int currentNumberOfPoints = 4;
 	float currentRadius = in_startRadius;		// set the start radius
 	ECBPolyPoint bottomLayerMRP = triangleBottomStripMRPMap[0];
+	//ECBPolyPoint bottomLayerMRP = bottomStartPoint;
 	for (int x = 0; x < in_numberOfLayers; x++)
 	{
 		if (x != 0)								// it isn't necessary to add on to the radius for the very first strip
