@@ -537,6 +537,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	ECBPolyPoint summit1, summit2;
 	int numberOfLayers = 3;
 
+	
 	// first mountain
 	summit1.x = 28;
 	summit1.y = 16;
@@ -547,11 +548,11 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	summit1Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit1");
-
+	
 	
 	// second mountain
 	
-	summit2.x = 4;
+	summit2.x = 4.00;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, by the rework to EnclaveBlock's triangle management (see commit for that da
 	summit2.y = 16;
 	summit2.z = 16;
 	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
