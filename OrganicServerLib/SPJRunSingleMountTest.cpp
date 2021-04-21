@@ -65,8 +65,11 @@ void SPJRunSingleMountTest::initializeCurrentPhase()
 		completionMessage.insertInt(currentJobMapKey);								// insert the key value of the job, as it exists in jobMap
 
 		std::shared_ptr<ServerJobBase> job(new (SJSendRequestForOGLMRMCBlueprints));
+		Message enumedMessage;
+		enumedMessage.messageType = MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER;
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey] = job;													// instantiation.
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setServerPtr(server);									// Set the required OSServer pointer in the job.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setStartMessage(std::move(enumedMessage));
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setCompletionMessage(std::move(completionMessage));		// Move the built completion message into the job.
 		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
 	}

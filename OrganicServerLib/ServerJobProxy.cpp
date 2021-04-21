@@ -20,13 +20,7 @@ void ServerJobProxy::callServerJobSendUpdateMessageToJobManager(OSServer* in_ser
 	//std::cout << "######## update inserted successfully. " << std::endl;
 }
 
-void ServerJobProxy::callServerJobSendSetWorldDirectionToClient(OSServer* in_serverRef, Message in_message)
+void ServerJobProxy::callServerSendOutgoingMessageToMessageInterpreter(OSServer* in_serverRef, Message in_message)
 {
-	std::cout << "!!! calling send world direction... " << std::endl;
-	in_serverRef->jobSendSetWorldDirectionToClient(in_message);
-}
-
-void ServerJobProxy::callServerJobSendRequestToSendOGLMCubeFromClient(OSServer* in_serverRef)
-{
-	in_serverRef->jobSendRequestToSendOGLMCubeFromClient();
+	in_serverRef->jobSendOutgoingMessageToInterpreter(std::move(in_message));
 }

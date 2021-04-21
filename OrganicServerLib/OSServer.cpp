@@ -552,7 +552,9 @@ void OSServer::constructMultiMountTestWithElevator()
 	
 	// second mountain
 	
-	summit2.x = 4.00;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, by the rework to EnclaveBlock's triangle management (see commit for that da
+	summit2.x = 4;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
+					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
+					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
 	summit2.y = 16;
 	summit2.z = 16;
 	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
@@ -616,31 +618,7 @@ void OSServer::constructBigMountTestNoInput()
 	executeDerivedContourPlanNoInput("mountain");
 }
 
-void OSServer::jobSendSetWorldDirectionToClient(Message in_message)
-{
-	ECBPolyPoint direction;
-	Message tempInBoundMessage = in_message;
-	tempInBoundMessage.open();
-	direction = tempInBoundMessage.readPoint();
 
-	Message outgoingRequest;
-	outgoingRequest.messageType = MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION;
-	outgoingRequest.insertPoint(direction);
-	messageInterpreter.messageCableRef->insertOutgoingMessage(outgoingRequest);	// prep for output to client.
-}
-
-void OSServer::jobSendUpdateMessageToJobManager(Message in_message)
-{
-	serverJobManager.updateMessages.insertUpdate(in_message);
-}
-
-void OSServer::jobSendRequestToSendOGLMCubeFromClient()
-{
-	Message outgoingRequest;
-	outgoingRequest.messageType = MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER;
-	//serverMessages.outgoingMessages.push(std::move(outgoingRequest));
-	client.insertResponseMessage(outgoingRequest);
-}
 
 void OSServer::constructMissingFillBlueprint3()
 {
@@ -842,13 +820,25 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	std::cin >> someVal;
 }
 
+void OSServer::jobSendUpdateMessageToJobManager(Message in_message)
+{
+	serverJobManager.updateMessages.insertUpdate(in_message);
+}
+
+void OSServer::jobSendOutgoingMessageToInterpreter(Message in_message)
+{
+	messageInterpreter.messageCableRef->insertOutgoingMessage(std::move(in_message));
+}
+
+
 void OSServer::setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ)
 {
 	ECBPolyPoint direction(in_directionX, in_directionY, in_directionZ);
 	Message newMessage;
 	newMessage.messageType = MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION;
 	newMessage.insertPoint(direction);
-	serverJobManager.messageQueue.insertMessage(newMessage);		// insert the job into the ServerJobManager
+	// need to insert the client type (localhost, or remotehost) into the message...
+	serverJobManager.insertJobRequestMessage(std::move(newMessage));
 }
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
@@ -903,7 +893,7 @@ void OSServer::runServer()
 	{
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0)	// run until the command line is shutdown
 		{
-
+			checkClientMessages();							// the server should still listen for remote client's messages, and handle them accordingly, even though OpenGL isn't active.
 		}
 	}
 	else if (serverRunMode == 1)		// server runs actively alongside an instance of an OrganicSystem

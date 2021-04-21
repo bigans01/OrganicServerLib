@@ -20,6 +20,7 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T1 :				{ handleRequestFromClientGetBlueprintForT1(std::move(*currentMessage));  break;  }
 			case MessageType::REQUEST_FROM_CLIENT_GET_BLUEPRINT_FOR_T2 :				{ handleRequestFromClientGetBlueprintForT2(std::move(*currentMessage));  break;  }
 			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN :					{ handleRequestFromClientRunContourPlan(std::move(*currentMessage));  break;  }
+			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_BLOCK_HIGHLIGHTING:			{ handleRequestFromClientToggleBlockHighlighting(std::move(*currentMessage)); break; }
 		}
 		messageCableRef->popIncomingQueue();
 	}
@@ -34,7 +35,8 @@ void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
 		currentMessage->open();
 		switch (currentMessage->messageType)
 		{
-			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION :					{ handleRequestToClientSetWorldDirection(std::move(*currentMessage)); break; }
+			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION :						{ handleRequestToClientSetWorldDirection(std::move(*currentMessage)); break; }
+			case MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER:	{ handleRequestToClientSendCurrentClientOGLMRMC(std::move(*currentMessage)); break; }
 		}
 		messageCableRef->popOutgoingQueue();
 	}
@@ -43,12 +45,12 @@ void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
 void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Message in_message)
 {
 
-	// ###################
-	// PREVIOUS CALL/MESSAGE: Message spawned by calling function from client (OrganicSystem): CoreMessageInterpreter::sendMessageRequestAllBlueprintsInOGLMRMC(EnclaveKeyDef::EnclaveKey in_OGLMCenterKey)
+	// ####################
+	// MESSAGE CHAIN: serverRequestsCurrentClientOGLMRMC(3 of 3)
 	//
-	// uses a BlueprintScanningCuboid that is constructed based off the client's current center collection key, to scan for existing blueprints. The blueprints are then sent the client.
-	//
-	//
+	// The server receives a MessageType of REQUEST_FROM_CLIENT_BLUEPRINTS_FOR_OGLMBUFFERMANAGER from a client, and uses the key inside this message to construct a scanning cuboid.
+	// The server checks for all blueprints that exist within the cuboid, and sends them back to the client.
+	// 
 	//
 
 	switch (in_message.messageLocality)
@@ -190,9 +192,9 @@ void ServerMessageInterpreter::handleRequestFromClientRunContourPlan(Message in_
 {
 	// other cases follow here...
 	// ###################
+	//
+	// MESSAGE CHAIN: clientRequestsContourPlanRun(message sent to serverJobManager, 2 of 3)
 	// PREVIOUS CALL/MESSAGE: client requests a contour plan via button click in ImGui.
-	//
-	//
 	//
 
 	switch (in_message.messageLocality)
@@ -200,7 +202,7 @@ void ServerMessageInterpreter::handleRequestFromClientRunContourPlan(Message in_
 		case MessageLocality::LOCAL:
 		{
 			std::cout << "!! Found contour map request. " << std::endl;
-			serverPtr->serverJobManager.messageQueue.insertMessage(std::move(in_message));		//  move the request to the server job manager.
+			serverPtr->serverJobManager.insertJobRequestMessage(std::move(in_message));
 			break;
 		}
 		case MessageLocality::REMOTE:
@@ -221,17 +223,68 @@ void ServerMessageInterpreter::handleRequestToClientSetWorldDirection(Message in
 
 	switch (in_message.messageLocality)
 	{
-	case MessageLocality::LOCAL:
-	{
-		std::cout << "SERVER: sending request to client to set world direction" << std::endl;
-		//serverPtr->serverJobManager.messageQueue.insertMessage(std::move(in_message));		//  move the request to the server job manager.
-		serverPtr->client.insertResponseMessage(in_message);
-		break;
-	}
-	case MessageLocality::REMOTE:
-	{
-		break;
-	}
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "SERVER: sending request to client to set world direction" << std::endl;
+			serverPtr->client.insertResponseMessage(in_message);
+			break;
+		}
+		case MessageLocality::REMOTE:
+		{
+			break;
+		}
 	}
 }
 
+void ServerMessageInterpreter::handleRequestToClientSendCurrentClientOGLMRMC(Message in_message)
+{
+	// ###################
+	//
+	// MESSAGE CHAIN: serverRequestsCurrentClientOGLMRMC (message sent to serverJobManager, 1 of 3)
+	// 
+	// the server needs to send a request to all clients, to get the center key of the OGLMRMC.
+	//
+	// will eventually need logic below to run the check against any connected client.
+
+	switch (in_message.messageLocality)
+	{
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "SERVER: sending request for current OGLM center key value." << std::endl;
+			serverPtr->client.insertResponseMessage(in_message);
+			break;
+		}
+		case MessageLocality::REMOTE:
+		{
+		
+
+			break;
+		}
+	}
+}
+
+void ServerMessageInterpreter::handleRequestFromClientToggleBlockHighlighting(Message in_message)
+{
+	// other cases follow here...
+	// ###################
+	// MESSAGE CHAIN: toggleBlockHighlighting (end of chain, 2 of 2)
+	//
+	// PREVIOUS CALL/MESSAGE: client requests to turn on/off current target block highlighting; this request is generated by CoreMessageInterpreter::interpretOutgoingRequestToServer;
+	// see the case for MessageType::REQUEST_FROM_CLIENT_TOGGLE_BLOCK_HIGHLIGHTING in CoreMessageInterpreter::sendMessageRequestToggleBlockHighlighting() (OrganicCoreLib)
+	//
+	//
+	switch (in_message.messageLocality)
+	{
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "SERVER: sending toggle block highlighting requested back to client..." << std::endl;
+			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_TOGGLE_BLOCK_HIGHLIGHTING);
+			serverPtr->client.insertResponseMessage(responseMessage);
+			break;
+		}
+		case MessageLocality::REMOTE:
+		{
+			break;
+		}
+	}
+}

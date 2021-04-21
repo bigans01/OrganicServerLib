@@ -28,7 +28,11 @@
 class OSServer;
 class ServerJobManager
 {
-	public:
+	private:
+		friend class OSServer;
+		friend class ServerMessageInterpreter;
+		friend class ServerJobProxy;			// needed for ServerJobProxy::callServerJobSendUpdateMessageToJobManager
+
 		OSServer* server;	// a pointer to the server instance that this ServerJobManager instance should be contained in.
 		ServerThreadDesignationMap designations;
 
@@ -36,7 +40,7 @@ class ServerJobManager
 
 
 		// STEP 1: Read messages 
-		ServerJobMessageQueue messageQueue;
+		ServerJobMessageQueue jobRequestQueue;
 
 		// server job map
 		//std::map<int, std::shared_ptr<ServerPhasedJobBase>> serverJobs;
@@ -48,6 +52,7 @@ class ServerJobManager
 
 		void initialize(OSServer* in_serverPtr);
 		void startCommandLine();
+		void insertJobRequestMessage(Message in_message);
 
 		// STEP 2: insert jobs based into the appropraite containers, based on the message.
 		void checkForUpdateMessages();		// 1: check for messages that would be updates to existing jobs.

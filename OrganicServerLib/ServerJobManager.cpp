@@ -23,6 +23,11 @@ void ServerJobManager::startCommandLine()
 	targetThread->submit(&OSServer::runCommandLineV3, server);
 }
 
+void ServerJobManager::insertJobRequestMessage(Message in_message)
+{
+	jobRequestQueue.insertMessage(std::move(in_message));
+}
+
 void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
 {
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
@@ -105,9 +110,9 @@ void ServerJobManager::checkForMessages()
 	
 	*/
 
-	while (!messageQueue.isEmpty())
+	while (!jobRequestQueue.isEmpty())
 	{
-		Message* currentMessageRef = messageQueue.getMessageRefFromFront();		// get a ref to the message
+		Message* currentMessageRef = jobRequestQueue.getMessageRefFromFront();		// get a ref to the message
 		currentMessageRef->open();												// open the message
 		switch (currentMessageRef->messageType)
 		{
@@ -116,7 +121,7 @@ void ServerJobManager::checkForMessages()
 			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION: { handleSetDirectionRequest(std::move(*currentMessageRef)); break; }
 
 		}
-		messageQueue.safePopQueue();
+		jobRequestQueue.safePopQueue();
 	}
 }
 
@@ -167,6 +172,12 @@ void ServerJobManager::checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJob
 
 void ServerJobManager::handleContourPlanRequest(Message in_message)
 {
+	// ###################
+	//
+	// MESSAGE CHAIN: clientRequestsContourPlanRun(attempts to run the requested contour plan, 3 of 3)
+	// PREVIOUS CALL/MESSAGE: ServerMessageInterpreter sent the message to this ServerJobManager.
+	//
+
 	// message should have already been opened before (test of std::move)
 	std::cout << "SERVER: JobManager found contour plan request. " << std::endl;
 	std::string planName = in_message.readString();											// remember, every read increments the string.

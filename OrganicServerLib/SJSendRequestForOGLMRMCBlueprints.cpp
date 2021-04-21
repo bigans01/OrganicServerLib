@@ -9,7 +9,8 @@ void SJSendRequestForOGLMRMCBlueprints::runPrechecks()
 void SJSendRequestForOGLMRMCBlueprints::runJob(OrganicThread* in_threadToRunOn)
 {
 	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.							// main work
-	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendRequestToSendOGLMCubeFromClient, server);									// main work
+	//in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendRequestToSendOGLMCubeFromClient, server);									// main work
+	in_threadToRunOn->submit(&ServerJobProxy::callServerSendOutgoingMessageToMessageInterpreter, server, startMessage);		// send a message that has MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER
 	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendUpdateMessageToJobManager, server, completionMessage);	// required: job completion message
 }
 

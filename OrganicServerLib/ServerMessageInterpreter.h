@@ -13,7 +13,9 @@
 class OSServer;	
 class ServerMessageInterpreter : public MessageInterpreter
 {
-	public:
+	private:
+		friend class OSServer;
+
 		OSServer* serverPtr = NULL;
 		MessageCable* messageCableRef = NULL;
 		void initialize(OSServer* in_organicSystemServerRef, MessageCable* in_messageCableRef);
@@ -28,6 +30,8 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void handleRequestFromClientGetBlueprintForT2(Message in_message);
 		void handleRequestFromClientRunContourPlan(Message in_message);
 		void handleRequestToClientSetWorldDirection(Message in_message);
+		void handleRequestToClientSendCurrentClientOGLMRMC(Message in_message);
+		void handleRequestFromClientToggleBlockHighlighting(Message in_message);
 };
 
 #endif

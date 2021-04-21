@@ -122,9 +122,8 @@ private:
 	// test run jobs for ServerJobManager
 	void constructSingleMountTestNoInput();
 	void constructBigMountTestNoInput();
-	void jobSendSetWorldDirectionToClient(Message in_message);
 	void jobSendUpdateMessageToJobManager(Message in_message);
-	void jobSendRequestToSendOGLMCubeFromClient();
+	void jobSendOutgoingMessageToInterpreter(Message in_message);
 
 };
 
