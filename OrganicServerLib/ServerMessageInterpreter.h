@@ -31,7 +31,8 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void handleRequestFromClientRunContourPlan(Message in_message);
 		void handleRequestToClientSetWorldDirection(Message in_message);
 		void handleRequestToClientSendCurrentClientOGLMRMC(Message in_message);
-		void handleRequestFromClientToggleBlockHighlighting(Message in_message);
+		void handleRequestFromClientToggleBlockHighlighting(Message in_message);				// MESSAGE CHAIN: toggleBlockHighlighting
+		void handleRequestFromClientToggleCurrentEnclaveHighlighting(Message in_message);		// MESSAGE CHAIN: toggleCurrentEnclaveHighlighting
 };
 
 #endif

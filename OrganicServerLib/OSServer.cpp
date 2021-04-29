@@ -552,7 +552,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	
 	// second mountain
 	
-	summit2.x = 4;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
+	summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
 					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
 					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
 	summit2.y = 16;
