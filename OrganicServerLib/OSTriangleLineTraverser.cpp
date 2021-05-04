@@ -198,8 +198,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 {
 	//cout << "currentKey Value: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;	// test output only
 	//cout << "nextKeyAdd Value: " << nextKeyAdd.x << ", " << nextKeyAdd.y << ", " << nextKeyAdd.z << endl;
-	EnclaveKeyDef::EnclaveKey* currentKeyPtr = &currentKey;													// get a pointer to the current key
-	*currentKeyPtr = OrganicUtils::addEnclaveKeys(*currentKeyPtr, nextKeyAdd);								// add the nextKeyAdd to currentKey
+	currentKey += nextKeyAdd;
 
 	//cout << "NEW currentKey Value (AKA current blueprint to get): " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 	//std::cout << "----> current iteration endpoint (before findClosestIntersection call) is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
@@ -215,7 +214,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	)
 	{
 		std::cout << "!!!!! Special halt, OSTriangleLineTraverser " << std::endl;
-		std::cout << "Current blueprint is: " << currentKeyPtr->x << ", " << currentKeyPtr->y << ", " << currentKeyPtr->z << std::endl;
+		std::cout << "Current blueprint is: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
 		std::cout << "contoured line begin point: " << beginPoint.x << ", " << beginPoint.y << "," << beginPoint.z << std::endl;
 		std::cout << "contoured line end point: " << endPoint.x << ", " << endPoint.y << "," << endPoint.z << std::endl;
 		std::cout << "current end point: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << std::endl;
@@ -226,13 +225,13 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 	}
 
 	//std::cout << "---->  traverseLineOnce intersection call " << std::endl;
-	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey);
-	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, *currentKeyPtr, endKey, in_TrianglePtr->centroid, in_TrianglePtr->trianglePoints[0], in_TrianglePtr->trianglePoints[1], in_TrianglePtr->trianglePoints[2]);
+	ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, currentKey, endKey);
+	//ECBIntersectMeta resultantIntersect = OrganicUtils::findClosestBlueprintIntersection(currentIterationEndpoint, endPoint, currentKey, endKey, in_TrianglePtr->centroid, in_TrianglePtr->trianglePoints[0], in_TrianglePtr->trianglePoints[1], in_TrianglePtr->trianglePoints[2]);
 	//std::cout << "--Resultant intersect at traverseLineOnce: " << resultantIntersect.intersectedPoint.x << ", " << resultantIntersect.intersectedPoint.y << ", " << resultantIntersect.intersectedPoint.z << std::endl;
 	nextKeyAdd = resultantIntersect.incrementingKey;
 	// 1. Do check for the currentIterationEndpoint; it must exist on an axis somewhere.
 	//cout << "current iteration endpoint is: " << currentIterationEndpoint.x << ", " << currentIterationEndpoint.y << ", " << currentIterationEndpoint.z << endl;
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>::iterator polyMapIter = in_TrianglePtr->polygonPieceMap.find(*currentKeyPtr);	// check to see if the polygon exists already in the contoured triangle (using the currentKeyPtr)
+	auto polyMapIter = in_TrianglePtr->polygonPieceMap.find(currentKey);	// check to see if the polygon exists already in the contoured triangle (using the currentKeyPtr)
 																																								/**/
 	if (polyMapIter != in_TrianglePtr->polygonPieceMap.end())	// polygon was already found
 	{
