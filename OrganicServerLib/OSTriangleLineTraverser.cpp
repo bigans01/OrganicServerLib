@@ -50,7 +50,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 	blueprintMapRef = in_blueprintMapPtr;
 	//ECBBorderLineList borderLineList;
-	//borderLineList = OrganicUtils::determineBorderLines(beginKey);		// get the border line list for the first point
+	//borderLineList = IndependentUtils::determineBorderLines(beginKey);		// get the border line list for the first point
 	//std::cout << "-->>>> OSTriangleLineTraverser constructor, blueprint intersection call..." << std::endl;
 	//std::cout << "T 0: " << in_TrianglePtr->trianglePoints[0].x << ", " << in_TrianglePtr->trianglePoints[0].y << ", " << in_TrianglePtr->trianglePoints[0].z << std::endl;
 	//std::cout << "T 1: " << in_TrianglePtr->trianglePoints[1].x << ", " << in_TrianglePtr->trianglePoints[1].y << ", " << in_TrianglePtr->trianglePoints[1].z << std::endl;

@@ -10,6 +10,7 @@
 #include "EnclaveCollectionBlueprint.h"
 #include "EnclaveKeyDef.h"
 #include "OrganicUtils.h"
+#include "IndependentUtils.h"
 #include "PrimaryLineT1.h"
 #include "PrimaryLineT1Array.h"
 #include "PolyRunDirection.h"

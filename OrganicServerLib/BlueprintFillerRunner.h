@@ -6,6 +6,7 @@
 #include "OSContouredTriangle.h"
 #include "PrimaryLineT1.h"
 #include "OrganicUtils.h"
+#include "IndependentUtils.h"
 #include "ECBIntersectMeta.h"
 #include "EnclaveKeyDef.h"
 #include "ECBPPOrientationResults.h"

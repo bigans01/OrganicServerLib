@@ -326,8 +326,8 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 bool OSContouredTriangleRunner::checkIfPointIsOnBlueprintBorder(ECBPolyPoint in_point, EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	bool check = false;
-	ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(in_blueprintKey);
-	ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(in_point, &currentBorderLineList);
+	ECBBorderLineList currentBorderLineList = IndependentUtils::determineBorderLines(in_blueprintKey);
+	ECBPPOrientationResults currentEndpointOrientationResults = IndependentUtils::GetBlueprintPointOrientation(in_point, &currentBorderLineList);
 	if (currentEndpointOrientationResults.osubtype != ECBPPOrientations::NOVAL)
 	{
 		check = true;

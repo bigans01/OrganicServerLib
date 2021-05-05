@@ -4,7 +4,7 @@
 void PrimaryCircuit::setBorderData(EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	blueprintKey = in_blueprintKey;
-	borderLineList = OrganicUtils::OrganicUtils::determineBorderLines(blueprintKey);	// set up the blueprint border line list
+	borderLineList = IndependentUtils::determineBorderLines(blueprintKey);	// set up the blueprint border line list
 	//borderDataMapRef = in_borderDataMapRef;
 }
 

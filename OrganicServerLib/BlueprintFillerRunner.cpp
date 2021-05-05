@@ -14,8 +14,8 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef,
 	// get the intercept point of the referenced line
 	//ECBIntersectMeta initialIntersect = OrganicUtils::findClosestBlueprintIntersection(in_lineRef->beginPointRealXYZ, in_lineRef->endPointRealXYZ, in_lineRef->beginPointBlueprintKey, in_lineRef->endPointBlueprintKey);
 	//ECBPolyPoint initialIntersectedPoint = initialIntersect.intersectedPoint;
-	//ECBBorderLineList currentBorderLineList = OrganicUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
-	//ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(initialIntersectedPoint, &currentBorderLineList);
+	//ECBBorderLineList currentBorderLineList = IndependentUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
+	//ECBPPOrientationResults currentEndpointOrientationResults = IndependentUtils::GetBlueprintPointOrientation(initialIntersectedPoint, &currentBorderLineList);
 	//BorderDataMap borderData;
 	//EnclaveKeyDef::EnclaveKey moveVals = OrganicUtils::retrieveBorderDirection(currentEndpointOrientationResults, &borderData);
 
@@ -60,7 +60,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 {
 	
 	//EnclaveKeyDef::EnclaveKey tempMoveVals = borderDataMapRef->cornerMap[currentBeginOrientation.osubtype].borderLimits;
-	//currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);	// get the blueprint borders for this iteration, in order to figure out the next iteration.
+	//currentBorderLineList = IndependentUtils::determineBorderLines(blueprintKey);	// get the blueprint borders for this iteration, in order to figure out the next iteration.
 
 	/*
 	if (currentEndOrientation.otype == ECBPPOrientations::FACE)
@@ -83,8 +83,8 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 	//std::cout << "Beginning value of blueprint key: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 	if (isRunValid == true) // only do this if the run is valid
 	{
-		currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);
-		ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);
+		currentBorderLineList = IndependentUtils::determineBorderLines(blueprintKey);
+		ECBPPOrientationResults currentEndpointOrientationResults = IndependentUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);
 		EnclaveKeyDef::EnclaveKey tempMoveVals = OrganicUtils::retrieveBorderDirection(currentEndpointOrientationResults, &borderData);
 		ECBPolyPoint commonValsToFind;
 		commonValsToFind.x = tempMoveVals.x;
@@ -125,7 +125,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 				//std::cout << "Primary line slope was: " << primaryLineSlope.x << ", " << primaryLineSlope.y << ", " << primaryLineSlope.z << std::endl;
 
 				fillerRunnerPrimaryLine.endPointRealXYZ = intersectData.intersectedPoint;			// load the new point into the line.
-				currentBorderLineList = OrganicUtils::determineBorderLines(blueprintKey);           // set the new border lines based on the new blueprint key value.
+				currentBorderLineList = IndependentUtils::determineBorderLines(blueprintKey);           // set the new border lines based on the new blueprint key value.
 
 
 
@@ -150,7 +150,7 @@ void BlueprintFillerRunner::iterateAndCheckedForTouchedBlueprint()
 				}
 
 				// iterate to the next blueprint, and check if it was a traced blueprint. If it isn't a traced blueprint, continue the while loop.
-				currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);	// set new endpoint orientation
+				currentEndpointOrientationResults = IndependentUtils::GetBlueprintPointOrientation(fillerRunnerPrimaryLine.endPointRealXYZ, &currentBorderLineList);	// set new endpoint orientation
 				tempMoveVals = OrganicUtils::retrieveBorderDirection(currentEndpointOrientationResults, &borderData);		// get the border direction
 				commonValsToFind.x = tempMoveVals.x;		// set the values for the common vals to find.
 				commonValsToFind.y = tempMoveVals.y;
@@ -320,11 +320,11 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 	//std::cout << "!! ## Line segment end: " << in_currentSegmentEnd.x << ", " << in_currentSegmentEnd.y << ", " << in_currentSegmentEnd.z << std::endl;
 
 	ECBPolyPoint initialIntersectedPoint = in_currentSegmentEnd;
-	//currentBorderLineList = OrganicUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
+	//currentBorderLineList = IndependentUtils::determineBorderLines(in_lineRef->beginPointBlueprintKey);
 	//std::cout << ">> Current blueprint key is: " << in_currentSegmentBlueprintKey.x << ", " << in_currentSegmentBlueprintKey.y << ", " << in_currentSegmentBlueprintKey.z << std::endl;
-	currentBorderLineList = OrganicUtils::determineBorderLines(in_currentSegmentBlueprintKey);
+	currentBorderLineList = IndependentUtils::determineBorderLines(in_currentSegmentBlueprintKey);
 	//std::cout << "Current blueprint key is: " << in_currentSegmentBlueprintKey.x << ", " << in_currentSegmentBlueprintKey.y << ", " << in_currentSegmentBlueprintKey.x << std::endl;
-	ECBPPOrientationResults currentEndpointOrientationResults = OrganicUtils::GetBlueprintPointOrientation(initialIntersectedPoint, &currentBorderLineList);
+	ECBPPOrientationResults currentEndpointOrientationResults = IndependentUtils::GetBlueprintPointOrientation(initialIntersectedPoint, &currentBorderLineList);
 
 	//std::cout << "!! Found inital orientation results..." << std::endl;
 
@@ -648,7 +648,7 @@ PLTracingResult BlueprintFillerRunner::getBlueprintTracingResult(ECBPolyPoint in
 {
 	PLTracingResult resultToReturn;
 	ECBPolyPoint resultEndpoint = OrganicUtils::getBlueprintTracingEndpointForIsolatedPrimaryT2(currentBeginPoint, in_interceptToUse, &currentBorderLineList, blueprintKey);
-	ECBPPOrientationResults orientationResults = OrganicUtils::GetBlueprintPointOrientation(resultEndpoint, &currentBorderLineList);
+	ECBPPOrientationResults orientationResults = IndependentUtils::GetBlueprintPointOrientation(resultEndpoint, &currentBorderLineList);
 	//std::cout << "oh hello!! " << std::endl;
 	BorderMDFaceList resultFaceList = OrganicUtils::getFaceList(orientationResults, &borderData);					// get resultant face list by looking up the map with the orientation
 	//std::cout << "oh hello!!! " << std::endl;

@@ -8,6 +8,7 @@
 #include "ECBBorderLineList.h"
 #include "OrganicUtils.h"
 #include "BorderDataMap.h"
+#include "IndependentUtils.h"
 
 class PrimaryCircuitSegment
 {

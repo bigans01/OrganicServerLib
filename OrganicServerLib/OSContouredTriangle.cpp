@@ -277,7 +277,7 @@ void OSContouredTriangle::adjustPointKeysIfPerfectlyAlignedToECBBorders()
 		//std::cout << std::endl;
 		//std::cout << "Key calibration; current key used is: " << currentKeyCopy.x << ", " << currentKeyCopy.y << ", " << currentKeyCopy.z << std::endl;
 
-		currentBorderLineList = OrganicUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
+		currentBorderLineList = IndependentUtils::determineBorderLines(currentKeyCopy);			// get the ecb border line list	
 		//std::cout << "################ Calibrating keys for line: " << x << std::endl;
 		//findTrueKeysForTriangleLinePoints(contouredTrianglePtr, currentLine, currentKeyPtr, currentBorderLineList);	// calculate the true key for the points in the lines. This function call handles one point of the contoured triangle per call. (so loop 3 times)
 	}

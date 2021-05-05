@@ -7,6 +7,7 @@
 #include "ECBBorderLineList.h"
 #include "EnclaveKeyDef.h"
 #include "OrganicUtils.h"
+#include "IndependentUtils.h"
 #include "BorderDataMap.h"
 
 class PrimaryCircuit

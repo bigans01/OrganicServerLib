@@ -3,8 +3,8 @@
 
 void PrimaryCircuitSegment::determineInitialType()
 {
-	ECBPPOrientationResults currentSegmentEndOrientation = OrganicUtils::GetBlueprintPointOrientation(endPoint, borderLineListRef);
-	ECBPPOrientationResults targetOrientation = OrganicUtils::GetBlueprintPointOrientation(targetPoint, borderLineListRef);
+	ECBPPOrientationResults currentSegmentEndOrientation = IndependentUtils::GetBlueprintPointOrientation(endPoint, borderLineListRef);
+	ECBPPOrientationResults targetOrientation = IndependentUtils::GetBlueprintPointOrientation(targetPoint, borderLineListRef);
 	BorderMDFaceList currentSegmentEndFaceList = OrganicUtils::getFaceList(currentSegmentEndOrientation, borderDataMapRef);
 	BorderMDFaceList targetFaceList = OrganicUtils::getFaceList(targetOrientation, borderDataMapRef);
 
