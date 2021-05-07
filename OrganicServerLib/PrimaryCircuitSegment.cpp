@@ -5,8 +5,8 @@ void PrimaryCircuitSegment::determineInitialType()
 {
 	ECBPPOrientationResults currentSegmentEndOrientation = IndependentUtils::GetBlueprintPointOrientation(endPoint, borderLineListRef);
 	ECBPPOrientationResults targetOrientation = IndependentUtils::GetBlueprintPointOrientation(targetPoint, borderLineListRef);
-	BorderMDFaceList currentSegmentEndFaceList = OrganicUtils::getFaceList(currentSegmentEndOrientation, borderDataMapRef);
-	BorderMDFaceList targetFaceList = OrganicUtils::getFaceList(targetOrientation, borderDataMapRef);
+	BorderMDFaceList currentSegmentEndFaceList = IndependentUtils::getFaceList(currentSegmentEndOrientation, borderDataMapRef);
+	BorderMDFaceList targetFaceList = IndependentUtils::getFaceList(targetOrientation, borderDataMapRef);
 
 	// are the points the same
 	if (OrganicUtils::checkIfPolyPointsMatch(endPoint, targetPoint) == 1)

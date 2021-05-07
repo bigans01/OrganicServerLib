@@ -650,7 +650,7 @@ PLTracingResult BlueprintFillerRunner::getBlueprintTracingResult(ECBPolyPoint in
 	ECBPolyPoint resultEndpoint = OrganicUtils::getBlueprintTracingEndpointForIsolatedPrimaryT2(currentBeginPoint, in_interceptToUse, &currentBorderLineList, blueprintKey);
 	ECBPPOrientationResults orientationResults = IndependentUtils::GetBlueprintPointOrientation(resultEndpoint, &currentBorderLineList);
 	//std::cout << "oh hello!! " << std::endl;
-	BorderMDFaceList resultFaceList = OrganicUtils::getFaceList(orientationResults, &borderData);					// get resultant face list by looking up the map with the orientation
+	BorderMDFaceList resultFaceList = IndependentUtils::getFaceList(orientationResults, &borderData);					// get resultant face list by looking up the map with the orientation
 	//std::cout << "oh hello!!! " << std::endl;
 	resultToReturn.resultingEndPoint = resultEndpoint;
 	resultToReturn.resultingFaceList = resultFaceList;
