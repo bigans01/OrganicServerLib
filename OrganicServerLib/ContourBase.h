@@ -16,6 +16,7 @@
 #include "PointAdherenceOrder.h"
 #include "OSTriangleMaterialLookup.h"
 #include <vector>
+#include "OrganicTriangleTracker.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)

@@ -409,7 +409,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	
 	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
 	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
-	//auto planPolyRegistryBeginV2 = 
+	// In addition to this, keep track of all OREs that an OrganicTriangle produces, which is needed for the post-collision check step that occurs at the end of this function.
 
 	//std::cout << "!!!! MassDriving: Running step 1. " << std::endl;
 
@@ -417,6 +417,8 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	auto adherenceListBegin = adherenceData.adherenceOrder.begin();
 	auto adherenceListEnd = adherenceData.adherenceOrder.end();
 	int currentAdherenceIndex = 0;														// iterate every loop; the very first blueprint doesn't need to do adherence.
+
+	OrganicTriangleTracker oreTracker;													// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check)
 	for (; adherenceListBegin != adherenceListEnd; adherenceListBegin++)
 	{
 		// #############################################################################################################################
@@ -448,7 +450,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 
 		//std::cout << "!!! Step 1.1, attempting production of produceRawEnclaves..." << std::endl;
 
-		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
+		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
 		containerMapMap[blueprintKey] = tempMap;																			// 2.) Copy the results, before reunning adherence
 		if (currentAdherenceIndex > 0)																						// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
@@ -463,6 +465,8 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 																																				// then append the results to the target blueprint to update.				
 		currentAdherenceIndex++;
 	}
+
+	//oreTracker.printTrackedOREsPerTriangle();
 	
 	//std::cout << "Step 1 pass.... " << std::endl;
 
