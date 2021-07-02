@@ -40,7 +40,7 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_ma
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
 		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// first, generate the OrganicRawEnclaves that would be produced by this set; keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-collision check)
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck, &oreTracker);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
 	}
 }
 

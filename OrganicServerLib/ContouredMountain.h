@@ -18,6 +18,7 @@
 #include "EnclaveFractureResultsMap.h"
 #include "OSServerUtils.h"
 #include <map>
+#include "BlueprintMassManager.h"
 
 class ContouredMountain : public ContourBase
 {

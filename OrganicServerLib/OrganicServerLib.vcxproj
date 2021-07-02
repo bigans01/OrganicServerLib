@@ -156,6 +156,7 @@
     <ClInclude Include="AdhesiveRunner.h" />
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="BlueprintFillerRunner.h" />
+    <ClInclude Include="BlueprintMassManager.h" />
     <ClInclude Include="CalibratableBlueprintKeyPair.h" />
     <ClInclude Include="ContourBase.h" />
     <ClInclude Include="ContouredMountain.h" />
@@ -217,6 +218,7 @@
     <ClCompile Include="AdhesiveRunner.cpp" />
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="BlueprintFillerRunner.cpp" />
+    <ClCompile Include="BlueprintMassManager.cpp" />
     <ClCompile Include="CalibratableBlueprintKeyPair.cpp" />
     <ClCompile Include="ContourBase.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />

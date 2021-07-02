@@ -406,6 +406,27 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	}
 	*/
 
+	// Step 0): create an independent blueprint mass, by creating a shell and running its mass drivers. Save this mass, acquire the blueprints that the mass ran through, and compare its
+	// blueprints against existing mass. 
+	BlueprintMassManager planMassManager(in_blueprintMapRef);
+
+
+	// ************ Step 0.1: Load the BlueprintMassManager with shell data
+	ForgedPolyRegistry firstPassRegistry;
+	auto firstMassPassBegin = adherenceData.adherenceOrder.begin();
+	auto firstMassPassEnd = adherenceData.adherenceOrder.end();
+	for (; firstMassPassBegin != firstMassPassEnd; firstMassPassBegin++)
+	{
+		auto firstPassRegistryBegin = planPolyRegistry.polySetRegistry.find(*firstMassPassBegin); // find the forged poly set, for the current blueprint we're looking at
+		EnclaveKeyDef::EnclaveKey currentFirstPassBlueprintKey = firstPassRegistryBegin->first;			// get the key of the blueprint to check.
+		OperableIntSet firstMassPassContourAddedTriangles = firstPassRegistryBegin->second.polySet;		// get an OperableIntSet of the OrganicTriangles that this contourplan added to the blueprint.
+		planMassManager.transferMassShellPolysFromServerToMass(currentFirstPassBlueprintKey, firstMassPassContourAddedTriangles);
+	}
+	// *********** Step 0.2: Produce OREs for the shell data
+	planMassManager.produceOREsForShellPolys(in_clientRef);
+
+	// *********** Step 0.3: Run mass drivers, for the independent mass.
+	planMassManager.runMassDriversForIndependentMass(in_clientRef);
 	
 	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
 	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
@@ -418,7 +439,6 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 	auto adherenceListEnd = adherenceData.adherenceOrder.end();
 	int currentAdherenceIndex = 0;														// iterate every loop; the very first blueprint doesn't need to do adherence.
 
-	OrganicTriangleTracker oreTracker;													// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check)
 	for (; adherenceListBegin != adherenceListEnd; adherenceListBegin++)
 	{
 		// #############################################################################################################################
@@ -428,8 +448,10 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.find(*adherenceListBegin); // find the forged poly set, for the current blueprint we're looking at
 																								 // in the vector. For example, a ForgedPolySet might have a range of polys between 0 and 7 (8 total).
 		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
-		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
+
+
+		EnclaveCollectionBlueprint* currentServerBlueprintRef = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		std::map<int, ECBPoly>* polyMapRef = &currentServerBlueprintRef->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
 		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();					// ""
 		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)	// check for SHELL_MASSDRIVER polys, and add them appropriately.
@@ -448,24 +470,47 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
 
-		//std::cout << "!!! Step 1.1, attempting production of produceRawEnclaves..." << std::endl;
 
-		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set
-		containerMapMap[blueprintKey] = tempMap;																			// 2.) Copy the results, before reunning adherence
-		if (currentAdherenceIndex > 0)																						// **the first blueprint never does adherence, as it is the primal blueprint (the first)
+		// #############################################################################################################################
+		// STEP 1.3): acquire the ECBPoly IDs of what the contour plan added to the target blueprint, as well as ECBPoly IDs of what was already in the blueprint before this;
+		// this will be needed for STEP 1.5, where we do a post-fracture check.
+		OperableIntSet currentPlanAddedOrganicTriangles = originalSet.polySet;										// get the IDs of ECBPolys that this plan added to the current blueprint we're on
+		OperableIntSet existingCurrentBlueprintPolyIDs = (*in_blueprintMapRef)[blueprintKey].produceECBPolyIDSet();		// get all the IDS of the blueprint
+		existingCurrentBlueprintPolyIDs -= currentPlanAddedOrganicTriangles;
+
+		// let's print the contents, just to show:
+		/*
+		std::cout << "(( Key: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << ")) ---> current plan, added triangle IDs: " << std::endl;
+		currentPlanAddedOrganicTriangles.printSet();
+
+		std::cout << "(( Key: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << ")) ---> current blueprint, old poly IDs: " << std::endl;
+		allCurrentBlueprintPolyIDs.printSet();
+
+		int printWait = 3;
+		std::cin >> printWait;
+		*/
+
+		// #############################################################################################################################
+		// STEP 1.4): Produce the OREs for each OrganicTriangle that this ContourPlan added to this specific blueprint (produceRawEnclavesForPolySetWithTracking), 
+		// AND get the OREs for each OrganicTriangle that already existed in the blueprint (via produceTrackedORESForOrganicTriangleIDs)
+
+		OrganicTriangleTracker oreTracker;		// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check), 
+												// for all ECBPolys in this blueprint.
+		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, &oreTracker);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set; load the tracked OREs of the OrganicTriangles that were added by the plan
+		in_clientRef->OS->produceTrackedORESForOrganicTriangleIDs(&tempMap, blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, &oreTracker);			// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
+		containerMapMap[blueprintKey] = tempMap;																												// 3.) Copy the results, before running adherence
+		if (currentAdherenceIndex > 0)					// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
-			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 3.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
+			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 4.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
 
-		//std::cout << "!!! Step 1.2, attempting production of produceRawEnclaves..." << std::endl;
-
 		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], blueprintToCheck);					// 4.) for each blueprint in the adherence list, 
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], currentServerBlueprintRef, &oreTracker);					// 4.) for each blueprint in the adherence list, 
 																																				// spawn the EnclaveTriangleSkeletonContainers from the corresponding EnclaveFractureResultsMap for that blueprint; 
 																																				// then append the results to the target blueprint to update.				
 		currentAdherenceIndex++;
 	}
-
+	//oreTracker.determineOrganicTrianglesToDissolve();
 	//oreTracker.printTrackedOREsPerTriangle();
 	
 	//std::cout << "Step 1 pass.... " << std::endl;
