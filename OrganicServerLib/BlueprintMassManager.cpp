@@ -1,7 +1,22 @@
 #include "stdafx.h"
 #include "BlueprintMassManager.h"
 
-void BlueprintMassManager::transferMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveKey in_blueprintKey, OperableIntSet in_contourAddedOrganicTrianglesSet)
+void BlueprintMassManager::buildContourMassShell()
+{
+	auto blueprintsWithShellsToTransferBegin = contourPlanRef->adherenceData.adherenceOrder.begin();
+	auto blueprintsWithShellsToTransferEnd = contourPlanRef->adherenceData.adherenceOrder.end();
+	for (; blueprintsWithShellsToTransferBegin != blueprintsWithShellsToTransferEnd; blueprintsWithShellsToTransferBegin++)
+	{
+		// find the forged poly set, for the current blueprint we're looking at
+		auto refedContourPlanPolySetRegistryBegin = contourPlanRef->planPolyRegistry.polySetRegistry.find(*blueprintsWithShellsToTransferBegin);
+		EnclaveKeyDef::EnclaveKey currentFirstPassBlueprintKey = refedContourPlanPolySetRegistryBegin->first;		// get the key of the blueprint to check.
+		OperableIntSet firstMassPassContourAddedTriangles = refedContourPlanPolySetRegistryBegin->second.polySet;		// get an OperableIntSet of the OrganicTriangles that the ref'ed ContourPlan
+																														// added to the blueprint.
+		copyMassShellPolysFromServerToMass(currentFirstPassBlueprintKey, firstMassPassContourAddedTriangles);	// transfer the specific OrganicTriangles into this mass
+	}
+}
+
+void BlueprintMassManager::copyMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveKey in_blueprintKey, OperableIntSet in_contourAddedOrganicTrianglesSet)
 {
 	EnclaveCollectionBlueprint* currentBlueprintRef = &(*serverBlueprintsRef)[in_blueprintKey];
 	massAShellBlueprintKeyAndSetPairs[in_blueprintKey] = in_contourAddedOrganicTrianglesSet;
@@ -25,20 +40,20 @@ void BlueprintMassManager::transferMassShellPolysFromServerToMass(EnclaveKeyDef:
 	}
 }
 
-void BlueprintMassManager::produceOREsForShellPolys(OrganicClient* in_clientRef)
+void BlueprintMassManager::produceOREsForShellPolys()
 {
 	auto massShellBegin = massAShellBlueprintKeyAndSetPairs.begin();
 	auto massShellEnd = massAShellBlueprintKeyAndSetPairs.end();
 	for (; massShellBegin != massShellEnd; massShellBegin++)
 	{
-		in_clientRef->OS->produceRawEnclavesForPolySet(massA.getFractureResultsMapRef(massShellBegin->first),
+		organicClientRef->OS->produceRawEnclavesForPolySet(massA.getFractureResultsMapRef(massShellBegin->first),
 														massShellBegin->first,
 														massA.getBlueprintRef(massShellBegin->first),
 														massShellBegin->second.intSet);
 	}
 }
 
-void BlueprintMassManager::runMassDriversForIndependentMass(OrganicClient* in_clientRef)
+void BlueprintMassManager::runMassDriversForIndependentMass()
 {
 	auto massDriverRegistryBegin = massAMassDriverRegistry.polySetRegistry.begin();
 	auto massDriverRegistryEnd = massAMassDriverRegistry.polySetRegistry.end();
@@ -58,7 +73,7 @@ void BlueprintMassManager::runMassDriversForIndependentMass(OrganicClient* in_cl
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
-		in_clientRef->OS->generateAndRunMassDriversForBlueprint(massA.getBlueprintMapRef(),
+		organicClientRef->OS->generateAndRunMassDriversForBlueprint(massA.getBlueprintMapRef(),
 																&massAEntireShellRegistry.polySetRegistry,
 																blueprintKey,
 																startingFloorTerminatingSet,

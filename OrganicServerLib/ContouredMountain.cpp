@@ -366,7 +366,9 @@ void ContouredMountain::addContourLine(map<int, OSContourLine>* in_contourLineMa
 	(*line_id)++;									
 }
 
-void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef)
+void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, 
+									   std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_serverBlueprintMapRef, 
+									   EnclaveFractureResultsMap* in_fractureResultsMapRef)
 {
 	std::cout << "### Running mass drivers for mountain; printing out SHELL_MASSDSRIVER polys: " << std::endl;
 	auto organicstart = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
@@ -408,25 +410,16 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 
 	// Step 0): create an independent blueprint mass, by creating a shell and running its mass drivers. Save this mass, acquire the blueprints that the mass ran through, and compare its
 	// blueprints against existing mass. 
-	BlueprintMassManager planMassManager(in_blueprintMapRef);
+	BlueprintMassManager planMassManager(in_serverBlueprintMapRef, in_clientRef, this);
 
+	// ************ Step 0.1: Build the ContourPlan's mass shell.
+	planMassManager.buildContourMassShell();
 
-	// ************ Step 0.1: Load the BlueprintMassManager with shell data
-	ForgedPolyRegistry firstPassRegistry;
-	auto firstMassPassBegin = adherenceData.adherenceOrder.begin();
-	auto firstMassPassEnd = adherenceData.adherenceOrder.end();
-	for (; firstMassPassBegin != firstMassPassEnd; firstMassPassBegin++)
-	{
-		auto firstPassRegistryBegin = planPolyRegistry.polySetRegistry.find(*firstMassPassBegin); // find the forged poly set, for the current blueprint we're looking at
-		EnclaveKeyDef::EnclaveKey currentFirstPassBlueprintKey = firstPassRegistryBegin->first;			// get the key of the blueprint to check.
-		OperableIntSet firstMassPassContourAddedTriangles = firstPassRegistryBegin->second.polySet;		// get an OperableIntSet of the OrganicTriangles that this contourplan added to the blueprint.
-		planMassManager.transferMassShellPolysFromServerToMass(currentFirstPassBlueprintKey, firstMassPassContourAddedTriangles);
-	}
 	// *********** Step 0.2: Produce OREs for the shell data
-	planMassManager.produceOREsForShellPolys(in_clientRef);
+	planMassManager.produceOREsForShellPolys();
 
 	// *********** Step 0.3: Run mass drivers, for the independent mass.
-	planMassManager.runMassDriversForIndependentMass(in_clientRef);
+	planMassManager.runMassDriversForIndependentMass();
 	
 	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
 	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
@@ -450,7 +443,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
 
 
-		EnclaveCollectionBlueprint* currentServerBlueprintRef = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		EnclaveCollectionBlueprint* currentServerBlueprintRef = &(*in_serverBlueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
 		std::map<int, ECBPoly>* polyMapRef = &currentServerBlueprintRef->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
 		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();					// ""
@@ -475,7 +468,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		// STEP 1.3): acquire the ECBPoly IDs of what the contour plan added to the target blueprint, as well as ECBPoly IDs of what was already in the blueprint before this;
 		// this will be needed for STEP 1.5, where we do a post-fracture check.
 		OperableIntSet currentPlanAddedOrganicTriangles = originalSet.polySet;										// get the IDs of ECBPolys that this plan added to the current blueprint we're on
-		OperableIntSet existingCurrentBlueprintPolyIDs = (*in_blueprintMapRef)[blueprintKey].produceECBPolyIDSet();		// get all the IDS of the blueprint
+		OperableIntSet existingCurrentBlueprintPolyIDs = (*in_serverBlueprintMapRef)[blueprintKey].produceECBPolyIDSet();		// get all the IDS of the blueprint
 		existingCurrentBlueprintPolyIDs -= currentPlanAddedOrganicTriangles;
 
 		// let's print the contents, just to show:
@@ -549,7 +542,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef, std::unorder
 		//
 		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
 		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
-		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_blueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, startingFloorTerminatingSet, massDriverSet);
+		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_serverBlueprintMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, startingFloorTerminatingSet, massDriverSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 	}

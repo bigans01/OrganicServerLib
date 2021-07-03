@@ -46,7 +46,9 @@ public:
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;
 	virtual void amplifyAllContourLinePoints() = 0;
 	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
-	virtual void runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;
+	virtual void runMassDrivers(OrganicClient* in_clientRef, 
+								std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_serverBlueprintMapRef, 
+								EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;
 	virtual void buildContouredTriangles() = 0;
 	virtual std::vector<OSContouredTriangle*> getProcessableContouredTriangles() = 0;
 
