@@ -162,6 +162,8 @@
     <ClInclude Include="ContouredMountain.h" />
     <ClInclude Include="ContourPlanState.h" />
     <ClInclude Include="ContourPlanStateContainer.h" />
+    <ClInclude Include="ECBPolyReformer.h" />
+    <ClInclude Include="ECBPolyReformerType.h" />
     <ClInclude Include="LocalizedPointsMetaData.h" />
     <ClInclude Include="OrganicRawEnclaveAdhesives.h" />
     <ClInclude Include="OSBlueprintTraversalController.h" />
@@ -222,6 +224,7 @@
     <ClCompile Include="CalibratableBlueprintKeyPair.cpp" />
     <ClCompile Include="ContourBase.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />
+    <ClCompile Include="ECBPolyReformer.cpp" />
     <ClCompile Include="OSAmpField.cpp" />
     <ClCompile Include="OSBlueprintTraversalController.cpp" />
     <ClCompile Include="OSCommandDirector.cpp" />

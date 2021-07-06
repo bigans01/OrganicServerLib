@@ -481,10 +481,11 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		// STEP 1.4): Produce the OREs for each OrganicTriangle that this ContourPlan added to this specific blueprint (produceRawEnclavesForPolySetWithTracking), 
 		// AND get the OREs for each OrganicTriangle that already existed in the blueprint (via produceTrackedORESForOrganicTriangleIDs)
 
-		OrganicTriangleTracker oreTracker;		// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check), 
-												// for all ECBPolys in this blueprint.
-		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, &oreTracker);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set; load the tracked OREs of the OrganicTriangles that were added by the plan
-		in_clientRef->OS->produceTrackedORESForOrganicTriangleIDs(&tempMap, blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, &oreTracker);			// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
+		OrganicTriangleTracker* oreTrackerRef = planMassManager.getReformerTrackerRef(blueprintKey);				// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check), 
+																// for all ECBPolys in this blueprint.
+		
+		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, oreTrackerRef);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set; load the tracked OREs of the OrganicTriangles that were added by the plan
+		in_clientRef->OS->produceTrackedORESForOrganicTriangleIDs(&tempMap, blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, oreTrackerRef);			// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
 		containerMapMap[blueprintKey] = tempMap;																												// 3.) Copy the results, before running adherence
 		if (currentAdherenceIndex > 0)					// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
@@ -492,7 +493,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		}
 
 		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], currentServerBlueprintRef, &oreTracker);					// 4.) for each blueprint in the adherence list, 
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &containerMapMap[blueprintKey], currentServerBlueprintRef, oreTrackerRef);					// 4.) for each blueprint in the adherence list, 
 																																				// spawn the EnclaveTriangleSkeletonContainers from the corresponding EnclaveFractureResultsMap for that blueprint; 
 																																				// then append the results to the target blueprint to update.				
 		currentAdherenceIndex++;
@@ -546,6 +547,8 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 
 	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
 	std::chrono::duration<double> organicelapsed = organicend - organicstart;
+
+	planMassManager.scanForDissolvableTriangles();
 
 	std::cout << "Size of map map is: " << containerMapMap.size() << std::endl;
 	std::cout << "### End of mass driver run. Time spent:" << organicelapsed.count() << std::endl;

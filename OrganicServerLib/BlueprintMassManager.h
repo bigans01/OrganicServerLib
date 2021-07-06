@@ -12,6 +12,7 @@
 #include <unordered_map>
 #include "OrganicClient.h"
 #include "ContourBase.h"
+#include "ECBPolyReformer.h"
 
 class BlueprintMassManager
 {
@@ -28,6 +29,8 @@ class BlueprintMassManager
 		void buildContouredMass();
 
 		void buildPersistentMasses();		// build persistent masses for any blueprints found to exist on the server, that also exist in the ContourPlan.
+		OrganicTriangleTracker* getReformerTrackerRef(EnclaveKeyDef::EnclaveKey in_blueprintKey);
+		void scanForDissolvableTriangles();
 	private:
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* serverBlueprintsRef = nullptr;
 
@@ -41,6 +44,7 @@ class BlueprintMassManager
 
 		ECBMap persistentMass;	// the mass for what exists on the server, before the contour plan adds anything.
 
+		std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBPolyReformer, EnclaveKeyDef::KeyHasher> reformerTracker;
 
 		void buildContourMassShell();		// build a mass shell, based off the shell spolys that the referenced contour plan produced.
 		void produceOREsForShellPolys();
