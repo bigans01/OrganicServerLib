@@ -57,6 +57,14 @@ void BlueprintMassManager::produceOREsForShellPolys()
 														contouredPlanShellBegin->first,
 														contouredPlanMass.getBlueprintRef(contouredPlanShellBegin->first),
 														contouredPlanShellBegin->second.intSet);
+
+		// for the ORE's we just spawned, make sure to load their skeleton containers.
+		auto spawnedOREsBegin = contouredPlanMass.getFractureResultsMapRef(contouredPlanShellBegin->first)->fractureResultsContainerMap.begin();
+		auto spawnedOREsEnd = contouredPlanMass.getFractureResultsMapRef(contouredPlanShellBegin->first)->fractureResultsContainerMap.end();
+		for (; spawnedOREsBegin != spawnedOREsEnd; spawnedOREsBegin++)
+		{
+			spawnedOREsBegin->second.loadSkeletonContainersFromEnclaveContainers();
+		}
 	}
 }
 
@@ -131,12 +139,14 @@ void BlueprintMassManager::buildPersistentMasses()
 			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = &(*serverBlueprintsRef)[contouredBlueprintsBegin->first];
 			blueprintFractureCopySourceRef->copyFractureResultsMapToOtherBlueprint(blueprintFractureCopyDestinationRef);
 
-			ECBPolyReformer collisionReformer(ECBPolyReformerType::REFORM_BY_COLLISION,
-											contouredPlanAddedTrianglesToCurrentBlueprint,
-											contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
-											persistentBlueprintAllTriangles,
-											persistentMass.getFractureResultsMapRef(contouredBlueprintsBegin->first)
-										);
+			ECBPolyReformer collisionReformer(contouredBlueprintsBegin->first,
+												&(*serverBlueprintsRef)[contouredBlueprintsBegin->first],
+												ECBPolyReformerType::REFORM_BY_COLLISION,
+												contouredPlanAddedTrianglesToCurrentBlueprint,
+												contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
+												persistentBlueprintAllTriangles,
+												persistentMass.getFractureResultsMapRef(contouredBlueprintsBegin->first)
+											);
 			reformerTracker[contouredBlueprintsBegin->first] = collisionReformer;
 
 			// let's get counts of what we just copied.
@@ -189,12 +199,14 @@ void BlueprintMassManager::buildPersistentMasses()
 			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = &(*serverBlueprintsRef)[contouredBlueprintsBegin->first];
 			blueprintFractureCopySourceRef->copyFractureResultsMapToOtherBlueprint(blueprintFractureCopyDestinationRef);
 
-			ECBPolyReformer collisionReformer(ECBPolyReformerType::REFORM_BY_OVERWRITE,
-				contouredPlanAddedTrianglesToCurrentBlueprint,
-				contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
-				persistentBlueprintAllTriangles,
-				persistentMass.getFractureResultsMapRef(contouredBlueprintsBegin->first)
-			);
+			ECBPolyReformer collisionReformer(contouredBlueprintsBegin->first,
+												&(*serverBlueprintsRef)[contouredBlueprintsBegin->first],
+												ECBPolyReformerType::REFORM_BY_OVERWRITE,
+												contouredPlanAddedTrianglesToCurrentBlueprint,
+												contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
+												persistentBlueprintAllTriangles,
+												persistentMass.getFractureResultsMapRef(contouredBlueprintsBegin->first)
+											);
 			reformerTracker[contouredBlueprintsBegin->first] = collisionReformer;
 
 			// let's get counts of what we just copied.
@@ -239,7 +251,7 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 		dissolveCallsBegin->second.reformerTracker.determineOrganicTrianglesToDissolve();
 	}
 
-	// Step 2: run analysis.
+	// Step 2: run analysis for each blueprint
 
 	auto ecbPolyReformerTrackerBegin = reformerTracker.begin();
 	auto ecbPolyReformerTrackerEnd = reformerTracker.end();
@@ -265,16 +277,16 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 			std::cout << ". Next ECBPoly key ID: " << nextECBPolyIDForCurrentBlueprint << std::endl;
 
 			std::cout << ". Size of modified ore set: " << ecbPolyReformerTrackerBegin->second.reformerTracker.modifiedORESet.size() << std::endl;
-			std::cout << ". Size of dissolved erased: " << ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleErasedOREs.size() << std::endl;
-			std::cout << ". Size of dissolved remaining: " << ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleRemainingOREs.size() << std::endl;
+			std::cout << ". Size of dissolved erased: " << ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.size() << std::endl;
+			std::cout << ". Size of dissolved remaining: " << ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs.size() << std::endl;
 			
 			// First pass: build new ECBPolys from dissolved ECBPolys, for the ECBPolys that are in the contour plan.
 			auto contouredSetBegin = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.begin();
 			auto contouredSetEnd = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.end();
 			for (; contouredSetBegin != contouredSetEnd; contouredSetBegin++)
 			{
-				auto wasCurrentECBPolyIDErased = ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleErasedOREs.find(*contouredSetBegin);	// attempt to find an entry indicating some OREs were erased was found.
-				if (wasCurrentECBPolyIDErased != ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleErasedOREs.end())	// it was found
+				auto wasCurrentECBPolyIDErased = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.find(*contouredSetBegin);	// attempt to find an entry indicating some OREs were erased was found.
+				if (wasCurrentECBPolyIDErased != ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.end())	// it was found
 				{
 					std::cout << ".Contoured Set ECBPoly with ID " << *contouredSetBegin << " was dissolved, stats are: " << std::endl;
 					std::cout << ".Erased Ore keys: " << std::endl;
@@ -286,8 +298,8 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 					}
 
 					std::cout << ".Remaining Ore keys: " << std::endl;
-					auto remainingOresBegin = ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleRemainingOREs[*contouredSetBegin].begin();
-					auto remainingOresEnd = ecbPolyReformerTrackerBegin->second.reformerTracker.dissolvedTriangleRemainingOREs[*contouredSetBegin].end();
+					auto remainingOresBegin = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs[*contouredSetBegin].begin();
+					auto remainingOresEnd = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs[*contouredSetBegin].end();
 					for (; remainingOresBegin != remainingOresEnd; remainingOresBegin++)
 					{
 						std::cout << "(" << remainingOresBegin->x << ", " << remainingOresBegin->y << ", " << remainingOresBegin->z << ") " << std::endl;
@@ -298,7 +310,8 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 				}
 			}
 			*/
-			ecbPolyReformerTrackerBegin->second.produceFirstPassECBPolys(&nextECBPolyIDForCurrentBlueprint);
+			ecbPolyReformerTrackerBegin->second.processContouredPolysAgainstPersistentMass(&nextECBPolyIDForCurrentBlueprint);
+			ecbPolyReformerTrackerBegin->second.processPersistentPolysAgainstContouredMass(&nextECBPolyIDForCurrentBlueprint);
 		}
 	}
 }
