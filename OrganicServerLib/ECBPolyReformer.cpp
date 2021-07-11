@@ -55,6 +55,28 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
 				{
+					if
+						(
+						(reformerBlueprintKey.x == 0)
+							&&
+							(reformerBlueprintKey.y == -1)
+							&&
+							(reformerBlueprintKey.z == 1)
+
+							&&
+							(currentProcessableOREKey->x == 6)
+							&&
+							(currentProcessableOREKey->y == 7)
+							&&
+							(currentProcessableOREKey->z == 1)
+							)
+					{
+						std::cout << "!!!!!!!!!!!!!!! SPECIAL DEBUG: OrganicServerLib, ECBPolyReformer::processContouredPolysAgainstPersistentMass" << std::endl;
+						int processContouredWait = 3;
+						std::cin >> processContouredWait;
+					}
+
+
 					std::cout << "(" << currentProcessableOREKey->x << ", " << currentProcessableOREKey->y << ", " << currentProcessableOREKey->z << ") " << std::endl;
 					OrganicRawEnclave* currentProcessableKeyedORERef = &contouredMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
 					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentContouredSetPolyIDIter);
@@ -77,6 +99,9 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 					{
 						std::cout << "!! EnclaveTriangleSkeletonSupergroup with an ID matching " << *currentContouredSetPolyIDIter << " was found!" << std::endl;
 					}
+
+					//currentProcessableKeyedORERef->updateCurrentAppendedState();
+					firstPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
 
 				std::cout << "(processContouredPolysAgainstPersistentMass) !! Value of next ECBPoly ID will be: " << *in_nextECBPolyIDTrackerRef << std::endl;
@@ -173,6 +198,27 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
 				{
+					if
+					(
+						(reformerBlueprintKey.x == 0)
+						&&
+						(reformerBlueprintKey.y == -1)
+						&&
+						(reformerBlueprintKey.z == 1)
+
+						&&
+						(currentProcessableOREKey->x == 6)
+						&&
+						(currentProcessableOREKey->y == 7)
+						&&
+						(currentProcessableOREKey->z == 1)
+					)
+					{
+						std::cout << "!!!!!!!!!!!!!!! SPECIAL DEBUG: OrganicServerLib, ECBPolyReformer::processPersistentPolysAgainstContouredMass" << std::endl;
+						int processPersistentWait = 3;
+						std::cin >> processPersistentWait;
+					}
+
 					std::cout << "(" << currentProcessableOREKey->x << ", " << currentProcessableOREKey->y << ", " << currentProcessableOREKey->z << ") " << std::endl;
 					OrganicRawEnclave* currentProcessableKeyedORERef = &persistentMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
 					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentPersistentSetPolyIDIter);
@@ -190,7 +236,8 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 					secondPassResultingShatteredECBPolys[*currentPersistentSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
 					(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
 
-
+					//currentProcessableKeyedORERef->updateCurrentAppendedState();
+					secondPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
 			}
 			else if (processableKeys.empty())

@@ -237,8 +237,8 @@ void BlueprintMassManager::buildPersistentMasses()
 		}
 	}
 
-	int waitVal = 3;
-	std::cin >> waitVal;
+	//int waitVal = 3;
+	//std::cin >> waitVal;
 }
 
 void BlueprintMassManager::scanForDissolvableTriangles()
@@ -312,6 +312,121 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 			*/
 			ecbPolyReformerTrackerBegin->second.processContouredPolysAgainstPersistentMass(&nextECBPolyIDForCurrentBlueprint);
 			ecbPolyReformerTrackerBegin->second.processPersistentPolysAgainstContouredMass(&nextECBPolyIDForCurrentBlueprint);
+		}
+	}
+}
+
+void BlueprintMassManager::updatePersistentBlueprintPolys()
+{
+
+	// First pass: contoured ECBPolys.
+
+	// For each blueprint that the contour plan touched, update that blueprint 
+	auto ecbPolyReformerTrackerBegin = reformerTracker.begin();
+	auto ecbPolyReformerTrackerEnd = reformerTracker.end();
+	for (; ecbPolyReformerTrackerBegin != ecbPolyReformerTrackerEnd; ecbPolyReformerTrackerBegin++)
+	{
+		/*
+		std::cout << ">>>>>>>>>> Checking current ecbPolyReformer, for blueprint key: (" << ecbPolyReformerTrackerBegin->first.x << ", " << ecbPolyReformerTrackerBegin->first.y << ", " << ecbPolyReformerTrackerBegin->first.z << ") " << std::endl;
+		std::cout << ">>>>>>>>>> Size of contouredMassShellECBPolyIDs is: " << ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.size() << std::endl;
+		std::cout << ">>>>>>>>>> Size of firstPassResultingShatteredECBPolys is: " << ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.size() << std::endl;
+		int firstPassWait = 3;
+		std::cin >> firstPassWait;
+		*/
+
+		auto currentReformerContouredSetBegin = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.begin();
+		auto currentReformerContouredSetEnd = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.end();
+		for (; currentReformerContouredSetBegin != currentReformerContouredSetEnd; currentReformerContouredSetBegin++)
+		{
+			// first check: check for any shattered contoured ECBPolys that were spawned for the original contoured ECBPoly ID.
+			
+			auto currentPolyShatteredCheck = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.find(*currentReformerContouredSetBegin);
+			if (currentPolyShatteredCheck != ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.end())
+			{
+				// now, take each produced contoured (shattered) ECBPoly from the corresponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
+				auto currentShatteredPolysBegin = currentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
+				auto currentShatteredPolysEnd = currentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
+				//std::cout << "Origin ECBPoly ID is: " << currentPolyShatteredCheck->first << std::endl;
+				for (; currentShatteredPolysBegin != currentShatteredPolysEnd; currentShatteredPolysBegin++)
+				{
+					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentShatteredPolysBegin->first] = currentShatteredPolysBegin->second;
+				}
+
+				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(currentPolyShatteredCheck->first);
+
+				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
+				auto firstPassShatteredOreSetBegin = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.begin();
+				auto firstPassShatteredOreSetEnd = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.end();
+				for (; firstPassShatteredOreSetBegin != firstPassShatteredOreSetEnd; firstPassShatteredOreSetBegin++)
+				{
+					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*firstPassShatteredOreSetBegin].updateCurrentAppendedState();
+				}
+			}
+			
+			auto currentPolyDeleteCheck = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.find(*currentReformerContouredSetBegin);
+			if (currentPolyDeleteCheck != ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end())
+			{
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentReformerContouredSetBegin);
+			}
+		}
+
+		// second check: check for any contoured ECBPolys that weren't shattered, but need to be erased.
+		auto currentErasePolyCheckBegin = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.begin();
+		auto currentErasePolyCheckEnd = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end();
+		for (; currentErasePolyCheckBegin != currentErasePolyCheckEnd; currentErasePolyCheckBegin++)
+		{
+			ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentErasePolyCheckBegin);
+		}
+		
+	}
+
+	// Second pass: persistent ECBPolys.
+
+	auto secondPassECBPolyReformerTrackerBegin = reformerTracker.begin();
+	auto secondPassECBPolyReformerTrackerEnd = reformerTracker.end();
+	for (; secondPassECBPolyReformerTrackerBegin != secondPassECBPolyReformerTrackerEnd; secondPassECBPolyReformerTrackerBegin++)
+	{
+		
+		auto currentReformerPersistentSetBegin = secondPassECBPolyReformerTrackerBegin->second.persistentMassShellECBPolyIDs.intSet.begin();
+		auto currentReformerPersistentSetEnd = secondPassECBPolyReformerTrackerBegin->second.persistentMassShellECBPolyIDs.intSet.end();
+		for (; currentReformerPersistentSetBegin != currentReformerPersistentSetEnd; currentReformerPersistentSetBegin++)
+		{
+			// first check: check for any shattered persistent ECBPolys that were spawned for the original contoured ECBPoly ID.
+			
+			auto currentPersistentPolyShatteredCheck = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.find(*currentReformerPersistentSetBegin);
+			if (currentPersistentPolyShatteredCheck != secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.end())
+			{
+				// now,  take each produced persistent (shatered) ECBPoly from the corressponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
+				
+				auto currentPersistentShatteredPolysBegin = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
+				auto currentPersistentShatteredPolysEnd = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
+				for (; currentPersistentShatteredPolysBegin != currentPersistentShatteredPolysEnd; currentPersistentShatteredPolysBegin++)
+				{
+					//secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentPersistentShatteredPolysBegin->first] = currentPersistentShatteredPolysBegin->second;
+				}
+				
+				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.
+				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(currentPersistentPolyShatteredCheck->first);
+
+				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
+				auto secondPassShatteredOreSetBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.begin();
+				auto secondPassShatteredOreSetEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.end();
+				for (; secondPassShatteredOreSetBegin != secondPassShatteredOreSetEnd; secondPassShatteredOreSetBegin++)
+				{
+					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*secondPassShatteredOreSetBegin].updateCurrentAppendedState();
+				}
+
+			}
+			
+		}
+
+		// second check: check for any persistent ECBPolys that weren't shattered, but need to be erased.	
+		auto currentPersistentErasePolyCheckBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassUnshatteredECBPolysToErase.begin();
+		auto currentPersistentErasePolyCheckEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassUnshatteredECBPolysToErase.end();
+		for (; currentPersistentErasePolyCheckBegin != currentPersistentErasePolyCheckEnd; currentPersistentErasePolyCheckBegin++)
+		{
+			secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentPersistentErasePolyCheckBegin);
 		}
 	}
 }

@@ -31,6 +31,7 @@ class BlueprintMassManager
 		void buildPersistentMasses();		// build persistent masses for any blueprints found to exist on the server, that also exist in the ContourPlan.
 		OrganicTriangleTracker* getReformerTrackerRef(EnclaveKeyDef::EnclaveKey in_blueprintKey);
 		void scanForDissolvableTriangles();
+		void updatePersistentBlueprintPolys();
 	private:
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* serverBlueprintsRef = nullptr;
 

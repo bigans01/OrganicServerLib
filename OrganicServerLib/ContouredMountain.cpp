@@ -489,7 +489,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		containerMapMap[blueprintKey] = tempMap;																												// 3.) Copy the results, before running adherence
 		if (currentAdherenceIndex > 0)					// **the first blueprint never does adherence, as it is the primal blueprint (the first)
 		{
-			OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 4.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
+			//OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 4.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
 		}
 
 		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
@@ -525,7 +525,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
-		std::cout << "Mass Driving blueprint Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
+		std::cout << "!! Mass Driving blueprint Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
 		// now that the shell has been produced in all its affected blueprints, its now time to at last run the mass drivers.
 		// a mass driver should pass:
 
@@ -549,6 +549,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	std::chrono::duration<double> organicelapsed = organicend - organicstart;
 
 	planMassManager.scanForDissolvableTriangles();
+	planMassManager.updatePersistentBlueprintPolys();
 
 	std::cout << "Size of map map is: " << containerMapMap.size() << std::endl;
 	std::cout << "### End of mass driver run. Time spent:" << organicelapsed.count() << std::endl;

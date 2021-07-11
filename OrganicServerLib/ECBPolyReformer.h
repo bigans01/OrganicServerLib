@@ -12,6 +12,7 @@
 #include "EnclaveCollectionBlueprint.h"
 #include "ECBPolyPoint.h"
 #include <map>
+#include <unordered_set>
 
 class ECBPolyReformer
 {
@@ -47,6 +48,7 @@ class ECBPolyReformer
 		OrganicTriangleTracker reformerTracker;
 
 	private:
+		friend class BlueprintMassManager;
 		struct ShatteredECBPolys
 		{
 			ShatteredECBPolys() {};
@@ -89,11 +91,13 @@ class ECBPolyReformer
 		std::map<int, ShatteredECBPolys> firstPassResultingShatteredECBPolys;
 		std::map<int, std::unordered_map<EnclaveKeyDef::EnclaveKey, ShatteredEnclaveTriangles, EnclaveKeyDef::KeyHasher>> firstPassResultingShatteredEnclaveTriangles;
 		std::set<int> firstPassUnshatteredECBPolysToErase;
+		std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> firstPassShatteredORESet;
 
 		// members needed for second pass (persistent ECBPoyls compared to contoured mass)
 		std::map<int, ShatteredECBPolys> secondPassResultingShatteredECBPolys;
 		std::map<int, std::unordered_map<EnclaveKeyDef::EnclaveKey, ShatteredEnclaveTriangles, EnclaveKeyDef::KeyHasher>> secondPassResultingShatteredEnclaveTriangles;
 		std::set<int> secondPassUnshatteredECBPolysToErase;
+		std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> secondPassShatteredORESet;
 
 		ShatteredResults produceShatteredResultsForORE(int* in_nextECBPolyIDTrackerRef, 
 													   std::vector<EnclaveTriangle> in_enclaveTriangleVector, 
