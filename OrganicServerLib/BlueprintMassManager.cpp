@@ -162,7 +162,7 @@ void BlueprintMassManager::buildPersistentMasses()
 				{
 					fullCounter++;
 				}
-				else if (copiedOREsBegin->second.getLodState() == ORELodState::LOD_ENCLAVE)
+				else if (copiedOREsBegin->second.getLodState() == ORELodState::LOD_ENCLAVE_SMATTER)
 				{
 					lodCounter++;
 				}
@@ -172,7 +172,7 @@ void BlueprintMassManager::buildPersistentMasses()
 			std::cout << "--- copied fracture results map stats are: " << std::endl;
 			std::cout << ":: Number of OREs: " << allCounter << std::endl;
 			std::cout << ":: Number of FULL OREs: " << fullCounter << std::endl;
-			std::cout << ":: Number of LOD_ENCLAVE OREs: " << lodCounter << std::endl;
+			std::cout << ":: Number of LOD_ENCLAVE_SMATTER OREs: " << lodCounter << std::endl;
 			*/
 		}
 
@@ -222,7 +222,7 @@ void BlueprintMassManager::buildPersistentMasses()
 				{
 					fullCounter++;
 				}
-				else if (copiedOREsBegin->second.getLodState() == ORELodState::LOD_ENCLAVE)
+				else if (copiedOREsBegin->second.getLodState() == ORELodState::LOD_ENCLAVE_SMATTER)
 				{
 					lodCounter++;
 				}
@@ -232,7 +232,7 @@ void BlueprintMassManager::buildPersistentMasses()
 			std::cout << "--- copied fracture results map stats are: " << std::endl;
 			std::cout << ":: Number of OREs: " << allCounter << std::endl;
 			std::cout << ":: Number of FULL OREs: " << fullCounter << std::endl;
-			std::cout << ":: Number of LOD_ENCLAVE OREs: " << lodCounter << std::endl;
+			std::cout << ":: Number of LOD_ENCLAVE_SMATTER OREs: " << lodCounter << std::endl;
 			*/
 		}
 	}
