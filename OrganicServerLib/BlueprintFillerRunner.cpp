@@ -187,7 +187,7 @@ void BlueprintFillerRunner::insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::Enclav
 	newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 	EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[blueprintKey];
 
-	int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
+	int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
 	blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 	contouredTrianglePtr->forgedPolyRegistryRef->addToPolyset(blueprintKey, elementID);	// Add the new poly to the ForgedPolyRegistry
 	ECBPolyLine newLine;

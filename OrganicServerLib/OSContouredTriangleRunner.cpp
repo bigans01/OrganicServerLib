@@ -107,7 +107,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
 			adherenceOrderRef->attemptAdherentInsertion(incrementingKey);
 			
-			OSServerUtils::analyzePolyValidityAndInsert(contouredTrianglePtr,
+			bool wasInserted = OSServerUtils::analyzePolyValidityAndInsert(contouredTrianglePtr,
 				contouredTrianglePtr->triangleLines[in_pointID].pointA,
 				contouredTrianglePtr->triangleLines[in_pointID].pointB,
 				in_pointID,
@@ -118,7 +118,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 													
 			
 			/*
-			int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
+			int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
 			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			OSServerUtils::fillLineMetaData(&newPolyLine, contouredTrianglePtr, in_pointID, contouredTrianglePtr->triangleLines[in_pointID].pointA, contouredTrianglePtr->triangleLines[in_pointID].pointB);

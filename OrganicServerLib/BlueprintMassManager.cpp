@@ -403,7 +403,8 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 				auto currentPersistentShatteredPolysEnd = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
 				for (; currentPersistentShatteredPolysBegin != currentPersistentShatteredPolysEnd; currentPersistentShatteredPolysBegin++)
 				{
-					//secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentPersistentShatteredPolysBegin->first] = currentPersistentShatteredPolysBegin->second;
+					// need to figure out why the below line was commented out before 8/27/2021...(perhaps a mistake?)
+					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentPersistentShatteredPolysBegin->first] = currentPersistentShatteredPolysBegin->second;
 				}
 				
 				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.

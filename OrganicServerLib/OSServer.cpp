@@ -534,7 +534,7 @@ void OSServer::constructSingleMountTest()
 
 void OSServer::constructMultiMountTestWithElevator()
 {
-	ECBPolyPoint summit1, summit2;
+	ECBPolyPoint summit1, summit2, summit3;
 	int numberOfLayers = 3;
 
 	
@@ -562,6 +562,16 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit2Ref->amplifyAllContourLinePoints();
 	summit2Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit2");
+
+	// third mountain
+	summit3.x = 14.00f;
+	summit3.y = 16;
+	summit3.z = 28;
+	addDerivedContourPlan("summit3", OSTerrainFormation::MOUNTAIN, summit3, numberOfLayers, 6.81, 9, 9);
+	ContourBase* summit3Ref = getDerivedContourPlan("summit3");
+	summit3Ref->amplifyAllContourLinePoints();
+	summit3Ref->buildContouredTriangles();
+	//executeDerivedContourPlan("summit3");
 
 }
 
@@ -682,6 +692,9 @@ void OSServer::executeDerivedContourPlan(string in_string)
 
 	// 1. ) Execute all processable OSContouredTriangles in the plan.
 	auto processableList = planPtr->getProcessableContouredTriangles();
+
+	std::cout << "!!!! Size of processable triangles: " << processableList.size() << std::endl;
+
 	auto processableListBegin = processableList.begin();
 	auto processableListEnd = processableList.end();
 	for (; processableListBegin != processableListEnd; processableListBegin++)
@@ -803,7 +816,7 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 		//std::cout << "----> Sending blueprint to OrganicSystem: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
 
 		//std::cout << "Poly groupRange size: " << blueprintBegin->second.polyGroupRangeMap.size() << std::endl;
-		//std::cout << "Poly map size: " << blueprintBegin->second.primaryPolygonMap.size() << std::endl;
+		//std::cout << "Poly map size: " << blueprintBegin->second.fetchNextECBPolyKeyID() << std::endl;
 		//std::cout << "Raw enclave size: " << blueprintBegin->second.fractureResults.fractureResultsContainerMap.size() << std::endl;
 		//std::cout << "Skeleton container size: " << blueprintBegin->second.fractureResults.ske.size() << std::endl;
 

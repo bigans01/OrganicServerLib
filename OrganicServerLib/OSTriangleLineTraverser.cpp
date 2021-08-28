@@ -149,7 +149,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
 		adherenceOrderRef->attemptAdherentInsertion(beginKey);
 		
-		OSServerUtils::analyzePolyValidityAndInsert(contouredTriangleRef,
+		bool wasInserted = OSServerUtils::analyzePolyValidityAndInsert(contouredTriangleRef,
 			resultantIntersect.originPoint,
 			resultantIntersect.intersectedPoint,
 			lineID,
@@ -159,7 +159,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 			&newPoly);
 
 		/*
-		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
+		int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 
@@ -286,7 +286,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		adherenceOrderRef->attemptAdherentInsertion(currentKey);
 
 
-		OSServerUtils::analyzePolyValidityAndInsert(in_TrianglePtr, 
+		bool wasInserted = OSServerUtils::analyzePolyValidityAndInsert(in_TrianglePtr, 
 					resultantIntersect.originPoint, 
 					resultantIntersect.intersectedPoint, 
 					lineID, 
@@ -295,7 +295,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 					&newPoly);
 
 		/*
-		int elementID = blueprintPtr->primaryPolygonMap.size();						// will store the ID of the newly inserted polygon
+		int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
 		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
