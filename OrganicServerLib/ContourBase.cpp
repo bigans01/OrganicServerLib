@@ -27,19 +27,21 @@ void ContourBase::writeAffectedBlueprintsToDisk(std::unordered_map<EnclaveKeyDef
 		EnclaveKeyDef::EnclaveKey currentFileName = affectedBegin->first;	// get the blueprint traversed
 		//std::cout << ">> Blueprint file to write is: " << currentFileName.x << ", " << currentFileName.y << ", " << currentFileName.z << ", " << std::endl;
 		EnclaveCollectionBlueprint* blueprintRef = &(*in_blueprintMapRef)[currentFileName];
-		std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;	// values to load to the strucutre that gets passed to the adapter 
+		//std::map<int, ECBPoly>* polyMapRef = &blueprintRef->primaryPolygonMap;	// values to load to the strucutre that gets passed to the adapter 
 
 		//OSWinAdapter::writeBlueprintPolysToFile(in_worldName, currentFileName, polyMapRef);
 
-		BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, 
-											 &blueprintRef->fractureResults.fractureResultsContainerMap,
-											 &blueprintRef->polyGroupRangeMap);
+		BlueprintTransformRefs transformRefs(blueprintRef->getPolygonMapBeginIter(),
+											blueprintRef->getPolygonMapEndIter(),
+											blueprintRef->getPolygonMapSize(),
+											&blueprintRef->fractureResults.fractureResultsContainerMap,
+											&blueprintRef->polyGroupRangeMap);
 		OSWinAdapter::writeBlueprintsToFile(in_worldName, currentFileName, transformRefs);
 
 
 		//EnclaveCollectionBlueprint readBackBP;
 		//OSWinAdapter::readBlueprintPolysFromFile(in_worldName, currentFileName, polyMapRef);
-		OSWinAdapter::outputBlueprintStats(polyMapRef);
+		//OSWinAdapter::outputBlueprintStats(polyMapRef);
 		writeCount++;
 	}
 	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	

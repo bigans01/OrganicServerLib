@@ -91,7 +91,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 				std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
 			}
 			*/
-			blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_pointID] = newPolyLine;
+			blueprintPtr->insertECBPolyLineIntoPoly(polygonIDinBlueprint, in_pointID, newPolyLine);
 			//OSWinAdapter::writeBlueprintPolysToFile(incrementingKey, &blueprintMap);
 		}
 		else  // polygon wasn't found, it needs to be created
@@ -119,12 +119,12 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			
 			/*
 			int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
-			blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
+			blueprintPtr->insertPolyWithKeyValue(elementID, newPoly);							// insert a new polygon; the ID will be equalto the size
 			ECBPolyLine newPolyLine;												// create a new poly line
 			OSServerUtils::fillLineMetaData(&newPolyLine, contouredTrianglePtr, in_pointID, contouredTrianglePtr->triangleLines[in_pointID].pointA, contouredTrianglePtr->triangleLines[in_pointID].pointB);
 			
 			contouredTrianglePtr->addNewPrimarySegment(newPolyLine.pointA, newPolyLine.pointB, in_pointID, incrementingKey);
-			blueprintPtr->primaryPolygonMap[elementID].lineMap[in_pointID] = newPolyLine;
+			blueprintPtr->insertECBPolyLineIntoPoly(elementID, in_pointID, newPolyLine);
 			contouredTrianglePtr->addPolygonPiece(incrementingKey, elementID);
 			runnerForgedPolyRegistryRef->addToPolyset(incrementingKey, elementID); // Add the new poly to the ForgedPolyRegistry
 			*/

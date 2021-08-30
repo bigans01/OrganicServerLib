@@ -87,7 +87,8 @@ bool OSServerUtils::analyzePolyValidityAndInsert(OSContouredTriangle* in_contour
 	bool wasInserted = false;
 
 	int elementID = in_blueprintPtr->fetchNextECBPolyKeyID();				// get the element ID.
-	//in_blueprintPtr->primaryPolygonMap[elementID] = *in_polyToInsertRef;	// always insert the poly first; if the poly becomes degenerate after adding the first line, we'll flag it.
+	// the below line to needs to be re-analyzed. (noted on 8/29/2021)
+	//in_blueprintPtr->insertPolyWithKeyValue(elementID, *in_polyToInsertRef);	// always insert the poly first; if the poly becomes degenerate after adding the first line, we'll flag it.
 	ECBPolyLine newPolyLine;
 	fillLineMetaData(&newPolyLine, in_contouredTriangle, in_lineID, in_segmentPointA, in_segmentPointB);
 	bool validityCheck = OrganicUtils::checkIfBlueprintLineIsValid(newPolyLine, in_dataMapRef, in_currentTraceKey, in_polyToInsertRef->isPolyPerfectlyClamped);		// run the validity check on the new candidate line
@@ -101,8 +102,8 @@ bool OSServerUtils::analyzePolyValidityAndInsert(OSContouredTriangle* in_contour
 		}
 
 		in_contouredTriangle->addNewPrimarySegment(in_segmentPointA, in_segmentPointB, in_lineID, in_currentTraceKey);		// register the valid segment with the contoured triangle
-		in_blueprintPtr->primaryPolygonMap[elementID] = *in_polyToInsertRef;												// insert the new poly data we were going to insert anyway
-		in_blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;																	// insert the valid segment into the poly
+		in_blueprintPtr->insertPolyWithKeyValue(elementID, *in_polyToInsertRef);												// insert the new poly data we were going to insert anyway
+		in_blueprintPtr->insertECBPolyLineIntoPoly(elementID,in_lineID, newPolyLine);																	// insert the valid segment into the poly
 		in_contouredTriangle->addPolygonPiece(in_currentTraceKey, elementID);																			// register the new poly with the contoured triangle, tied to the appropriate blueprint
 		in_contouredTriangle->forgedPolyRegistryRef->addToPolyset(in_currentTraceKey, elementID);														// register the piece with the parent ContourBase-derived class (contour plan)
 
@@ -118,7 +119,7 @@ bool OSServerUtils::analyzePolyValidityAndInsert(OSContouredTriangle* in_contour
 		// do logic for ROGUE polys here (perhaps, inserting into a ROGUE poly map?)
 		
 	}
-
+	return wasInserted;
 }
 
 void OSServerUtils::writeBlueprintToDisk(std::string in_worldName, 
@@ -126,9 +127,11 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 										std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef)
 {
 	EnclaveCollectionBlueprint* blueprintRef = &(*in_blueprintMapRef)[in_blueprintKey];		// get a ref to the blueprint.
-	BlueprintTransformRefs transformRefs(&blueprintRef->primaryPolygonMap, 
-										 &blueprintRef->fractureResults.fractureResultsContainerMap,
-										 &blueprintRef->polyGroupRangeMap);
+	BlueprintTransformRefs transformRefs(blueprintRef->getPolygonMapBeginIter(),
+										blueprintRef->getPolygonMapEndIter(),
+										blueprintRef->getPolygonMapSize(),
+										&blueprintRef->fractureResults.fractureResultsContainerMap,
+										&blueprintRef->polyGroupRangeMap);
 	OSWinAdapter::writeBlueprintsToFile(in_worldName, in_blueprintKey, transformRefs);
 }
 

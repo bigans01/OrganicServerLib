@@ -133,7 +133,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 			std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
 			std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
 		}
-		blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[in_lineID] = newPolyLine;
+		blueprintPtr->insertECBPolyLineIntoPoly(polygonIDinBlueprint, in_lineID, newPolyLine);
 
 	}
 	else  // polygon wasn't found, it needs to be created
@@ -160,7 +160,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 		/*
 		int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
-		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
+		blueprintPtr->insertPolyWithKeyValue(elementID, newPoly);							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
@@ -182,7 +182,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 			std::cout << "Y: " << newPolyLine.y_interceptSlope.x << ", " << newPolyLine.y_interceptSlope.y << ", " << newPolyLine.y_interceptSlope.z << std::endl;
 			std::cout << "Z: " << newPolyLine.z_interceptSlope.x << ", " << newPolyLine.z_interceptSlope.y << ", " << newPolyLine.z_interceptSlope.z << std::endl;
 		}
-		blueprintPtr->primaryPolygonMap[elementID].lineMap[in_lineID] = newPolyLine;	// add the line to the newly created polygon
+		blueprintPtr->insertECBPolyLineIntoPoly(elementID, in_lineID, newPolyLine);	// add the line to the newly created polygon
 		in_TrianglePtr->addPolygonPiece(beginKey, elementID);					// add the polygon piece to the triangle
 		in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(beginKey, elementID); // Add the new poly to the ForgedPolyRegistry
 		*/
@@ -263,8 +263,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << ":::::blueprint ID: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 		//cout << ":::::elementID: " << polygonIDinBlueprint << endl;
 		//cout << ":::::lineID: " << lineID << endl;
-		blueprintPtr->primaryPolygonMap[polygonIDinBlueprint].lineMap[lineID] = newPolyLine;
-
+		blueprintPtr->insertECBPolyLineIntoPoly(polygonIDinBlueprint, lineID, newPolyLine);
 	}
 	else  // polygon wasn't found, it needs to be created
 	{
@@ -296,7 +295,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 
 		/*
 		int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
-		blueprintPtr->primaryPolygonMap[elementID] = newPoly;							// insert a new polygon; the ID will be equalto the size
+		blueprintPtr->insertPolyWithKeyValue(elementID, newPoly);							// insert a new polygon; the ID will be equalto the size
 		ECBPolyLine newPolyLine;												// create a new poly line
 		OSServerUtils::fillLineMetaData(&newPolyLine, in_TrianglePtr, lineID, resultantIntersect.originPoint, resultantIntersect.intersectedPoint);
 		bool validityCheck = OrganicUtils::checkIfBlueprintLineIsValid(newPolyLine, &borderData, currentKey, newPoly.isPolyPerfectlyClamped);
@@ -310,7 +309,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 			//cout << ":::::blueprint ID: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << endl;
 			//cout << ":::::elementID: " << elementID << endl;
 			//cout << ":::::lineID: " << lineID << endl;
-			blueprintPtr->primaryPolygonMap[elementID].lineMap[lineID] = newPolyLine;	// add the line to the newly created polygon
+			blueprintPtr->insertECBPolyLineIntoPoly(elementID, lineID, newPolyLine);	// add the line to the newly created polygon
 			in_TrianglePtr->addPolygonPiece(currentKey, elementID);					// add the polygon piece to the triangle
 			in_TrianglePtr->forgedPolyRegistryRef->addToPolyset(currentKey, elementID); // Add the new poly to the ForgedPolyRegistry
 		}

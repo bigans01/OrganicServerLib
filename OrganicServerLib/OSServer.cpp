@@ -571,7 +571,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	ContourBase* summit3Ref = getDerivedContourPlan("summit3");
 	summit3Ref->amplifyAllContourLinePoints();
 	summit3Ref->buildContouredTriangles();
-	//executeDerivedContourPlan("summit3");
+	executeDerivedContourPlan("summit3");
 
 }
 
@@ -787,10 +787,12 @@ void OSServer::runPolyFracturerForAllBlueprints()
 void OSServer::constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
 	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_blueprintKey]; // fetch a pointer to the blueprint
-	BlueprintTransformRefs  transformRefs(&blueprintRef->primaryPolygonMap,
-										  &blueprintRef->fractureResults.fractureResultsContainerMap,
-										  &blueprintRef->polyGroupRangeMap);
-	OSWinAdapter::readBlueprintPolysFromFile(in_worldName, in_blueprintKey, transformRefs);
+	BlueprintTransformRefs	transformRefs(blueprintRef->getPolygonMapBeginIter(),
+										blueprintRef->getPolygonMapEndIter(),
+										blueprintRef->getPolygonMapSize(),
+										&blueprintRef->fractureResults.fractureResultsContainerMap,
+										&blueprintRef->polyGroupRangeMap);
+	BlueprintReadData fetchedData = OSWinAdapter::readBlueprintPolysFromFile(in_worldName, in_blueprintKey, transformRefs);
 }
 
 void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
@@ -863,8 +865,8 @@ void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, 
 void OSServer::writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys)
 {
 	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_keys];	// get a pointer to the blueprint
-	std::map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->primaryPolygonMap.begin();	// beginning of the poly map
-	std::map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->primaryPolygonMap.end();		// ending of the poly map
+	std::map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->getPolygonMapBeginIter();	// beginning of the poly map
+	std::map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->getPolygonMapEndIter();		// ending of the poly map
 	for (currentPrimaryPoly; currentPrimaryPoly != primaryPolyEnd; ++currentPrimaryPoly)
 	{
 

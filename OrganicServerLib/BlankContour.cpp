@@ -33,7 +33,7 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_ma
 		int foundGroupID = planPolyRegistryBegin->second.groupID;									// grab the group ID we'll be working with.
 		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
+		//std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
 		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
 

@@ -27,12 +27,11 @@ void BlueprintMassManager::copyMassShellPolysFromServerToMass(EnclaveKeyDef::Enc
 {
 	EnclaveCollectionBlueprint* currentBlueprintRef = &(*serverBlueprintsRef)[in_blueprintKey];
 	contouredPlanShellBlueprintKeyAndSetPairs[in_blueprintKey] = in_contourAddedOrganicTrianglesSet;
-	std::map<int, ECBPoly>* currentPolyMapRef = &currentBlueprintRef->primaryPolygonMap;
 	auto setBegin = in_contourAddedOrganicTrianglesSet.intSet.begin();
 	auto setEnd = in_contourAddedOrganicTrianglesSet.intSet.end();
 	for (; setBegin != setEnd; setBegin++)
 	{
-		ECBPoly* polyRef = &(*currentPolyMapRef).find(*setBegin)->second;	// grab a ref from the persistent state of the blueprint on the server
+		ECBPoly* polyRef = &currentBlueprintRef->getPolyIterFromMap(*setBegin)->second;	// grab a ref from the persistent state of the blueprint on the server
 		contouredPlanEntireShellRegistry.addToPolyset(in_blueprintKey, *setBegin);// add to the entire shell
 		if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the contouredPlanMassDriverRegistry
 		{
@@ -349,11 +348,11 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 				//std::cout << "Origin ECBPoly ID is: " << currentPolyShatteredCheck->first << std::endl;
 				for (; currentShatteredPolysBegin != currentShatteredPolysEnd; currentShatteredPolysBegin++)
 				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentShatteredPolysBegin->first] = currentShatteredPolysBegin->second;
+					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentShatteredPolysBegin->first, currentShatteredPolysBegin->second);
 				}
 
 				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(currentPolyShatteredCheck->first);
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPolyShatteredCheck->first);
 
 				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
 				auto firstPassShatteredOreSetBegin = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.begin();
@@ -367,7 +366,7 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 			auto currentPolyDeleteCheck = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.find(*currentReformerContouredSetBegin);
 			if (currentPolyDeleteCheck != ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end())
 			{
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentReformerContouredSetBegin);
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentReformerContouredSetBegin);
 			}
 		}
 
@@ -376,7 +375,7 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 		auto currentErasePolyCheckEnd = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end();
 		for (; currentErasePolyCheckBegin != currentErasePolyCheckEnd; currentErasePolyCheckBegin++)
 		{
-			ecbPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentErasePolyCheckBegin);
+			ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentErasePolyCheckBegin);
 		}
 		
 	}
@@ -404,11 +403,11 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 				for (; currentPersistentShatteredPolysBegin != currentPersistentShatteredPolysEnd; currentPersistentShatteredPolysBegin++)
 				{
 					// need to figure out why the below line was commented out before 8/27/2021...(perhaps a mistake?)
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap[currentPersistentShatteredPolysBegin->first] = currentPersistentShatteredPolysBegin->second;
+					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPersistentShatteredPolysBegin->first, currentPersistentShatteredPolysBegin->second);
 				}
 				
 				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(currentPersistentPolyShatteredCheck->first);
+				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPersistentPolyShatteredCheck->first);
 
 				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
 				auto secondPassShatteredOreSetBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.begin();
@@ -427,7 +426,7 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 		auto currentPersistentErasePolyCheckEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassUnshatteredECBPolysToErase.end();
 		for (; currentPersistentErasePolyCheckBegin != currentPersistentErasePolyCheckEnd; currentPersistentErasePolyCheckBegin++)
 		{
-			secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->primaryPolygonMap.erase(*currentPersistentErasePolyCheckBegin);
+			secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentPersistentErasePolyCheckBegin);
 		}
 	}
 }

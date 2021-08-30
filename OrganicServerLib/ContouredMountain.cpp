@@ -433,12 +433,11 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 
 
 		EnclaveCollectionBlueprint* currentServerBlueprintRef = &(*in_serverBlueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		std::map<int, ECBPoly>* polyMapRef = &currentServerBlueprintRef->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = currentForgedPolySetIter->second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
 		auto forgedPolySetEnd = currentForgedPolySetIter->second.polySet.end();					// ""
 		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)	// check for SHELL_MASSDRIVER polys, and add them appropriately.
 		{
-			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
+			ECBPoly* polyRef = &currentServerBlueprintRef->getPolyIterFromMap(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
 			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
 			{
 				massDriverPolyRegistry.addToPolyset(blueprintKey, *forgedPolySetBegin);
