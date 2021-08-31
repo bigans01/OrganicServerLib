@@ -354,12 +354,13 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
 				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPolyShatteredCheck->first);
 
-				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
+				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
+				// as being INDEPENDENT.
 				auto firstPassShatteredOreSetBegin = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.begin();
 				auto firstPassShatteredOreSetEnd = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.end();
 				for (; firstPassShatteredOreSetBegin != firstPassShatteredOreSetEnd; firstPassShatteredOreSetBegin++)
 				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*firstPassShatteredOreSetBegin].updateCurrentAppendedState();
+					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*firstPassShatteredOreSetBegin].setOREasIndependent();
 				}
 			}
 			
@@ -409,12 +410,13 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.
 				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPersistentPolyShatteredCheck->first);
 
-				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint.
+				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
+				// as being INDEPENDENT.
 				auto secondPassShatteredOreSetBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.begin();
 				auto secondPassShatteredOreSetEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.end();
 				for (; secondPassShatteredOreSetBegin != secondPassShatteredOreSetEnd; secondPassShatteredOreSetBegin++)
 				{
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*secondPassShatteredOreSetBegin].updateCurrentAppendedState();
+					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*secondPassShatteredOreSetBegin].setOREasIndependent();
 				}
 
 			}

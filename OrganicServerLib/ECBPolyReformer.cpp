@@ -99,8 +99,7 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 					{
 						//std::cout << "!! EnclaveTriangleSkeletonSupergroup with an ID matching " << *currentContouredSetPolyIDIter << " was found!" << std::endl;
 					}
-
-					//currentProcessableKeyedORERef->updateCurrentAppendedState();
+					//currentProcessableKeyedORERef->setOREasIndependent();
 					firstPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
 
@@ -236,7 +235,7 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 					secondPassResultingShatteredECBPolys[*currentPersistentSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
 					(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
 
-					//currentProcessableKeyedORERef->updateCurrentAppendedState();
+					//currentProcessableKeyedORERef->setOREasIndependent();
 					secondPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
 			}

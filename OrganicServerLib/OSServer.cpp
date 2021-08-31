@@ -537,6 +537,9 @@ void OSServer::constructMultiMountTestWithElevator()
 	ECBPolyPoint summit1, summit2, summit3;
 	int numberOfLayers = 3;
 
+	EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, 0, 0);
+	EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(2, 2, 4);
+
 	
 	// first mountain
 	summit1.x = 28;
@@ -548,6 +551,18 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	summit1Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit1");
+
+	auto existingOREFinder = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
+
+
+	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	{
+		std::cout << "::::::: metadata fetch #1 " << std::endl;
+		existingOREFinder->second.printMetadata();
+	}
+	int metadataWait = 3;
+	
+	std::cin >> metadataWait;
 	
 	
 	// second mountain
@@ -563,16 +578,82 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit2Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit2");
 
-	// third mountain
+	
+	// for debugging test only.
+	//EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, -1, 1);
+	//EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(5, 7, 0);
+	
+	//EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, 0, 0);
+	//EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(3, 1, 3);
+
+
+
+	auto existingOREFinder2 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
+
+
+	if (existingOREFinder2 != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	{
+		std::cout << "::::::: metadata fetch #2 " << std::endl;
+		existingOREFinder2->second.printMetadata();
+	}
+	int metadataWait2 = 3;
+	std::cin >> metadataWait2;
+
+
+	/*
+	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	{
+		existingOREFinder->second.printTriangleMetadata();
+	}
+	else
+	{
+		std::cout << "!!! ORE not found. " << std::endl;
+	}
+
+	std::cout << "!!!! Finished print test #1...." << std::endl;
+	int printWait1 = 3;
+	std::cin >> printWait1;
+	*/
+
+
+
+	//organicSystemPtr->disableColliderOldAppend(EnclaveKeyDef::EnclaveKey(3, 1, 3));
+	//organicSystemPtr->disableColliderNewAppend(EnclaveKeyDef::EnclaveKey(2, 2, 4));
+	//organicSystemPtr->disableColliderOldAppend(EnclaveKeyDef::EnclaveKey(2, 2, 4));
+
+
+
+	// third mountain -- diagonal to other two
 	summit3.x = 14.00f;
 	summit3.y = 16;
 	summit3.z = 28;
 	addDerivedContourPlan("summit3", OSTerrainFormation::MOUNTAIN, summit3, numberOfLayers, 6.81, 9, 9);
 	ContourBase* summit3Ref = getDerivedContourPlan("summit3");
 	summit3Ref->amplifyAllContourLinePoints();
+	summit3Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit3");
 
+	/*
+	auto existingOREFinder3 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
+	if (existingOREFinder3 != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	{
+		std::cout << "::::::: metadata fetch #3 " << std::endl;
+		existingOREFinder3->second.printMetadata();
+	}
+	int metadataWait3 = 3;
+	std::cin >> metadataWait3;
+	*/
+
+	/*
+	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	{
+		existingOREFinder->second.printTriangleMetadata();
+	}
+	std::cout << "!!!! Finished print test #2...." << std::endl;
+	int printWait2 = 3;
+	std::cin >> printWait2;
+	*/
 }
 
 void OSServer::constructSingleMountTestNoInput()

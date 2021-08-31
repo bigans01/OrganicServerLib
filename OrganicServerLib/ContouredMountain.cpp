@@ -467,6 +467,10 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		// Remember, If an existing OrganicTriangle in the blueprint has an ORE key that is also found in the tracked OREs of an OrganicTriangle that is produced by this plan, those
 		// OrganicTriangles will have to be dissolved into smaller ones, which will be done by a call to planMassManager.scanForDissolvableTriangles(), and 
 		// planMassManager.updatePersistentBlueprintPolys()
+		//
+		// The call to spawnAndAppendEnclaveTriangleSkeletonsToBlueprint will also call the appropriate function based on whether or note the ORE exists:
+		// --if the ORE doesn't exist, a new ORE is created (it's appended state is NONE)
+		// --if the ORE already exists, it's current appended state is iterated (to SINGLE_APPEND or MULTIPLE_APPEND).
 
 		OrganicTriangleTracker* oreTrackerRef = planMassManager.getReformerTrackerRef(blueprintKey);	// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check), 
 																										// for all ECBPolys in this blueprint
@@ -530,7 +534,9 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	auto organicend = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
 	std::chrono::duration<double> organicelapsed = organicend - organicstart;
 
-	// Step 3) Use the plan mass manager to apply updates, if there are any.
+	// Step 3) Use the plan mass manager to apply updates, if there are any; 
+	// the call to updatePersistentBlueprintPolys() will also update the
+	// dependency state of any OREs that were produced as a result of shattering, to have a state of INDEPENDENT
 	planMassManager.scanForDissolvableTriangles();
 	planMassManager.updatePersistentBlueprintPolys();
 
