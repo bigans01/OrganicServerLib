@@ -80,8 +80,8 @@ void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Messa
 			for (int x = 0; x < cuboidArraySize; x++)
 			{
 				EnclaveKeyDef::EnclaveKey currentKey = cuboid.keyArray[x];
-				auto blueprintFinder = serverPtr->blueprintMap.find(currentKey);
-				if (blueprintFinder != serverPtr->blueprintMap.end())	// it was found, so it needs to be sent over.
+				auto blueprintFinder = serverPtr->serverBlueprints.getSpecificBlueprintIter(currentKey);
+				if (blueprintFinder != serverPtr->serverBlueprints.getBlueprintEndIter())	// it was found, so it needs to be sent over.
 				{
 					std::cout << "Key to send was found: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
 					serverPtr->sendAndRenderBlueprintToLocalOS(currentKey);		// toggle on/off for testing as needed (9/24/2020)

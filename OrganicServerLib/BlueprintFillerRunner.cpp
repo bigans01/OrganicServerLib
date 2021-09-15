@@ -8,7 +8,7 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef,
 									std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, 
 									std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, 
 									OSContouredTriangle* in_osTriangleRef, 
-									std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
+									ECBMap* in_runnerECBMapRef,
 									PointAdherenceOrder* in_adherenceOrderRef)
 {
 	// get the intercept point of the referenced line
@@ -35,7 +35,7 @@ void BlueprintFillerRunner::initialize(PrimaryLineT1* in_lineRef,
 	baseKey = in_currentSegmentBlueprintKey;
 	adherenceOrderRef = in_adherenceOrderRef;
 
-	blueprintMapRef = in_blueprintMapRef;
+	runnerECBMapRef = in_runnerECBMapRef;
 	fillerRunnerPrimaryLine = constructFillerPrimaryInitial(in_lineRef, in_currentSegmentBegin, in_currentSegmentEnd, in_currentSegmentBlueprintKey);	// assign the primary line
 	primaryLineSlope = OrganicUtils::findSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);							
 	normalizedPrimaryLineSlope = OrganicUtils::findNormalizedSlope(fillerRunnerPrimaryLine.beginPointRealXYZ, fillerRunnerPrimaryLine.endPointRealXYZ);	
@@ -185,7 +185,7 @@ void BlueprintFillerRunner::insertKeyAsFilledAndCreatePoly(EnclaveKeyDef::Enclav
 	ECBPoly newPoly(contouredTrianglePtr->contouredPolyType);
 	newPoly.materialID = contouredTrianglePtr->materialID;
 	newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
-	EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[blueprintKey];
+	EnclaveCollectionBlueprint* blueprintPtr = runnerECBMapRef->getBlueprintRef(blueprintKey);
 
 	int elementID = blueprintPtr->fetchNextECBPolyKeyID();						// will store the ID of the newly inserted polygon
 	contouredTrianglePtr->forgedPolyRegistryRef->addToPolyset(blueprintKey, elementID);	// Add the new poly to the ForgedPolyRegistry

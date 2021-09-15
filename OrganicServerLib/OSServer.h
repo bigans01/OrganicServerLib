@@ -36,6 +36,7 @@
 #include "ServerMessageInterpreter.h"
 #include "ServerJobManager.h"
 #include "ContourPlanStateContainer.h"
+#include "ECBMap.h"
 
 
 class OSServer
@@ -90,7 +91,7 @@ private:
 	friend class ServerJobProxy;
 
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher> blueprintMap;	// stores all server blueprints
+	ECBMap serverBlueprints; // ECBMap which stores all server blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	ContourPlanStateContainer planStateContainer;

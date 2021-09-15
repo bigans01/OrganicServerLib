@@ -20,7 +20,9 @@ void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBP
 	//std::cout << "### New size is: " << triangleStripMap[in_triangleStripID].triangleMap.size() << std::endl;
 }
 
-void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef)
+void BlankContour::runMassDrivers(OrganicClient* in_clientRef, 
+								ECBMap* in_ecbMapRef, 
+								EnclaveFractureResultsMap* in_fractureResultsMapRef)
 {
 
 	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key).
@@ -32,7 +34,7 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef, std::unordered_ma
 		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
 		int foundGroupID = planPolyRegistryBegin->second.groupID;									// grab the group ID we'll be working with.
 		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		EnclaveCollectionBlueprint* blueprintToCheck = in_ecbMapRef->getBlueprintRef(blueprintKey);	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
 		//std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
 		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
 		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();

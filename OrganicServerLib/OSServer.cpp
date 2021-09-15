@@ -552,10 +552,10 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit1");
 
-	auto existingOREFinder = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
+	auto existingOREFinder = serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.find(serverBlueprintOREKey);
 
 
-	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	if (existingOREFinder != serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.end())
 	{
 		std::cout << "::::::: metadata fetch #1 " << std::endl;
 		existingOREFinder->second.printMetadata();
@@ -588,10 +588,9 @@ void OSServer::constructMultiMountTestWithElevator()
 
 
 
-	auto existingOREFinder2 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
+	auto existingOREFinder2 = serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.find(serverBlueprintOREKey);
 
-
-	if (existingOREFinder2 != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
+	if (existingOREFinder2 != serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.end())
 	{
 		std::cout << "::::::: metadata fetch #2 " << std::endl;
 		existingOREFinder2->second.printMetadata();
@@ -786,17 +785,17 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cout << "######### Plan execution complete; " << std::endl;
 
 	// 2.) perform fracturing for affected blueprints.
-	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
+	planPtr->runPolyFracturerForAffectedBlueprints(&client, &serverBlueprints);
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	EnclaveFractureResultsMap tempMap;
-	planPtr->runMassDrivers(&client, &blueprintMap, &tempMap);
+	planPtr->runMassDrivers(&client, &serverBlueprints, &tempMap);
 
 	// 4.) update the affected blueprints (aka, update the OrganicRawEnclaves), after all work has been done
 	//planPtr->updateAffectedBlueprints(&client, &blueprintMap, &tempMap);
 
 	// 5.) write updated blueprints to disk
-	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
+	planPtr->writeAffectedBlueprintsToDisk(&serverBlueprints, currentWorld);
 
 	std::cout << "Write to disk complete; press key to transfer blueprints to local OrganicSystem. " << std::endl;
 	int someVal = 3;
@@ -822,42 +821,42 @@ void OSServer::executeDerivedContourPlanNoInput(string in_string)
 	std::cout << "######### Plan execution complete; " << std::endl;
 
 	// 2.) perform fracturing for affected blueprints.
-	planPtr->runPolyFracturerForAffectedBlueprints(&client, &blueprintMap);
+	planPtr->runPolyFracturerForAffectedBlueprints(&client, &serverBlueprints);
 
 	// 3.) run the mass driver for the plan. (if the plan allows for it)
 	EnclaveFractureResultsMap tempMap;
-	planPtr->runMassDrivers(&client, &blueprintMap, &tempMap);
+	planPtr->runMassDrivers(&client, &serverBlueprints, &tempMap);
 
 	// 4.) update the affected blueprints (aka, update the OrganicRawEnclaves), after all work has been done
 	//planPtr->updateAffectedBlueprints(&client, &blueprintMap, &tempMap);
 
 	// 5.) write updated blueprints to disk
-	planPtr->writeAffectedBlueprintsToDisk(&blueprintMap, currentWorld);
+	planPtr->writeAffectedBlueprintsToDisk(&serverBlueprints, currentWorld);
 
 	std::cout << "SERVER: completed contour plan run." << std::endl;
 }
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {
-	organicSystemPtr->addBlueprint(in_key, &blueprintMap[in_key], 0);		// assign constructed blueprint to organic system
+	organicSystemPtr->addBlueprint(in_key, serverBlueprints.getBlueprintRef(in_key), 0);		// assign constructed blueprint to organic system
 }
 
 void OSServer::runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel)
 {
-	auto bpBegin = blueprintMap.begin();
-	auto bpEnd = blueprintMap.end();
+	auto bpBegin = serverBlueprints.getBlueprintBeginIter();
+	auto bpEnd = serverBlueprints.getBlueprintEndIter();
 	for (bpBegin; bpBegin != bpEnd; bpBegin++)
 	{
 		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
 	}
 
-	client.fracturePolysInBlueprint(in_key, &blueprintMap[in_key], PolyFractureMode::INITIAL_FILL, in_debugLevel);		// we can set any debug level we want to here.
+	client.fracturePolysInBlueprint(in_key, serverBlueprints.getBlueprintRef(in_key), PolyFractureMode::INITIAL_FILL, in_debugLevel);		// we can set any debug level we want to here.
 }
 
 void OSServer::runPolyFracturerForAllBlueprints()
 {
-	auto bpBegin = blueprintMap.begin();
-	auto bpEnd = blueprintMap.end();
+	auto bpBegin = serverBlueprints.getBlueprintBeginIter();
+	auto bpEnd = serverBlueprints.getBlueprintEndIter();
 	for (bpBegin; bpBegin != bpEnd; bpBegin++)
 	{
 		std::cout << "Running fracturing for: " << bpBegin->first.x << ", " << bpBegin->first.y << ", " << bpBegin->first.z << std::endl;
@@ -867,7 +866,7 @@ void OSServer::runPolyFracturerForAllBlueprints()
 
 void OSServer::constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
-	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_blueprintKey]; // fetch a pointer to the blueprint
+	EnclaveCollectionBlueprint* blueprintRef = serverBlueprints.getBlueprintRef(in_blueprintKey); // fetch a pointer to the blueprint
 	BlueprintTransformRefs	transformRefs(blueprintRef->getPolygonMapBeginIter(),
 										blueprintRef->getPolygonMapEndIter(),
 										blueprintRef->getPolygonMapSize(),
@@ -890,8 +889,8 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 	auto organicstart = std::chrono::high_resolution_clock::now();
 
 
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintBegin = blueprintMap.begin();
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintEnd = blueprintMap.end();
+	auto blueprintBegin = serverBlueprints.getBlueprintBeginIter();
+	auto blueprintEnd = serverBlueprints.getBlueprintEndIter();
 	for (blueprintBegin; blueprintBegin != blueprintEnd; blueprintBegin++)
 	{
 		EnclaveKeyDef::EnclaveKey currentKey = blueprintBegin->first;
@@ -939,13 +938,13 @@ void OSServer::setWorldDirectionInClient(float in_directionX, float in_direction
 
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
-	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &blueprintMap, in_Triangle->forgedPolyRegistryRef, in_orderRef);
+	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &serverBlueprints, in_Triangle->forgedPolyRegistryRef, in_orderRef);
 	runner.performRun();
 }
 
 void OSServer::writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys)
 {
-	EnclaveCollectionBlueprint* blueprintRef = &blueprintMap[in_keys];	// get a pointer to the blueprint
+	EnclaveCollectionBlueprint* blueprintRef = serverBlueprints.getBlueprintRef(in_keys);	// get a pointer to the blueprint
 	std::map<int, ECBPoly>::iterator currentPrimaryPoly = blueprintRef->getPolygonMapBeginIter();	// beginning of the poly map
 	std::map<int, ECBPoly>::iterator primaryPolyEnd = blueprintRef->getPolygonMapEndIter();		// ending of the poly map
 	for (currentPrimaryPoly; currentPrimaryPoly != primaryPolyEnd; ++currentPrimaryPoly)
@@ -1140,8 +1139,8 @@ void OSServer::signalServerShutdown(mutex& in_serverMutex)
 int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 {
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>::iterator blueprintMapIterator;
-	blueprintMapIterator = blueprintMap.find(in_Key);
-	if (blueprintMapIterator != blueprintMap.end())
+	blueprintMapIterator = serverBlueprints.getSpecificBlueprintIter(in_Key);
+	if (blueprintMapIterator != serverBlueprints.getBlueprintEndIter())
 	{
 		//cout << "Blueprint exists at: " << in_Key.x << ", " << in_Key.y << ", " << in_Key.z << endl;
 		return 1;

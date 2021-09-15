@@ -25,7 +25,7 @@ void BlueprintMassManager::buildContourMassShell()
 
 void BlueprintMassManager::copyMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveKey in_blueprintKey, OperableIntSet in_contourAddedOrganicTrianglesSet)
 {
-	EnclaveCollectionBlueprint* currentBlueprintRef = &(*serverBlueprintsRef)[in_blueprintKey];
+	EnclaveCollectionBlueprint* currentBlueprintRef = managerEcbMapRef->getBlueprintRef(in_blueprintKey);
 	contouredPlanShellBlueprintKeyAndSetPairs[in_blueprintKey] = in_contourAddedOrganicTrianglesSet;
 	auto setBegin = in_contourAddedOrganicTrianglesSet.intSet.begin();
 	auto setEnd = in_contourAddedOrganicTrianglesSet.intSet.end();
@@ -87,11 +87,11 @@ void BlueprintMassManager::runMassDriversForIndependentMass()
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
-		organicClientRef->OS->generateAndRunMassDriversForBlueprint(contouredPlanMass.getBlueprintMapRef(),
-																&contouredPlanEntireShellRegistry.polySetRegistry,
-																blueprintKey,
-																startingFloorTerminatingSet,
-																massDriverSet);
+		organicClientRef->OS->generateAndRunMassDriversForBlueprint(&contouredPlanMass,
+			&contouredPlanEntireShellRegistry.polySetRegistry,
+			blueprintKey,
+			startingFloorTerminatingSet,
+			massDriverSet);
 	}
 }
 
@@ -102,13 +102,13 @@ OrganicTriangleTracker* BlueprintMassManager::getReformerTrackerRef(EnclaveKeyDe
 
 void BlueprintMassManager::buildPersistentMasses()
 {
-	auto contouredMassMapRef = contouredPlanMass.getBlueprintMapRef();
-	auto contouredBlueprintsBegin = contouredMassMapRef->begin();
-	auto contouredBlueprintsEnd = contouredMassMapRef->end();
+	auto contouredBlueprintsBegin = contouredPlanMass.getBlueprintBeginIter();
+	auto contouredBlueprintsEnd = contouredPlanMass.getBlueprintEndIter();
+
 	for (; contouredBlueprintsBegin != contouredBlueprintsEnd; contouredBlueprintsBegin++)
 	{
 		OperableIntSet contouredPlanAddedTrianglesToCurrentBlueprint = contourPlanRef->planPolyRegistry.polySetRegistry[contouredBlueprintsBegin->first].polySet;
-		OperableIntSet persistentBlueprintAllTriangles = (*serverBlueprintsRef)[contouredBlueprintsBegin->first].produceECBPolyIDSet();
+		OperableIntSet persistentBlueprintAllTriangles = managerEcbMapRef->getBlueprintRef(contouredBlueprintsBegin->first)->produceECBPolyIDSet();
 
 		std::cout << "Checking for existing persistent mass in key (" << contouredBlueprintsBegin->first.x << ", "  
 																	  << contouredBlueprintsBegin->first.y << ", " 
@@ -135,11 +135,11 @@ void BlueprintMassManager::buildPersistentMasses()
 			std::cout << "! Persistent poly ID set size: " << persistentBlueprintAllTriangles.intSet.size() << std::endl;
 
 			EnclaveCollectionBlueprint* blueprintFractureCopyDestinationRef = persistentMass.getBlueprintRef(contouredBlueprintsBegin->first);
-			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = &(*serverBlueprintsRef)[contouredBlueprintsBegin->first];
+			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = managerEcbMapRef->getBlueprintRef(contouredBlueprintsBegin->first);
 			blueprintFractureCopySourceRef->copyFractureResultsMapToOtherBlueprint(blueprintFractureCopyDestinationRef);
 
 			ECBPolyReformer collisionReformer(contouredBlueprintsBegin->first,
-												&(*serverBlueprintsRef)[contouredBlueprintsBegin->first],
+												managerEcbMapRef->getBlueprintRef(contouredBlueprintsBegin->first),
 												ECBPolyReformerType::REFORM_BY_COLLISION,
 												contouredPlanAddedTrianglesToCurrentBlueprint,
 												contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
@@ -195,11 +195,11 @@ void BlueprintMassManager::buildPersistentMasses()
 				<< contouredBlueprintsBegin->first.y << ", "
 				<< contouredBlueprintsBegin->first.z << ") " << std::endl;
 			EnclaveCollectionBlueprint* blueprintFractureCopyDestinationRef = persistentMass.getBlueprintRef(contouredBlueprintsBegin->first);
-			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = &(*serverBlueprintsRef)[contouredBlueprintsBegin->first];
+			EnclaveCollectionBlueprint* blueprintFractureCopySourceRef = managerEcbMapRef->getBlueprintRef(contouredBlueprintsBegin->first);
 			blueprintFractureCopySourceRef->copyFractureResultsMapToOtherBlueprint(blueprintFractureCopyDestinationRef);
 
 			ECBPolyReformer collisionReformer(contouredBlueprintsBegin->first,
-												&(*serverBlueprintsRef)[contouredBlueprintsBegin->first],
+												managerEcbMapRef->getBlueprintRef(contouredBlueprintsBegin->first),
 												ECBPolyReformerType::REFORM_BY_OVERWRITE,
 												contouredPlanAddedTrianglesToCurrentBlueprint,
 												contouredPlanMass.getFractureResultsMapRef(contouredBlueprintsBegin->first),
@@ -268,7 +268,7 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 			std::cout << "..Contoured ECBPoly stats are: " << std::endl;
 
 			// need to get the ID that would be used for the next ECBPoly; this value would be from the persistent blueprint. 
-			int nextECBPolyIDForCurrentBlueprint = (*serverBlueprintsRef)[ecbPolyReformerTrackerBegin->first].fetchNextECBPolyKeyID();
+			int nextECBPolyIDForCurrentBlueprint = managerEcbMapRef->getBlueprintRef(ecbPolyReformerTrackerBegin->first)->fetchNextECBPolyKeyID();
 
 			/*
 			std::cout << ". Old set size: " << ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.size() << std::endl;

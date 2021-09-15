@@ -20,24 +20,32 @@
 #include "BorderDataMap.h"
 #include "ForgedPolyRegistry.h"
 #include "PointAdherenceOrder.h"
+#include "ECBMap.h"
 
 class OSContouredTriangleRunner
 {
 	public:
-		OSContouredTriangleRunner(OSContouredTriangle* in_trianglePtr, 
-			OSContourPlanDirections in_contourPlanDirections, 
-			std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
+
+
+		OSContouredTriangleRunner(OSContouredTriangle* in_trianglePtr,
+			OSContourPlanDirections in_contourPlanDirections,
+			ECBMap* in_serverECBMapRef,
 			ForgedPolyRegistry* in_forgedPolyRegistryRef,
 			PointAdherenceOrder* in_adherenceOrderRef
-		) 
-			: contouredTrianglePtr(in_trianglePtr), planDirections(in_contourPlanDirections), blueprintMapRef(in_blueprintMapRef), runnerForgedPolyRegistryRef(in_forgedPolyRegistryRef), adherenceOrderRef(in_adherenceOrderRef) {}
+		) :
+			contouredTrianglePtr(in_trianglePtr),
+			planDirections(in_contourPlanDirections),
+			serverECBMapRef(in_serverECBMapRef),
+			runnerForgedPolyRegistryRef(in_forgedPolyRegistryRef),
+			adherenceOrderRef(in_adherenceOrderRef)
+		{}
 
-		OSContouredTriangle* contouredTrianglePtr = NULL;	// initialize to null; set in initializer list anyway
+		OSContouredTriangle* contouredTrianglePtr = nullptr;	// initialize to null; set in initializer list anyway
 		OSContourPlanDirections planDirections;
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef = NULL;
+		ECBMap* serverECBMapRef = nullptr;
 		BorderDataMap borderDataMapInstance;
-		ForgedPolyRegistry* runnerForgedPolyRegistryRef = NULL;	// set on constructor initialization
-		PointAdherenceOrder* adherenceOrderRef = NULL;			// ""
+		ForgedPolyRegistry* runnerForgedPolyRegistryRef = nullptr;	// set on constructor initialization
+		PointAdherenceOrder* adherenceOrderRef = nullptr;			// ""
 
 		//PrimaryLineT1Array contourLineArray;
 

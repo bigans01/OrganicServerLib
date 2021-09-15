@@ -69,7 +69,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 			//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(incrementingKey)->second;	// get a pointer to the blueprint (for code readability only)
 			//&(*blueprintMapRef)[currentKey];
-			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
+			EnclaveCollectionBlueprint* blueprintPtr = serverECBMapRef->getBlueprintRef(incrementingKey);
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);			// traced blueprint set update (in case it wasn't inserted already.
 			adherenceOrderRef->attemptAdherentInsertion(incrementingKey);
 
@@ -102,8 +102,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 			newPoly.materialID = contouredTrianglePtr->materialID;
 			newPoly.emptyNormal = contouredTrianglePtr->contouredEmptyNormal;
 			OSServerUtils::fillPolyWithClampResult(&newPoly, contouredTrianglePtr);
-			EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[incrementingKey];
-
+			EnclaveCollectionBlueprint* blueprintPtr = serverECBMapRef->getBlueprintRef(incrementingKey);
 			contouredTrianglePtr->insertTracedBlueprint(incrementingKey);		// traced blueprint set update (in case it wasn't inserted already.
 			adherenceOrderRef->attemptAdherentInsertion(incrementingKey);
 			
@@ -133,7 +132,7 @@ void OSContouredTriangleRunner::tracePointThroughBlueprints(int in_pointID)
 	}
 	else								// points do not exist in same blueprint; run a OSTriangleLineTraverser
 	{
-		OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, blueprintMapRef, adherenceOrderRef);
+		OSTriangleLineTraverser lineTraverser(contouredTrianglePtr, in_pointID, serverECBMapRef, adherenceOrderRef);
 		OSTriangleLineTraverser* lineRef = &lineTraverser;
 		while (!(lineRef->currentKey == lineRef->endKey))
 		{
@@ -276,7 +275,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 											&contouredTrianglePtr->tracedBlueprintCountMap,
 											&contouredTrianglePtr->filledBlueprintMap, 
 											contouredTrianglePtr, 
-											blueprintMapRef,
+											serverECBMapRef,
 											adherenceOrderRef);
 				}
 				else if (traceCount == 2)
@@ -306,7 +305,7 @@ void OSContouredTriangleRunner::fillBlueprintArea(PrimaryLineT1Array* in_contour
 													&contouredTrianglePtr->tracedBlueprintCountMap, 
 													&contouredTrianglePtr->filledBlueprintMap, 
 													contouredTrianglePtr, 
-													blueprintMapRef,
+													serverECBMapRef,
 													adherenceOrderRef);
 						}
 					}

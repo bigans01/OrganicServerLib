@@ -14,6 +14,7 @@
 #include "ECBPoly.h"
 #include "EnclaveCollectionBlueprint.h"
 #include "PointAdherenceOrder.h"
+#include "ECBMap.h"
 
 class BlueprintFillerRunner
 {
@@ -64,8 +65,8 @@ class BlueprintFillerRunner
 		// pointer to the OS contoured triangle
 		OSContouredTriangle* contouredTrianglePtr = NULL;
 
-		// blueprint map ref
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* blueprintMapRef;
+		// server ECBMap ref
+		ECBMap* runnerECBMapRef = nullptr;
 
 		// run status flags
 		bool isRunComplete = false;
@@ -76,16 +77,16 @@ class BlueprintFillerRunner
 		// point adherence order ref
 		PointAdherenceOrder* adherenceOrderRef = NULL;
 
-		void initialize(PrimaryLineT1* in_lineRef, 
-						ECBPolyPoint in_currentSegmentBegin, 
-						ECBPolyPoint in_currentSegmentEnd, 
-						EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey, 
-						std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef, 
-						std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef, 
-						OSContouredTriangle* in_osTriangleRef, 
-						std::unordered_map<EnclaveKeyDef::EnclaveKey, 
-						EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef,
-						PointAdherenceOrder* in_adherenceOrderRef);
+		void initialize(PrimaryLineT1* in_lineRef,
+			ECBPolyPoint in_currentSegmentBegin,
+			ECBPolyPoint in_currentSegmentEnd,
+			EnclaveKeyDef::EnclaveKey in_currentSegmentBlueprintKey,
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_tracedBlueprintCountMapRef,
+			std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher>* in_filledBlueprintMapRef,
+			OSContouredTriangle* in_osTriangleRef,
+			ECBMap* in_runnerECBMapRef,
+			PointAdherenceOrder* in_adherenceOrderRef);
+
 		bool checkIfRunComplete();			// check if the run is complete
 		void traverseToNewBlueprint();
 		void iterateAndCheckedForTouchedBlueprint();

@@ -29,7 +29,7 @@ public:
 	void amplifyAllContourLinePoints();
 	void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID);
 	void runMassDrivers(OrganicClient* in_clientRef, 
-					    std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_serverBlueprintMapRef,
+						ECBMap* in_ecbMapRef,
 						EnclaveFractureResultsMap* in_fractureResultsMapRef);
 	void buildContouredTriangles();
 	std::vector<OSContouredTriangle*> getProcessableContouredTriangles();

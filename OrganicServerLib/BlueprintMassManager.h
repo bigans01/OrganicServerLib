@@ -13,15 +13,18 @@
 #include "OrganicClient.h"
 #include "ContourBase.h"
 #include "ECBPolyReformer.h"
+#include "ECBMap.h"
 
 class BlueprintMassManager
 {
 	public:
 		BlueprintMassManager() {};
-		BlueprintMassManager(std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_serverBlueprintsRef,
-			                 OrganicClient* in_organicClientRef,
-			                 ContourBase* in_contourPlanRef) :
-			serverBlueprintsRef(in_serverBlueprintsRef),
+
+
+		BlueprintMassManager(ECBMap* in_managerEcbMapRef,
+			OrganicClient* in_organicClientRef,
+			ContourBase* in_contourPlanRef) :
+			managerEcbMapRef(in_managerEcbMapRef),
 			organicClientRef(in_organicClientRef),
 			contourPlanRef(in_contourPlanRef)
 		{};
@@ -33,7 +36,7 @@ class BlueprintMassManager
 		void scanForDissolvableTriangles();
 		void updatePersistentBlueprintPolys();
 	private:
-		std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* serverBlueprintsRef = nullptr;
+		ECBMap* managerEcbMapRef = nullptr;
 
 		ContourBase* contourPlanRef = nullptr;
 		OrganicClient* organicClientRef = nullptr;

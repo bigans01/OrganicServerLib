@@ -4,7 +4,10 @@
 #include "ECBIntersectMeta.h"
 #include "OSServer.h"
 
-OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapPtr, PointAdherenceOrder* in_pointAdherenceOrderRef)
+OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, 
+												int in_lineID, 
+												ECBMap* in_traverserECBMapRef,
+												PointAdherenceOrder* in_pointAdherenceOrderRef)
 //OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_TrianglePtr, int in_lineID, OSServer* in_serverPtr)
 {
 	/*
@@ -48,7 +51,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 	//std::cout << ">>>>>>>>>>>> OSTriangleLineTraverser; line ID is: " << in_lineID  << std::endl;
 
 
-	blueprintMapRef = in_blueprintMapPtr;
+	traverserECBMapRef = in_traverserECBMapRef;
 	//ECBBorderLineList borderLineList;
 	//borderLineList = IndependentUtils::determineBorderLines(beginKey);		// get the border line list for the first point
 	//std::cout << "-->>>> OSTriangleLineTraverser constructor, blueprint intersection call..." << std::endl;
@@ -91,8 +94,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 
 		//EnclaveCollectionBlueprint* blueprintPtr = &in_serverPtr->blueprintMap[beginKey];	// get a pointer to the blueprint (for code readability only)
 		//&blueprintMapRef->find(incrementingKey)->second;
-		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(beginKey)->second;
-		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
+		EnclaveCollectionBlueprint* blueprintPtr = traverserECBMapRef->getBlueprintRef(beginKey);
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
 		adherenceOrderRef->attemptAdherentInsertion(beginKey);
 
@@ -145,7 +147,7 @@ OSTriangleLineTraverser::OSTriangleLineTraverser(OSContouredTriangle* in_Triangl
 		newPoly.materialID = in_TrianglePtr->materialID;
 		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
-		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[beginKey];
+		EnclaveCollectionBlueprint* blueprintPtr = traverserECBMapRef->getBlueprintRef(beginKey);
 		in_TrianglePtr->insertTracedBlueprint(beginKey);
 		adherenceOrderRef->attemptAdherentInsertion(beginKey);
 		
@@ -244,8 +246,8 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		//cout << "|||| Polygon was found!! " << endl;
 		int polygonIDinBlueprint = polyMapIter->second;						// get the corresponding int value from the triangle's registered blueprint polygon map
 
-		//EnclaveCollectionBlueprint* blueprintPtr = &blueprintMapRef->find(currentKey)->second;	// get a pointer to the blueprint (for code readability only)
-		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		EnclaveCollectionBlueprint* blueprintPtr = traverserECBMapRef->getBlueprintRef(currentKey);	// get a pointer to the blueprint (for code readability only)
+
 		//if (!(currentKey == endKey))	// don't update the count if it is the last one.
 		//{
 			in_TrianglePtr->insertTracedBlueprint(currentKey);
@@ -280,7 +282,7 @@ void OSTriangleLineTraverser::traverseLineOnce(OSContouredTriangle* in_TriangleP
 		newPoly.materialID = in_TrianglePtr->materialID;
 		newPoly.emptyNormal = in_TrianglePtr->contouredEmptyNormal;
 		OSServerUtils::fillPolyWithClampResult(&newPoly, in_TrianglePtr);
-		EnclaveCollectionBlueprint* blueprintPtr = &(*blueprintMapRef)[currentKey];
+		EnclaveCollectionBlueprint* blueprintPtr = traverserECBMapRef->getBlueprintRef(currentKey);
 		in_TrianglePtr->insertTracedBlueprint(currentKey);
 		adherenceOrderRef->attemptAdherentInsertion(currentKey);
 
