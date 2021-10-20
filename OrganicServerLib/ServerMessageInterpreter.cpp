@@ -22,6 +22,7 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN :					{ handleRequestFromClientRunContourPlan(std::move(*currentMessage));  break;  }
 			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_BLOCK_HIGHLIGHTING:			{ handleRequestFromClientToggleBlockHighlighting(std::move(*currentMessage)); break; }
 			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_CURRENT_ENCLAVE_HIGHLIGHTING:	{ handleRequestFromClientToggleCurrentEnclaveHighlighting(std::move(*currentMessage)); break; }
+			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_IMGUI_WORLD_LOCATION:			{ handleRequestFromClientOGLMToggleWorldLocation(std::move(*currentMessage)); break;	};
 		}
 		messageCableRef->popIncomingQueue();
 	}
@@ -303,6 +304,28 @@ void ServerMessageInterpreter::handleRequestFromClientToggleCurrentEnclaveHighli
 			std::cout << "SERVER: sending toggle current enclave highlighting requested back to client..." << std::endl;
 			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_TOGGLE_CURRENT_ENCLAVE_HIGHLIGHTING);
 			serverPtr->client.insertResponseMessage(responseMessage);
+			break;
+		}
+		case MessageLocality::REMOTE:
+		{
+			break;
+		}
+	}
+}
+
+void ServerMessageInterpreter::handleRequestFromClientOGLMToggleWorldLocation(Message in_message)
+{
+	std::cout << "SERVER: Calling handleRequestFromClientOGLMToggleWorldLocation..." << std::endl;
+	// ####################
+	// MESSAGE CHAIN: toggleWorldLocationPanel (2 of 2)
+	//
+	// This sends a response message back to the requesting OrganicSystem instance -- local or remote host -- that requested the toggling of the World Location panel in the GUI.
+	//
+	switch (in_message.messageLocality)
+	{
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "SERVER: sending OK for toggling of World Location panel back to client..." << std::endl;
 			break;
 		}
 		case MessageLocality::REMOTE:

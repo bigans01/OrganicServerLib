@@ -540,6 +540,8 @@ void OSServer::constructMultiMountTestWithElevator()
 	EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, 0, 0);
 	EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(2, 2, 4);
 
+	AdjacentFinder testFinder(&serverBlueprints);
+
 	
 	// first mountain
 	summit1.x = 28;
@@ -553,6 +555,17 @@ void OSServer::constructMultiMountTestWithElevator()
 	executeDerivedContourPlan("summit1");
 
 	auto existingOREFinder = serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.find(serverBlueprintOREKey);
+
+	// tests for AdjacentFinder
+	EnclaveKeyDef::EnclaveKey adjacentBeginBlueprintKey(0, 0, 0);
+	std::cout << "!!! Findind adjacents for: "; adjacentBeginBlueprintKey.printKey(); std::cout << std::endl;
+	auto neighboringBlueprints = testFinder.findAdjacentBlueprints(adjacentBeginBlueprintKey);
+	auto foundNeighborsBegin = neighboringBlueprints.begin();
+	auto foundNeighborsEnd = neighboringBlueprints.end();
+	for (; foundNeighborsBegin != foundNeighborsEnd; foundNeighborsBegin++)
+	{
+		std::cout << "!! Found neighbor at: "; foundNeighborsBegin->second.blueprintKey.printKey(); std::cout << std::endl;
+	}
 
 
 	if (existingOREFinder != serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.end())
@@ -578,7 +591,14 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit2Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit2");
 
-	
+	// debug block test
+	EnclaveKeyDef::EnclaveKey targetBlueprintDebug(0, -1, 0);
+	EnclaveKeyDef::EnclaveKey targetOREDebug(4, 6, 4);
+	//serverBlueprints.getFractureResultsMapRef(targetBlueprintDebug)->fractureResultsContainerMap[targetOREDebug].simulateBlockProduction();
+	//serverBlueprints.getFractureResultsMapRef(targetBlueprintDebug)->fractureResultsContainerMap[targetOREDebug].printEnclaveTriangleContainers(true);
+
+
+
 	// for debugging test only.
 	//EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, -1, 1);
 	//EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(5, 7, 0);
@@ -631,7 +651,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit3Ref->amplifyAllContourLinePoints();
 	summit3Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
-	executeDerivedContourPlan("summit3");
+	//executeDerivedContourPlan("summit3");
 
 	/*
 	auto existingOREFinder3 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
@@ -653,6 +673,14 @@ void OSServer::constructMultiMountTestWithElevator()
 	int printWait2 = 3;
 	std::cin >> printWait2;
 	*/
+
+	// test, convert an ORE's lod to block.
+	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
+	EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
+	EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
+	auto blockReformTarget = serverBlueprints.getFractureResultsMapRef(blockReformBlueprintKey)->fractureResultsContainerMap.find(blockReformOREKey);
+	blockReformTarget->second.morphLodToBlock(&serverReadWrite, blockReformOREKey);
+	//blockReformTarget->second.eraseBlock(&serverReadWrite, blockKey);
 }
 
 void OSServer::constructSingleMountTestNoInput()
@@ -936,6 +964,32 @@ void OSServer::setWorldDirectionInClient(float in_directionX, float in_direction
 	serverJobManager.insertJobRequestMessage(std::move(newMessage));
 }
 
+void OSServer::testFunction()
+{
+	// testingonly
+	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
+	EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
+	EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
+	int currentTotalTriangles = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getTotalTriangles();
+	auto currentLodState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getLodState();
+	auto currentAppendedState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getAppendedState();
+	int currentNumberOfBlocks = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].blockMap.size();
+	int currentEraseCount = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].eraseCounter;
+	std::string state = "";
+	std::string appendedState = "";
+	if (currentLodState == ORELodState::LOD_BLOCK)
+	{
+		state = "LOD_BLOCK";
+	}
+
+	if (currentAppendedState == OREAppendedState::NONE)
+	{
+		appendedState = "NONE";
+	}
+
+	std::cout << ":: (TEST FUNCTION) Hard TEST: currentTotalTriangles for debugging ORE: " << currentTotalTriangles << "; state is: " << state << "; appendedState is: " << appendedState << "; number of blocks: " << currentNumberOfBlocks << "; eraseCounter: " << currentEraseCount << std::endl;
+}
+
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
 	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &serverBlueprints, in_Triangle->forgedPolyRegistryRef, in_orderRef);
@@ -993,9 +1047,36 @@ void OSServer::runServer()
 	}
 	else if (serverRunMode == 1)		// server runs actively alongside an instance of an OrganicSystem
 	{
+		int currentTickCounter = 0;
 		while (getCommandLineShutdownValue(std::ref(serverReadWrite)) == 0) // ""
 		{
 			//std::cout << "Looping...." << std::endl;
+
+			// testingonly
+			EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
+			EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
+			EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
+			int currentTotalTriangles = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getTotalTriangles();
+			auto currentLodState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getLodState();
+			auto currentAppendedState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getAppendedState();
+			int currentNumberOfBlocks = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].blockMap.size();
+			int currentEraseCount = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].eraseCounter;
+			std::string state = "";
+			std::string appendedState = "";
+			if (currentLodState == ORELodState::LOD_BLOCK)
+			{
+				state = "LOD_BLOCK";
+			}
+
+			if (currentAppendedState == OREAppendedState::NONE)
+			{
+				appendedState = "NONE";
+			}
+
+			if (currentTickCounter == 0)
+			{
+				std::cout << "(BEFORE CLIENT MESSAGE CHECK) Hard TEST: currentTotalTriangles for debugging ORE: " << currentTotalTriangles << "; state is: " << state << "; appendedState is: " << appendedState << "; number of blocks: " << currentNumberOfBlocks << "; eraseCounter: " << currentEraseCount << std::endl;
+			}
 
 			checkClientMessages();							// Does 3 things: 
 															// 1. Move messages coming in from the local client (the underlying OrganicClient on this host), into the messageInterpreter.
@@ -1013,6 +1094,48 @@ void OSServer::runServer()
 			//serverJobManager.checkForMessages();	// have the job manager check for messages to process.
 			//std::cout << ">>>> Running organic tick. " << std::endl;
 			organicSystemPtr->runOrganicTick();		// run core loop
+
+			currentTotalTriangles = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getTotalTriangles();
+			currentLodState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getLodState();
+			currentNumberOfBlocks = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].blockMap.size();
+			currentEraseCount = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].eraseCounter;
+			if (currentTickCounter == 0)
+			{
+				std::cout << "(AFTER CLIENT MESSAGE CHECK) Hard TEST: currentTotalTriangles for debugging ORE: " << currentTotalTriangles << "; state is: " << state << "; appendedState is: " << appendedState << "; number of blocks: " << currentNumberOfBlocks << "; eraseCounter: " << currentEraseCount << std::endl;
+				std::cout << ">>>>>>>>>> calling debug test a 2nd time..." << std::endl;
+	
+			}
+			
+
+			// testingonly
+			/*
+			EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
+			EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
+			EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
+			int currentTotalTriangles = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getTotalTriangles();
+			auto currentLodState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getLodState();
+			auto currentAppendedState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getAppendedState();
+			int currentNumberOfBlocks = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].blockMap.size();
+			int currentEraseCount = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].eraseCounter;
+			std::string state = "";
+			std::string appendedState = "";
+			if (currentLodState == ORELodState::LOD_BLOCK)
+			{
+				state = "LOD_BLOCK";
+			}
+
+			if (currentAppendedState == OREAppendedState::NONE)
+			{
+				appendedState = "NONE";
+			}
+
+			if (currentTickCounter < 50)
+			{
+
+				std::cout << "Hard TEST: currentTotalTriangles for debugging ORE: " << currentTotalTriangles << "; state is: " << state << "; appendedState is: " << appendedState << "; number of blocks: " << currentNumberOfBlocks << "; eraseCounter: " << currentEraseCount << std::endl;
+			}
+			*/
+			currentTickCounter++;
 			//std::cout << ">>>> Organic tick done. " << std::endl;
 		}
 		organicSystemPtr->glCleanup();

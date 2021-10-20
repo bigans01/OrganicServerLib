@@ -37,6 +37,7 @@
 #include "ServerJobManager.h"
 #include "ContourPlanStateContainer.h"
 #include "ECBMap.h"
+#include "AdjacentFinder.h"
 
 
 class OSServer
@@ -70,6 +71,8 @@ public:
 	void sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
 	void sendAndRenderAllBlueprintsToLocalOS();											// transfers all processed blueprints to the local OS.
 	void setWorldDirectionInClient(float in_directionX, float in_directionY, float in_directionZ);
+
+	void testFunction();
 
 private:
 	ServerMessageInterpreter messageInterpreter;

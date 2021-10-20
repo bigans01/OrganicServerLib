@@ -33,6 +33,7 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void handleRequestToClientSendCurrentClientOGLMRMC(Message in_message);
 		void handleRequestFromClientToggleBlockHighlighting(Message in_message);				// MESSAGE CHAIN: toggleBlockHighlighting
 		void handleRequestFromClientToggleCurrentEnclaveHighlighting(Message in_message);		// MESSAGE CHAIN: toggleCurrentEnclaveHighlighting
+		void handleRequestFromClientOGLMToggleWorldLocation(Message in_message);				// MESSAGE CHAIN: toggleWorldLocationPanel
 };
 
 #endif
