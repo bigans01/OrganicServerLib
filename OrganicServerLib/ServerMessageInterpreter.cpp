@@ -326,6 +326,8 @@ void ServerMessageInterpreter::handleRequestFromClientOGLMToggleWorldLocation(Me
 		case MessageLocality::LOCAL:
 		{
 			std::cout << "SERVER: sending OK for toggling of World Location panel back to client..." << std::endl;
+			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_TOGGLE_IMGUI_WORLD_LOCATION);
+			serverPtr->client.insertResponseMessage(responseMessage);
 			break;
 		}
 		case MessageLocality::REMOTE:
