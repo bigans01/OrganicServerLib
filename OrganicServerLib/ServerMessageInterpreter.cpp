@@ -23,6 +23,7 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_BLOCK_HIGHLIGHTING:			{ handleRequestFromClientToggleBlockHighlighting(std::move(*currentMessage)); break; }
 			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_CURRENT_ENCLAVE_HIGHLIGHTING:	{ handleRequestFromClientToggleCurrentEnclaveHighlighting(std::move(*currentMessage)); break; }
 			case MessageType::REQUEST_FROM_CLIENT_TOGGLE_IMGUI_WORLD_LOCATION:			{ handleRequestFromClientOGLMToggleWorldLocation(std::move(*currentMessage)); break;	};
+			case MessageType::REQUEST_FROM_CLIENT_INPUT_GENERATED: { handleRequestFromClientInputGenerated(std::move(*currentMessage)); break; };
 		}
 		messageCableRef->popIncomingQueue();
 	}
@@ -337,3 +338,26 @@ void ServerMessageInterpreter::handleRequestFromClientOGLMToggleWorldLocation(Me
 	}
 }
 
+void ServerMessageInterpreter::handleRequestFromClientInputGenerated(Message in_message)
+{
+	std::cout << "SERVER: Calling handleRequestFromClientInputGenerated..." << std::endl;
+	// ####################
+	// MESSAGE CHAIN: clientSendsInput  (2 of 2)
+	//
+	// This sends a response message back to the requesting OrganicSystem instance -- local or remote host -- indicating whether or not the input was valid/allowed.
+	//
+	switch (in_message.messageLocality)
+	{
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "SERVER: sending OK for input received back to client..." << std::endl;
+			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_INPUT_GENERATED);
+			serverPtr->client.insertResponseMessage(responseMessage);
+			break;
+		}
+		case MessageLocality::REMOTE:
+		{
+			break;
+		}
+	}
+}
