@@ -350,9 +350,24 @@ void ServerMessageInterpreter::handleRequestFromClientInputGenerated(Message in_
 	{
 		case MessageLocality::LOCAL:
 		{
+			std::cout << "SERVER: checking message contents for input received: " << std::endl;
+			in_message.open();
+			int numberOfInputs = in_message.readInt();
+			for (int x = 0; x < numberOfInputs; x++)
+			{
+				int currentInput = in_message.readInt();
+				std::cout << "GLFW input enum value: " << currentInput << std::endl;
+			}
+
+			// our response message will be a copy of th request message, the only difference being that the response message
+			// has its MessageType changed to RESPONSE_FROM_SERVER_INPUT_GENERATED, and includes a response string.
 			std::cout << "SERVER: sending OK for input received back to client..." << std::endl;
-			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_INPUT_GENERATED);
-			serverPtr->client.insertResponseMessage(responseMessage);
+			Message generatedResponseMessage = in_message;
+			generatedResponseMessage.insertString("ACCEPTED");
+			generatedResponseMessage.messageType = MessageType::RESPONSE_FROM_SERVER_INPUT_GENERATED;
+
+			//Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_INPUT_GENERATED);
+			serverPtr->client.insertResponseMessage(generatedResponseMessage);
 			break;
 		}
 		case MessageLocality::REMOTE:
