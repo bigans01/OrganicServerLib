@@ -803,12 +803,20 @@ void OSServer::executeDerivedContourPlan(string in_string)
 
 	std::cout << "!!!! Size of processable triangles: " << processableList.size() << std::endl;
 
+	auto traceStart = std::chrono::high_resolution_clock::now();
+
 	auto processableListBegin = processableList.begin();
 	auto processableListEnd = processableList.end();
 	for (; processableListBegin != processableListEnd; processableListBegin++)
 	{
 		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
 	}
+
+	auto traceEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> traceElapsed = traceEnd - traceStart;
+
+	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
+
 	
 	std::cout << "######### Plan execution complete; " << std::endl;
 
@@ -837,6 +845,8 @@ void OSServer::executeDerivedContourPlanNoInput(string in_string)
 	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
 	ContourBase* planPtr = newContourMap[in_string].get();
 
+	auto traceStart = std::chrono::high_resolution_clock::now();
+
 	// 1. ) Execute all processable OSContouredTriangles in the plan.
 	auto processableList = planPtr->getProcessableContouredTriangles();
 	auto processableListBegin = processableList.begin();
@@ -845,6 +855,11 @@ void OSServer::executeDerivedContourPlanNoInput(string in_string)
 	{
 		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
 	}
+
+	auto traceEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> traceElapsed = traceEnd - traceStart;
+
+	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
 
 	std::cout << "######### Plan execution complete; " << std::endl;
 

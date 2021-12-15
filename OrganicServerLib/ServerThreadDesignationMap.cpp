@@ -28,6 +28,66 @@ void ServerThreadDesignationMap::designateCommandLineThread(int in_key)
 	removeFromUndesignatedPool(in_key); // remove from the unDesignatedPool
 }
 
+void ServerThreadDesignationMap::designateTerrainThread(int in_key)
+{
+	designations[ServerThreadDesignation::TERRAIN] = in_key;
+	removeFromUndesignatedPool(in_key);
+}
+
+bool ServerThreadDesignationMap::doesDesignatedThreadExist(std::string in_designationString)
+{
+	if (in_designationString == "ANY")
+	{
+		return true;
+	}
+	else
+	{
+		if (in_designationString == "TERRAIN")
+		{
+			auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
+			if (terrainFinder != designations.end())	// it was found.
+			{
+				return true;
+			}
+			else   // designated thread not found, return false.
+			{
+				return false;
+			}
+		}
+		
+		if (in_designationString == "COMMAND_LINE")
+		{
+			auto commandLineFinder = designations.find(ServerThreadDesignation::COMMAND_LINE);
+			if (commandLineFinder != designations.end())
+			{
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+	}
+}
+
+AcquiredServerThread ServerThreadDesignationMap::fetchDesignatedThread(std::string in_designationString)
+{
+	AcquiredServerThread returnThread;
+	if (in_designationString == "ANY")
+	{
+		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
+		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->stemcellMap[terrainFinder->second].threadPtr.get());
+		returnThread = acquisition;
+	}
+	else if (in_designationString == "TERRAIN")
+	{
+		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
+		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->stemcellMap[terrainFinder->second].threadPtr.get());
+		returnThread = acquisition;
+	}
+	return returnThread;
+}
+
 OrganicThread* ServerThreadDesignationMap::getCommandLineThread()
 {
 	int keyToLookup = designations[ServerThreadDesignation::COMMAND_LINE];	// fetch the key that uses the command line

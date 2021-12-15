@@ -40,6 +40,7 @@ class ServerPhasedJobBase
 		// parent key values
 		int parentContainerIntKey = 0;
 		std::string parentContainerStringKey = "";
+		std::string requiredThreadDesignation = "";	// must be set for all descendants of this base class, in that specific class.
 
 		JobPhaseState getCurrentPhaseState();									// should be called every time we are checking the job, before anything else
 		void removeCompletedPhaseSubJobs();
@@ -47,6 +48,8 @@ class ServerPhasedJobBase
 		bool checkIfCurrentPhaseIsInProgress();
 
 		ReadyJobSearch findNextWaitingJob();
+		
+		std::string fetchThreadDesignation();
 
 		// job removal
 		//void removeDonePhaseSubJobs();

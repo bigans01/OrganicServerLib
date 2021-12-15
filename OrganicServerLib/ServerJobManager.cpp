@@ -9,6 +9,8 @@ void ServerJobManager::initialize(OSServer* in_serverPtr)
 	designations.initialize(&server->OSCManager);
 	designations.buildInitialUndesignatedPool();
 	designations.designateCommandLineThread(0);							// thread 0 from the pool should be the command line thread.
+	designations.designateTerrainThread(1);								// thread 1 from the pool should be the the terrain thread.
+	// rest of threads come here...when developed appropriately in time.
 }
 
 void ServerJobManager::startCommandLine()
@@ -137,18 +139,25 @@ void ServerJobManager::runJobScan()
 
 			checkCurrentJobPhaseSetup(&intServerJobsBegin->second);
 			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();		// don't run jobs that are already executing.
-			if (searchForAvailableJobInCurrentPhase.wasJobFound == true)
+			if 
+			(
+				(searchForAvailableJobInCurrentPhase.wasJobFound == true)
+				&&
+				(designations.doesDesignatedThreadExist(intServerJobsBegin->second->fetchThreadDesignation()) == true)	// a job can't be submitted unless it's designated thread exists
+			)
 			{
 				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runPrechecks();									// calculate the work load.
 				float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
 
 				// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
 
-				AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
+				//AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
+				AcquiredServerThread acquiredThread = designations.fetchDesignatedThread(intServerJobsBegin->second->fetchThreadDesignation());							// get the acquired thread data
 				designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
 
 				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
-				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);										// finally, run the job.
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);		// finally, run the job; and set 
+																											// the ServerPhasedJob's status to ServerJobState::RUNNING
 			}
 		}
 	}

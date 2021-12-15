@@ -18,6 +18,8 @@ void SPJRunSingleMountTest::interpretMessage(Message in_message)
 
 void SPJRunSingleMountTest::initialize()
 {
+	requiredThreadDesignation = "TERRAIN";	// must be run on the server's TERRAIN thread.
+
 	if (locality == MessageLocality::LOCAL)
 	{
 		std::cout << ":::: Inserting new local phase..." << std::endl;

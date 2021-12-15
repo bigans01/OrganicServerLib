@@ -8,6 +8,7 @@ enum class ServerThreadDesignation
 	UNDEFINED,
 	COMMAND_LINE,
 	NETWORKING,
+	TERRAIN,
 	SLAVE_1,
 	SLAVE_2,
 	SLAVE_3,

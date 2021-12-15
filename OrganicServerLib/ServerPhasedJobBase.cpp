@@ -95,3 +95,8 @@ ReadyJobSearch ServerPhasedJobBase::findNextWaitingJob()
 
 	return jobSearchResult;
 }
+
+std::string ServerPhasedJobBase::fetchThreadDesignation()
+{
+	return requiredThreadDesignation;
+}

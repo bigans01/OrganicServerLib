@@ -22,9 +22,12 @@ class ServerThreadDesignationMap
 		void buildInitialUndesignatedPool();
 		void removeFromUndesignatedPool(int in_key);
 		void designateCommandLineThread(int in_key);
+		void designateTerrainThread(int in_key);
+		bool doesDesignatedThreadExist(std::string in_designationString);
 		OrganicThread* getCommandLineThread();
 		//OrganicThread* getFirstAvailableThread();
 		AcquiredServerThread getFirstAvailableThread();
+		AcquiredServerThread fetchDesignatedThread(std::string in_designationString);
 		void incrementWorkload(int in_monitorID, float in_workload);
 		void decrementWorkload(int in_monitorID, float in_workload);
 		//void resetWorkload(int in_monitorID);
