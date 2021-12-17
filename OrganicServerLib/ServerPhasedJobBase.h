@@ -13,12 +13,18 @@
 #include <unordered_map>
 #include <mutex>
 #include "ReadyJobSearch.h"
+#include "ServerJobRunVerdict.h"
+#include "ServerThreadDesignationMap.h"
 
 class OSServer;
 class ServerPhasedJobBase
 {
 	public:
-		virtual void interpretMessage(Message in_message) = 0;		// all phased jobs will be interpreting incoming messages diffrently
+		virtual void interpretMessage(Message in_message) = 0;		// all phased jobs will be interpreting incoming messages differently;
+																	// depending on how the ServerPhasedJobBase-derived class interprets this message, the class can do things like:
+																	//	-insert new jobs into an existing phase for a run, therefore extending the life of the phase by one server tick per added job
+																	//  -check the OrganicServer to see if it is time for an indefinitely-running job to quit (for instance, sounds or temporary world events)
+
 		virtual void initialize() = 0;								// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
 		virtual void initializeCurrentPhase() = 0;					// would be called after initialize()
 		int currentPhaseIndex = 0;									
@@ -48,6 +54,7 @@ class ServerPhasedJobBase
 		bool checkIfCurrentPhaseIsInProgress();
 
 		ReadyJobSearch findNextWaitingJob();
+		bool isCurrentJobRunnable(ServerThreadDesignationMap* in_serverThreadDesignationMapRef);			// returns true if verdict is good (it can run)
 		
 		std::string fetchThreadDesignation();
 

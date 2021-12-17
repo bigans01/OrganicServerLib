@@ -1100,7 +1100,10 @@ void OSServer::runServer()
 															//    MessageCable
 													
 
-			serverJobManager.checkForUpdateMessages();		// 2.1: check for messages that would be updates to existing jobs, from the previous tick
+			serverJobManager.checkForUpdateMessages();		// 2.1: check for messages that would be updates -- or even logical changes to a ServerPhasedJobBase-derived class itself, 
+															// such as inserting new ServerJobBase-derived classes  (aka, "atomic" server jobs) into the current job phase -- 
+															// to existing jobs, from the previous tick
+
 			serverJobManager.removeCompletedPhasedJobs();	// 2.2: with the updates applied, check to see if there are any jobs to remove.
 			serverJobManager.checkForMessages();			// 2.3: check the messages that would spawn new jobs.
 			serverJobManager.runJobScan();					// 2.4: look for jobs to execute.

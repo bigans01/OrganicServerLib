@@ -2,11 +2,6 @@
 #include "SJRunSingleMountTest.h"
 #include "OSServer.h"
 
-void SJRunSingleMountTest::runPrechecks() 
-{
-	estimatedWorkLoad = 11.5f;		// hardcoded test.
-}
-
 void SJRunSingleMountTest::runJob(OrganicThread* in_threadToRunOn) 
 {
 	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.
@@ -23,4 +18,15 @@ std::string SJRunSingleMountTest::getJobName()
 void SJRunSingleMountTest::runPostCompleteTasks() 
 {
 
+}
+
+ServerJobRunVerdict SJRunSingleMountTest::getCurrentVerdict()
+{
+	ServerJobRunVerdict currentVerdict(true, "TERRAIN");
+	estimatedWorkLoad = 11.5f;		// hardcoded test.
+
+	// Below line is Test code only, does nothing; (just making sure it works for now)
+	bool doesFlagExist = ServerJobProxy::checkIfServerJobBlockingFlagExists(server, ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN);
+
+	return currentVerdict;
 }

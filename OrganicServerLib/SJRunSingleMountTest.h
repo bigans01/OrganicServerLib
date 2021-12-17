@@ -8,10 +8,10 @@
 class SJRunSingleMountTest : public ServerJobBase
 {
 	public:
-		void runPrechecks();
 		void runJob(OrganicThread* in_threadToRunOn);
 		std::string getJobName();
 		void runPostCompleteTasks();
+		ServerJobRunVerdict getCurrentVerdict();
 };
 
 #endif

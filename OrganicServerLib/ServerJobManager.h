@@ -64,6 +64,9 @@ class ServerJobManager
 		void handleContourPlanRequest(Message in_message);
 		void handleSetDirectionRequest(Message in_message);
 
+		// blocking flag checks
+		bool doesFlagExist(ServerJobBlockingFlags in_flagToCheck);	// checks if exactly one flag exists.
+
 		// job insertion calls
 		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.
 		void insertPhasedJobSetWorldDirection(Message in_message);

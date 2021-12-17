@@ -100,3 +100,26 @@ std::string ServerPhasedJobBase::fetchThreadDesignation()
 {
 	return requiredThreadDesignation;
 }
+
+bool ServerPhasedJobBase::isCurrentJobRunnable(ServerThreadDesignationMap* in_serverThreadDesignationMapRef)
+{
+	bool isRunnable = false;
+	auto currentSearchResult = findNextWaitingJob();
+	ServerJobRunVerdict currentVerdict = (*currentSearchResult.currentJobPtr)->getCurrentVerdict();		// determine if the job can run, 
+																										// by calling the job's verdict function; will also set the 
+																										// workload for the job (if needed)
+
+	// if the job can run, we must now check if the designated thread it will run on exists.
+	if (currentVerdict.canJobRun == true)
+	{
+		// the isRunnable flag should only be true, if we have established that the thread this job will run on exists.
+		if (in_serverThreadDesignationMapRef->doesDesignatedThreadExist(currentVerdict.designatedThreadString))
+		{
+			// everything checked out OK; this "atomic" job will now run after this function returns.
+			isRunnable = true;
+			requiredThreadDesignation = currentVerdict.designatedThreadString;
+		}
+	}
+
+	return isRunnable;
+}

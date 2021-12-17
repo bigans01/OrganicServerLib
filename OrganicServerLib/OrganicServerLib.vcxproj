@@ -197,6 +197,7 @@
     <ClInclude Include="ServerJobMessageQueue.h" />
     <ClInclude Include="ServerJobPhase.h" />
     <ClInclude Include="ServerJobProxy.h" />
+    <ClInclude Include="ServerJobRunVerdict.h" />
     <ClInclude Include="ServerJobsIntContainer.h" />
     <ClInclude Include="ServerJobState.h" />
     <ClInclude Include="ServerJobUpdateInt.h" />

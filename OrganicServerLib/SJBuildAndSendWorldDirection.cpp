@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "SJBuildAndSendWorldDirection.h"
 
-void SJBuildAndSendWorldDirection::runPrechecks()
-{
-
-}
 void SJBuildAndSendWorldDirection::runJob(OrganicThread* in_threadToRunOn)
 {
 	std::cout << "#### Running job for updating world direction..." << std::endl;
@@ -23,4 +19,10 @@ std::string SJBuildAndSendWorldDirection::getJobName()
 void SJBuildAndSendWorldDirection::runPostCompleteTasks()
 {
 
+}
+
+ServerJobRunVerdict SJBuildAndSendWorldDirection::getCurrentVerdict()
+{
+	ServerJobRunVerdict returnVerdict(true, "ANY");
+	return returnVerdict;
 }

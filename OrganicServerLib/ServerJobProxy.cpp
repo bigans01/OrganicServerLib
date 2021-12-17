@@ -24,3 +24,8 @@ void ServerJobProxy::callServerSendOutgoingMessageToMessageInterpreter(OSServer*
 {
 	in_serverRef->jobSendOutgoingMessageToInterpreter(std::move(in_message));
 }
+
+bool ServerJobProxy::checkIfServerJobBlockingFlagExists(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck)
+{
+	return in_serverRef->serverJobManager.doesFlagExist(in_flagToCheck);
+}

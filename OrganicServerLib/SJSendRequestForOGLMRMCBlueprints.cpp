@@ -1,11 +1,6 @@
 #include "stdafx.h"
 #include "SJSendRequestForOGLMRMCBlueprints.h"
 
-void SJSendRequestForOGLMRMCBlueprints::runPrechecks()
-{
-	estimatedWorkLoad = 1.0f;
-}
-
 void SJSendRequestForOGLMRMCBlueprints::runJob(OrganicThread* in_threadToRunOn)
 {
 	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.							// main work
@@ -21,4 +16,11 @@ std::string SJSendRequestForOGLMRMCBlueprints::getJobName()
 void SJSendRequestForOGLMRMCBlueprints::runPostCompleteTasks()
 {
 
+}
+
+ServerJobRunVerdict SJSendRequestForOGLMRMCBlueprints::getCurrentVerdict()
+{
+	ServerJobRunVerdict returnVerdict(true, "TERRAIN");
+	estimatedWorkLoad = 1.0f;
+	return returnVerdict;
 }

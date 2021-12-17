@@ -7,16 +7,17 @@
 #include "OrganicThread.h"
 #include "ServerJobState.h"
 #include "ServerJobProxy.h"
+#include "ServerJobRunVerdict.h"
 
 class OSServer;
 class OrganicThread;
 class ServerJobBase
 {
 	public:
-		virtual void runPrechecks() = 0;
 		virtual void runJob(OrganicThread* in_threadToRunOn) = 0;
 		virtual std::string getJobName() = 0;
 		virtual void runPostCompleteTasks() = 0;
+		virtual ServerJobRunVerdict getCurrentVerdict() = 0;
 
 		void setStartMessage(Message in_message);
 		void setCompletionMessage(Message in_message);

@@ -59,7 +59,11 @@ void ServerJobManager::checkForUpdateMessages()
 
 		switch (currentMessageRef->messageType)
 		{
-			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :
+			// All update messages must have an appropriate MessageType, to direct it to the proper job container.
+			// Allowed values are:
+			//	--MessageType::SERVER_JOB_EVENT_UPDATE_INT 
+
+			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :		// if the server job is of this message type, it must be sent to jobs in the intJobsContainer.
 			{
 				int parentJobID = currentMessageRef->readInt();
 				intJobsContainer.serverJobs[parentJobID]->interpretMessage(std::move(*currentMessageRef));
@@ -129,6 +133,35 @@ void ServerJobManager::checkForMessages()
 
 void ServerJobManager::runJobScan()
 {
+	/* 
+	
+	The running of jobs in the OrganicServer is different, than how they run in an OrganicCoreLib; 
+	The OrganicServer job engine does not periodically "pause" for all threads, like the ticks in an OrganicSystem instance.
+
+	Additionally, jobs to submit are done via round-robin style -- this means that each ServerPhasedJob-derived class
+	gets an opportunity to submit exactly one job in per server tick, to the underlying threads, and only if that job to be submitted meets
+	three conditions:
+
+	1. The job is waiting to run
+	2. The designated thread for the job exists
+	3. The job meets the criteria to be run
+
+	Every tick, each job in the tree is analyzed from the highest priority jobs (usually beginning at 0) to the lowest priority jobs.
+	For example, terrain modification/alteration operations are going to be higher priority than an operation where a single block is needed to be 
+	changed. I.e, if in OrganicServer tick 0 (T0), there is only a single block modification job (priority 1) and nothing else, that will definitely run. 
+	However, if in OrganicServer T1, there is a terrain modification/alteration operation (priority 0) AND a single block modification (priority 1),
+	Then the priority 0 will always run first and get any necessary locks, and likely preventing the single block modification from running in that tick.
+	At it's end, the terrain modificaition/alteration operation will release its locks, and then that single block modification that might still exist in T2 will be
+	allowed to run (if it needs to).
+
+	This system allows us to only have to worry about the level of priority for each job type, and ensure that the order of checks and locks follows an
+	appropriate hierarchy.
+
+	Remember, as of 12/16/2021, the intJobsContainer is still very simple -- it's an std::map (int) of ServerJobs to run; so, one
+	int, one job. This should be reworked early next year (January)
+	
+	*/
+
 	if (!intJobsContainer.serverJobs.empty())
 	{
 		auto intServerJobsBegin = intJobsContainer.serverJobs.begin();
@@ -139,25 +172,28 @@ void ServerJobManager::runJobScan()
 
 			checkCurrentJobPhaseSetup(&intServerJobsBegin->second);
 			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();		// don't run jobs that are already executing.
-			if 
-			(
-				(searchForAvailableJobInCurrentPhase.wasJobFound == true)
-				&&
-				(designations.doesDesignatedThreadExist(intServerJobsBegin->second->fetchThreadDesignation()) == true)	// a job can't be submitted unless it's designated thread exists
-			)
+
+			// Check 1: we found a job to run.
+			if (searchForAvailableJobInCurrentPhase.wasJobFound == true) 
 			{
-				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runPrechecks();									// calculate the work load.
-				float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
+				// Check 2: have the current target job do pre-checks to ensure it will run;
+				// the call to isCurrentJobRunnable() will call the getCurrentVerdict() virtual function of the job,
+				// to determine if that job should run, and additionally set its workload if needed. If the job can run, 
+				// we will proceed. In addition to this, the return value of this function will only be true if the designated thread exists.
+				if (intServerJobsBegin->second->isCurrentJobRunnable(&designations) == true)		
+				{
+					float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
 
-				// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
+					// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
 
-				//AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
-				AcquiredServerThread acquiredThread = designations.fetchDesignatedThread(intServerJobsBegin->second->fetchThreadDesignation());							// get the acquired thread data
-				designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
+					//AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
+					AcquiredServerThread acquiredThread = designations.fetchDesignatedThread(intServerJobsBegin->second->fetchThreadDesignation());							// get the acquired thread data
+					designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
 
-				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
-				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);		// finally, run the job; and set 
-																											// the ServerPhasedJob's status to ServerJobState::RUNNING
+					(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
+					(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);		// finally, run the job; and set 
+																													// the ServerPhasedJob's status to ServerJobState::RUNNING
+				}
 			}
 		}
 	}
@@ -210,4 +246,9 @@ void ServerJobManager::handleSetDirectionRequest(Message in_message)
 	insertPhasedJobSetWorldDirection(in_message);
 
 	// REMOTE message logic
+}
+
+bool ServerJobManager::doesFlagExist(ServerJobBlockingFlags in_flagToCheck)
+{
+	return jobBlockingFlags.checkIfFlagExists(in_flagToCheck);
 }
