@@ -231,6 +231,9 @@
     <ClInclude Include="ServerJobRunVerdict.h">
       <Filter>Header Files\Jobs</Filter>
     </ClInclude>
+    <ClInclude Include="ServerPhasedJobHierarchy.h">
+      <Filter>Header Files\Jobs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

@@ -39,13 +39,10 @@ class ServerPhasedJobBase
 		ServerJobState jobState = ServerJobState::RUNNING;		// can probably be something other than "running"
 
 		void initializeBaseClass(OSServer* in_serverPtr, MessageLocality in_locality, ServerJobContainerType in_parentContainerType);
-		void insertParentContainerIntKey(int in_parentContainerIntKey);
-		void insertParentContainerStringKey(std::string in_parentContainerStringKey);
+		void setLocation(int in_spjLayerID, int in_spjLayerSmartID);
 		void insertStringedMessage(std::string in_stringName, Message in_message);
 
 		// parent key values
-		int parentContainerIntKey = 0;
-		std::string parentContainerStringKey = "";
 		std::string requiredThreadDesignation = "";	// must be set for all descendants of this base class, in that specific class.
 
 		JobPhaseState getCurrentPhaseState();									// should be called every time we are checking the job, before anything else
@@ -58,11 +55,9 @@ class ServerPhasedJobBase
 		
 		std::string fetchThreadDesignation();
 
-		// job removal
-		//void removeDonePhaseSubJobs();
-
-		//void loadDonePhaseSubjobs();
-		//void eraseDonePhaseSubJobs();
+		// job location
+		int spjLayerID = 0;
+		int spjLayerSmartID = 0;
 };
 
 #endif

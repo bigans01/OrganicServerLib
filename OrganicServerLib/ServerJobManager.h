@@ -9,13 +9,17 @@
 #include "ServerPhasedJobBase.h"
 #include "SPJRunSingleMountTest.h"
 #include "SPJSendWorldDirectionToClient.h"
+
 #include "ServerJobsIntContainer.h"
+#include "ServerPhasedJobHierarchy.h"
+
 #include "ServerJobUpdateQueue.h"
 #include "ServerJobMessageQueue.h"
 #include "ServerJobProxy.h"
 #include "ServerJobBlockingFlagsSet.h"
 #include "ReadyJobSearch.h"
 #include "ServerThreadWorkloadUpdate.h"
+
 
 // Job life cycle:
 // 1. ServerJobManager reads Messages from its Pending message queue, and creates new phased or non-phased jobs.
@@ -43,8 +47,7 @@ class ServerJobManager
 		ServerJobMessageQueue jobRequestQueue;
 
 		// server job map
-		//std::map<int, std::shared_ptr<ServerPhasedJobBase>> serverJobs;
-		ServerJobsIntContainer intJobsContainer;
+		ServerPhasedJobHierarchy intJobsContainer;
 		ServerJobBlockingFlagsSet jobBlockingFlags;
 
 		// STEP 3: job update containers (each one should have built in mutex for lock_guarding); 

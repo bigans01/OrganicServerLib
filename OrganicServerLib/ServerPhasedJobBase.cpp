@@ -4,19 +4,27 @@
 
 void ServerPhasedJobBase::initializeBaseClass(OSServer* in_serverPtr, MessageLocality in_locality, ServerJobContainerType in_parentContainerType)
 {
+	std::cout << "##------ Begin base class initialization... " << std::endl;
 	server = in_serverPtr;
+	std::cout << "## -> set server OK. " << std::endl;
 	locality = in_locality;
+	std::cout << "## -> set locality OK. " << std::endl;
 	parentContainerType = in_parentContainerType;
+	std::cout << "## -> set type OK. " << std::endl;
+	std::cout << "##------ Finished base class initialization... " << std::endl;
 }
 
+/*
 void ServerPhasedJobBase::insertParentContainerIntKey(int in_parentContainerKey)
 {
 	parentContainerIntKey = in_parentContainerKey;
 }
+*/
 
-void ServerPhasedJobBase::insertParentContainerStringKey(std::string in_parentContainerStringKey)
+void ServerPhasedJobBase::setLocation(int in_spjLayerID, int in_spjLayerSmartID)
 {
-	parentContainerStringKey = in_parentContainerStringKey;
+	spjLayerID = in_spjLayerID;
+	spjLayerSmartID = in_spjLayerSmartID;
 }
 
 void ServerPhasedJobBase::insertStringedMessage(std::string in_stringName, Message in_message)

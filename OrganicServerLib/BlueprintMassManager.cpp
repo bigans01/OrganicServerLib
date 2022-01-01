@@ -242,7 +242,8 @@ void BlueprintMassManager::buildPersistentMasses()
 
 void BlueprintMassManager::scanForDissolvableTriangles()
 {
-	// Step 1: cycle through each ORE tracker, and call determineOrganicTrianglesToDissolve().
+	// Step 1: cycle through each ORE tracker, and call determineOrganicTrianglesToDissolve();
+	// in other words, if two triangles share an ORE, they are both dissolvable.
 	auto dissolveCallsBegin = reformerTracker.begin();
 	auto dissolveCallsEnd = reformerTracker.end();
 	for (; dissolveCallsBegin != dissolveCallsEnd; dissolveCallsBegin++)

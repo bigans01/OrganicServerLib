@@ -33,17 +33,18 @@ void ServerJobManager::insertJobRequestMessage(Message in_message)
 void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
 {
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
-	//std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
-	intJobsContainer.insertJob(&job, std::move(in_message));
+	intJobsContainer.insertJob(1, &job, std::move(in_message));	// SPJ-F1
 }
 
 void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
 {
-	//std::cout << "############# Inserted set direction job..." << std::endl;
+	std::cout << "############# Inserted set direction job..." << std::endl;
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJSendWorldDirectionToClient));
 	Message directionMessage = in_message;
 	job->insertStringedMessage("direction", directionMessage);
-	intJobsContainer.insertJob(&job, std::move(in_message));
+
+	intJobsContainer.insertJob(2, &job, std::move(in_message));	// SPJ-F1
+	std::cout << ">> Finished inserting set direction job..." << std::endl;
 }
 
 void ServerJobManager::checkForUpdateMessages()
@@ -55,7 +56,7 @@ void ServerJobManager::checkForUpdateMessages()
 
 		// after opening the message, read the update data.
 		ServerThreadWorkloadUpdate updateData = readUpdateDataFromMessage(currentMessageRef);
-		//std::cout << "---> Job update updateData workload to update is: " << updateData.workload << std::endl;
+		std::cout << "---> Job update updateData workload to update is: " << updateData.workload << std::endl;
 
 		switch (currentMessageRef->messageType)
 		{
@@ -66,7 +67,7 @@ void ServerJobManager::checkForUpdateMessages()
 			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :		// if the server job is of this message type, it must be sent to jobs in the intJobsContainer.
 			{
 				int parentJobID = currentMessageRef->readInt();
-				intJobsContainer.serverJobs[parentJobID]->interpretMessage(std::move(*currentMessageRef));
+				intJobsContainer.handleUpdateMessage(std::move(*currentMessageRef));	// SPJ-F4
 				break;
 			}
 		}
@@ -122,7 +123,7 @@ void ServerJobManager::checkForMessages()
 		currentMessageRef->open();												// open the message
 		switch (currentMessageRef->messageType)
 		{
-			//std::cout << "!!! Message found. " << std::endl;
+			std::cout << "!!! Message found. " << std::endl;
 			case MessageType::REQUEST_FROM_CLIENT_RUN_CONTOUR_PLAN : {  handleContourPlanRequest(std::move(*currentMessageRef));  break;  }
 			case MessageType::REQUEST_FROM_SERVER_SET_WORLD_DIRECTION: { handleSetDirectionRequest(std::move(*currentMessageRef)); break; }
 
@@ -162,47 +163,51 @@ void ServerJobManager::runJobScan()
 	
 	*/
 
-	if (!intJobsContainer.serverJobs.empty())
+	// SPJ-F5 (OK, it seems...)
+	auto jobList = intJobsContainer.produceRunnableJobs();
+	auto intServerJobsBegin = jobList.begin();
+	auto intServerJobsEnd = jobList.end();
+	for (; intServerJobsBegin != intServerJobsEnd; intServerJobsBegin++)
 	{
-		auto intServerJobsBegin = intJobsContainer.serverJobs.begin();
-		auto intServerJobsEnd = intJobsContainer.serverJobs.end();
-		for (; intServerJobsBegin != intServerJobsEnd; intServerJobsBegin++)
+		//std::cout << "!!! Found job to run. " << std::endl;
+
+		checkCurrentJobPhaseSetup(&(*intServerJobsBegin));
+		ReadyJobSearch searchForAvailableJobInCurrentPhase = (*intServerJobsBegin)->findNextWaitingJob();		// don't run jobs that are already executing.
+
+		// Check 1: we found a job to run.
+		if (searchForAvailableJobInCurrentPhase.wasJobFound == true)
 		{
-			//std::cout << "!!! Found job to run. " << std::endl;
-
-			checkCurrentJobPhaseSetup(&intServerJobsBegin->second);
-			ReadyJobSearch searchForAvailableJobInCurrentPhase = intServerJobsBegin->second->findNextWaitingJob();		// don't run jobs that are already executing.
-
-			// Check 1: we found a job to run.
-			if (searchForAvailableJobInCurrentPhase.wasJobFound == true) 
+			// Check 2: have the current target job do pre-checks to ensure it will run;
+			// the call to isCurrentJobRunnable() will call the getCurrentVerdict() virtual function of the job,
+			// to determine if that job should run, and additionally set its workload if needed. If the job can run, 
+			// we will proceed. In addition to this, the return value of this function will only be true if the designated thread exists.
+			if ((*intServerJobsBegin)->isCurrentJobRunnable(&designations) == true)
 			{
-				// Check 2: have the current target job do pre-checks to ensure it will run;
-				// the call to isCurrentJobRunnable() will call the getCurrentVerdict() virtual function of the job,
-				// to determine if that job should run, and additionally set its workload if needed. If the job can run, 
-				// we will proceed. In addition to this, the return value of this function will only be true if the designated thread exists.
-				if (intServerJobsBegin->second->isCurrentJobRunnable(&designations) == true)		
-				{
-					float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
+				float calculatedWorkload = (*searchForAvailableJobInCurrentPhase.currentJobPtr)->estimatedWorkLoad;		// ..grab it (for readability purposes)
 
-					// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
+				// std::cout << "---> Acquired estimated workload is: " << calculatedWorkload << std::endl;
 
-					//AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
-					AcquiredServerThread acquiredThread = designations.fetchDesignatedThread(intServerJobsBegin->second->fetchThreadDesignation());							// get the acquired thread data
-					designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
+				//AcquiredServerThread acquiredThread = designations.getFirstAvailableThread();							// get the acquired thread data
+				AcquiredServerThread acquiredThread = designations.fetchDesignatedThread((*intServerJobsBegin)->fetchThreadDesignation());							// get the acquired thread data
+				designations.incrementWorkload(acquiredThread.threadID, calculatedWorkload);							// increment the workload for the monitor that's wrapped around the thread we are about to submit to
 
-					(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
-					(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);		// finally, run the job; and set 
-																													// the ServerPhasedJob's status to ServerJobState::RUNNING
-				}
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->appendMatchedThreadAndWorkLoadToMessage(acquiredThread.threadID);		// append the monitor ID, and the job's current workload to the message.
+				(*searchForAvailableJobInCurrentPhase.currentJobPtr)->runJob(acquiredThread.threadPtr);		// finally, run the job; and set 
+																												// the ServerPhasedJob's status to ServerJobState::RUNNING
 			}
 		}
 	}
+	
+	
 }
 
 void ServerJobManager::removeCompletedPhasedJobs()
 {
 	intJobsContainer.cleanupJobsInPhasedJobs();
 	intJobsContainer.removeCompletedPhasedJobs();
+
+	// SPJ-F2
+	// SPJ-F3
 }
 
 void ServerJobManager::checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr)

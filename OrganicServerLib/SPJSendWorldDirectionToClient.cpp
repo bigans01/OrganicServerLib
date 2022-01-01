@@ -7,7 +7,17 @@ void SPJSendWorldDirectionToClient::interpretMessage(Message in_message)
 
 	Message currentMessage = in_message;
 	currentMessage.open();
+
+	//currentMessage.readInt();
+
+	
+	
+	// SPJ-F7 (skip 2 ints, because first 2 ints are for the SPJ's location)
 	currentMessage.readInt();
+	currentMessage.readInt();
+	
+	
+
 	int phaseID = currentMessage.readInt();
 	int jobID = currentMessage.readInt();
 
@@ -42,7 +52,14 @@ void SPJSendWorldDirectionToClient::initializeCurrentPhase()
 		int currentJobMapKey = 0;
 		Message completionMessage;
 		completionMessage.messageType = MessageType::SERVER_JOB_EVENT_UPDATE_INT;	// signal that this message will come back to a container of int'd values
-		completionMessage.insertInt(parentContainerIntKey);
+
+		//completionMessage.insertInt(parentContainerIntKey);
+
+		
+		// SPJ-F8 (insert the spj's layer, and layer-unique ID)
+		completionMessage.insertInt(spjLayerID);
+		completionMessage.insertInt(spjLayerSmartID);
+		
 		completionMessage.insertInt(currentPhaseIndex);								// insert the phase that this job is in
 		completionMessage.insertInt(currentJobMapKey);								// insert the key value of the job, as it exists in jobMap
 

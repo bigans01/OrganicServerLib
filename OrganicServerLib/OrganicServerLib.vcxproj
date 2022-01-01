@@ -204,6 +204,7 @@
     <ClInclude Include="ServerJobUpdateQueue.h" />
     <ClInclude Include="ServerMessageInterpreter.h" />
     <ClInclude Include="ServerPhasedJobBase.h" />
+    <ClInclude Include="ServerPhasedJobHierarchy.h" />
     <ClInclude Include="ServerThreadDesignation.h" />
     <ClInclude Include="ServerThreadDesignationMap.h" />
     <ClInclude Include="ServerThreadWorkloadMonitor.h" />

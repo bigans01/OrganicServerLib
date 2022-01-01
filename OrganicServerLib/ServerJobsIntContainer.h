@@ -23,7 +23,7 @@ class ServerJobsIntContainer
 			std::cout << "!! Insert job into int container, at index: " << currentIndex << std::endl;
 			serverJobs[currentIndex] = *in_jobRef;
 			serverJobs[currentIndex]->initializeBaseClass(server, in_initialMessage.messageLocality, containerType);
-			serverJobs[currentIndex]->insertParentContainerIntKey(currentIndex);
+			//serverJobs[currentIndex]->insertParentContainerIntKey(currentIndex);
 			serverJobs[currentIndex]->initialize();
 			currentIndex++;
 		}
