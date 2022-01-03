@@ -22,7 +22,7 @@ void SPJRunSingleMountTest::interpretMessage(Message in_message)
 	phaseMap[phaseID]->currentJobsCompleted = 1;		// should just be 1.
 }
 
-void SPJRunSingleMountTest::initialize()
+void SPJRunSingleMountTest::initializeAndSetOptionalSPJMetadata(Message in_message)
 {
 	requiredThreadDesignation = "TERRAIN";	// must be run on the server's TERRAIN thread.
 

@@ -19,6 +19,7 @@
 #include "ServerJobBlockingFlagsSet.h"
 #include "ReadyJobSearch.h"
 #include "ServerThreadWorkloadUpdate.h"
+#include "OSTerrainFormation.h"
 
 
 // Job life cycle:
@@ -47,7 +48,7 @@ class ServerJobManager
 		ServerJobMessageQueue jobRequestQueue;
 
 		// server job map
-		ServerPhasedJobHierarchy intJobsContainer;
+		ServerPhasedJobHierarchy spjHierarchy;
 		ServerJobBlockingFlagsSet jobBlockingFlags;
 
 		// STEP 3: job update containers (each one should have built in mutex for lock_guarding); 

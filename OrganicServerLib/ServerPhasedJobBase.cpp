@@ -4,14 +4,9 @@
 
 void ServerPhasedJobBase::initializeBaseClass(OSServer* in_serverPtr, MessageLocality in_locality, ServerJobContainerType in_parentContainerType)
 {
-	std::cout << "##------ Begin base class initialization... " << std::endl;
 	server = in_serverPtr;
-	std::cout << "## -> set server OK. " << std::endl;
 	locality = in_locality;
-	std::cout << "## -> set locality OK. " << std::endl;
 	parentContainerType = in_parentContainerType;
-	std::cout << "## -> set type OK. " << std::endl;
-	std::cout << "##------ Finished base class initialization... " << std::endl;
 }
 
 /*

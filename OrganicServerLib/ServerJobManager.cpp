@@ -2,10 +2,11 @@
 #include "ServerJobManager.h"
 #include "OSServer.h"
 
+
 void ServerJobManager::initialize(OSServer* in_serverPtr)
 {
 	server = in_serverPtr;
-	intJobsContainer.server = server;
+	spjHierarchy.setServerPtr(server);
 	designations.initialize(&server->OSCManager);
 	designations.buildInitialUndesignatedPool();
 	designations.designateCommandLineThread(0);							// thread 0 from the pool should be the command line thread.
@@ -32,8 +33,13 @@ void ServerJobManager::insertJobRequestMessage(Message in_message)
 
 void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
 {
+	// Remember, the data for the input message of the call to the function needs to contain:
+	// 
+	// --an int for the OSTerrainFormation
+	// --any additional meta data for that formation, that should be passed into the SPJ.
+
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
-	intJobsContainer.insertJob(1, &job, std::move(in_message));	// SPJ-F1
+	spjHierarchy.insertJob(1, &job, std::move(in_message));	
 }
 
 void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
@@ -43,7 +49,7 @@ void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
 	Message directionMessage = in_message;
 	job->insertStringedMessage("direction", directionMessage);
 
-	intJobsContainer.insertJob(2, &job, std::move(in_message));	// SPJ-F1
+	spjHierarchy.insertJob(2, &job, std::move(in_message));	
 	std::cout << ">> Finished inserting set direction job..." << std::endl;
 }
 
@@ -64,10 +70,10 @@ void ServerJobManager::checkForUpdateMessages()
 			// Allowed values are:
 			//	--MessageType::SERVER_JOB_EVENT_UPDATE_INT 
 
-			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :		// if the server job is of this message type, it must be sent to jobs in the intJobsContainer.
+			case MessageType::SERVER_JOB_EVENT_UPDATE_INT :		// if the server job is of this message type, it must be sent to jobs in the spjHierarchy.
 			{
 				int parentJobID = currentMessageRef->readInt();
-				intJobsContainer.handleUpdateMessage(std::move(*currentMessageRef));	// SPJ-F4
+				spjHierarchy.handleUpdateMessage(std::move(*currentMessageRef));
 				break;
 			}
 		}
@@ -158,13 +164,12 @@ void ServerJobManager::runJobScan()
 	This system allows us to only have to worry about the level of priority for each job type, and ensure that the order of checks and locks follows an
 	appropriate hierarchy.
 
-	Remember, as of 12/16/2021, the intJobsContainer is still very simple -- it's an std::map (int) of ServerJobs to run; so, one
+	Remember, as of 12/16/2021, the spjHierarchy is still very simple -- it's an std::map (int) of ServerJobs to run; so, one
 	int, one job. This should be reworked early next year (January)
 	
 	*/
 
-	// SPJ-F5 (OK, it seems...)
-	auto jobList = intJobsContainer.produceRunnableJobs();
+	auto jobList = spjHierarchy.produceRunnableJobs();
 	auto intServerJobsBegin = jobList.begin();
 	auto intServerJobsEnd = jobList.end();
 	for (; intServerJobsBegin != intServerJobsEnd; intServerJobsBegin++)
@@ -203,11 +208,8 @@ void ServerJobManager::runJobScan()
 
 void ServerJobManager::removeCompletedPhasedJobs()
 {
-	intJobsContainer.cleanupJobsInPhasedJobs();
-	intJobsContainer.removeCompletedPhasedJobs();
-
-	// SPJ-F2
-	// SPJ-F3
+	spjHierarchy.cleanupJobsInPhasedJobs();
+	spjHierarchy.removeCompletedPhasedJobs();
 }
 
 void ServerJobManager::checkCurrentJobPhaseSetup(std::shared_ptr<ServerPhasedJobBase>* in_phasePtr)
@@ -229,13 +231,32 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 	//
 
 	// message should have already been opened before (test of std::move)
+	// 
+	// First string SHOULD be unique name of the plan, or message is bad.
+	// First int SHOULD be the terrain formation type, or message is bad.
+
 	std::cout << "SERVER: JobManager found contour plan request. " << std::endl;
 	std::string planName = in_message.readString();											// remember, every read increments the string.
+	int requestedTerrainFormation = in_message.readInt();
+
+	// Can create a new message that is "clipped" of the planName; the remainder of message will still need the formation type and any 
+	// particular data related to that formation type. For the time being, as of 1/3/2022, the call for Mountains isn't using any specific data to that type,
+	// as that logic hasn't been implemented yet; the "logic" being the metadata specific to the Mountain, that the client (OrganicCoreLib) would have to 
+	// insert into the message (see the function, CoreMessageInterpreter::sendMessageRequestContourPlanRun in OrganicCoreLib)
+
 	bool wasContouredPlanFound = server->planStateContainer.checkIfStateExistsForPlan(planName);	// check if the plan has a state; if it does, we won't run this plan (because of the rule: a single contour plan may only run once.)
 	if (wasContouredPlanFound == false)																// it wasn't found as having a state, lets run it.
 	{
-		insertPhasedJobRunSingleMountTest(std::move(in_message));									// move the message into the job.	
-		server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
+		switch (requestedTerrainFormation)
+		{
+			// Mountains
+			case int(OSTerrainFormation::MOUNTAIN):	// I have no idea why I need to cast to int for this, but not MessageType?
+			{
+				insertPhasedJobRunSingleMountTest(std::move(in_message));									// move the message into the job.	
+				server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
+				break;
+			}
+		}
 	}
 	else if (wasContouredPlanFound == true)															// drop the job request.
 	{

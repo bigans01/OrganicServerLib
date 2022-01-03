@@ -24,7 +24,7 @@ class ServerJobsIntContainer
 			serverJobs[currentIndex] = *in_jobRef;
 			serverJobs[currentIndex]->initializeBaseClass(server, in_initialMessage.messageLocality, containerType);
 			//serverJobs[currentIndex]->insertParentContainerIntKey(currentIndex);
-			serverJobs[currentIndex]->initialize();
+			//serverJobs[currentIndex]->initialize();
 			currentIndex++;
 		}
 

@@ -25,7 +25,8 @@ class ServerPhasedJobBase
 																	//	-insert new jobs into an existing phase for a run, therefore extending the life of the phase by one server tick per added job
 																	//  -check the OrganicServer to see if it is time for an indefinitely-running job to quit (for instance, sounds or temporary world events)
 
-		virtual void initialize() = 0;								// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
+		virtual void initializeAndSetOptionalSPJMetadata(Message in_message) = 0;								// initialize the SPJ, and be sure to set the value of requiredThreadDesignation for that class;
+																	// additionally, the SPJ can optionally set metadata from a Message that is passed in.
 		virtual void initializeCurrentPhase() = 0;					// would be called after initialize()
 		int currentPhaseIndex = 0;									
 

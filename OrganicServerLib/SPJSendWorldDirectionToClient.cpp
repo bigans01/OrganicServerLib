@@ -26,7 +26,7 @@ void SPJSendWorldDirectionToClient::interpretMessage(Message in_message)
 	phaseMap[phaseID]->currentJobsCompleted = 1;		// should just be 1.
 }
 
-void SPJSendWorldDirectionToClient::initialize()	// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
+void SPJSendWorldDirectionToClient::initializeAndSetOptionalSPJMetadata(Message in_message)	// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
 {
 	requiredThreadDesignation = "ANY";	// can be run on ANY thread.
 
