@@ -105,9 +105,15 @@ private:
 
 	void constructBlueprintFromFile(std::string in_worldName, EnclaveKeyDef::EnclaveKey in_blueprintKey);
 	void checkClientMessages();
-	void addDerivedContourPlan(string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
-	void executeDerivedContourPlan(string in_string);
-	void executeDerivedContourPlanNoInput(string in_string);	// run the plan without waiting for input afterwards.
+	void addDerivedContourPlan(std::string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
+	void executeDerivedContourPlan(std::string in_string);
+
+	// Contour plan run functions
+	void executeDerivedContourPlanNoInput(std::string in_string);	// run the plan without waiting for input afterwards.
+	void runContourPlanWorldTracing(std::string in_string);
+	void buildContourPlanAffectedBlueprints(std::string in_string);
+	void runContourPlanFracturingAndMassDriving(std::string in_string);
+
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);
 	void transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key);
@@ -124,7 +130,7 @@ private:
 	OSPDir getFormationDirections(OSTerrainFormation in_terrainFormation);
 
 	// test run jobs for ServerJobManager
-	void constructSingleMountTestNoInput();
+	void constructSingleMountTestNoInput(Message in_metadataMessage);
 	void constructBigMountTestNoInput();
 	void jobSendUpdateMessageToJobManager(Message in_message);
 	void jobSendOutgoingMessageToInterpreter(Message in_message);

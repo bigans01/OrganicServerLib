@@ -5,8 +5,7 @@
 void SJRunSingleMountTest::runJob(OrganicThread* in_threadToRunOn) 
 {
 	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.
-	in_threadToRunOn->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server);									// main work
-	//in_threadToRunOn->submit(&ServerJobProxy::callServerJobRunBigMountTest, server);									// main work
+	in_threadToRunOn->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server, startMessage);	// main work; the call needs an intance of OSServer + plan meta data.							// main work
 	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendUpdateMessageToJobManager, server, completionMessage);	// required: job completion message
 }
 

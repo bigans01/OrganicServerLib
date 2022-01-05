@@ -683,24 +683,37 @@ void OSServer::constructMultiMountTestWithElevator()
 	//blockReformTarget->second.eraseBlock(&serverReadWrite, blockKey);
 }
 
-void OSServer::constructSingleMountTestNoInput()
+void OSServer::constructSingleMountTestNoInput(Message in_metadataMessage)
 {
-	ECBPolyPoint summit1;
-	int numberOfLayers = 35;
+	in_metadataMessage.open();
+	std::string planName = in_metadataMessage.readString();
+	int mountainLayers = in_metadataMessage.readInt();
+	float mountainLocationX = in_metadataMessage.readFloat();
+	float mountainLocationY = in_metadataMessage.readFloat();
+	float mountainLocationZ = in_metadataMessage.readFloat();
+	float distBetweenLayers = in_metadataMessage.readFloat();
+	float startRadius = in_metadataMessage.readFloat();
+	float expansionValue = in_metadataMessage.readFloat();
 
-	// first mountain
-	summit1.x = 48;
-	summit1.y = 16;
-	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
+	// Part 1: Build the plan, set it up.
+	ECBPolyPoint summit1(mountainLocationX, mountainLocationY, mountainLocationZ);
+	int numberOfLayers = mountainLayers;
+	addDerivedContourPlan(planName, OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, distBetweenLayers, startRadius, expansionValue);	// create the points in all contour lines
+
+	ContourBase* summit1Ref = getDerivedContourPlan(planName);
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
 	summit1Ref->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
 
-	executeDerivedContourPlanNoInput("summit1");
+	runContourPlanWorldTracing(planName);				// Part 2: trace contoured triangles. This should only be called once there are no terrain-modifying jobs running; 
+														// As a result, this job must wait for all those to finish, which should be done with 
+														// the HALT_FUTURE_COLLECTION_MODIFICATIONS blocking flag being set (this will prevent any future block/modification jobs
+														// from running until this flag is no longer set, as long as those jobs check for that flag NOT being set as a pre-requisite to running)
+
+	buildContourPlanAffectedBlueprints(planName);		// Part 3: build affected blueprints.
+	runContourPlanFracturingAndMassDriving(planName);	// Part 4: run fracturing and mass driving.
 }
 
 void OSServer::constructBigMountTestNoInput()
@@ -838,7 +851,7 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cin >> someVal;
 }
 
-void OSServer::executeDerivedContourPlanNoInput(string in_string)
+void OSServer::executeDerivedContourPlanNoInput(std::string in_string)
 {
 	OSWinAdapter::clearWorldFolder(currentWorld);
 
@@ -878,6 +891,58 @@ void OSServer::executeDerivedContourPlanNoInput(string in_string)
 
 	std::cout << "SERVER: completed contour plan run." << std::endl;
 }
+
+void OSServer::runContourPlanWorldTracing(std::string in_string)
+{
+	OSWinAdapter::clearWorldFolder(currentWorld);
+
+	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
+	ContourBase* planPtr = newContourMap[in_string].get();
+
+	auto traceStart = std::chrono::high_resolution_clock::now();
+
+	// 1. ) Execute all processable OSContouredTriangles in the plan.
+	auto processableList = planPtr->getProcessableContouredTriangles();
+	auto processableListBegin = processableList.begin();
+	auto processableListEnd = processableList.end();
+	for (; processableListBegin != processableListEnd; processableListBegin++)
+	{
+		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
+	}
+
+	auto traceEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> traceElapsed = traceEnd - traceStart;
+
+	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
+
+	std::cout << "######### Plan execution complete; " << std::endl;
+}
+
+void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
+{
+
+}
+
+void OSServer::runContourPlanFracturingAndMassDriving(std::string in_string)
+{
+	ContourBase* planPtr = newContourMap[in_string].get();
+
+	// 2.) perform fracturing for affected blueprints.
+	planPtr->runPolyFracturerForAffectedBlueprints(&client, &serverBlueprints);
+
+	// 3.) run the mass driver for the plan. (if the plan allows for it)
+	EnclaveFractureResultsMap tempMap;
+	planPtr->runMassDrivers(&client, &serverBlueprints, &tempMap);
+
+	// 4.) update the affected blueprints (aka, update the OrganicRawEnclaves), after all work has been done
+	//planPtr->updateAffectedBlueprints(&client, &blueprintMap, &tempMap);
+
+	// 5.) write updated blueprints to disk
+	planPtr->writeAffectedBlueprintsToDisk(&serverBlueprints, currentWorld);
+
+	std::cout << "SERVER: completed contour plan run." << std::endl;
+}
+
 
 void OSServer::transferBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 {

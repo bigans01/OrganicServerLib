@@ -25,6 +25,9 @@ void SPJRunSingleMountTest::interpretMessage(Message in_message)
 void SPJRunSingleMountTest::initializeAndSetOptionalSPJMetadata(Message in_message)
 {
 	requiredThreadDesignation = "TERRAIN";	// must be run on the server's TERRAIN thread.
+	mountainMetadataMessage = in_message;	// Need to create a new message, for the call to OSServer::constructSingleMountTestNoInput; 
+											// extract the metadata from the message.  This will be sent to the SJRunSingleMountTest job, via a call to setStartMessage.
+
 
 	if (locality == MessageLocality::LOCAL)
 	{
@@ -64,6 +67,7 @@ void SPJRunSingleMountTest::initializeCurrentPhase()
 		std::shared_ptr<ServerJobBase> job(new (SJRunSingleMountTest));
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey] = job;													// instantiation.
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setServerPtr(server);									// Set the required OSServer pointer in the job.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setStartMessage(std::move(mountainMetadataMessage));
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setCompletionMessage(std::move(completionMessage));		// Move the built completion message into the job.
 		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
 	}

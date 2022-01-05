@@ -2,10 +2,9 @@
 #include "ServerJobProxy.h"
 #include "OSServer.h"
 
-void ServerJobProxy::callServerJobRunSingleMountTest(OSServer* in_serverRef)
+void ServerJobProxy::callServerJobRunSingleMountTest(OSServer* in_serverRef, Message in_mountainMetaData)
 {
-	//in_serverRef->constructSingleMountTest();
-	in_serverRef->constructSingleMountTestNoInput();
+	in_serverRef->constructSingleMountTestNoInput(in_mountainMetaData);
 }
 
 void ServerJobProxy::callServerJobRunBigMountTest(OSServer* in_serverRef)

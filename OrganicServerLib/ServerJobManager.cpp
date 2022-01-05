@@ -239,10 +239,12 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 	std::string planName = in_message.readString();											// remember, every read increments the string.
 	int requestedTerrainFormation = in_message.readInt();
 
-	// Can create a new message that is "clipped" of the planName; the remainder of message will still need the formation type and any 
-	// particular data related to that formation type. For the time being, as of 1/3/2022, the call for Mountains isn't using any specific data to that type,
+	// For the time being, as of 1/3/2022, the call for Mountains isn't using any specific data to that type,
 	// as that logic hasn't been implemented yet; the "logic" being the metadata specific to the Mountain, that the client (OrganicCoreLib) would have to 
 	// insert into the message (see the function, CoreMessageInterpreter::sendMessageRequestContourPlanRun in OrganicCoreLib)
+	Message planSpecificData = in_message;
+	planSpecificData.removeIntsFromFrontAndResetIter(1);	// remove the OSTerrainFormation enum from the message, prior to opening it.
+	planSpecificData.open();	// set all the iters.
 
 	bool wasContouredPlanFound = server->planStateContainer.checkIfStateExistsForPlan(planName);	// check if the plan has a state; if it does, we won't run this plan (because of the rule: a single contour plan may only run once.)
 	if (wasContouredPlanFound == false)																// it wasn't found as having a state, lets run it.
@@ -252,7 +254,7 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 			// Mountains
 			case int(OSTerrainFormation::MOUNTAIN):	// I have no idea why I need to cast to int for this, but not MessageType?
 			{
-				insertPhasedJobRunSingleMountTest(std::move(in_message));									// move the message into the job.	
+				insertPhasedJobRunSingleMountTest(std::move(planSpecificData));									// move the message into the job.	
 				server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
 				break;
 			}

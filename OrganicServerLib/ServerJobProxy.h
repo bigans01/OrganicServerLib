@@ -11,7 +11,7 @@ class OSServer;
 class ServerJobProxy
 {
 	public:
-		static void callServerJobRunSingleMountTest(OSServer* in_serverRef);
+		static void callServerJobRunSingleMountTest(OSServer* in_serverRef, Message in_mountainMetaData);
 		static void callServerJobRunBigMountTest(OSServer* in_serverRef);
 		static void callServerJobSendUpdateMessageToJobManager(OSServer* in_serverRef, Message in_message);
 		static void callServerSendOutgoingMessageToMessageInterpreter(OSServer* in_serverRef, Message in_message);

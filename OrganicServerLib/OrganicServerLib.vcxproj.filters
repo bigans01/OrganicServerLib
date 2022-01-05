@@ -31,6 +31,30 @@
     <Filter Include="Source Files\Jobs\SJ">
       <UniqueIdentifier>{3c034cd5-411c-4f97-977d-7263a6ffe66a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Jobs\SPJ\ContouredPlans">
+      <UniqueIdentifier>{a23bb4f1-4c5c-4db8-a45b-93a2276fbe0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\SPJ\ContouredPlans\Mountain">
+      <UniqueIdentifier>{116e5774-6b5a-46b2-b2b8-0f2f881758d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\SPJ\WorldDirection">
+      <UniqueIdentifier>{c7e8bf62-f419-4837-885c-2461856ca4f7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SPJ\ContouredPlans">
+      <UniqueIdentifier>{aa4aa0a7-5d32-44f1-a77d-540712dc40cf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SPJ\ContouredPlans\Mountain">
+      <UniqueIdentifier>{6743437a-32ee-4faf-a43a-bbac81100743}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SPJ\WorldDirection">
+      <UniqueIdentifier>{9e8472ef-32fc-43e1-959b-5bff5e8595e9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\ServerJobManager">
+      <UniqueIdentifier>{11ceb226-86a9-4384-8255-fae0ac264c48}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\ServerJobManager">
+      <UniqueIdentifier>{f244e33b-e734-462f-852b-84b2339b000f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -81,9 +105,6 @@
     <ClInclude Include="ContourBase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ContouredMountain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="BlankContour.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -132,9 +153,6 @@
     <ClInclude Include="ServerMessageInterpreter.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerJobManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ServerThreadDesignation.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -147,16 +165,7 @@
     <ClInclude Include="ServerJobUpdateInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerJobMessageQueue.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ServerJobProxy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerJobBlockingFlags.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerJobBlockingFlagsSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ContourPlanState.h">
@@ -166,9 +175,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ServerJobContainerType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerJobPhase.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ServerJobState.h">
@@ -186,9 +192,6 @@
     <ClInclude Include="AcquiredServerThread.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerThreadWorkloadUpdate.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OSTriangleMaterial.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,32 +207,53 @@
     <ClInclude Include="ECBPolyReformer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SPJSendWorldDirectionToClient.h">
-      <Filter>Header Files\Jobs\SPJ</Filter>
-    </ClInclude>
-    <ClInclude Include="SPJRunSingleMountTest.h">
-      <Filter>Header Files\Jobs\SPJ</Filter>
-    </ClInclude>
-    <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h">
-      <Filter>Header Files\Jobs\SJ</Filter>
-    </ClInclude>
-    <ClInclude Include="SJBuildAndSendWorldDirection.h">
-      <Filter>Header Files\Jobs\SJ</Filter>
-    </ClInclude>
-    <ClInclude Include="SJRunSingleMountTest.h">
-      <Filter>Header Files\Jobs\SJ</Filter>
-    </ClInclude>
     <ClInclude Include="ServerJobBase.h">
       <Filter>Header Files\Jobs\SJ</Filter>
     </ClInclude>
     <ClInclude Include="ServerPhasedJobBase.h">
       <Filter>Header Files\Jobs\SPJ</Filter>
     </ClInclude>
+    <ClInclude Include="SPJRunSingleMountTest.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJSendWorldDirectionToClient.h">
+      <Filter>Header Files\Jobs\SPJ\WorldDirection</Filter>
+    </ClInclude>
+    <ClInclude Include="SJBuildAndSendWorldDirection.h">
+      <Filter>Header Files\Jobs\SPJ\WorldDirection</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunSingleMountTest.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredMountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
     <ClInclude Include="ServerJobRunVerdict.h">
-      <Filter>Header Files\Jobs</Filter>
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
     <ClInclude Include="ServerPhasedJobHierarchy.h">
-      <Filter>Header Files\Jobs</Filter>
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobMessageQueue.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobBlockingFlagsSet.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobBlockingFlags.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobPhase.h">
+      <Filter>Header Files\Jobs\SPJ</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerThreadWorkloadUpdate.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobManager.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -255,9 +279,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSCommandDirector.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ContouredMountain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="BlankContour.cpp">
@@ -302,16 +323,10 @@
     <ClCompile Include="ServerMessageInterpreter.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ServerJobManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ServerThreadDesignationMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ServerJobProxy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="ServerJobPhase.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="OSTriangleMaterialLookup.cpp">
@@ -323,29 +338,38 @@
     <ClCompile Include="ECBPolyReformer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="SPJRunSingleMountTest.cpp">
-      <Filter>Source Files\Jobs\SPJ</Filter>
-    </ClCompile>
-    <ClCompile Include="SPJSendWorldDirectionToClient.cpp">
-      <Filter>Source Files\Jobs\SPJ</Filter>
-    </ClCompile>
-    <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp">
-      <Filter>Source Files\Jobs\SJ</Filter>
-    </ClCompile>
-    <ClCompile Include="SJBuildAndSendWorldDirection.cpp">
-      <Filter>Source Files\Jobs\SJ</Filter>
-    </ClCompile>
-    <ClCompile Include="SJRunSingleMountTest.cpp">
-      <Filter>Source Files\Jobs\SJ</Filter>
-    </ClCompile>
     <ClCompile Include="ServerJobBase.cpp">
       <Filter>Source Files\Jobs\SJ</Filter>
     </ClCompile>
     <ClCompile Include="ServerPhasedJobBase.cpp">
       <Filter>Source Files\Jobs\SPJ</Filter>
     </ClCompile>
+    <ClCompile Include="ContouredMountain.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunSingleMountTest.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJRunSingleMountTest.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJSendWorldDirectionToClient.cpp">
+      <Filter>Source Files\Jobs\SPJ\WorldDirection</Filter>
+    </ClCompile>
+    <ClCompile Include="SJBuildAndSendWorldDirection.cpp">
+      <Filter>Source Files\Jobs\SPJ\WorldDirection</Filter>
+    </ClCompile>
     <ClCompile Include="ServerPhasedJobHierarchy.cpp">
-      <Filter>Source Files\Jobs</Filter>
+      <Filter>Source Files\Jobs\ServerJobManager</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobPhase.cpp">
+      <Filter>Source Files\Jobs\SPJ</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobManager.cpp">
+      <Filter>Source Files\Jobs\ServerJobManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

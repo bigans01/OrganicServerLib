@@ -14,6 +14,7 @@ class SPJRunSingleMountTest : public ServerPhasedJobBase
 		void initializeAndSetOptionalSPJMetadata(Message in_message);	// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
 		void initializeCurrentPhase();
 	private:
+		Message mountainMetadataMessage;
 };
 
 #endif
