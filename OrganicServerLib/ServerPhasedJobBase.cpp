@@ -71,6 +71,27 @@ void ServerPhasedJobBase::insertNewPhase(std::shared_ptr<ServerJobPhase> in_phas
 	phaseMap[currentMapIndexToUse] = in_phasePtr;
 }
 
+void ServerPhasedJobBase::insertNewPhases(int in_phaseCount)
+{
+	for (int x = 0; x < in_phaseCount; x++)
+	{
+		int currentMapIndexToUse = int(phaseMap.size());	// get the current index to use; for example, if the map is empty, this would be 0.
+		std::shared_ptr<ServerJobPhase> phaseToInsert(new (ServerJobPhase));
+		phaseMap[currentMapIndexToUse] = phaseToInsert;
+	}
+}
+
+Message ServerPhasedJobBase::buildCompletionMessageForSJ(int in_currentPhaseIndex, int in_currentJobMapKey)
+{
+	Message returnMessage;
+	returnMessage.messageType = MessageType::SERVER_JOB_EVENT_UPDATE_INT;
+	returnMessage.insertInt(spjLayerID);
+	returnMessage.insertInt(spjLayerSmartID);
+	returnMessage.insertInt(in_currentPhaseIndex);
+	returnMessage.insertInt(in_currentJobMapKey);
+	return returnMessage;
+}
+
 bool ServerPhasedJobBase::checkIfCurrentPhaseIsInProgress()
 {
 	bool isInProgress = false;

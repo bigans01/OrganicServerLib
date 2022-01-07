@@ -683,7 +683,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	//blockReformTarget->second.eraseBlock(&serverReadWrite, blockKey);
 }
 
-void OSServer::constructSingleMountTestNoInput(Message in_metadataMessage)
+void OSServer::prepCPMountain(Message in_metadataMessage)
 {
 	in_metadataMessage.open();
 	std::string planName = in_metadataMessage.readString();
@@ -695,11 +695,13 @@ void OSServer::constructSingleMountTestNoInput(Message in_metadataMessage)
 	float startRadius = in_metadataMessage.readFloat();
 	float expansionValue = in_metadataMessage.readFloat();
 
-	// Part 1: Build the plan, set it up.
+	// Part 1: Set up the plan, give it's necessary parmaters, etc.
 	ECBPolyPoint summit1(mountainLocationX, mountainLocationY, mountainLocationZ);
 	int numberOfLayers = mountainLayers;
 	addDerivedContourPlan(planName, OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, distBetweenLayers, startRadius, expansionValue);	// create the points in all contour lines
 
+	// Part 2: run point amplification, insert materials, and build the actual triangles. Note that at this point, no actual blueprints are affected;
+	// we are just constructing the triangles of the plan.
 	ContourBase* summit1Ref = getDerivedContourPlan(planName);
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
@@ -939,6 +941,9 @@ void OSServer::runContourPlanFracturingAndMassDriving(std::string in_string)
 
 	// 5.) write updated blueprints to disk
 	planPtr->writeAffectedBlueprintsToDisk(&serverBlueprints, currentWorld);
+
+	// 6.) deactive the blocking flag.
+	serverJobManager.deactivateBlockingFlag(ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN);
 
 	std::cout << "SERVER: completed contour plan run." << std::endl;
 }

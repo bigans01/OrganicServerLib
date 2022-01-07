@@ -1,16 +1,16 @@
 #pragma once
 
-#ifndef SPJRUNSINGLEMOUNTTEST_H
-#define SPJRUNSINGLEMOUNTTEST_H
+#ifndef SPJBuildCPMountain_H
+#define SPJBuildCPMountain_H
 
 #include "ServerPhasedJobBase.h"
-#include "SJRunSingleMountTest.h"
+#include "SJPrepCPMountainRun.h"
 #include "SJRunContourPlanWorldTracing.h"
 #include "SJBuildContourPlanAffectedBlueprints.h"
 #include "SJSendRequestForOGLMRMCBlueprints.h"
 #include "SJRunContourPlanFracturingAndMassDriving.h"
 
-class SPJRunSingleMountTest : public ServerPhasedJobBase
+class SPJBuildCPMountain : public ServerPhasedJobBase
 {
 	public:
 		void interpretMessage(Message in_message);

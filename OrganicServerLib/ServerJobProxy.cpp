@@ -2,9 +2,9 @@
 #include "ServerJobProxy.h"
 #include "OSServer.h"
 
-void ServerJobProxy::callServerJobRunSingleMountTest(OSServer* in_serverRef, Message in_mountainMetaData)
+void ServerJobProxy::callServerJobPrepCPMountain(OSServer* in_serverRef, Message in_mountainMetaData)
 {
-	in_serverRef->constructSingleMountTestNoInput(in_mountainMetaData);
+	in_serverRef->prepCPMountain(in_mountainMetaData);
 }
 
 void ServerJobProxy::callServerRunContourPlanWorldTracing(OSServer* in_serverRef, std::string in_contourPlanName)
@@ -42,4 +42,14 @@ void ServerJobProxy::callServerSendOutgoingMessageToMessageInterpreter(OSServer*
 bool ServerJobProxy::checkIfServerJobBlockingFlagExists(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck)
 {
 	return in_serverRef->serverJobManager.doesFlagExist(in_flagToCheck);
+}
+
+void ServerJobProxy::activateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck)
+{
+	in_serverRef->serverJobManager.activateBlockingFlag(in_flagToCheck);
+}
+
+void ServerJobProxy::deactivateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck)
+{
+	in_serverRef->serverJobManager.deactivateBlockingFlag(in_flagToCheck);
 }

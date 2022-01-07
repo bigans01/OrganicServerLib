@@ -11,7 +11,7 @@ class OSServer;
 class ServerJobProxy
 {
 	public:
-		static void callServerJobRunSingleMountTest(OSServer* in_serverRef, Message in_mountainMetaData);
+		static void callServerJobPrepCPMountain(OSServer* in_serverRef, Message in_mountainMetaData);
 		static void callServerRunContourPlanWorldTracing(OSServer* in_serverRef, std::string in_contourPlanName);
 		static void callServerBuildContourPlanAffectedBlueprints(OSServer* in_serverRef, std::string in_contourPlanName);
 		static void callServerRunContourPlanFracturingAndMassDriving(OSServer* in_serverRef, std::string in_contourPlanName);
@@ -19,6 +19,8 @@ class ServerJobProxy
 		static void callServerJobSendUpdateMessageToJobManager(OSServer* in_serverRef, Message in_message);
 		static void callServerSendOutgoingMessageToMessageInterpreter(OSServer* in_serverRef, Message in_message);
 		static bool checkIfServerJobBlockingFlagExists(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
+		static void activateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
+		static void deactivateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
 };
 
 #endif

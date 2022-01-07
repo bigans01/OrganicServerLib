@@ -130,7 +130,8 @@ private:
 	OSPDir getFormationDirections(OSTerrainFormation in_terrainFormation);
 
 	// test run jobs for ServerJobManager
-	void constructSingleMountTestNoInput(Message in_metadataMessage);
+	void prepCPMountain(Message in_metadataMessage);	// preps the triangles and parameters used for a ContourPlan that builds a MOUNTAIN;
+														// used when the client clicks button1 to run a contour plan. (Last update: 1/7/2022)
 	void constructBigMountTestNoInput();
 	void jobSendUpdateMessageToJobManager(Message in_message);
 	void jobSendOutgoingMessageToInterpreter(Message in_message);

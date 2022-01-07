@@ -42,27 +42,19 @@ void SPJSendWorldDirectionToClient::initializeAndSetOptionalSPJMetadata(Message 
 }
 void SPJSendWorldDirectionToClient::initializeCurrentPhase()
 {
-	//std::cout << "### Initialize current phase for setting world direction (1)... " << std::endl;
 	currentPhaseIndex = currentPhaseIter->first;
 	if (currentPhaseIndex == 0)
 	{
-		// std::cout << "### Initialize current phase for setting world direction (2)... " << std::endl;
+		/*
 
-		// Required: completion message must be built.
+		Summary: this SJ is designed to update the corresponding client with the appropriate world direction -- which is used by OpenGL to point the camera
+
+		*/
+
+		std::cout << "### Initialize current phase for setting world direction (2)... " << std::endl;
 		int currentJobMapKey = 0;
-		Message completionMessage;
-		completionMessage.messageType = MessageType::SERVER_JOB_EVENT_UPDATE_INT;	// signal that this message will come back to a container of int'd values
-
-		//completionMessage.insertInt(parentContainerIntKey);
-
+		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);	// Required: completion message must be built.
 		
-		// SPJ-F8 (insert the spj's layer, and layer-unique ID)
-		completionMessage.insertInt(spjLayerID);
-		completionMessage.insertInt(spjLayerSmartID);
-		
-		completionMessage.insertInt(currentPhaseIndex);								// insert the phase that this job is in
-		completionMessage.insertInt(currentJobMapKey);								// insert the key value of the job, as it exists in jobMap
-
 		std::shared_ptr<ServerJobBase> job(new (SJBuildAndSendWorldDirection));
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey] = job;													// instantiation.
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setServerPtr(server);									// Set the required OSServer pointer in the job.

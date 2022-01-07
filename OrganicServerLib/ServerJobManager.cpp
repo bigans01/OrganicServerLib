@@ -38,7 +38,7 @@ void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		//
 	// --an int for the OSTerrainFormation
 	// --any additional meta data for that formation, that should be passed into the SPJ.
 
-	std::shared_ptr<ServerPhasedJobBase> job(new (SPJRunSingleMountTest));
+	std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPMountain));
 	spjHierarchy.insertJob(1, &job, std::move(in_message));	
 }
 
@@ -109,7 +109,7 @@ void ServerJobManager::checkForMessages()
 				{
 					server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);
 					OrganicThread* targetThread = designations.getFirstAvailableThread();
-					targetThread->submit(&ServerJobProxy::callServerJobRunSingleMountTest, server);
+					targetThread->submit(&ServerJobProxy::callServerJobPrepCPMountain, server);
 				}
 				else if (wasContouredPlanFound == true)															// drop the job request.
 				{
@@ -279,4 +279,14 @@ void ServerJobManager::handleSetDirectionRequest(Message in_message)
 bool ServerJobManager::doesFlagExist(ServerJobBlockingFlags in_flagToCheck)
 {
 	return jobBlockingFlags.checkIfFlagExists(in_flagToCheck);
+}
+
+void ServerJobManager::activateBlockingFlag(ServerJobBlockingFlags in_flagToActivate)
+{
+	jobBlockingFlags.insertFlag(in_flagToActivate);
+}
+
+void ServerJobManager::deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate)
+{
+	jobBlockingFlags.eraseFlag(in_flagToDeactivate);
 }

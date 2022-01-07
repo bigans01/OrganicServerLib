@@ -7,7 +7,7 @@
 #include <map>
 #include <mutex>
 #include "ServerPhasedJobBase.h"
-#include "SPJRunSingleMountTest.h"
+#include "SPJBuildCPMountain.h"
 #include "SPJSendWorldDirectionToClient.h"
 
 #include "ServerJobsIntContainer.h"
@@ -68,8 +68,10 @@ class ServerJobManager
 		void handleContourPlanRequest(Message in_message);
 		void handleSetDirectionRequest(Message in_message);
 
-		// blocking flag checks
+		// blocking flag operations
 		bool doesFlagExist(ServerJobBlockingFlags in_flagToCheck);	// checks if exactly one flag exists.
+		void activateBlockingFlag(ServerJobBlockingFlags in_flagToActivate);
+		void deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate);
 
 		// job insertion calls
 		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.

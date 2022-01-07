@@ -171,9 +171,6 @@
     <ClInclude Include="ServerJobUpdateInt.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ServerJobProxy.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ContourPlanState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -181,12 +178,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ServerJobContainerType.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerJobState.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ServerJobUpdateQueue.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ReadyJobSearch.h">
@@ -219,17 +210,11 @@
     <ClInclude Include="ServerPhasedJobBase.h">
       <Filter>Header Files\Jobs\SPJ</Filter>
     </ClInclude>
-    <ClInclude Include="SPJRunSingleMountTest.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClInclude>
     <ClInclude Include="SPJSendWorldDirectionToClient.h">
       <Filter>Header Files\Jobs\SPJ\WorldDirection</Filter>
     </ClInclude>
     <ClInclude Include="SJBuildAndSendWorldDirection.h">
       <Filter>Header Files\Jobs\SPJ\WorldDirection</Filter>
-    </ClInclude>
-    <ClInclude Include="SJRunSingleMountTest.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClInclude>
     <ClInclude Include="ContouredMountain.h">
       <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
@@ -269,6 +254,21 @@
     </ClInclude>
     <ClInclude Include="SJRunContourPlanFracturingAndMassDriving.h">
       <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJPrepCPMountainRun.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJBuildCPMountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobProxy.h">
+      <Filter>Header Files\Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobState.h">
+      <Filter>Header Files\Jobs</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobUpdateQueue.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -341,9 +341,6 @@
     <ClCompile Include="ServerThreadDesignationMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ServerJobProxy.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="OSTriangleMaterialLookup.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -360,12 +357,6 @@
       <Filter>Source Files\Jobs\SPJ</Filter>
     </ClCompile>
     <ClCompile Include="ContouredMountain.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
-    <ClCompile Include="SJRunSingleMountTest.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
-    <ClCompile Include="SPJRunSingleMountTest.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
     <ClCompile Include="SPJSendWorldDirectionToClient.cpp">
@@ -394,6 +385,15 @@
     </ClCompile>
     <ClCompile Include="SJRunContourPlanFracturingAndMassDriving.cpp">
       <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJPrepCPMountainRun.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJBuildCPMountain.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobProxy.cpp">
+      <Filter>Source Files\Jobs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -49,7 +49,9 @@ class ServerPhasedJobBase
 		JobPhaseState getCurrentPhaseState();									// should be called every time we are checking the job, before anything else
 		void removeCompletedPhaseSubJobs();
 		void insertNewPhase(std::shared_ptr<ServerJobPhase> in_phasePtr);
+		void insertNewPhases(int in_phaseCount);
 		bool checkIfCurrentPhaseIsInProgress();
+		Message buildCompletionMessageForSJ(int in_currentPhaseIndex, int in_currentJobMapKey);
 
 		ReadyJobSearch findNextWaitingJob();
 		bool isCurrentJobRunnable(ServerThreadDesignationMap* in_serverThreadDesignationMapRef);			// returns true if verdict is good (it can run)
