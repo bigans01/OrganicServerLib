@@ -7,6 +7,21 @@ void ServerJobProxy::callServerJobRunSingleMountTest(OSServer* in_serverRef, Mes
 	in_serverRef->constructSingleMountTestNoInput(in_mountainMetaData);
 }
 
+void ServerJobProxy::callServerRunContourPlanWorldTracing(OSServer* in_serverRef, std::string in_contourPlanName)
+{
+	in_serverRef->runContourPlanWorldTracing(in_contourPlanName);
+}
+
+void ServerJobProxy::callServerBuildContourPlanAffectedBlueprints(OSServer* in_serverRef, std::string in_contourPlanName)
+{
+	in_serverRef->buildContourPlanAffectedBlueprints(in_contourPlanName);
+}
+
+void ServerJobProxy::callServerRunContourPlanFracturingAndMassDriving(OSServer* in_serverRef, std::string in_contourPlanName)
+{
+	in_serverRef->runContourPlanFracturingAndMassDriving(in_contourPlanName);
+}
+
 void ServerJobProxy::callServerJobRunBigMountTest(OSServer* in_serverRef)
 {
 	in_serverRef->constructBigMountTestNoInput();

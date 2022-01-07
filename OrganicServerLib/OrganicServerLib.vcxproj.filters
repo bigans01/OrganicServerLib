@@ -55,6 +55,12 @@
     <Filter Include="Source Files\Jobs\ServerJobManager">
       <UniqueIdentifier>{f244e33b-e734-462f-852b-84b2339b000f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Jobs\SJ\GenericSJs">
+      <UniqueIdentifier>{d3a8a430-8409-4a88-afaa-c7e4888114b2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SJ\GenericSJs">
+      <UniqueIdentifier>{0c2e9c44-42e6-44e1-9b9d-7ec3160f1057}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -225,9 +231,6 @@
     <ClInclude Include="SJRunSingleMountTest.h">
       <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClInclude>
-    <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClInclude>
     <ClInclude Include="ContouredMountain.h">
       <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClInclude>
@@ -254,6 +257,18 @@
     </ClInclude>
     <ClInclude Include="ServerJobManager.h">
       <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunContourPlanWorldTracing.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJBuildContourPlanAffectedBlueprints.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunContourPlanFracturingAndMassDriving.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -347,9 +362,6 @@
     <ClCompile Include="ContouredMountain.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
-    <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
     <ClCompile Include="SJRunSingleMountTest.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
@@ -370,6 +382,18 @@
     </ClCompile>
     <ClCompile Include="ServerJobManager.cpp">
       <Filter>Source Files\Jobs\ServerJobManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunContourPlanWorldTracing.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJBuildContourPlanAffectedBlueprints.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunContourPlanFracturingAndMassDriving.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

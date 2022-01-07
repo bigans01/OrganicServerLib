@@ -707,13 +707,13 @@ void OSServer::constructSingleMountTestNoInput(Message in_metadataMessage)
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
 
-	runContourPlanWorldTracing(planName);				// Part 2: trace contoured triangles. This should only be called once there are no terrain-modifying jobs running; 
+	//runContourPlanWorldTracing(planName);				// Part 2: trace contoured triangles. This should only be called once there are no terrain-modifying jobs running; 
 														// As a result, this job must wait for all those to finish, which should be done with 
 														// the HALT_FUTURE_COLLECTION_MODIFICATIONS blocking flag being set (this will prevent any future block/modification jobs
 														// from running until this flag is no longer set, as long as those jobs check for that flag NOT being set as a pre-requisite to running)
 
-	buildContourPlanAffectedBlueprints(planName);		// Part 3: build affected blueprints.
-	runContourPlanFracturingAndMassDriving(planName);	// Part 4: run fracturing and mass driving.
+	//buildContourPlanAffectedBlueprints(planName);		// Part 3: build affected blueprints.
+	//runContourPlanFracturingAndMassDriving(planName);	// Part 4: run fracturing and mass driving.
 }
 
 void OSServer::constructBigMountTestNoInput()

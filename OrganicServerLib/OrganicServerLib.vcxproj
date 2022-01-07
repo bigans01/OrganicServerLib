@@ -209,6 +209,9 @@
     <ClInclude Include="ServerThreadWorkloadMonitor.h" />
     <ClInclude Include="ServerThreadWorkloadUpdate.h" />
     <ClInclude Include="SJBuildAndSendWorldDirection.h" />
+    <ClInclude Include="SJBuildContourPlanAffectedBlueprints.h" />
+    <ClInclude Include="SJRunContourPlanFracturingAndMassDriving.h" />
+    <ClInclude Include="SJRunContourPlanWorldTracing.h" />
     <ClInclude Include="SJRunSingleMountTest.h" />
     <ClInclude Include="SJSendRequestForOGLMRMCBlueprints.h" />
     <ClInclude Include="SPJRunSingleMountTest.h" />
@@ -250,6 +253,9 @@
     <ClCompile Include="ServerPhasedJobHierarchy.cpp" />
     <ClCompile Include="ServerThreadDesignationMap.cpp" />
     <ClCompile Include="SJBuildAndSendWorldDirection.cpp" />
+    <ClCompile Include="SJBuildContourPlanAffectedBlueprints.cpp" />
+    <ClCompile Include="SJRunContourPlanFracturingAndMassDriving.cpp" />
+    <ClCompile Include="SJRunContourPlanWorldTracing.cpp" />
     <ClCompile Include="SJRunSingleMountTest.cpp" />
     <ClCompile Include="SJSendRequestForOGLMRMCBlueprints.cpp" />
     <ClCompile Include="SPJRunSingleMountTest.cpp" />

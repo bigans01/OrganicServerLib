@@ -5,7 +5,10 @@
 
 #include "ServerPhasedJobBase.h"
 #include "SJRunSingleMountTest.h"
+#include "SJRunContourPlanWorldTracing.h"
+#include "SJBuildContourPlanAffectedBlueprints.h"
 #include "SJSendRequestForOGLMRMCBlueprints.h"
+#include "SJRunContourPlanFracturingAndMassDriving.h"
 
 class SPJRunSingleMountTest : public ServerPhasedJobBase
 {
@@ -15,6 +18,7 @@ class SPJRunSingleMountTest : public ServerPhasedJobBase
 		void initializeCurrentPhase();
 	private:
 		Message mountainMetadataMessage;
+		std::string planName = "";
 };
 
 #endif
