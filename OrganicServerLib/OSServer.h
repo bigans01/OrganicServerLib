@@ -38,6 +38,7 @@
 #include "ContourPlanStateContainer.h"
 #include "ECBMap.h"
 #include "AdjacentFinder.h"
+#include "CPAffectedBlueprints.h"
 
 
 class OSServer
@@ -80,6 +81,10 @@ private:
 	ServerJobManager serverJobManager;
 	OrganicStemcellManager OSCManager;
 	OSCommandDirector OSdirector;
+	CPAffectedBlueprints currentPlanAffectedBlueprints;		// stores the current blueprint keys that are determined as possibly being affected by the currently 
+															// running ContourPlan. It should only be read, written, and analyzed 
+															// in a controlled manner (via SJs)
+
 	short isServerActive = 1;			// flag for determining server
 	short numberOfSlaves = 0;			// number of slave threads
 	int isCommandLineRunning = 1;

@@ -22,6 +22,11 @@ class CPAffectedBlueprints
 			producedKeys.clear();
 		}
 
+		int getProducedKeySize()
+		{
+			return producedKeys.size();
+		}
+
 		void produceKeys()
 		{
 			// Remember, the current value of pillarsBegin is a 2D key that stores the X (in a) 

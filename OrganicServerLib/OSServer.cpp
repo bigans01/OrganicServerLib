@@ -922,7 +922,24 @@ void OSServer::runContourPlanWorldTracing(std::string in_string)
 
 void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
 {
+	ContourBase* planPtr = newContourMap[in_string].get();
+	auto keysBegin = planPtr->adherenceData.adherenceOrder.begin();
+	auto keysEnd = planPtr->adherenceData.adherenceOrder.end();
 
+	// add each key into the affected blueprints.
+	for (; keysBegin != keysEnd; keysBegin++)
+	{
+		currentPlanAffectedBlueprints.insertKeyIntoPillar(*keysBegin);
+	}
+
+	// build the affected set
+	currentPlanAffectedBlueprints.produceKeys();
+
+	std::cout << "!! Total number of potentially affected blueprint keys for the current ContourPlan is: " << currentPlanAffectedBlueprints.getProducedKeySize() << std::endl;
+
+
+	// Remember, when everything is done, the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag needs to be unset.
+	serverJobManager.jobBlockingFlags.eraseFlag(ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS);
 }
 
 void OSServer::runContourPlanFracturingAndMassDriving(std::string in_string)
