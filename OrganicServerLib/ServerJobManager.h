@@ -20,6 +20,7 @@
 #include "ReadyJobSearch.h"
 #include "ServerThreadWorkloadUpdate.h"
 #include "OSTerrainFormation.h"
+#include "ServerJobRunCounters.h"
 
 
 // Job life cycle:
@@ -53,6 +54,9 @@ class ServerJobManager
 
 		// STEP 3: job update containers (each one should have built in mutex for lock_guarding); 
 		ServerJobUpdateQueue updateMessages;
+
+		// run counters, for jobs of a specific type.
+		ServerJobRunCounters runCounters;
 
 		void initialize(OSServer* in_serverPtr);
 		void startCommandLine();

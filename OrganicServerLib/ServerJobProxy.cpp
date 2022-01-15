@@ -53,3 +53,8 @@ void ServerJobProxy::deactivateServerJobBlockingFlag(OSServer* in_serverRef, Ser
 {
 	in_serverRef->serverJobManager.deactivateBlockingFlag(in_flagToCheck);
 }
+
+bool ServerJobProxy::isJobCategoryAtZero(OSServer* in_serverRef, ServerJobRunCategory in_categoryToCheck)
+{
+	return in_serverRef->serverJobManager.runCounters.isCategoryAllZero(in_categoryToCheck);
+}

@@ -6,6 +6,7 @@
 #include "Message.h"
 #include "ServerJobBlockingFlags.h"
 #include <iostream>
+#include "ServerJobRunCategory.h"
 
 class OSServer;
 class ServerJobProxy
@@ -18,9 +19,11 @@ class ServerJobProxy
 		static void callServerJobRunBigMountTest(OSServer* in_serverRef);
 		static void callServerJobSendUpdateMessageToJobManager(OSServer* in_serverRef, Message in_message);
 		static void callServerSendOutgoingMessageToMessageInterpreter(OSServer* in_serverRef, Message in_message);
+
 		static bool checkIfServerJobBlockingFlagExists(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
 		static void activateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
 		static void deactivateServerJobBlockingFlag(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck);
+		static bool isJobCategoryAtZero(OSServer* in_serverRef, ServerJobRunCategory in_categoryToCheck);
 };
 
 #endif

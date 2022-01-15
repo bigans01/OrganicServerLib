@@ -21,32 +21,22 @@ void SJPrepCPMountainRun::runPostCompleteTasks()
 
 ServerJobRunVerdict SJPrepCPMountainRun::getCurrentVerdict()
 {
-	ServerJobRunVerdict currentVerdict(true, "TERRAIN");
+	ServerJobRunVerdict currentVerdict;	// remember, the verdict should always starts as "false" 
 	estimatedWorkLoad = 11.5f;		// hardcoded test.
 
 	// Below line is Test code only, does nothing; (just making sure it works for now)
 	bool doesFlagExist = ServerJobProxy::checkIfServerJobBlockingFlagExists(server, ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN);
 	if (doesFlagExist == false)
 	{
-		// if no, acquire/activate the flag...this flag should be released by whatever server function is called by the
-		// SJRunContourPlanFracturingAndMassDriving.
+		// if no, acquire/activate the ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN flag...this flag should be released by whatever server function is called by the
+		// SJRunContourPlanFracturingAndMassDriving. 
+		//
+		// Also need to acquire the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag;
+		// this flag will be released by the function OSServer::buildContourPlanAffectedBlueprints, via the SJ SJBuildContourPlanAffectedBlueprints.
 		ServerJobProxy::activateServerJobBlockingFlag(server, ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN);
-		
-		// 
-		// Steps would be (assuming ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN is acquired by this job):
-		// 
-		// 1. A placebo ServerJob checks if the HALT_FUTURE_COLLECTION_MODIFICATIONS flag is activated, acquires/activates it if not. This job will get submitted, but will probably do nothing (placebo).
-		//    The HALT_FUTURE_COLLECTION_MODIFICATIONS will prevent other block jobs from being submitted; current block jobs that are queued to run will have to finish. 
-		//    The SJBuildContourPlanAffectedBlueprints will have to release the HALT_FUTURE_COLLECTION_MODIFICATIONS, after the contour plan's affected blueprint list has been generated.
-		//
-		// 2. In the next phase of the phased job, there will be a single job that waits for all existing collection modifications (i.e, block edits) to be at 0;
-		//	  this can be done by checking some sort of counter in the system that decrements when a block modification (or similiar) is finished. When this value is 0,
-		//	  this job (#2) can run on the next call to runJobScan() -- which will generate the contour plan's affected blueprint list. 
-		//
-		// 3. In the next phase, call a placebo job that releases the HALT_FUTURE_COLLECTION_MODIFICATIONS flag; any other block modification jobs may now run.
-		//
-		// 4. At the very end of the phased job, the last job should be one that releases the SERVER_RUNNING_CONTOUR_PLAN flag.
+		ServerJobProxy::activateServerJobBlockingFlag(server, ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS);
 
+		currentVerdict.setTruthAndDesignatedString("TERRAIN");
 	}
 
 	// the flag is already up from another running contour job that hasn't completed yet; so the contorued job isn't ready to run.

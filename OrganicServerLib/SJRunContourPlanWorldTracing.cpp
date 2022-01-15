@@ -24,7 +24,19 @@ void SJRunContourPlanWorldTracing::runPostCompleteTasks()
 
 ServerJobRunVerdict SJRunContourPlanWorldTracing::getCurrentVerdict()
 {
-	ServerJobRunVerdict returnVerdict(true, "TERRAIN");
-	estimatedWorkLoad = 1.0f;
-	return returnVerdict;
+	// Remember, the default verdict value is always false, until it is set.
+	ServerJobRunVerdict currentVerdict;
+
+	// This job will only run as long as there are no active terrain modifications.
+	if (ServerJobProxy::isJobCategoryAtZero(server, ServerJobRunCategory::TERRAIN_MODIFICATION) == true)
+	{
+		std::cout << "!! No active terrain modifications found; ContourPlan will begin world tracing. " << std::endl;
+		currentVerdict.setTruthAndDesignatedString("TERRAIN");
+		estimatedWorkLoad = 1.0f;
+	}
+	else
+	{
+		return currentVerdict;
+	}
+	return currentVerdict;
 }

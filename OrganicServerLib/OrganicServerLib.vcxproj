@@ -197,11 +197,13 @@
     <ClInclude Include="ServerJobMessageQueue.h" />
     <ClInclude Include="ServerJobPhase.h" />
     <ClInclude Include="ServerJobProxy.h" />
+    <ClInclude Include="ServerJobRunCounters.h" />
     <ClInclude Include="ServerJobRunVerdict.h" />
     <ClInclude Include="ServerJobsIntContainer.h" />
     <ClInclude Include="ServerJobState.h" />
     <ClInclude Include="ServerJobUpdateInt.h" />
     <ClInclude Include="ServerJobUpdateQueue.h" />
+    <ClInclude Include="ServerJobRunCategory.h" />
     <ClInclude Include="ServerMessageInterpreter.h" />
     <ClInclude Include="ServerPhasedJobBase.h" />
     <ClInclude Include="ServerPhasedJobHierarchy.h" />
@@ -249,6 +251,7 @@
     <ClCompile Include="ServerJobManager.cpp" />
     <ClCompile Include="ServerJobPhase.cpp" />
     <ClCompile Include="ServerJobProxy.cpp" />
+    <ClCompile Include="ServerJobRunCounters.cpp" />
     <ClCompile Include="ServerMessageInterpreter.cpp" />
     <ClCompile Include="ServerPhasedJobBase.cpp" />
     <ClCompile Include="ServerPhasedJobHierarchy.cpp" />

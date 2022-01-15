@@ -14,6 +14,12 @@ class ServerJobRunVerdict
 			designatedThreadString(in_designatedThreadString)
 		{};
 
+		void setTruthAndDesignatedString(std::string in_string)
+		{
+			canJobRun = true;
+			designatedThreadString = in_string;
+		}
+
 		bool canJobRun = false;
 		std::string designatedThreadString = "";
 };

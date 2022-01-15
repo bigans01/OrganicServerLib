@@ -276,6 +276,12 @@
     <ClInclude Include="CPAffectedBlueprints.h">
       <Filter>Header Files\CPAffectedBlueprints</Filter>
     </ClInclude>
+    <ClInclude Include="ServerJobRunCounters.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
+    <ClInclude Include="ServerJobRunCategory.h">
+      <Filter>Header Files\Jobs\ServerJobManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -399,6 +405,9 @@
       <Filter>Source Files\Jobs</Filter>
     </ClCompile>
     <ClCompile Include="ServerThreadDesignationMap.cpp">
+      <Filter>Source Files\Jobs\ServerJobManager</Filter>
+    </ClCompile>
+    <ClCompile Include="ServerJobRunCounters.cpp">
       <Filter>Source Files\Jobs\ServerJobManager</Filter>
     </ClCompile>
   </ItemGroup>

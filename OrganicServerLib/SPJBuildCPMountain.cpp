@@ -42,7 +42,13 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 	{
 		/*
 		Summary: this phase has one job will prep the ContouredMontain's run (no blueprints will be affected, we are just setting up the OSContouredTriangles 
-		that constitute the plan). The job should only run if ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN isn't already set. Otherwise, it will have to wait
+		that constitute the plan). The job should only run if ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN isn't already set; if it isn't set, the verdict 
+		should flag the ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN and ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flags. 
+
+		The ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS will prevent any future terrain modification categorized jobs from being submitted, 
+		while letting the current ones run their course, therefore bringing the counter to 0.
+		
+		Otherwise, if ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN cannot be set, the CP will have to wait for this flag to be down before it starts its run.
 		for this flag to be available (which would indicate another ContourPlan is running).
 
 		*/
@@ -64,10 +70,9 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 		/*
 		Summary: this phase will trace the contour plan through the actual blueprints. 
 
-		It should be noted that another SJ must run before this job, that job being a placebo job that will raise the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag.
-		This flag will prevent any future terrain modifications from running, while allowing the current ones running to finish their run. This will eventually bring the 
-		yet-to-be-developed modification counter mechanism down to 0. When this counter is 0, then this job should run. In other words, this job needs to run a 
-		prerequisite check to ensure this counter is 0, before it actually runs. 
+		This job should only run when the category ServerJobRunCategory::TERRAIN_MODIFICATION has a counter of 0. The counter should eventually go to 0, by allowing
+		existing modification jobs to finish, but preventing new ones from starting (via the raising of the flag ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS from
+		the previous SJ run). 
 
 		As of 1/7/2022, the modification mechanism and placebo job haven't been developed.
 
@@ -124,6 +129,9 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 
 		Summary: this is the final phase, and arguably the longest. It will perform the required fracturing of ECBPolys and then run the mass driving for the ContourPlan.
 		The ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN will need to be released at the end of OrganicServer function that is called by the SJ.
+
+		With the release of this flag, both the ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN and ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flags
+		should be down, and another ContourPlan can now run.
 		
 		*/
 		std::cout << "(SPJBuildCPMountain) Phase 3 - Fracturing ECBPolys and executing mass driving..." << std::endl;

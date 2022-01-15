@@ -939,7 +939,7 @@ void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
 
 
 	// Remember, when everything is done, the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag needs to be unset.
-	serverJobManager.jobBlockingFlags.eraseFlag(ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS);
+	serverJobManager.deactivateBlockingFlag(ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS);
 }
 
 void OSServer::runContourPlanFracturingAndMassDriving(std::string in_string)
