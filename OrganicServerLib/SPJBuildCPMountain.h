@@ -9,6 +9,8 @@
 #include "SJBuildContourPlanAffectedBlueprints.h"
 #include "SJSendRequestForOGLMRMCBlueprints.h"
 #include "SJRunContourPlanFracturingAndMassDriving.h"
+#include "SJGenerateBlueprintBackupsForCP.h"
+#include "SJCheckContourPlanSuccess.h"
 
 class SPJBuildCPMountain : public ServerPhasedJobBase
 {

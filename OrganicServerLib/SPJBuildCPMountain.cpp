@@ -30,7 +30,7 @@ void SPJBuildCPMountain::initializeAndSetOptionalSPJMetadata(Message in_message)
 	if (locality == MessageLocality::LOCAL)
 	{
 		std::cout << ":::: Inserting new local phases..." << std::endl;
-		insertNewPhases(5);		// insert 5 new phases for this SPJ.
+		insertNewPhases(7);		// insert 7 new phases for this SPJ.
 	}
 	currentPhaseIter = phaseMap.begin();	// Required: set the current iterator to be the very first phase.
 }
@@ -90,8 +90,7 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setCompletionMessage(std::move(completionMessage));		// Move the built completion message into the job.
 		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
 	}
-	
-	
+
 	else if (currentPhaseIndex == 2)
 	{
 		/*
@@ -99,15 +98,16 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 		Summary: this phase will build the Mountain's possible affected blueprints, which can only be done after the ContourPlan has been traced through world space,
 		and subsequently inserted into the appropriate blueprints. The "possible affected blueprints" is a set that must be checked against when any terrain modification
 		needs to be done; if the blueprint that the terrain modification is done in is found in the set, then that SJ must not run. At the same time, the set can only be built
-		reliably without any race conditions or undefined behavior caused by other threads, if and only when no other current terrain modifications are taking place -- which is why the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS 
-		was created. 
+		reliably without any race conditions or undefined behavior caused by other threads, if and only when no other current terrain modifications are taking place -- which is why the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS
+		was created.
 
 		The SJ in this phase will need to release the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag set by the yet-to-be-defined SJ that activates that flag,
 		at the end of the OrganicServer function called by the SJ. This will allow other terrain modifications to at at least attempt their run on another thread, as long
-		as the blueprint those jobs affect isn't in the set. The ContourPlan can then simultaneously run another thread, with the safety of knowing that none of the blueprints 
-		it is planning to affect will be altered while it is running. 
+		as the blueprint those jobs affect isn't in the set. The ContourPlan can then simultaneously run another thread, with the safety of knowing that none of the blueprints
+		it is planning to affect will be altered while it is running.
 
 		*/
+
 		std::cout << "(SPJBuildCPMountain) Phase 2 - Building possible affected blueprints... " << std::endl;
 		int currentJobMapKey = 0;
 
@@ -127,6 +127,33 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 	{
 		/*
 
+		Summary: this phase analyzes all blueprints that the CP added polys to, to get the IDs of the polys that it added into a OperableIntSet, and then creates a copy of
+		each blueprint affected (the backups could be put into memory or written to disk, depending on conditions). The fetched OperableIntSet will the be used
+		to delete the ECBPolys having IDs in that set, from the copied blueprint; the result will then be the blueprint in it's original form prior to the CP running.
+
+		This should generate a safe backup, as only ECBPolys should have been added to each blueprint (but no fracturing done)
+
+		*/
+
+		std::cout << "(SPJBuildCPMountain) Phase 3 - Generating backups of CP affected blueprints..." << std::endl;
+		int currentJobMapKey = 0;
+
+		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);			// Required: completion message must be built.
+		Message affectedBlueprintsMessage;
+		affectedBlueprintsMessage.insertString(planName);
+		std::shared_ptr<ServerJobBase> job(new (SJGenerateBlueprintBackupsForCP));
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey] = job;	// instantiation; program will crash if this isn't called.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setServerPtr(server);									// Set the required OSServer pointer in the job.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setStartMessage(std::move(affectedBlueprintsMessage));
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setCompletionMessage(std::move(completionMessage));		// Move the built completion message into the job.
+		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
+	}
+	
+	
+	else if (currentPhaseIndex == 4)
+	{
+		/*
+
 		Summary: this is the final phase, and arguably the longest. It will perform the required fracturing of ECBPolys and then run the mass driving for the ContourPlan.
 		The ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN will need to be released at the end of OrganicServer function that is called by the SJ.
 
@@ -134,7 +161,7 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 		should be down, and another ContourPlan can now run.
 		
 		*/
-		std::cout << "(SPJBuildCPMountain) Phase 3 - Fracturing ECBPolys and executing mass driving..." << std::endl;
+		std::cout << "(SPJBuildCPMountain) Phase 4 - Fracturing ECBPolys and executing mass driving..." << std::endl;
 		int currentJobMapKey = 0;
 
 		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);			// Required: completion message must be built.
@@ -148,10 +175,26 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
 
 	}
+
+	else if (currentPhaseIndex == 5)
+	{
+		std::cout << "(SPJBuildCPMountain) Phase 5 - Checking ContourPlan's success..." << std::endl;
+		int currentJobMapKey = 0;
+
+		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);			// Required: completion message must be built.
+		Message affectedBlueprintsMessage;
+		affectedBlueprintsMessage.insertString(planName);
+		std::shared_ptr<ServerJobBase> job(new (SJCheckContourPlanSuccess));
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey] = job;	// instantiation; program will crash if this isn't called.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setServerPtr(server);									// Set the required OSServer pointer in the job.
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setStartMessage(std::move(affectedBlueprintsMessage));
+		phaseMap[currentPhaseIndex]->jobMap[currentJobMapKey]->setCompletionMessage(std::move(completionMessage));		// Move the built completion message into the job.
+		phaseMap[currentPhaseIndex]->requiredJobsToBeCompleted = 1;
+	}
 	
 	
 
-	else if (currentPhaseIndex == 4)
+	else if (currentPhaseIndex == 6)
 	{
 		/*
 
@@ -160,7 +203,7 @@ void SPJBuildCPMountain::initializeCurrentPhase()
 
 		*/
 
-		std::cout << "(SPJBuildCPMountain) Phase 4 - Sending request to client to send OGLMRMC key..." << std::endl;
+		std::cout << "(SPJBuildCPMountain) Phase 6 - Sending request to client to send OGLMRMC key..." << std::endl;
 		int currentJobMapKey = 0;
 
 		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);

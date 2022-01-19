@@ -282,6 +282,12 @@
     <ClInclude Include="ServerJobRunCategory.h">
       <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
+    <ClInclude Include="SJGenerateBlueprintBackupsForCP.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJCheckContourPlanSuccess.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -409,6 +415,12 @@
     </ClCompile>
     <ClCompile Include="ServerJobRunCounters.cpp">
       <Filter>Source Files\Jobs\ServerJobManager</Filter>
+    </ClCompile>
+    <ClCompile Include="SJGenerateBlueprintBackupsForCP.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJCheckContourPlanSuccess.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

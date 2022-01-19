@@ -520,7 +520,7 @@ void OSServer::constructSingleMountTest()
 	summit1.x = 48;
 	summit1.y = 16;
 	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 13.22, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
@@ -547,7 +547,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1.x = 28;
 	summit1.y = 16;
 	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 15.82, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
@@ -651,7 +651,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit3Ref->amplifyAllContourLinePoints();
 	summit3Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
-	//executeDerivedContourPlan("summit3");
+	executeDerivedContourPlan("summit3");
 
 	/*
 	auto existingOREFinder3 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
@@ -918,6 +918,69 @@ void OSServer::runContourPlanWorldTracing(std::string in_string)
 	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
 
 	std::cout << "######### Plan execution complete; " << std::endl;
+}
+
+void OSServer::generateBlueprintBackups(std::string in_planName)
+{
+	ContourBase* planPtr = newContourMap[in_planName].get();
+
+	// Part 1: ---------------
+	// cycle through each affected blueprint that had generated ECBPolys; as we cycle through, take the EnclaveKey 
+	// and put it into an unordered set.
+	std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> affectedBlueprints;
+	auto processableListBegin = planPtr->planPolyRegistry.polySetRegistry.begin();
+	auto processableListEnd = planPtr->planPolyRegistry.polySetRegistry.end();
+	for (; processableListBegin != processableListEnd; processableListBegin++)
+	{
+		affectedBlueprints.insert(processableListBegin->first);
+		OperableIntSet tentativePolySet = processableListBegin->second.polySet;	// construct an OperableIntSet from the ForgedPolySet's std::set<int>.
+																				// this set represents all the new ECBPoly IDs that were added to the blueprints
+																				// during the tracing run; we need to subtract the newly added ones from the existing 
+																				// blueprints to get the original value before the tracing began 
+		EnclaveKeyDef::EnclaveKey currentBlueprintKey = processableListBegin->first;
+
+		// first, copy the blueprint into the backupECBMap; do this by calling addBlueprintViaCopy
+		cpRunBackupBlueprints.addBlueprintViaCopy(currentBlueprintKey, *serverBlueprints.getBlueprintRef(currentBlueprintKey));
+
+		// second, get a ref to that newly added blueprint.
+		auto currentBackupBlueprintRef = cpRunBackupBlueprints.getBlueprintRef(currentBlueprintKey);
+		
+		// third, subtract the added polys from the backup
+		auto tentativesBegin = tentativePolySet.begin();
+		auto tentativesEnd = tentativePolySet.end();
+		for (; tentativesBegin != tentativesEnd; tentativesBegin++)
+		{
+			currentBackupBlueprintRef->deletePoly(*tentativesBegin);
+		}
+
+		// write to disk? (optional)
+	}
+
+	// Part 2: ---------------
+	// the affected blueprints should already have been built; cycle through each CP affected blueprint key, and only insert that blueprint
+	// if it wasn't already in the polySetRegistry we analyzed above. A 1:1 to copy should occur for these, but obviously only if there is
+	// an existing blueprint with that key.
+	auto currentPlanAffectedBegin = currentPlanAffectedBlueprints.producedKeys.begin();
+	auto currentPlanAffectedEnd = currentPlanAffectedBlueprints.producedKeys.end();
+	for (; currentPlanAffectedBegin != currentPlanAffectedEnd; currentPlanAffectedBegin++)
+	{
+		auto processedMatch = affectedBlueprints.find(*currentPlanAffectedBegin);
+		if (processedMatch == affectedBlueprints.end())	// if the key wasn't found in the above poly registry (from "Part 1" above), then that key wasn't affected
+														// but still needs to be copied -- but only if it exists.
+		{
+			bool doesBlueprintExist = serverBlueprints.checkIfBlueprintExists(*processedMatch);
+			if (doesBlueprintExist == true)
+			{
+				cpRunBackupBlueprints.addBlueprintViaCopy(*processedMatch, *serverBlueprints.getBlueprintRef(*processedMatch));
+			}
+		}
+	}
+}
+
+void OSServer::checkContourPlanSuccess(std::string in_string)
+{
+	// backup blueprint map must always be cleared at the end of the run
+	cpRunBackupBlueprints.clearAllBlueprints();
 }
 
 void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)

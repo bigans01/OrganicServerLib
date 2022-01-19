@@ -99,7 +99,12 @@ private:
 	friend class ServerJobProxy;
 
 	std::unordered_map<string, std::unique_ptr<ContourBase>> newContourMap;
+
 	ECBMap serverBlueprints; // ECBMap which stores all server blueprints
+	ECBMap cpRunBackupBlueprints;	// a temporary map that stores copies of blueprints that are about to be affected by a ContourPlan run; it is 
+									// used to restore blueprints in the event that a ContourPlan run fails; regardless of success or failure of the CP run,
+									// this always needs to be emptied at the end.
+
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	ContourPlanStateContainer planStateContainer;
@@ -113,11 +118,13 @@ private:
 	void addDerivedContourPlan(std::string in_planName, OSTerrainFormation in_Formation, ECBPolyPoint in_polyPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue);
 	void executeDerivedContourPlan(std::string in_string);
 
-	// Contour plan run functions
+	// Generic ContourPlan run functions
 	void executeDerivedContourPlanNoInput(std::string in_string);	// run the plan without waiting for input afterwards.
+	void generateBlueprintBackups(std::string in_string);	// will generate backups for blueprints affected by a CP; the message should just cotn
 	void runContourPlanWorldTracing(std::string in_string);
 	void buildContourPlanAffectedBlueprints(std::string in_string);
 	void runContourPlanFracturingAndMassDriving(std::string in_string);
+	void checkContourPlanSuccess(std::string in_string);
 
 	void traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef);		// constructs primary polygon lines for each line of the contoured triangle that the 
 	void writeECBPolysToDisk(EnclaveKeyDef::EnclaveKey in_keys);

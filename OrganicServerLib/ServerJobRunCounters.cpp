@@ -34,8 +34,8 @@ void ServerJobRunCounters::incrementCategory(ServerJobRunCategory in_category)
 
 bool ServerJobRunCounters::isCategoryAllZero(ServerJobRunCategory in_category)
 {
-	bool returnValue = false;
 	std::lock_guard<std::mutex> guard(flagsGuard);
+	bool returnValue = false;
 	auto categoryFinder = runCategoryMap.find(in_category);
 	if (categoryFinder != runCategoryMap.end())	// it was found
 	{

@@ -39,6 +39,16 @@ void ServerJobProxy::callServerSendOutgoingMessageToMessageInterpreter(OSServer*
 	in_serverRef->jobSendOutgoingMessageToInterpreter(std::move(in_message));
 }
 
+void ServerJobProxy::callServerGenerateBlueprintBackupsForCP(OSServer* in_serverRef, std::string in_planName)
+{
+	in_serverRef->generateBlueprintBackups(in_planName);
+}
+
+void ServerJobProxy::callServerCheckContourPlanSuccess(OSServer* in_serverRef, std::string in_contourPlanName)
+{
+	in_serverRef->checkContourPlanSuccess(in_contourPlanName);
+}
+
 bool ServerJobProxy::checkIfServerJobBlockingFlagExists(OSServer* in_serverRef, ServerJobBlockingFlags in_flagToCheck)
 {
 	return in_serverRef->serverJobManager.doesFlagExist(in_flagToCheck);

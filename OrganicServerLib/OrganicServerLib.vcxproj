@@ -213,6 +213,8 @@
     <ClInclude Include="ServerThreadWorkloadUpdate.h" />
     <ClInclude Include="SJBuildAndSendWorldDirection.h" />
     <ClInclude Include="SJBuildContourPlanAffectedBlueprints.h" />
+    <ClInclude Include="SJCheckContourPlanSuccess.h" />
+    <ClInclude Include="SJGenerateBlueprintBackupsForCP.h" />
     <ClInclude Include="SJRunContourPlanFracturingAndMassDriving.h" />
     <ClInclude Include="SJRunContourPlanWorldTracing.h" />
     <ClInclude Include="SJPrepCPMountainRun.h" />
@@ -258,6 +260,8 @@
     <ClCompile Include="ServerThreadDesignationMap.cpp" />
     <ClCompile Include="SJBuildAndSendWorldDirection.cpp" />
     <ClCompile Include="SJBuildContourPlanAffectedBlueprints.cpp" />
+    <ClCompile Include="SJCheckContourPlanSuccess.cpp" />
+    <ClCompile Include="SJGenerateBlueprintBackupsForCP.cpp" />
     <ClCompile Include="SJRunContourPlanFracturingAndMassDriving.cpp" />
     <ClCompile Include="SJRunContourPlanWorldTracing.cpp" />
     <ClCompile Include="SJPrepCPMountainRun.cpp" />
