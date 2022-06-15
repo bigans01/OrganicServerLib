@@ -25,6 +25,8 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void interpretOutgoingMessagesToClient();
 
 		// message handling functions; each function below should have logic for handling LOCAL and REMOTE message types.
+		void handleRequestFromClientEnableORECompositionHighlighting(Message in_message);
+		void handleRequestFromClientDisableORECompositionHighlighting(Message in_message);
 		void handleRequestFromClientForOGLMRMCBlueprints(Message in_message);
 		void handleRequestFromClientGetBlueprintForT1(Message in_message);
 		void handleRequestFromClientGetBlueprintForT2(Message in_message);
@@ -35,6 +37,8 @@ class ServerMessageInterpreter : public MessageInterpreter
 		void handleRequestFromClientToggleCurrentEnclaveHighlighting(Message in_message);		// MESSAGE CHAIN: toggleCurrentEnclaveHighlighting
 		void handleRequestFromClientOGLMToggleWorldLocation(Message in_message);				// MESSAGE CHAIN: toggleWorldLocationPanel
 		void handleRequestFromClientInputGenerated(Message in_message);
+		void handleRequestFromClientMouseWheelScroll(Message in_message);
+		void handleRequestFromClientBlockDelete(Message in_message);							// MESSAGE CHAIN: clientRequestsBlockDelete 
 };
 
 #endif

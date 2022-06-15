@@ -547,7 +547,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1.x = 28;
 	summit1.y = 16;
 	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 15.82, 9);	// create the points in all contour lines
+	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, 5, 12.81, 31.82, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
 	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
@@ -675,12 +675,57 @@ void OSServer::constructMultiMountTestWithElevator()
 	*/
 
 	// test, convert an ORE's lod to block.
-	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
-	EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
+	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -2, -1);
+	EnclaveKeyDef::EnclaveKey blockReformOREKey(3, 3, 7);
 	EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
-	auto blockReformTarget = serverBlueprints.getFractureResultsMapRef(blockReformBlueprintKey)->fractureResultsContainerMap.find(blockReformOREKey);
-	blockReformTarget->second.morphLodToBlock(&serverReadWrite, blockReformOREKey);
+	
+	//auto blockReformTarget = serverBlueprints.getFractureResultsMapRef(blockReformBlueprintKey)->fractureResultsContainerMap.find(blockReformOREKey);
+	//blockReformTarget->second.morphLodToBlock(&serverReadWrite, blockReformOREKey);
+
+	//auto targetBlueprintRef = serverBlueprints.getBlueprintRef(blockReformBlueprintKey);
+	//organicSystemPtr->applyOREMorphLodToBlockRippleEffect(&serverBlueprints, blockReformBlueprintKey, blockReformOREKey);
+
+	/*
+	serverBlueprints.rebuildBlueprintCatalog(blockReformBlueprintKey);	// this must be called on the same blueprint that contains the ORE we are about to morph, before
+																		// the actual morphing occurs.
+
+	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, blockReformBlueprintKey, blockReformOREKey);
+	EnclaveKeyDef::EnclaveKey otherReformKey(2, 3, 7);
+	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, blockReformBlueprintKey, otherReformKey);
+	std::cout << "(OrganicServer): Done with calls for rebuildBlueprintCatalog and attemptOREMorphLodToBlock; enter number to continue " << std::endl;
+	int done = 3;
+	std::cin >> done;
+	*/
+
+	//organicSystemPtr->comboJobEraseBlockInOre(blockReformBlueprintKey, blockReformOREKey, blockKey);
+
+	/*
+	EnclaveKeyDef::EnclaveKey debugCollection(-1, 0, 0);
+	EnclaveKeyDef::EnclaveKey debugORE(5, 1, 2);
+
+	serverBlueprints.rebuildBlueprintCatalog(debugCollection);	// this must be called on the same blueprint that contains the ORE we are about to morph, before
+																		// the actual morphing occurs.
+	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, debugCollection, debugORE);
+
+	std::cout << "(OrganicServer): Done with DEBUG calls for rebuildBlueprintCatalog and attemptOREMorphLodToBlock; enter number to continue " << std::endl;
+	int done = 3;
+	std::cin >> done;
+	*/
+
+	//organicSystemPtr->comboJobEraseBlockInOre(blockReformBlueprintKey, blockReformOREKey, blockKey);
+
+
+
 	//blockReformTarget->second.eraseBlock(&serverReadWrite, blockKey);
+
+	// test, show block composition of ORE at 0,0,0 6,2,5
+	EnclaveKeyDef::EnclaveKey compositionOneBlueprint(0, 0, 0);
+	EnclaveKeyDef::EnclaveKey compositionOneORE(6,2,5);
+	auto compositionTarget = serverBlueprints.getFractureResultsMapRef(compositionOneBlueprint)->fractureResultsContainerMap.find(compositionOneORE);
+	compositionTarget->second.printBlockCategorizations();
+	std::cout << "*************************** Done printing categorizations. Enter number to continue. " << std::endl;
+	int compVal = 3;
+	std::cin >> compVal;
 }
 
 void OSServer::prepCPMountain(Message in_metadataMessage)

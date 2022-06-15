@@ -10,8 +10,8 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 	auto contouredSetEnd = contouredMassShellECBPolyIDs.intSet.end();
 	for (; currentContouredSetPolyIDIter != contouredSetEnd; currentContouredSetPolyIDIter++)
 	{
-		auto wasCurrentECBPolyIDErased = reformerTracker.shatteredTriangleErasedOREs.find(*currentContouredSetPolyIDIter);	// attempt to find an entry indicating some OREs were erased was found.
-		if (wasCurrentECBPolyIDErased != reformerTracker.shatteredTriangleErasedOREs.end())	// it was found
+		auto wasCurrentECBPolyIDErased = triangleTracker.shatteredTriangleErasedOREs.find(*currentContouredSetPolyIDIter);	// attempt to find an entry indicating some OREs were erased was found.
+		if (wasCurrentECBPolyIDErased != triangleTracker.shatteredTriangleErasedOREs.end())	// it was found
 		{
 			//std::cout << "(processContouredPolysAgainstPersistentMass) !! Value of next ECBPoly, before dissolve: " << *in_nextECBPolyIDTrackerRef << std::endl;
 			//std::cout << "(processContouredPolysAgainstPersistentMass) .Contoured Set ECBPoly with ID " << *currentContouredSetPolyIDIter << " was dissolved, stats are: " << std::endl;
@@ -20,8 +20,8 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 
 			// get the remaining OREs; figure out which ones should remain. Should remain meaning that the ORE the new ECBPoly would go into isn't full.
 			// For the first pass, that means to compare each of the remaining OREs to the persistentMassContentsRef.
-			auto remainingOresBegin = reformerTracker.shatteredTriangleRemainingOREs[*currentContouredSetPolyIDIter].begin();
-			auto remainingOresEnd = reformerTracker.shatteredTriangleRemainingOREs[*currentContouredSetPolyIDIter].end();
+			auto remainingOresBegin = triangleTracker.shatteredTriangleRemainingOREs[*currentContouredSetPolyIDIter].begin();
+			auto remainingOresEnd = triangleTracker.shatteredTriangleRemainingOREs[*currentContouredSetPolyIDIter].end();
 			for (; remainingOresBegin != remainingOresEnd; remainingOresBegin++)
 			{
 				if 
@@ -37,8 +37,8 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 
 			/*
 			std::cout << ":: Printing erased OREs: " << std::endl;
-			auto printErasedOREsBegin = reformerTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].begin();
-			auto printErasedOREsEnd = reformerTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].end();
+			auto printErasedOREsBegin = triangleTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].begin();
+			auto printErasedOREsEnd = triangleTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].end();
 			for (; printErasedOREsBegin != printErasedOREsEnd; printErasedOREsBegin++)
 			{
 				std::cout << "(" << printErasedOREsBegin->x << ", " << printErasedOREsBegin->y << ", " << printErasedOREsBegin->z << ") " << std::endl;
@@ -125,8 +125,8 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 			// because the triangle wasn't shattered, it also means we have to use the tracked ORE keys that the contoured ECBPoly covered to see if
 			// any of the matching ones in the persistent mass are full. If any are full, it would mean this ECBPoly is consumed by a persistent mass, and we 
 			// can then break out of the loop.
-			auto remainingContouredECBPolyOREsBegin = reformerTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.begin();
-			auto remainingContouredECBPolyOREsEnd = reformerTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.end();
+			auto remainingContouredECBPolyOREsBegin = triangleTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.begin();
+			auto remainingContouredECBPolyOREsEnd = triangleTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.end();
 			bool wasECBPolyConsumedByPersistentMass = true;
 			for (; remainingContouredECBPolyOREsBegin != remainingContouredECBPolyOREsEnd; remainingContouredECBPolyOREsBegin++)
 			{
@@ -164,8 +164,8 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 	auto persistentSetEnd = persistentMassShellECBPolyIDs.intSet.end();
 	for (; currentPersistentSetPolyIDIter != persistentSetEnd; currentPersistentSetPolyIDIter++)
 	{
-		auto wasPersistentECBPolyErased = reformerTracker.shatteredTriangleErasedOREs.find(*currentPersistentSetPolyIDIter);
-		if (wasPersistentECBPolyErased != reformerTracker.shatteredTriangleErasedOREs.end())
+		auto wasPersistentECBPolyErased = triangleTracker.shatteredTriangleErasedOREs.find(*currentPersistentSetPolyIDIter);
+		if (wasPersistentECBPolyErased != triangleTracker.shatteredTriangleErasedOREs.end())
 		{
 			//std::cout << "(processPersistentPolysAgainstContouredMass) !! Value of next ECBPoly, before dissolve: " << *in_nextECBPolyIDTrackerRef << std::endl;
 			//std::cout << "(processPersistentPolysAgainstContouredMass) .Contoured Set ECBPoly with ID " << *currentPersistentSetPolyIDIter << " was dissolved, stats are: " << std::endl;
@@ -173,8 +173,8 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 
 			// get the remaining OREs; figure out which ones should remain. Should remain meaning that the ORE the new ECBPoly would go into isn't full.
 			// For the second pass, that means to compare each of the remaining OREs to the contouredMassContentsRef.
-			auto remainingOresBegin = reformerTracker.shatteredTriangleRemainingOREs[*currentPersistentSetPolyIDIter].begin();
-			auto remainingOresEnd = reformerTracker.shatteredTriangleRemainingOREs[*currentPersistentSetPolyIDIter].end();
+			auto remainingOresBegin = triangleTracker.shatteredTriangleRemainingOREs[*currentPersistentSetPolyIDIter].begin();
+			auto remainingOresEnd = triangleTracker.shatteredTriangleRemainingOREs[*currentPersistentSetPolyIDIter].end();
 			for (; remainingOresBegin != remainingOresEnd; remainingOresBegin++)
 			{
 				if
@@ -258,8 +258,8 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 			// because the triangle wasn't shattered, it also means we have to use the tracked ORE keys that the persistent ECBPoly covered to see if
 			// any of the matching ones in the contoured mass are full. If any are full, it would mean this ECBPoly is consumed by a persistent mass, and we 
 			// can then break out of the loop.
-			auto remainingContouredECBPolyOREsBegin = reformerTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.begin();
-			auto remainingContouredECBPolyOREsEnd = reformerTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.end();
+			auto remainingContouredECBPolyOREsBegin = triangleTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.begin();
+			auto remainingContouredECBPolyOREsEnd = triangleTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.end();
 			bool wasECBPolyConsumedByContouredMass = true;
 			for (; remainingContouredECBPolyOREsBegin != remainingContouredECBPolyOREsEnd; remainingContouredECBPolyOREsBegin++)
 			{

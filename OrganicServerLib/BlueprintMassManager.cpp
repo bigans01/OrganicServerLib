@@ -87,17 +87,19 @@ void BlueprintMassManager::runMassDriversForIndependentMass()
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
+		
 		organicClientRef->OS->generateAndRunMassDriversForBlueprint(&contouredPlanMass,
 			&contouredPlanEntireShellRegistry.polySetRegistry,
 			blueprintKey,
 			startingFloorTerminatingSet,
 			massDriverSet);
+		
 	}
 }
 
 OrganicTriangleTracker* BlueprintMassManager::getReformerTrackerRef(EnclaveKeyDef::EnclaveKey in_blueprintKey)
 {
-	return &reformerTracker[in_blueprintKey].reformerTracker;
+	return &reformerTracker[in_blueprintKey].triangleTracker;
 }
 
 void BlueprintMassManager::buildPersistentMasses()
@@ -248,7 +250,7 @@ void BlueprintMassManager::scanForDissolvableTriangles()
 	auto dissolveCallsEnd = reformerTracker.end();
 	for (; dissolveCallsBegin != dissolveCallsEnd; dissolveCallsBegin++)
 	{
-		dissolveCallsBegin->second.reformerTracker.determineOrganicTrianglesToDissolve();
+		dissolveCallsBegin->second.triangleTracker.determineOrganicTrianglesToDissolve();
 	}
 
 	// Step 2: run analysis for each blueprint

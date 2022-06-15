@@ -576,7 +576,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		auto skeletonClearEnd = oreTrackerRef->modifiedORESet.end();
 		for (; skeletonClearBegin != skeletonClearEnd; skeletonClearBegin++)
 		{
-				in_clientRef->OS->updateOREAsRMass(currentServerBlueprintRef, *skeletonClearBegin);
+				in_clientRef->OS->updateOREAsRMass(currentServerBlueprintRef, *skeletonClearBegin);	// update the ORE, move over any pending solid blocks
 		}
 	}
 

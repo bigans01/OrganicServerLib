@@ -45,7 +45,7 @@ class ECBPolyReformer
 		OperableIntSet persistentMassShellECBPolyIDs;
 		EnclaveFractureResultsMap* persistentMassContentsRef = nullptr;
 
-		OrganicTriangleTracker reformerTracker;
+		OrganicTriangleTracker triangleTracker;
 
 	private:
 		friend class BlueprintMassManager;
