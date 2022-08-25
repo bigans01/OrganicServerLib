@@ -27,6 +27,7 @@ class ServerMessageInterpreter : public MessageInterpreter
 		// message handling functions; each function below should have logic for handling LOCAL and REMOTE message types.
 		void handleRequestFromClientEnableORECompositionHighlighting(Message in_message);
 		void handleRequestFromClientDisableORECompositionHighlighting(Message in_message);
+		void handleRequestFromClientGetBlockData(Message in_message);
 		void handleRequestFromClientForOGLMRMCBlueprints(Message in_message);
 		void handleRequestFromClientGetBlueprintForT1(Message in_message);
 		void handleRequestFromClientGetBlueprintForT2(Message in_message);

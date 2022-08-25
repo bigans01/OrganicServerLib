@@ -28,6 +28,7 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 			case MessageType::REQUEST_FROM_CLIENT_ENABLE_ORE_COMPOSITION_HIGHLIGHTING:	{ handleRequestFromClientEnableORECompositionHighlighting(std::move(*currentMessage)); break;}
 			case MessageType::REQUEST_FROM_CLIENT_DISABLE_ORE_COMPOSITION_HIGHLIGHTING: { handleRequestFromClientDisableORECompositionHighlighting(std::move(*currentMessage)); break;}
 			case MessageType::REQUEST_FROM_CLIENT_REMOVE_BLOCK:							{ handleRequestFromClientBlockDelete(std::move(*currentMessage)); break;}
+			case MessageType::REQUEST_FROM_CLIENT_GET_BLOCK_DATA:						{ handleRequestFromClientGetBlockData(std::move(*currentMessage)); break;}
 		}
 		messageCableRef->popIncomingQueue();
 	}
@@ -110,7 +111,32 @@ void ServerMessageInterpreter::handleRequestFromClientDisableORECompositionHighl
 	}
 }
 
+void ServerMessageInterpreter::handleRequestFromClientGetBlockData(Message in_message)
+{
+	// ####################
+	// MESSAGE CHAIN: getBlockData (2 of 3)
+	//
+	// Upon receiving the request from the core, the server can do a check/logic to see if it is a permitted operation.
 
+
+	switch (in_message.messageLocality)
+	{
+		// ****************************************************************** LOCAL LOGIC
+		case MessageLocality::LOCAL:
+		{
+			std::cout << "(ServerMessageInterpreter): handling get block data request. " << std::endl;
+
+			// just make a copy of the original message, but change it's type
+			Message fetchDataMessage = in_message;
+			fetchDataMessage.messageType = MessageType::RESPONSE_FROM_SERVER_GET_BLOCK_DATA;
+			serverPtr->client.insertResponseMessage(fetchDataMessage);
+		}
+		case MessageLocality::REMOTE:
+		{
+			break;
+		}
+	}
+}
 
 void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Message in_message)
 {
