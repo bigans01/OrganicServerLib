@@ -138,9 +138,6 @@
     <ClInclude Include="PrimaryCircuit.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="CalibratableBlueprintKeyPair.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="PointAdherenceOrder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -339,9 +336,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ContourBase.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="CalibratableBlueprintKeyPair.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PointAdherenceOrder.cpp">

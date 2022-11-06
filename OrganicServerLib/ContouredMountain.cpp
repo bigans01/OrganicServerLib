@@ -513,9 +513,9 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	auto massDriverRegistryEnd = massDriverPolyRegistry.polySetRegistry.end();
 	for (massDriverRegistryBegin; massDriverRegistryBegin != massDriverRegistryEnd; massDriverRegistryBegin++)
 	{
-		// set up the set to use
-		EnclaveKeyDef::EnclaveKey blueprintKey = massDriverRegistryBegin->first;
-		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+		// set up the set to use; grab the starting floor blueprint key
+		EnclaveKeyDef::EnclaveKey startingFloorBlueprintKey = massDriverRegistryBegin->first;
+		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[startingFloorBlueprintKey];	// get the original, unaltered set
 		//ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
 		ForgedPolySet massDriverSet = massDriverRegistryBegin->second;				// the set that represents the polys identified as SHELL_MASSDRIVER type.
 		ForgedPolySet startingFloorTerminatingSet = originalSet;
@@ -539,11 +539,11 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		//
 		// The new function will need to produce a "phantom" blueprint that contains only the polygons in the originalSet, to make it seem
 		// like those are the only ones that exist. To do this, the "originalSet" is used to trace 
-		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_ecbMapRef, &planPolyRegistry.polySetRegistry, blueprintKey, startingFloorTerminatingSet, massDriverSet);
+		in_clientRef->OS->generateAndRunMassDriversForBlueprint(in_ecbMapRef, &planPolyRegistry.polySetRegistry, startingFloorBlueprintKey, startingFloorTerminatingSet, massDriverSet);
 
 		//std::cout << "OrganicRawPolys updated... " << std::endl;
 
-		std::cout << "::: Size of OREs in origin mass driving blueprint key: " << in_ecbMapRef->getFractureResultsMapRef(blueprintKey)->fractureResultsContainerMap.size() << std::endl;
+		std::cout << "::: Size of OREs in origin mass driving blueprint key: " << in_ecbMapRef->getFractureResultsMapRef(startingFloorBlueprintKey)->fractureResultsContainerMap.size() << std::endl;
 
 	}
 
