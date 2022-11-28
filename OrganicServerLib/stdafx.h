@@ -34,6 +34,7 @@
 // -------------------------------Dependency Level 0 Headers
 // Custom headers, from OrganicIndependents.lib
 #include "ECBPolyPoint.h"
+#include "DoublePoint.h"
 #include "ECBPolyPointPair.h"
 #include "EnclaveKeyDef.h"
 #include "BoundaryOrientation.h"
@@ -43,11 +44,13 @@
 #include "OperableIntSet.h"
 #include "IndependentUtils.h"
 #include "FRayCasterTypeEnum.h"
-#include "EnclaveBlock.h"
 
 // -------------------------------Dependency Level 1 Headers
 // Custom headers, from OrganicGLWinLib.lib
-#include "SPolyShellProducer.h"
+
+// -------------------------------Dependency Level 2 Headers
+#include "OrganicSystem.h"
+
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 
 
