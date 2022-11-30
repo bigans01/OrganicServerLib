@@ -35,6 +35,7 @@
 // Custom headers, from OrganicIndependents.lib
 #include "ECBPolyPoint.h"
 #include "DoublePoint.h"
+#include "TriangleMaterial.h"
 #include "ECBPolyPointPair.h"
 #include "EnclaveKeyDef.h"
 #include "BoundaryOrientation.h"

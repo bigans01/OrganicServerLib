@@ -10,7 +10,7 @@ void BlankContour::amplifyAllContourLinePoints()
 
 }
 
-void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID)
+void BlankContour::constructSingleContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, TriangleMaterial in_materialID)
 {
 	planDirections.y_direction = -1;	// DEFAULT, can be changed later.
 	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry, ECBPolyType::FREE);

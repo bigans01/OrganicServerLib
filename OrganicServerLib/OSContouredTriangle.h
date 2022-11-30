@@ -22,7 +22,7 @@
 class OSContouredTriangle {
 public:
 	OSContouredTriangle();
-	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType);
+	OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, TriangleMaterial in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType);
 
 	ECBPolyPoint trianglePoints[3];					// stores 3 points
 	TriangleLine triangleLines[3];					// stores 3 lines
@@ -38,7 +38,7 @@ public:
 																											// area within the OSContourdTriangle.
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, int, EnclaveKeyDef::KeyHasher> filledBlueprintMap;		// stores blueprint IDs that were filled when attempting to fill the OSContouredTriangle's area.
 	std::unordered_map<EnclaveKeyDef::EnclaveKey, PrimaryCircuit, EnclaveKeyDef::KeyHasher> primarySegmentTrackerMap;
-	short materialID = 0;						// what is the material made of? stone, brick, snow, dirt, etc?
+	TriangleMaterial materialID = TriangleMaterial::NOVAL;						// what is the material made of? stone, brick, snow, dirt, etc?
 	bool containedWithinSameBlueprint = false;	// set by call to checkIfPointsAreinSameBlueprint
 
 	void addPolygonPiece(EnclaveKeyDef::EnclaveKey in_Key, int in_pieceType);

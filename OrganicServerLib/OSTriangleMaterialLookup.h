@@ -9,8 +9,8 @@
 class OSTriangleMaterialLookup
 {
 	public:
-		static std::map<OSTriangleMaterial, int> materialEnumToMaterialIDMap;
-		static int findMaterialID(OSTriangleMaterial in_materialEnum);
+		static std::set<TriangleMaterial> materialEnumToMaterialIDSet;
+		static TriangleMaterial findMaterialID(TriangleMaterial in_materialEnum);
 };
 
 #endif

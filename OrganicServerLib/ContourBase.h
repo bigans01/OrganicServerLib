@@ -40,13 +40,13 @@ public:
 	ForgedPolyRegistry planPolyRegistry;			// for any "shell" poly.
 	ForgedPolyRegistry massDriverPolyRegistry;		// only for "shell" polys which will become a mass driver.
 	PointAdherenceOrder adherenceData;
-	std::map<int, int> preferredMaterialLookup;		// a lookup map for specific materials that a Contour plan expects; each contour plan may look at this map
+	std::map<int, TriangleMaterial> preferredMaterialLookup;		// a lookup map for specific materials that a Contour plan expects; each contour plan may look at this map
 													// for materials to use, how they look it up is up to each plan.
 
 	// virtual functions
 	virtual void initialize(ECBPolyPoint in_startPoint, int in_numberOfLayers, float in_distanceBetweenLayers, float in_startRadius, float in_expansionValue) = 0;
 	virtual void amplifyAllContourLinePoints() = 0;
-	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, short in_materialID) = 0;
+	virtual void constructSingleContouredTriangle(ECBPolyPoint in_x, ECBPolyPoint in_y, ECBPolyPoint in_z, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, TriangleMaterial in_materialID) = 0;
 	virtual void runMassDrivers(OrganicClient* in_clientRef, 
 								ECBMap* in_ecbMapRef,
 								EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;
@@ -58,8 +58,8 @@ public:
 	void writeAffectedBlueprintsToDisk(ECBMap* in_ecbMapRef, std::string in_worldName);
 	void updateAffectedBlueprints(OrganicClient* in_clientRef, std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef, EnclaveFractureResultsMap* in_fractureResultsMapRef);
 	ECBPolyPoint roundContourPointToHundredths(ECBPolyPoint in_contourPoint);
-	void insertPreferredMaterial(int in_materialID);
-	int getPreferredMaterialAtIndex(int in_indexToLookup);
+	void insertPreferredMaterial(TriangleMaterial in_materialID);
+	TriangleMaterial getPreferredMaterialAtIndex(int in_indexToLookup);
 };
 
 #endif

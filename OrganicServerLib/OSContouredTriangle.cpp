@@ -12,7 +12,7 @@ OSContouredTriangle::OSContouredTriangle()
 	// for adding to unordered_map
 }
 
-OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, int in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType)
+OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, TriangleMaterial in_materialID, ECBPolyPoint in_massReferencePoint, ForgedPolyRegistry* in_forgedPolyRegistryRef, ECBPolyType in_polyType)
 {
 	contouredPolyType = in_polyType;
 

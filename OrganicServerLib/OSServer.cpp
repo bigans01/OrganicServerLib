@@ -192,8 +192,8 @@ void OSServer::constructSingleOrganicTest()
 	testPoint_2.z = 96.0f;
 	*/
 	
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 
 }
@@ -304,7 +304,7 @@ void OSServer::constructOrganicRawTest()
 	testPoint_3.z = 49.2f;
 	*/
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
@@ -348,7 +348,7 @@ void OSServer::constructBlueprintFillTest()
 	//testPoint_2.y = 12.0f;
 	//testPoint_2.z = -4.5f;
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
 
@@ -489,7 +489,7 @@ void OSServer::constructSingleDebug()
 	testPoint_2.z = 73.00f;
 	*/
 
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
@@ -505,7 +505,7 @@ void OSServer::constructMountainAtPoint(float in_summitX, float in_summitY, floa
 	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* planRef = getDerivedContourPlan("mountain");
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	planRef->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	planRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT); // set materials for mountain
 	planRef->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlan("mountain");
@@ -523,7 +523,7 @@ void OSServer::constructSingleMountTest()
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 13.22, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT); // set materials for mountain
 	summit1Ref->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
@@ -550,7 +550,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, 5, 12.81, 31.82, 9);	// create the points in all contour lines
 	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
+	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit1Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit1");
 
@@ -649,7 +649,7 @@ void OSServer::constructMultiMountTestWithElevator()
 	addDerivedContourPlan("summit3", OSTerrainFormation::MOUNTAIN, summit3, numberOfLayers, 6.81, 9, 9);
 	ContourBase* summit3Ref = getDerivedContourPlan("summit3");
 	summit3Ref->amplifyAllContourLinePoints();
-	summit3Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
+	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit3");
 
@@ -749,7 +749,7 @@ void OSServer::prepCPMountain(Message in_metadataMessage)
 	// we are just constructing the triangles of the plan.
 	ContourBase* summit1Ref = getDerivedContourPlan(planName);
 	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT); // set materials for mountain
+	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT); // set materials for mountain
 	summit1Ref->buildContouredTriangles();
 	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
 	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
@@ -789,7 +789,7 @@ void OSServer::constructBigMountTestNoInput()
 	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
 	ContourBase* planRef = getDerivedContourPlan("mountain");
 	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	planRef->insertMaterials(OSTriangleMaterial::GRASS, OSTriangleMaterial::DIRT);
+	planRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	planRef->buildContouredTriangles();
 
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
@@ -847,7 +847,7 @@ void OSServer::constructMissingFillBlueprint3()
 
 
 	ECBPolyPoint mrPoint;
-	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
+	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
 	executeDerivedContourPlan("plan");
 }
 

@@ -1,19 +1,19 @@
 #include "stdafx.h"
 #include "OSTriangleMaterialLookup.h"
 
-std::map<OSTriangleMaterial, int> OSTriangleMaterialLookup::materialEnumToMaterialIDMap =
+std::set<TriangleMaterial> OSTriangleMaterialLookup::materialEnumToMaterialIDSet =
 {
-	{OSTriangleMaterial::DIRT, 1},
-	{OSTriangleMaterial::GRASS, 2}
+	{TriangleMaterial::DIRT},
+	{TriangleMaterial::GRASS}
 };
 
-int OSTriangleMaterialLookup::findMaterialID(OSTriangleMaterial in_materialEnum)
+TriangleMaterial OSTriangleMaterialLookup::findMaterialID(TriangleMaterial in_materialEnum)
 {
-	int returnID = 1;	// if no value is found, return a value of dirt (1)
-	auto materialFinder = materialEnumToMaterialIDMap.find(in_materialEnum);
-	if (materialFinder != materialEnumToMaterialIDMap.end())
+	TriangleMaterial returnID = TriangleMaterial::DIRT;	// if no value is found, return a value of dirt (1)
+	auto materialFinder = materialEnumToMaterialIDSet.find(in_materialEnum);
+	if (materialFinder != materialEnumToMaterialIDSet.end())
 	{
-		returnID = materialFinder->second;
+		returnID = *materialFinder;
 	}
 	return returnID;
 }
