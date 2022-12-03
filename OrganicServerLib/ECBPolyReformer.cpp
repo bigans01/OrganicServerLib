@@ -50,7 +50,6 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 			{
 				// the processableKeys equate to the list of OREs that will receive a ECBPoly that is spawned from dissolving the parent ECBPOly;
 				//std::cout << ":: Printing processable OREs: " << std::endl;
-				ECBPolyPoint currentECBPolyMRP = serverBlueprintRef->getPolyMRP(*currentContouredSetPolyIDIter);
 				auto currentProcessableOREKey = processableKeys.begin();
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
@@ -88,7 +87,6 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 
 					ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
 						fetchedEnclaveTriangleVector,
-						currentECBPolyMRP,
 						reformerBlueprintKey,
 						*currentProcessableOREKey);
 					firstPassResultingShatteredECBPolys[*currentContouredSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
@@ -192,7 +190,6 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 			if (!processableKeys.empty())
 			{
 				// the processableKeys equate to the list of OREs that will receive a ECBPoly that is spawned from dissolving the parent ECBPOly;
-				ECBPolyPoint currentECBPolyMRP = serverBlueprintRef->getPolyMRP(*currentPersistentSetPolyIDIter);
 				auto currentProcessableOREKey = processableKeys.begin();
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
@@ -229,7 +226,6 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 
 					ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
 						fetchedEnclaveTriangleVector,
-						currentECBPolyMRP,
 						reformerBlueprintKey,
 						*currentProcessableOREKey);
 					secondPassResultingShatteredECBPolys[*currentPersistentSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
@@ -289,7 +285,6 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 
 ECBPolyReformer::ShatteredResults ECBPolyReformer::produceShatteredResultsForORE(int* in_nextECBPolyIDTrackerRef, 
 																				 std::vector<EnclaveTriangle> in_enclaveTriangleVector, 
-																				 ECBPolyPoint in_currentECBPolyMRP,
 																				 EnclaveKeyDef::EnclaveKey in_blueprintKey,
 																				 EnclaveKeyDef::EnclaveKey in_oreKey)
 {
@@ -309,7 +304,6 @@ ECBPolyReformer::ShatteredResults ECBPolyReformer::produceShatteredResultsForORE
 		int currentValue = (*in_nextECBPolyIDTrackerRef)++;
 
 		ECBPoly convertedPoly = IndependentUtils::buildECBPolyFromEnclaveTriangle(*triangleVectorBegin, 
-																				 in_currentECBPolyMRP,
 																				 in_blueprintKey,
 																				 in_oreKey);
 		//convertedPoly.printLineData();

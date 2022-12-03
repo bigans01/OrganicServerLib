@@ -36,6 +36,7 @@
 #include "ECBPolyPoint.h"
 #include "DoublePoint.h"
 #include "TriangleMaterial.h"
+#include "PerfectClampEnum.h"
 #include "ECBPolyPointPair.h"
 #include "EnclaveKeyDef.h"
 #include "BoundaryOrientation.h"

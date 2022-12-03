@@ -93,7 +93,7 @@ void OSContouredTriangle::checkForPerfectClamping()
 	)
 	{
 		//std::cout << "Perfect X-clamp detected! " << std::endl;
-		contouredTrianglePerfectClampValue = 1;			// 1 == clamped to X
+		contouredTrianglePerfectClampValue = PerfectClampEnum::CLAMPED_TO_X;			// 1 == clamped to X
 	}
 
 	// y clamp check
@@ -105,7 +105,7 @@ void OSContouredTriangle::checkForPerfectClamping()
 	)
 	{
 		//std::cout << "Perfect Y-clamp detected! " << std::endl;
-		contouredTrianglePerfectClampValue = 2;			// 2 == clamped to X
+		contouredTrianglePerfectClampValue = PerfectClampEnum::CLAMPED_TO_Y;			// 2 == clamped to Y
 	}
 
 	// z clamp check
@@ -117,7 +117,7 @@ void OSContouredTriangle::checkForPerfectClamping()
 	)
 	{
 		//std::cout << "Perfect Z-clamp detected! " << std::endl;
-		contouredTrianglePerfectClampValue = 3;			// 3 == clamped to X
+		contouredTrianglePerfectClampValue = PerfectClampEnum::CLAMPED_TO_Z;			// 3 == clamped to Z
 	}
 }
 
@@ -252,14 +252,14 @@ void OSContouredTriangle::printKeyPairArray()
 int OSContouredTriangle::isPerfectlyClamped()
 {
 	int result = 0;
-	if (contouredTrianglePerfectClampValue != 0)	// if this triangle is clamped to ANYTHING, return 1.
+	if (contouredTrianglePerfectClampValue != PerfectClampEnum::NONE)	// if this triangle is clamped to ANYTHING, return 1.
 	{
 		result = 1;
 	}
 	return result;
 }
 
-int OSContouredTriangle::getPerfectClampValue()
+PerfectClampEnum OSContouredTriangle::getPerfectClampValue()
 {
 	return contouredTrianglePerfectClampValue;
 }
@@ -283,7 +283,7 @@ void OSContouredTriangle::adjustPointKeysIfPerfectlyAlignedToECBBorders()
 	}
 
 	// check for perfect clamps; we can use the last iteration of currentKeyCopy for this
-	if (contouredTrianglePerfectClampValue == 1)		// if perfectly clamped to X... do this
+	if (contouredTrianglePerfectClampValue == PerfectClampEnum::CLAMPED_TO_X)		// if perfectly clamped to X... do this
 	{
 		/*
 
@@ -321,7 +321,7 @@ void OSContouredTriangle::adjustPointKeysIfPerfectlyAlignedToECBBorders()
 		}
 	}
 
-	else if (contouredTrianglePerfectClampValue == 2)	// if perfectly clamped to Y... do this
+	else if (contouredTrianglePerfectClampValue == PerfectClampEnum::CLAMPED_TO_Y)	// if perfectly clamped to Y... do this
 	{
 		TriangleLine tempLine = triangleLines[0];	// when checking for any x,y,z or that is clamped, we can get any point in any line (x, y, or z will be the same in all points)
 		if (tempLine.pointA.y == currentBorderLineList.corner_LowerNW.cornerPoint.y)		// triangle is at very bottom
@@ -352,7 +352,7 @@ void OSContouredTriangle::adjustPointKeysIfPerfectlyAlignedToECBBorders()
 		}
 	}
 
-	else if (contouredTrianglePerfectClampValue == 3)		// if perfectly clamped to Z... do this
+	else if (contouredTrianglePerfectClampValue == PerfectClampEnum::CLAMPED_TO_Z)		// if perfectly clamped to Z... do this
 	{
 		TriangleLine tempLine = triangleLines[0];
 		if (tempLine.pointA.z == currentBorderLineList.corner_LowerNW.cornerPoint.z)		// triangle is at very bottom

@@ -178,7 +178,7 @@ void OSContouredTriangleRunner::prepareContouredTriangleData(PolyRunDirection in
 	//std::cin >> sillyVal;
 
 	//int perfectClampFlag = isContouredTrianglePerfectlyClamped();		// is the contoured triangle perfectly clamped?
-	int perfectClampFlag = contouredTrianglePtr->isPerfectlyClamped();
+	PerfectClampEnum perfectClampFlag = contouredTrianglePtr->getPerfectClampValue();
 	for (int x = 0; x < 3; x++)		// go through each line in the contoured triangle.
 	{
 		

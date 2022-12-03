@@ -101,7 +101,6 @@ class ECBPolyReformer
 
 		ShatteredResults produceShatteredResultsForORE(int* in_nextECBPolyIDTrackerRef, 
 													   std::vector<EnclaveTriangle> in_enclaveTriangleVector, 
-													   ECBPolyPoint in_currentECBPolyMRP,
 													   EnclaveKeyDef::EnclaveKey in_blueprintKey,
 													   EnclaveKeyDef::EnclaveKey in_oreKey);
 
