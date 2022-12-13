@@ -40,6 +40,9 @@
 #include "AdjacentFinder.h"
 #include "CPAffectedBlueprints.h"
 
+#include "ContouredPlanV2Base.h"
+#include "CPV2Mountain.h"
+
 
 class OSServer
 {
@@ -75,6 +78,7 @@ public:
 
 	void testFunction();
 
+	void runSingleMountainV2();
 private:
 	ServerMessageInterpreter messageInterpreter;
 	MessageCable serverMessages;
@@ -110,6 +114,26 @@ private:
 	ContourPlanStateContainer planStateContainer;
 
 	ContourBase* getDerivedContourPlan(string in_string);
+
+
+
+
+
+	// NEW Contour plan functions
+	std::unordered_map<string, std::unique_ptr<ContouredPlanV2Base>> plansV2Map;
+	void addPlanV2(std::string in_planName, 
+					OSTerrainFormation in_Formation, 
+					DoublePoint in_polyPoint, 
+					int in_numberOfLayers, 
+					float in_distanceBetweenLayers, 
+					float in_startRadius, 
+					float in_expansionValue);
+	ContouredPlanV2Base* getPlanV2Ref(std::string in_planNameToGet);
+	void executePlanV2(std::string in_planNameToExecute);
+
+
+
+
 	void runPolyFracturer(EnclaveKeyDef::EnclaveKey in_key, PolyDebugLevel in_debugLevel);							// testing only (for now)
 	void runPolyFracturerForAllBlueprints();
 

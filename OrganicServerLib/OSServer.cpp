@@ -62,6 +62,23 @@ void OSServer::addDerivedContourPlan(string in_planName, OSTerrainFormation in_F
 	}
 }
 
+void OSServer::addPlanV2(std::string in_planName,
+	OSTerrainFormation in_Formation,
+	DoublePoint in_polyPoint,
+	int in_numberOfLayers,
+	float in_distanceBetweenLayers,
+	float in_startRadius,
+	float in_expansionValue)
+{
+	std::cout << "Adding new, plan V2..." << std::endl;
+	if (in_Formation == OSTerrainFormation::MOUNTAIN)
+	{
+		
+		plansV2Map[in_planName].reset(new CPV2Mountain());
+		plansV2Map[in_planName].get()->initialize(in_polyPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);		// call the initialization function (common to all ContourBase derivatives)
+	}
+}
+
 void OSServer::constructSingleOrganicTest()
 {
 	std::cout << "||||||| constructing single poly for OrganicTriangle testing (version 1)...." << std::endl;
@@ -531,6 +548,23 @@ void OSServer::constructSingleMountTest()
 	executeDerivedContourPlan("summit1");
 }
 
+void OSServer::runSingleMountainV2()
+{
+	DoublePoint summit1(28.0, 16.0, 16.0);
+	int numberOfLayers = 3;
+	addPlanV2("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 31.82, 9);
+	auto currentPlanRef = getPlanV2Ref("summit1");
+	currentPlanRef->amplifyAllContourLinePoints();
+	currentPlanRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	currentPlanRef->buildContouredTriangles();
+	executePlanV2("summit1");
+
+	int doneValue = 3;
+	std::cout << "Plan V2 test done. Enter key to continue (or just end). " << std::endl;
+	std::cin >> doneValue;
+}
+
+
 
 void OSServer::constructMultiMountTestWithElevator()
 {
@@ -898,6 +932,17 @@ void OSServer::executeDerivedContourPlan(string in_string)
 	std::cin >> someVal;
 }
 
+void OSServer::executePlanV2(std::string in_planNameToExecute)
+{
+	OSWinAdapter::clearWorldFolder(currentWorld);
+	auto planV2Ptr = getPlanV2Ref(in_planNameToExecute);
+	auto processableCTV2s = planV2Ptr->getProcessableContouredTriangles();
+
+	std::cout << "Size of processableCTV2s: " << processableCTV2s.size() << std::endl;
+
+	planV2Ptr->copyOverProducedECBPolys(processableCTV2s, &serverBlueprints);
+}
+
 void OSServer::executeDerivedContourPlanNoInput(std::string in_string)
 {
 	OSWinAdapter::clearWorldFolder(currentWorld);
@@ -1121,6 +1166,8 @@ void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
 	organicSystemPtr->addKeyToRenderList(in_key);
 }
+
+
 
 void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 {
@@ -1488,6 +1535,11 @@ int OSServer::checkIfBlueprintExists(EnclaveKeyDef::EnclaveKey in_Key)
 ContourBase* OSServer::getDerivedContourPlan(string in_string)
 {
 	return newContourMap[in_string].get();	// get a reference to the smart pointer
+}
+
+ContouredPlanV2Base* OSServer::getPlanV2Ref(std::string in_planNameToGet)
+{
+	return plansV2Map[in_planNameToGet].get();
 }
 
 void OSServer::checkClientMessages()

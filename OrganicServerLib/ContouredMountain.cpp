@@ -173,7 +173,14 @@ void ContouredMountain::constructSingleContouredTriangle(ECBPolyPoint in_x, ECBP
 
 }
 
-void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, ECBPolyPoint in_point0, ECBPolyPoint in_point1, ECBPolyPoint in_point2, ECBPolyPoint in_massReferencePoint, int in_triangleStripID, TriangleMaterial in_materialID, ECBPolyType in_type)
+void ContouredMountain::contouredMountainConstructSingleContouredTriangle(unordered_map<int, OSContouredTriangleStrip>* in_osContouredTriangleStripRef, 
+																		ECBPolyPoint in_point0, 
+																		ECBPolyPoint in_point1, 
+																		ECBPolyPoint in_point2, 
+																		ECBPolyPoint in_massReferencePoint, 
+																		int in_triangleStripID, 
+																		TriangleMaterial in_materialID, 
+																		ECBPolyType in_type)
 {
 	OSContouredTriangle testTriangle(in_point0, in_point1, in_point2, in_materialID, in_massReferencePoint, &planPolyRegistry, in_type);
 	int baseStripSize = (*in_osContouredTriangleStripRef)[in_triangleStripID].triangleMap.size();		// get the number of triangles in the base strip, should be 0

@@ -64,6 +64,12 @@
     <Filter Include="Header Files\CPAffectedBlueprints">
       <UniqueIdentifier>{8340b184-d0a3-499f-8418-50f4cf02ab30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\ContouredPlanV2">
+      <UniqueIdentifier>{9d5c2ff5-fa1a-4f76-8218-0f946f39c303}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContouredPlanV2">
+      <UniqueIdentifier>{32d5473d-daa9-4cbf-bfc4-794e519ff29b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -285,6 +291,24 @@
     <ClInclude Include="SJCheckContourPlanSuccess.h">
       <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
     </ClInclude>
+    <ClInclude Include="ContouredPlanV2Base.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredTriangleV2.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="CPV2Mountain.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredDoublePoint.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredCircuit.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="CTV2Strip.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -415,6 +439,18 @@
     </ClCompile>
     <ClCompile Include="SJCheckContourPlanSuccess.cpp">
       <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredTriangleV2.cpp">
+      <Filter>Source Files\ContouredPlanV2</Filter>
+    </ClCompile>
+    <ClCompile Include="CPV2Mountain.cpp">
+      <Filter>Source Files\ContouredPlanV2</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredCircuit.cpp">
+      <Filter>Source Files\ContouredPlanV2</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredPlanV2Base.cpp">
+      <Filter>Source Files\ContouredPlanV2</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
