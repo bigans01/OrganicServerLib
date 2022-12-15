@@ -381,40 +381,6 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	auto organicstart = std::chrono::high_resolution_clock::now();		// optional, for performance testing only	
 	//EnclaveFractureResultsMap tempMap;		// the tempMap where all the work will be written to.
 
-	/*
-	// Step 1) find each poly that is a SHELL_MASSDRIVER type, put it into the appropriate ForgedPolySet (mapped by blueprint key). At 
-	//			the same time, in the same loop, generate the raw enclave data for each affected blueprint.
-	auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.begin();
-	auto planPolyRegistryEnd = planPolyRegistry.polySetRegistry.end();
-	for (planPolyRegistryBegin; planPolyRegistryBegin != planPolyRegistryEnd; planPolyRegistryBegin++)
-	{
-		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
-		int foundGroupID = planPolyRegistryBegin->second.groupID;									// grab the group ID we'll be working with.
-		//std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-		EnclaveCollectionBlueprint* blueprintToCheck = &(*in_blueprintMapRef)[blueprintKey];	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		std::map<int, ECBPoly>* polyMapRef = &blueprintToCheck->primaryPolygonMap;				// get a ref to the poly map inside the blueprint.
-		auto forgedPolySetBegin = planPolyRegistryBegin->second.polySet.begin();
-		auto forgedPolySetEnd = planPolyRegistryBegin->second.polySet.end();
-		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)
-		{
-			ECBPoly* polyRef = &(*polyMapRef).find(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
-			if (polyRef->polyType == ECBPolyType::SHELL_MASSDRIVER)					// if it's a shell mass driver, insert it into the massDriverPolyRegistry
-			{
-				massDriverPolyRegistry.addToPolyset(blueprintKey, *forgedPolySetBegin);
-				//std::cout << "In blueprint, (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << "), polygon with ID: " << *forgedPolySetBegin << std::endl;
-			}
-		}
-
-		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
-		EnclaveFractureResultsMap tempMap;
-		//in_clientRef->OS->produceRawEnclavesForPolySet(in_fractureResultsMapRef, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		//in_clientRef->OS->updateRawEnclaveData(in_fractureResultsMapRef, blueprintToCheck);
-		in_clientRef->OS->produceRawEnclavesForPolySet(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet);		// first, generate the OrganicRawEnclaves that would be produced by this set
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(&tempMap, blueprintToCheck);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
-
-	}
-	*/
-
 	// Step 0): create an independent blueprint mass (which consists only of OrganicTriangles, and not ORE data), by creating a shell and running its mass drivers. Save this mass, acquire the blueprints that the mass ran through, and compare its
 	// blueprints against existing mass. 
 	BlueprintMassManager planMassManager(in_ecbMapRef, in_clientRef, this);
@@ -422,26 +388,21 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	planMassManager.buildPersistentMasses();	// For each blueprint that the ContourPlan touches -- that also has an existing mass -- acquire a copy of the mass
 												// from that blueprint before any changes are made in Phase 2.
 	
-	// Step 1), V2: iterate through the list of affected blueprints, by going through the adherence order; each blueprint in the adherence order (except for the first one) will attempt to perform
-	// adherence after the encalves have been produced, but before the triangle data skeletons are appended to the blueprints.
-	// In addition to this, keep track of all OREs that an OrganicTriangle produces, which is needed for the post-collision check step that occurs at the end of this function.
-	auto adherenceListBegin = adherenceData.adherenceOrder.begin();
-	auto adherenceListEnd = adherenceData.adherenceOrder.end();
-	int currentAdherenceIndex = 0;														// iterate every loop; the very first blueprint doesn't need to do adherence.
-	for (; adherenceListBegin != adherenceListEnd; adherenceListBegin++)
+	// Step 1): go through the list of affected blueprints, by iterating through each entry in the planPolyRegistry.polySetRegistry.
+	for (auto& currentForgedPolySetIter : planPolyRegistry.polySetRegistry)
 	{
 		// #############################################################################################################################
 		// STEP 1.1): find the SHELL_MASSDRIVER polys that this ContourPlan produced, 
 		// which are a subset of the ForgedPolySet, in each blueprint that the ContourPlan touched.
 
-		auto currentForgedPolySetIter = planPolyRegistry.polySetRegistry.find(*adherenceListBegin); // find the forged poly set, for the current blueprint we're looking at
+		//auto currentForgedPolySetIter = planPolyRegistry.polySetRegistry.find(*adherenceListBegin); // find the forged poly set, for the current blueprint we're looking at
 																								 // in the vector. For example, a ForgedPolySet might have a range of polys between 0 and 7 (8 total).
-		EnclaveKeyDef::EnclaveKey blueprintKey = currentForgedPolySetIter->first;					// get the key of the blueprint to check.
+		EnclaveKeyDef::EnclaveKey blueprintKey = currentForgedPolySetIter.first;					// get the key of the blueprint to check.
 
 
 		EnclaveCollectionBlueprint* currentServerBlueprintRef = in_ecbMapRef->getBlueprintRef(blueprintKey);	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		auto forgedPolySetBegin = currentForgedPolySetIter->second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
-		auto forgedPolySetEnd = currentForgedPolySetIter->second.polySet.end();					// ""
+		auto forgedPolySetBegin = currentForgedPolySetIter.second.polySet.begin();				// set iterators for the poly set we're using from the planPolyRegistry.
+		auto forgedPolySetEnd = currentForgedPolySetIter.second.polySet.end();					// ""
 		for (forgedPolySetBegin; forgedPolySetBegin != forgedPolySetEnd; forgedPolySetBegin++)	// check for SHELL_MASSDRIVER polys, and add them appropriately.
 		{
 			ECBPoly* polyRef = &currentServerBlueprintRef->getPolyIterFromMap(*forgedPolySetBegin)->second;	// get a ref to the poly to find.
@@ -492,19 +453,10 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 		
 		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, oreTrackerRef);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set; load the tracked OREs of the OrganicTriangles that were added by the plan
 		in_clientRef->OS->produceTrackedORESForOrganicTriangleIDs(&tempMap, blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, oreTrackerRef);			// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
-		if (currentAdherenceIndex > 0)					// **the first blueprint never does adherence, as it is the primal blueprint (the first)
-		{
-			//OSServerUtils::runAdherenceForBlueprint(&adherenceData, blueprintKey, &containerMapMap[blueprintKey], &containerMapMap);				// 4.) Run adherence; be sure to pass a ref to the containerMapMap we're working with
-		}
-
-		//std::cout << "!!! Spawning and appending skeletons for blueprint: " << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
 
 		// Use the ORE and EnclaveTriangle data that is stored in the tempMap, to apply OREMatterCollider operations -- and/or similiar ones -- if need be, for this
 		// blueprint that the ContourPlan affects/generated.
 		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, currentServerBlueprintRef, oreTrackerRef);					// 4.) for each blueprint in the adherence list, 
-																																				// spawn the EnclaveTriangleSkeletonContainers from the corresponding EnclaveFractureResultsMap for that blueprint; 
-																																				// then append the results to the target blueprint to update.				
-		currentAdherenceIndex++;
 	}
 
 	// Step 2) In this step, we must now apply the ContourPlans MassDriving to the persistent blueprints. Remember, the previous MassDriving operation was for 
@@ -516,15 +468,13 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 	//		   subtract the massDriverPolyRegistry set from it to produce a new set. This new set represents the OrganicTriangles that 
 	//         will have to be traced in the blueprint that the mass driver begins in (but only for that initial blueprint)
 	//std::cout << "Printing unique blueprint keys from massDriverPolyRegistry: " << std::endl;
-	auto massDriverRegistryBegin = massDriverPolyRegistry.polySetRegistry.begin();
-	auto massDriverRegistryEnd = massDriverPolyRegistry.polySetRegistry.end();
-	for (massDriverRegistryBegin; massDriverRegistryBegin != massDriverRegistryEnd; massDriverRegistryBegin++)
+	for (auto& massDriverRegistryBegin : massDriverPolyRegistry.polySetRegistry)
 	{
 		// set up the set to use; grab the starting floor blueprint key
-		EnclaveKeyDef::EnclaveKey startingFloorBlueprintKey = massDriverRegistryBegin->first;
+		EnclaveKeyDef::EnclaveKey startingFloorBlueprintKey = massDriverRegistryBegin.first;
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[startingFloorBlueprintKey];	// get the original, unaltered set
 		//ForgedPolySet subtractingSet = massDriverRegistryBegin->second;
-		ForgedPolySet massDriverSet = massDriverRegistryBegin->second;				// the set that represents the polys identified as SHELL_MASSDRIVER type.
+		ForgedPolySet massDriverSet = massDriverRegistryBegin.second;				// the set that represents the polys identified as SHELL_MASSDRIVER type.
 		ForgedPolySet startingFloorTerminatingSet = originalSet;
 
 		auto subtractionBegin = massDriverSet.polySet.begin();
@@ -534,7 +484,7 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
-		std::cout << "!! Mass Driving blueprint Key: (" << massDriverRegistryBegin->first.x << ", " << massDriverRegistryBegin->first.y << ", " << massDriverRegistryBegin->first.z << ") " << std::endl;
+		std::cout << "!! Mass Driving blueprint Key: (" << massDriverRegistryBegin.first.x << ", " << massDriverRegistryBegin.first.y << ", " << massDriverRegistryBegin.first.z << ") " << std::endl;
 		// now that the shell has been produced in all its affected blueprints, its now time to at last run the mass drivers.
 		// a mass driver should pass:
 
@@ -565,18 +515,17 @@ void ContouredMountain::runMassDrivers(OrganicClient* in_clientRef,
 													// For both the "shattered" and "unshattered" types, each ORE key of an ECBPoly is checked to see if there is an already existing 
 													// ORE that is FULL in the appropriate mass (appropriate mass meaning that the ECBPolys of the contour plan are compared against persistent mass, 
 													// and that existing ECB Polys are compared against the contoured mass). If all ORE keys that an ECBPoly touches are FULL, that ECBPoly is erased.
-													// In other words, if the single ORE key of a "shattered" ECBPoly is FULL, that is erased; if all the ORE keys of an "unshattered" poly are FULL,
-													// then that one is erased.
-	planMassManager.updatePersistentBlueprintPolys();
+													// In other words, if the single ORE key of a "shattered" ECBPoly is FULL, that is flagged for being erased; if all the ORE keys of an "unshattered" poly are FULL,
+													// then that one is also flagged for erase. The erasing/inserting action will actually occur in the call to updatePersistentBlueprintPolys() below.
 
-	// Step 4) Update any OREs that need to be set to RMass mode.
-	auto oreRMatterUpdateBegin = adherenceData.adherenceOrder.begin();
-	auto oreRMatterUpdateEnd = adherenceData.adherenceOrder.end();
-	for (; oreRMatterUpdateBegin != oreRMatterUpdateEnd; oreRMatterUpdateBegin++)
+	planMassManager.updatePersistentBlueprintPolys();	// does the actual erasing/inserting of ECBPolys in the persistent/contour masses.
+
+	// Step 4) Update any OREs that need to be set to RMass mode;
+	//			The iterator will be for the keyed-found forged poly set, for the current blueprint we're looking at.
+	//			The key of the iterator will be used as the blueprintKey to use.
+	for (auto& planPolyRegistryBegin : planPolyRegistry.polySetRegistry)
 	{
-		auto planPolyRegistryBegin = planPolyRegistry.polySetRegistry.find(*oreRMatterUpdateBegin); // find the forged poly set, for the current blueprint we're looking at
-																								 // in the vector. For example, a ForgedPolySet might have a range of polys between 0 and 7 (8 total).
-		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin->first;					// get the key of the blueprint to check.
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin.first;					// get the key of the blueprint to check.
 		EnclaveCollectionBlueprint* currentServerBlueprintRef = in_ecbMapRef->getBlueprintRef(blueprintKey);
 		OrganicTriangleTracker* oreTrackerRef = planMassManager.getReformerTrackerRef(blueprintKey);				// remember,  keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-fracture check), 
 		auto skeletonClearBegin = oreTrackerRef->modifiedORESet.begin();

@@ -10,10 +10,8 @@
 #include "ForgedPolyRegistry.h"
 #include "OrganicClient.h"
 #include <unordered_map>
-#include "OrganicClient.h"
 #include "ContourBase.h"
 #include "ECBPolyReformer.h"
-#include "ECBMap.h"
 
 class BlueprintMassManager
 {

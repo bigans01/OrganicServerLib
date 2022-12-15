@@ -309,6 +309,9 @@
     <ClInclude Include="CTV2Strip.h">
       <Filter>Header Files\ContouredPlanV2</Filter>
     </ClInclude>
+    <ClInclude Include="BPMassManagerV2.h">
+      <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -450,6 +453,9 @@
       <Filter>Source Files\ContouredPlanV2</Filter>
     </ClCompile>
     <ClCompile Include="ContouredPlanV2Base.cpp">
+      <Filter>Source Files\ContouredPlanV2</Filter>
+    </ClCompile>
+    <ClCompile Include="BPMassManagerV2.cpp">
       <Filter>Source Files\ContouredPlanV2</Filter>
     </ClCompile>
   </ItemGroup>

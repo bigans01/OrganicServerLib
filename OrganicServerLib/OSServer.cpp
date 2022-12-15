@@ -941,6 +941,14 @@ void OSServer::executePlanV2(std::string in_planNameToExecute)
 	std::cout << "Size of processableCTV2s: " << processableCTV2s.size() << std::endl;
 
 	planV2Ptr->copyOverProducedECBPolys(processableCTV2s, &serverBlueprints);
+
+	// 3.) run the mass driver for the plan. (if the plan allows for it)
+	EnclaveFractureResultsMap tempMap;
+	planV2Ptr->runMassDriversV2(&client, &serverBlueprints, &tempMap);
+
+	std::cout << ">>>>>>>>>>>>> Done with test of MassDriving, for executePlanV2. Enter number to continue. " << std::endl;
+	int continueVal = 3;
+	std::cin >> continueVal;
 }
 
 void OSServer::executeDerivedContourPlanNoInput(std::string in_string)

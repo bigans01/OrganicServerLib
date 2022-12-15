@@ -98,9 +98,9 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 				currentTriangleID++;
 			}
 
-			std::cout << "Enter a number to go to the next key." << std::endl;
-			int doneKeyWait = 3;
-			std::cin >> doneKeyWait;
+			//std::cout << "Enter a number to go to the next key." << std::endl;
+			//int doneKeyWait = 3;
+			//std::cin >> doneKeyWait;
 
 		}
 	}

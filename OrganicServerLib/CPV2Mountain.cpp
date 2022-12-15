@@ -178,7 +178,9 @@ void CPV2Mountain::constructOuterQuadrantShell(std::unordered_map<int, CTV2Strip
 			basePointForCurrentLine++;		// ""
 		}
 		
-		// perform logic for final triangle
+		// perform logic for final triangle; because we are doing the last triangle in a circuit,
+		// the first point needs to be used, i.e, whatever is at index 0 in the previous line.
+		basePointForPreviousLine = 0;
 		DoublePoint firstPoint = in_previousCircuit->smartContourPoint[basePointForPreviousLine].getDoublePoint();	// get the first point from the previous line
 		DoublePoint secondPoint = in_currentCircuit->smartContourPoint[basePointForCurrentLine].getDoublePoint();	// get the second point from the current line
 		DoublePoint thirdPoint = in_currentCircuit->smartContourPoint[0].getDoublePoint();	// get the third point from the current line
@@ -270,7 +272,7 @@ void CPV2Mountain::constructTriangle(std::unordered_map<int, CTV2Strip>* in_cont
 									in_point2, 
 									in_materialID, 
 									in_massReferencePoint,
-									&typicalShellRegistry,
+									&allPolysRegistry,
 									&shellMassDriverRegistry,
 									in_polyType);
 	// Below: get the index in the triangle strip, that we will use to insert the triangle we just made.
@@ -283,6 +285,27 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 	EnclaveFractureResultsMap* in_fractureResultsMapRef)
 {
 
+	// The below code block is the same as running multiple blank contours; this was just a "smoke test" to stamp out
+	// any initial bugs, and to ensure that the plan V2 logic (i.e, using FTriangles to form ECBPolys) was working.
+	// The logic to fill blueprints will come later.
+	OrganicTriangleTracker oreTracker;
+	for (auto& planPolyRegistryBegin : allPolysRegistry.polySetRegistry)
+	{
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin.first;					// get the key of the blueprint to check.
+		int foundGroupID = planPolyRegistryBegin.second.groupID;									// grab the group ID we'll be working with.
+		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+		EnclaveCollectionBlueprint* blueprintToCheck = in_ecbMapRef->getBlueprintRef(blueprintKey);	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		auto forgedPolySetBegin = planPolyRegistryBegin.second.polySet.begin();
+		auto forgedPolySetEnd = planPolyRegistryBegin.second.polySet.end();
+
+		ForgedPolySet originalSet = allPolysRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+
+		std::cout << "!! Size of the originalSet to be used in this blueprint: " << originalSet.polySet.size() << std::endl;
+
+		EnclaveFractureResultsMap tempMap;
+		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// first, generate the OrganicRawEnclaves that would be produced by this set; keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-collision check)
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck, &oreTracker);
+	}
 }
 
 void CPV2Mountain::setMountainUpperLayersContourPoints(DoublePoint in_startPoint,
@@ -311,6 +334,11 @@ void CPV2Mountain::setMountainUpperLayersContourPoints(DoublePoint in_startPoint
 		}
 
 		insertDoubleMRP(&triangleUpperStripMRPMap, x, mrpToAdd);		// add the MRP into the appropriate upper layer mountain strip.
+
+		//std::cout << "!!! Preparing to add a contorued circuit, with start point at: "; in_startPoint.printPointCoords(); std::cout << std::endl;
+		//int prepEnd = 3;
+		//std::cin >> prepEnd;
+
 		addContouredCircuit(&upperContourLineCircuits, &topCircuitCount, currentRadius, mrpToAdd.y, currentNumberOfPoints, in_startPoint);
 	}
 }

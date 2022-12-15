@@ -49,6 +49,7 @@ class ECBPolyReformer
 
 	private:
 		friend class BlueprintMassManager;
+		friend class BPMassManagerV2;
 		struct ShatteredECBPolys
 		{
 			ShatteredECBPolys() {};

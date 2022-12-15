@@ -59,9 +59,9 @@ void ContouredCircuit::amplifyPoint(int in_pointIndex, float in_pointAngle)
 
 			smartContourPoint[in_pointIndex] = pointToAdd;
 			auto currentPointRef = &smartContourPoint[in_pointIndex];
-			currentPointRef->contouredDPoint.x = xValue;
+			currentPointRef->contouredDPoint.x = xValue + circuitCenterPoint.x;
 			currentPointRef->contouredDPoint.y = circuitCenterPoint.y;
-			currentPointRef->contouredDPoint.z = zValue;
+			currentPointRef->contouredDPoint.z = zValue + circuitCenterPoint.z;
 			currentPointRef->contouredDPoint.roundHundredth();
 
 			wasWithinAmpField = true;	// no amplification required outside of this loop (see below)
@@ -78,9 +78,9 @@ void ContouredCircuit::amplifyPoint(int in_pointIndex, float in_pointAngle)
 		float zValue = finalDistance * (sin(anglePiRads));
 
 		auto currentPointRef = &smartContourPoint[in_pointIndex];
-		currentPointRef->contouredDPoint.x = xValue;
+		currentPointRef->contouredDPoint.x = xValue + circuitCenterPoint.x;
 		currentPointRef->contouredDPoint.y = circuitCenterPoint.y;
-		currentPointRef->contouredDPoint.z = zValue;
+		currentPointRef->contouredDPoint.z = zValue + circuitCenterPoint.z;
 		currentPointRef->contouredDPoint.roundHundredth();
 	}
 }

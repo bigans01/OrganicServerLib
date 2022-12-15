@@ -8,6 +8,7 @@
 #include "OrganicClient.h"
 #include "CTV2Strip.h"
 #include "ECBMap.h"
+#include "OrganicTriangleTracker.h"
 
 class ContouredPlanV2Base
 {
@@ -36,6 +37,15 @@ class ContouredPlanV2Base
 								float in_expansionValue) = 0;
 		virtual void amplifyAllContourLinePoints() = 0;				// Step 2: amplification function 
 		virtual void buildContouredTriangles() = 0;					// Step 3: build out the contoured triangles.
+
+		virtual void runMassDriversV2(OrganicClient* in_clientRef,
+			ECBMap* in_ecbMapRef,
+			EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;	// Step 5:	Once the child plan has applied the resulting ECBPolys of the FTriangleOutput instances 
+																		//			to their respective blueprints, we can attempt mass driving.
+		ForgedPolyRegistry allPolysRegistry;		// all produced ECBPolys from ContouredTriangleV2 instances initially get a pointer to this set.
+														// and will need to register with it.
+
+		ForgedPolyRegistry shellMassDriverRegistry;		// ECBPolys which are specifically of the ECBPolyType::SHELL_MASSDRIVER will need to go here (in addition to the allPolysRegistry)
 	protected:
 		
 
@@ -44,10 +54,6 @@ class ContouredPlanV2Base
 		std::unordered_map<int, CTV2Strip> typicalShellStrips;
 		std::unordered_map<int, CTV2Strip> shellMassDriverStrips;
 
-		ForgedPolyRegistry typicalShellRegistry;		// all produced ContouredTriangleV2 instances initially get a pointer to this set; this will need to be reworked,
-														// so that ContouredTriangleV2 instances that will produce ECBPolyType::SHELL_MASSDRIVE ECBPoly instances, actually have
-														// shellMassDriverRegistry set in their pointer (work not yet started on this task)
-		ForgedPolyRegistry shellMassDriverRegistry;
 
 		std::map<int, TriangleMaterial> preferredMaterialLookup;	// a lookup map for specific materials that a Contour plan expects; each contour plan may look at this map
 																	// for materials to use, how they look it up is up to each plan.
@@ -57,10 +63,6 @@ class ContouredPlanV2Base
 		TriangleMaterial getPreferredMaterialAtIndex(int in_indexToLookup);
 
 
-		virtual void runMassDriversV2(OrganicClient* in_clientRef,
-			ECBMap* in_ecbMapRef,
-			EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;	// Step 5:	Once the child plan has applied the resulting ECBPolys of the FTriangleOutput instances 
-																		//			to their respective blueprints, we can attempt mass driving.
 
 
 };

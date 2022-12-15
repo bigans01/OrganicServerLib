@@ -157,6 +157,7 @@
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="BlueprintMassManager.h" />
+    <ClInclude Include="BPMassManagerV2.h" />
     <ClInclude Include="ContouredDoublePoint.h" />
     <ClInclude Include="ContouredTriangleV2.h" />
     <ClInclude Include="ContourBase.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="BlueprintFillerRunner.cpp" />
     <ClCompile Include="BlueprintMassManager.cpp" />
+    <ClCompile Include="BPMassManagerV2.cpp" />
     <ClCompile Include="ContourBase.cpp" />
     <ClCompile Include="ContouredMountain.cpp" />
     <ClCompile Include="ContouredPlanV2Base.cpp" />
