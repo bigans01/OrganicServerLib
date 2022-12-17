@@ -5,6 +5,7 @@
 
 #include "ContouredPlanV2Base.h"
 #include "ContouredCircuit.h"
+#include "BPMassManagerV2.h"
 
 class CPV2Mountain : public ContouredPlanV2Base
 {

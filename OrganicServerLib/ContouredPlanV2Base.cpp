@@ -67,7 +67,8 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 				currentCTV2->allForgedPolysRegistryRef->addToPolyset(currentKeyCopy, currentID);
 
 				// ...but if currentCTV2PolyType is ECBPolyType::SHELL_MASSDRIVER, we must *ALSO* insert it appropriately, into shellMassDriverRegistryRef.
-				// This will prevent us from having to re-scan all ECBPolys the ContourPlanV2Base-derived instance to find out which ones are SHELL_MASSDRIVER.
+				// This will prevent us from having to re-scan all ECBPolys the ContourPlanV2Base-derived instance to find out which ones are SHELL_MASSDRIVER,
+				// which would be done by the runMassDriverV2 function (virtually defined) of the ContourPlanV2Base-derived class.
 				if (currentCTV2PolyType == ECBPolyType::SHELL_MASSDRIVER)
 				{
 					currentCTV2->shellMassDriverRegistryRef->addToPolyset(currentKeyCopy, currentID);
