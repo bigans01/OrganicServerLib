@@ -284,6 +284,32 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 	ECBMap* in_ecbMapRef,
 	EnclaveFractureResultsMap* in_fractureResultsMapRef)
 {
+	/*
+	// The below code block is the same as running multiple blank contours; this was just a "smoke test" to stamp out
+	// any initial bugs, and to ensure that the plan V2 logic (i.e, using FTriangles to form ECBPolys) was working.
+	// The logic to fill blueprints will come later.
+	//
+	// It remains as a way to debug/observe a shell that hasn't had mass drivers run on it yet.
+	OrganicTriangleTracker oreTracker;
+	for (auto& planPolyRegistryBegin : allPolysRegistry.polySetRegistry)
+	{
+		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin.first;					// get the key of the blueprint to check.
+		int foundGroupID = planPolyRegistryBegin.second.groupID;									// grab the group ID we'll be working with.
+		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
+		EnclaveCollectionBlueprint* blueprintToCheck = in_ecbMapRef->getBlueprintRef(blueprintKey);	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
+		auto forgedPolySetBegin = planPolyRegistryBegin.second.polySet.begin();
+		auto forgedPolySetEnd = planPolyRegistryBegin.second.polySet.end();
+
+		ForgedPolySet originalSet = allPolysRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
+
+		std::cout << "!! Size of the originalSet to be used in this blueprint: " << originalSet.polySet.size() << std::endl;
+
+		EnclaveFractureResultsMap tempMap;
+		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// first, generate the OrganicRawEnclaves that would be produced by this set; keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-collision check)
+		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck, &oreTracker);
+	}
+	*/
+	
 	// #############################################################################################################################
 	// STEP 1 OVERVIEW: use all the values from each ForgedPolySet -- which represent the IDs of ECBPolys that this ContourPlan added -- for each blueprint, and 
 	// then spawn the resulting EnclaveTriangles in the OREs (OrganicRawEnclaves) into the tempMap. When this is done, add the results to the containerMapMap.

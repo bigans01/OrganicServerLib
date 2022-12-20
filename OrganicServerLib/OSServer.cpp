@@ -551,7 +551,7 @@ void OSServer::constructSingleMountTest()
 void OSServer::runSingleMountainV2()
 {
 	DoublePoint summit1(28.0, 16.0, 16.0);
-	int numberOfLayers = 3;
+	int numberOfLayers = 5;
 	addPlanV2("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 31.82, 9);
 	auto currentPlanRef = getPlanV2Ref("summit1");
 	currentPlanRef->amplifyAllContourLinePoints();
