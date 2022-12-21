@@ -68,7 +68,7 @@ ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
 		yRanges.insert(points[x].y);
 		zRanges.insert(points[x].z);
 
-		std::cout << "Double point values were: " << points[x].x << ", " << points[x].y << ", " << points[x].z << std::endl;
+		//std::cout << "Double point values were: " << points[x].x << ", " << points[x].y << ", " << points[x].z << std::endl;
 	}
 
 	// the amount to adjust in x/y/z, is the inverse of the minimum found in each dim set.
@@ -81,7 +81,7 @@ ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
 	DoublePoint translationValue(minXAdjustment, minYAdjustment, minZAdjustment);
 	translationValue.roundHundredth();
 
-	std::cout << "translationValues are:" << translationValue.x << ", " << translationValue.y << ", " << translationValue.z << std::endl;
+	//std::cout << "translationValues are:" << translationValue.x << ", " << translationValue.y << ", " << translationValue.z << std::endl;
 
 	// now, translate copies of the points (not the original points), along with the MRP.
 	DoublePoint adjustedPoints[3];
@@ -97,17 +97,17 @@ ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
 	for (int x = 0; x < 3; x++)
 	{
 		convertedPoints[x] = glm::vec3(float(adjustedPoints[x].x), float(adjustedPoints[x].y), float(adjustedPoints[x].z));
-		std::cout << "Converted point at index " << x << " is: ";
-		std::cout << convertedPoints[x].x << ", " << convertedPoints[x].y << ", " << convertedPoints[x].z << std::endl;
+		//std::cout << "Converted point at index " << x << " is: ";
+		//std::cout << convertedPoints[x].x << ", " << convertedPoints[x].y << ", " << convertedPoints[x].z << std::endl;
 	}
 
 	glm::vec3 convertedMRP = glm::vec3(float(adjustedMRP.x), float(adjustedMRP.y), float(adjustedMRP.z));
 	EmptyNormalFinder normalFinder(convertedPoints[0], convertedPoints[1], convertedPoints[2], convertedMRP);
 	ECBPolyPoint determinedNormal = normalFinder.calculatedNormal;
 
-	std::cout << "Calculated normal is: "; 
-	determinedNormal.printPointCoords(); 
-	std::cout << endl;
+	//std::cout << "Calculated normal is: "; 
+	//determinedNormal.printPointCoords(); 
+	//std::cout << endl;
 
 	return determinedNormal;
 }
@@ -124,7 +124,7 @@ PerfectClampEnum ContouredTriangleV2::determinePerfectClampValue()
 	)
 	{
 		determinedClampValue = PerfectClampEnum::CLAMPED_TO_X;
-		std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_X. " << std::endl;
+		//std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_X. " << std::endl;
 	}
 
 	else if 
@@ -135,7 +135,7 @@ PerfectClampEnum ContouredTriangleV2::determinePerfectClampValue()
 	)
 	{
 		determinedClampValue = PerfectClampEnum::CLAMPED_TO_Y;
-		std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_Y. " << std::endl;
+		//std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_Y. " << std::endl;
 	}
 
 	else if 
@@ -146,7 +146,7 @@ PerfectClampEnum ContouredTriangleV2::determinePerfectClampValue()
 	)
 	{
 		determinedClampValue = PerfectClampEnum::CLAMPED_TO_Z;
-		std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_Z. " << std::endl;
+		//std::cout << "(ContouredTriangleV2::determinePerfectClampValue()) -> this instance of ContouredTriangleV2 found as being CLAMPED_TO_Z. " << std::endl;
 	}
 	
 

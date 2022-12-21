@@ -30,7 +30,9 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 		auto outputsRef = producedFTriangle.fetchOutputContainerRef();
 
 
+
 		// Below switch: optional debug output
+		/*
 		switch (currentCTV2PolyType)
 		{
 			case ECBPolyType::ROGUE: { std::cout << "Why is this rogue???" << std::endl; break; }
@@ -38,8 +40,9 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 			case ECBPolyType::SHELL: {std::cout << "ECBPoly instances to insert will be of the type ECBPolyType::SHELL. " << std::endl; break;}
 			case ECBPolyType::SHELL_MASSDRIVER: {std::cout << "ECBPoly instances to insert will be of the type ECBPolyType::SHELL_MASSDRIVER. " << std::endl; break;}
 		}
+		*/
 	
-		std::cout << "!!! Number of keys from this FTriangle: " << (*outputsRef).size() << std::endl;
+		//std::cout << "!!! Number of keys from this FTriangle: " << (*outputsRef).size() << std::endl;
 
 		// the ForgedPolySetRegistry needs to be updated accordingly, for each pointed-to instance of ContouredTriangleV2.
 		// This must be done for each EnclaveKey that the ContouredTriangleV2 touches, so it must be done per iteration in the loop that follows.
@@ -49,12 +52,12 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 																			// will need to be inserted into.
 
 
-			std::cout << "Triangles at key: ";
-			currentKeyCopy.printKey();
-			std::cout << std::endl;
+			//std::cout << "Triangles at key: ";
+			//currentKeyCopy.printKey();
+			//std::cout << std::endl;
 
 			int numberOfTrianglesToAdd = currentOutput.second.fracturedTriangles.size();
-			std::cout << "Number of triangles in this container: " << numberOfTrianglesToAdd << std::endl;
+			//std::cout << "Number of triangles in this container: " << numberOfTrianglesToAdd << std::endl;
 
 			// get a pointer to the blueprint, so that we can get the appropriate IDs of the ECBPolys that we are about to insert;
 			// also, insert the ECBPoly with the corresponding ID into the EnclaveCollectionBlueprint.
@@ -72,26 +75,33 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 				if (currentCTV2PolyType == ECBPolyType::SHELL_MASSDRIVER)
 				{
 					currentCTV2->shellMassDriverRegistryRef->addToPolyset(currentKeyCopy, currentID);
-					std::cout << "!!! Because the type is SHELL_MASSDRIVER, this poly will be sent to the shellMassDriverRegistryRef." << std::endl;
+					//std::cout << "!!! Because the type is SHELL_MASSDRIVER, this poly will be sent to the shellMassDriverRegistryRef." << std::endl;
 				}
 			}
 
+			// Below: option to output poly data.
+			/*
 			// optional: print out IDs of the idSet.
 			for (auto& currentID : idSet)
 			{
 				std::cout << "Found ID that would be inserted: " << currentID << std::endl;
 			}
+			*/
 
 			// correlate the triangle ID with each triangle we are reading, so that we have the key/value to insert into the EnclaveCollectionBlueprint.
 			auto currentTriangleID = idSet.begin();
 			for (auto& currentOutputTriangle : currentOutput.second.fracturedTriangles)
 			{
-				std::cout << "Found triangle to convert." << std::endl;
 
 				ECBPoly polyToInsert(currentOutputTriangle.second);	// the ECBPoly that is constructed from the FTriangleOutput.
 				polyToInsert.polyType = currentCTV2PolyType;
+
+				// Below: option to output poly data.
+				/*
+				std::cout << "Found triangle to convert." << std::endl;
 				std::cout << "Checking ECBPoly data: " << std::endl;
 				polyToInsert.printLineData();
+				*/
 
 				// insert the ECBPoly, with the value of currentTriangleID, into the blueprint.
 				currentBlueprintPtr->insertPolyWithKeyValue(*currentTriangleID, polyToInsert);
