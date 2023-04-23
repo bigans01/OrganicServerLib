@@ -422,6 +422,8 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 
 	planMassManager.updatePersistentBlueprintPolys();	// does the actual erasing/inserting of ECBPolys in the persistent/contour masses.
 
+	planMassManager.updatedAffectedORESAsIndependent();
+
 	// Step 4) Update any OREs that need to be set to RMass mode;
 	//			The iterator will be for the keyed-found forged poly set, for the current blueprint we're looking at.
 	//			The key of the iterator will be used as the blueprintKey to use.

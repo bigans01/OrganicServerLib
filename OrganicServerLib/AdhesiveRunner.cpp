@@ -413,7 +413,8 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 					std::cout << "------Points for original ORE triangle [container: " << enclaveTriangleContainersBegin->first << "][triangle index: " << currentEnclaveTriangleBegin->first << "]" << std::endl;
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentEnclaveTriangleBegin->second.points[x];
 						std::cout << "Original ORE points: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.z << std::endl;
 					}
 				}
@@ -428,7 +429,8 @@ void AdhesiveRunner::applyAdhesions(EnclaveKeyDef::EnclaveKey in_originalRawEncl
 
 void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, LocalizedPointsMetaData> in_localizedPointsMetaDataMap, EnclaveTriangle* in_enclaveTriangleRef, bool in_debugFlag)
 {
-	AdhesiveResults results(in_enclaveTriangleRef->lineArray[0].pointA, in_enclaveTriangleRef->lineArray[1].pointA, in_enclaveTriangleRef->lineArray[2].pointA);
+	//AdhesiveResults results(in_enclaveTriangleRef->lineArray[0].pointA, in_enclaveTriangleRef->lineArray[1].pointA, in_enclaveTriangleRef->lineArray[2].pointA);
+	AdhesiveResults results(in_enclaveTriangleRef->points[0], in_enclaveTriangleRef->points[1], in_enclaveTriangleRef->points[2]);
 	results.applyMetaDataMap(in_localizedPointsMetaDataMap);
 	if (results.scanResults() == true)
 	{
@@ -437,7 +439,7 @@ void AdhesiveRunner::adhereEnclaveTriangleToLocalizedPoints(std::map<int, Locali
 			std::cout << "###++++ NOTICE: this enclave triangle requires reform!! " << std::endl;
 		}
 		// initialize reform...
-		in_enclaveTriangleRef->reform(results.pointData[0].currentMatchedPointValue, results.pointData[1].currentMatchedPointValue, results.pointData[2].currentMatchedPointValue);
+		//in_enclaveTriangleRef->reform(results.pointData[0].currentMatchedPointValue, results.pointData[1].currentMatchedPointValue, results.pointData[2].currentMatchedPointValue);
 	}
 }
 
@@ -466,7 +468,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 					// cycle through each point in the triangle, via point A in its lineArray
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (currentPoint.x == 0.0f) // it is on the WEST border in the neighboring ORE
 
 						{
@@ -512,7 +515,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (in_debugFlag == true)
 						{
 							std::cout << "> Current point is: " << currentPoint.x << ", " << currentPoint.y << ", " << currentPoint.x << std::endl;
@@ -551,7 +555,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 					// cycle through each point in the triangle, via point A in its lineArray
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (currentPoint.x == 4.0f) // it is on the EAST border in the neighboring ORE
 						{
 							ECBPolyPoint localizedPoint = currentPoint; // copy, 
@@ -588,7 +593,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 					// cycle through each point in the triangle, via point A in its lineArray
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (currentPoint.z == 4.0f) // it is on the NORTH border in the neighboring ORE
 						{
 							ECBPolyPoint localizedPoint = currentPoint; // copy, 
@@ -623,7 +629,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 					// cycle through each point in the triangle, via point A in its lineArray
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (currentPoint.y == 0.0f) // it is on the BELOW border in the neighboring ORE
 						{
 							ECBPolyPoint localizedPoint = currentPoint; // copy, 
@@ -658,7 +665,8 @@ std::vector<ECBPolyPoint> AdhesiveRunner::acquireLocalizedPointsFromDiscoveredOR
 					// cycle through each point in the triangle, via point A in its lineArray
 					for (int x = 0; x < 3; x++)
 					{
-						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						//ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.lineArray[x].pointA;
+						ECBPolyPoint currentPoint = currentNeighborTriangleBegin->second.points[x];
 						if (currentPoint.y == 4.0f) // it is on the ABOVE border in the neighboring ORE
 						{
 							ECBPolyPoint localizedPoint = currentPoint; // copy, 

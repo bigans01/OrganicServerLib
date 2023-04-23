@@ -26,91 +26,63 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 			{
 				if 
 				(
-					//(persistentMassContentsRef->checkIfSpecificOREExists(*remainingOresBegin) == true)	// the ORE was found
-					//&&
-					(persistentMassContentsRef->fractureResultsContainerMap[*remainingOresBegin].checkIfFull() == false)	// and the ORE to append to wasn't full
+					(persistentMassContentsRef->fractureResultsContainerMap[*remainingOresBegin].getLodState() != ORELodState::FULL)
+
 				)
 				{
 					processableKeys.insert(*remainingOresBegin);
 				}
 			}
 
-			/*
-			std::cout << ":: Printing erased OREs: " << std::endl;
-			auto printErasedOREsBegin = triangleTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].begin();
-			auto printErasedOREsEnd = triangleTracker.shatteredTriangleErasedOREs[*currentContouredSetPolyIDIter].end();
-			for (; printErasedOREsBegin != printErasedOREsEnd; printErasedOREsBegin++)
-			{
-				std::cout << "(" << printErasedOREsBegin->x << ", " << printErasedOREsBegin->y << ", " << printErasedOREsBegin->z << ") " << std::endl;
-			}
-			*/
 
 			// if there are processable Keys post-shattering, run them here.
 			if (!processableKeys.empty())
 			{
-				// the processableKeys equate to the list of OREs that will receive a ECBPoly that is spawned from dissolving the parent ECBPOly;
-				//std::cout << ":: Printing processable OREs: " << std::endl;
+				// For each ORE in the processableList for the current shattered ECBPoly, we must create a new ECBPoly for each ORE.
+				// We can do this by calling retriveAllEnclaveTrianglesForSupergroup, assuming that the supergroup ID related to the ECBPoly 
+				// being shattered is still contained within the ORE. If not, this will produce strange OpenGL artifacts.
 				auto currentProcessableOREKey = processableKeys.begin();
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
 				{
-					if
-						(
-						(reformerBlueprintKey.x == 0)
-							&&
-							(reformerBlueprintKey.y == -1)
-							&&
-							(reformerBlueprintKey.z == 1)
-
-							&&
-							(currentProcessableOREKey->x == 6)
-							&&
-							(currentProcessableOREKey->y == 7)
-							&&
-							(currentProcessableOREKey->z == 1)
-							)
-					{
-						//std::cout << "!!!!!!!!!!!!!!! SPECIAL DEBUG: OrganicServerLib, ECBPolyReformer::processContouredPolysAgainstPersistentMass" << std::endl;
-						//int processContouredWait = 3;
-						//std::cin >> processContouredWait;
-					}
-
-
-					//std::cout << "(" << currentProcessableOREKey->x << ", " << currentProcessableOREKey->y << ", " << currentProcessableOREKey->z << ") " << std::endl;
+					// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
 					OrganicRawEnclave* currentProcessableKeyedORERef = &contouredMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
 					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentContouredSetPolyIDIter);
 
-					//std::cout << "Skeleton Supergroups size of current ORE: " << currentProcessableKeyedORERef->skeletonSGM.triangleSkeletonSupergroups.size() << std::endl;
-					//std::cout << "etcSgm Supergroups size of current ORE: " << currentProcessableKeyedORERef->etcSGM.enclaveTriangleSupergroups.size() << std::endl;
-					//std::cout << "organicTriangle Supergroups size of current ORE: " << currentProcessableKeyedORERef->organicTriangleSecondarySGM.secondarySupergroups.size() << std::endl;
-					//std::cout << "Size of fetched triangles for poly with ID: " << *currentContouredSetPolyIDIter << " is " << fetchedEnclaveTriangleVector.size() << std::endl;
+					
+					// The below code block is temporarily enabled for debugging; it doesn't break the system, it's just here.
+					if (fetchedEnclaveTriangleVector.size() == 0)
+					{
+						std::cout << "!!!~~~~ (ECBPolyReformer::processContouredPolysAgainstPersistentMass): FOUND no triangles for supergroup!!! Enter number to continue." << std::endl;
+						int warningWait = 3;
+						std::cin >> warningWait;
+					}
 
+					// Create new ECBPolys from the current ORE, and assign those ECBPoly instances appropriate IDs via the in_nextECBPolyIDTrackerRef.
 					ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
 						fetchedEnclaveTriangleVector,
 						reformerBlueprintKey,
 						*currentProcessableOREKey);
-					firstPassResultingShatteredECBPolys[*currentContouredSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
+	
+					// Take the current shattered results, and move them into the appropriate map. Also, 
+					// be sure to insert the ID of this ECBPoly being shattered.
+					moveShatterResultsIntoFirstPassECBPolys(currentShatterResults);
+					firstPassShatteredPolysSet.insert(*currentContouredSetPolyIDIter);
+
 					(firstPassResultingShatteredEnclaveTriangles[*currentContouredSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
 
-					auto currentECBPolyIDInOreFinder = currentProcessableKeyedORERef->organicTriangleSecondarySGM.secondarySupergroups.find(*currentContouredSetPolyIDIter);
-					if (currentECBPolyIDInOreFinder != currentProcessableKeyedORERef->organicTriangleSecondarySGM.secondarySupergroups.end())
-					{
-						//std::cout << "!! EnclaveTriangleSkeletonSupergroup with an ID matching " << *currentContouredSetPolyIDIter << " was found!" << std::endl;
-					}
-					//currentProcessableKeyedORERef->setOREasIndependent();
+					// the below call will be deprecated in the near future; but needs to be done to be friendly with the old version of the mass manager 
+					// (BlueprintMassManager), until it is deleted/removed.
 					firstPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
-
-				//std::cout << "(processContouredPolysAgainstPersistentMass) !! Value of next ECBPoly ID will be: " << *in_nextECBPolyIDTrackerRef << std::endl;
-				//int waitVal = 3;
-				//std::cin >> waitVal;
 			}
+
+			// If this was a shattered triangle, but there is nothing left to process because all of it's remaining ORE's are FULL,
+			// then we must mark it for deletion. We must mark it here, because it wouldn't get caught in the call to BPMassManagerV2::updatePersistentBlueprintPolys(),
+			// since that function only deletes old ECBPolys that were shattered and had entries in the processableKeys. 
 			else if (processableKeys.empty())
 			{
-				//std::cout << "!! Notice: contoured ECBPoly was shattered, but also completely consumed (no processable keys)" << std::endl;
 				firstPassUnshatteredECBPolysToErase.insert(*currentContouredSetPolyIDIter);
-				//int waitVal = 3;
-				//std::cin >> waitVal;
 			}
 		}
 
@@ -121,8 +93,8 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 			//std::cout << "!!!!! Notice ECBPoly with ID " << *currentContouredSetPolyIDIter << " (generated by contoured mass) wasn't shattered! " << std::endl;
 		
 			// because the triangle wasn't shattered, it also means we have to use the tracked ORE keys that the contoured ECBPoly covered to see if
-			// any of the matching ones in the persistent mass are full. If any are full, it would mean this ECBPoly is consumed by a persistent mass, and we 
-			// can then break out of the loop.
+			// any of the matching ones in the persistent mass are full. If all of them are truly full, it would mean this ECBPoly is consumed by a persistent mass, and we 
+			// can then break out of the loop. So, we will scan for any ORE that is FULL, which would indicate that it isn't entirely consumed.
 			auto remainingContouredECBPolyOREsBegin = triangleTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.begin();
 			auto remainingContouredECBPolyOREsEnd = triangleTracker.triangleTrackedOREKeys.find(*currentContouredSetPolyIDIter)->second.end();
 			bool wasECBPolyConsumedByPersistentMass = true;
@@ -133,7 +105,7 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 				// consumed by the persistent mass.
 				if
 				(
-					(persistentMassContentsRef->fractureResultsContainerMap[*remainingContouredECBPolyOREsBegin].checkIfFull() == false)
+					(persistentMassContentsRef->fractureResultsContainerMap[*remainingContouredECBPolyOREsBegin].getLodState() != ORELodState::FULL)
 				)
 				{
 					wasECBPolyConsumedByPersistentMass = false;
@@ -153,6 +125,34 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 	}
 }
 
+void ECBPolyReformer::moveShatterResultsIntoFirstPassECBPolys(ShatteredResults in_shatterResults)
+{
+	for (auto& currentPoly : in_shatterResults.shatterResultECBPolys.shatteredEcbPolyMap)
+	{
+		int currentShatteredECBPolyID = currentPoly.first;
+		ECBPoly currentShatteredECBPoly = currentPoly.second;
+
+		ShatteredECBPolys tempPolyGroup;
+		tempPolyGroup.insertECBPoly(currentShatteredECBPolyID, currentShatteredECBPoly);
+
+		firstPassResultingShatteredECBPolys[currentShatteredECBPolyID] = tempPolyGroup;
+	}
+}
+
+void ECBPolyReformer::moveShatterResultsIntoSecondPassECBPolys(ShatteredResults in_shatterResults)
+{
+	for (auto& currentPoly : in_shatterResults.shatterResultECBPolys.shatteredEcbPolyMap)
+	{
+		int currentShatteredECBPolyID = currentPoly.first;
+		ECBPoly currentShatteredECBPoly = currentPoly.second;
+
+		ShatteredECBPolys tempPolyGroup;
+		tempPolyGroup.insertECBPoly(currentShatteredECBPolyID, currentShatteredECBPoly);
+
+		secondPassResultingShatteredECBPolys[currentShatteredECBPolyID] = tempPolyGroup;
+	}
+}
+
 void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECBPolyIDTrackerRef)
 {
 	// Second pass: build new ECBPolys from dissolved ECBPolys, for the ECBPolys that are persistent (that is, existed before the contour plan was run).
@@ -165,8 +165,6 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 		auto wasPersistentECBPolyErased = triangleTracker.shatteredTriangleErasedOREs.find(*currentPersistentSetPolyIDIter);
 		if (wasPersistentECBPolyErased != triangleTracker.shatteredTriangleErasedOREs.end())
 		{
-			//std::cout << "(processPersistentPolysAgainstContouredMass) !! Value of next ECBPoly, before dissolve: " << *in_nextECBPolyIDTrackerRef << std::endl;
-			//std::cout << "(processPersistentPolysAgainstContouredMass) .Contoured Set ECBPoly with ID " << *currentPersistentSetPolyIDIter << " was dissolved, stats are: " << std::endl;
 			std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> processableKeys;
 
 			// get the remaining OREs; figure out which ones should remain. Should remain meaning that the ORE the new ECBPoly would go into isn't full.
@@ -177,9 +175,7 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 			{
 				if
 				(
-					//(contouredMassContentsRef->checkIfSpecificOREExists(*remainingOresBegin) == true)	// the ORE was found
-					//&&
-					(contouredMassContentsRef->fractureResultsContainerMap[*remainingOresBegin].checkIfFull() == false)	// and the ORE to append to wasn't full
+					(contouredMassContentsRef->fractureResultsContainerMap[*remainingOresBegin].getLodState() != ORELodState::FULL)
 				)
 				{
 					processableKeys.insert(*remainingOresBegin);
@@ -189,71 +185,53 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 			// if there are processable Keys post-shattering, run them here.
 			if (!processableKeys.empty())
 			{
-				// the processableKeys equate to the list of OREs that will receive a ECBPoly that is spawned from dissolving the parent ECBPOly;
+				// For each ORE in the processableList for the current shattered ECBPoly, we must create a new ECBPoly for each ORE.
+				// We can do this by calling retriveAllEnclaveTrianglesForSupergroup, assuming that the supergroup ID related to the ECBPoly 
+				// being shattered is still contained within the ORE. If not, this will produce strange OpenGL artifacts.
 				auto currentProcessableOREKey = processableKeys.begin();
 				auto processablePrintEnd = processableKeys.end();
 				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
 				{
-					if
-					(
-						(reformerBlueprintKey.x == 0)
-						&&
-						(reformerBlueprintKey.y == -1)
-						&&
-						(reformerBlueprintKey.z == 1)
 
-						&&
-						(currentProcessableOREKey->x == 6)
-						&&
-						(currentProcessableOREKey->y == 7)
-						&&
-						(currentProcessableOREKey->z == 1)
-					)
-					{
-						//std::cout << "!!!!!!!!!!!!!!! SPECIAL DEBUG: OrganicServerLib, ECBPolyReformer::processPersistentPolysAgainstContouredMass" << std::endl;
-						//int processPersistentWait = 3;
-						//std::cin >> processPersistentWait;
-					}
-
-					//std::cout << "(" << currentProcessableOREKey->x << ", " << currentProcessableOREKey->y << ", " << currentProcessableOREKey->z << ") " << std::endl;
+					// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
 					OrganicRawEnclave* currentProcessableKeyedORERef = &persistentMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
 					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentPersistentSetPolyIDIter);
-
-					//std::cout << "Skeleton Supergroups size of current ORE: " << currentProcessableKeyedORERef->skeletonSGM.triangleSkeletonSupergroups.size() << std::endl;
-					//std::cout << "etcSgm Supergroups size of current ORE: " << currentProcessableKeyedORERef->etcSGM.enclaveTriangleSupergroups.size() << std::endl;
-					//std::cout << "organicTriangle Supergroups size of current ORE: " << currentProcessableKeyedORERef->organicTriangleSecondarySGM.secondarySupergroups.size() << std::endl;
-					//std::cout << "Size of fetched triangles for poly with ID: " << *currentPersistentSetPolyIDIter << " is " << fetchedEnclaveTriangleVector.size() << std::endl;
-
+					
+					// Create new ECBPolys from the current ORE, and assign those ECBPoly instances appropriate IDs via the in_nextECBPolyIDTrackerRef.
 					ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
 						fetchedEnclaveTriangleVector,
 						reformerBlueprintKey,
 						*currentProcessableOREKey);
-					secondPassResultingShatteredECBPolys[*currentPersistentSetPolyIDIter] = currentShatterResults.shatterResultECBPolys;
-					(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
+					
+					// Take the current shattered results, and move them into the appropriate map. Also, 
+					// be sure to insert the ID of this ECBPoly being shattered.
+					moveShatterResultsIntoSecondPassECBPolys(currentShatterResults);
+					secondPassShatteredPolysSet.insert(*currentPersistentSetPolyIDIter);
 
-					//currentProcessableKeyedORERef->setOREasIndependent();
+					(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
+					
+					// the below call will be deprecated in the near future; but needs to be done to be friendly with the old version of the mass manager 
+					// (BlueprintMassManager), until it is deleted/removed.
 					secondPassShatteredORESet.insert(*currentProcessableOREKey);
 				}
 			}
+
+			// If this was a shattered triangle, but there is nothing left to process because all of it's remaining ORE's are FULL,
+			// then we must mark it for deletion. We must mark it here, because it wouldn't get caught in the call to BPMassManagerV2::updatePersistentBlueprintPolys(),
+			// since that function only deletes old ECBPolys that were shattered and had entries in the processableKeys. 
 			else if (processableKeys.empty())
 			{
-				//std::cout << "!! Notice: persistent ECBPoly was shattered, but also completely consumed (no processable keys)" << std::endl;
 				secondPassUnshatteredECBPolysToErase.insert(*currentPersistentSetPolyIDIter);
-				//int waitVal = 3;
-				//std::cin >> waitVal;
 			}
-			//std::cout << "(processPersistentPolysAgainstContouredMass) !! Value of next ECBPoly ID will be: " << *in_nextECBPolyIDTrackerRef << std::endl;
 		}
 
 		// none of the OREs of this ECBPoly were erased (unshattered); we will have to later check whether or not this exists entirely
 		// within the contoured mass.
 		else
 		{
-			//std::cout << "!!!!! Notice ECBPoly with ID " << *currentPersistentSetPolyIDIter << " (generated by persistent mass) wasn't shattered! " << std::endl;
-
 			// because the triangle wasn't shattered, it also means we have to use the tracked ORE keys that the persistent ECBPoly covered to see if
 			// any of the matching ones in the contoured mass are full. If any are full, it would mean this ECBPoly is consumed by a persistent mass, and we 
-			// can then break out of the loop.
+			// can then break out of the loop. So, we will scan for any ORE that is FULL, which would indicate that it isn't entirely consumed.
 			auto remainingContouredECBPolyOREsBegin = triangleTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.begin();
 			auto remainingContouredECBPolyOREsEnd = triangleTracker.triangleTrackedOREKeys.find(*currentPersistentSetPolyIDIter)->second.end();
 			bool wasECBPolyConsumedByContouredMass = true;
@@ -264,7 +242,7 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 				// consumed by the contoured mass.
 				if
 				(
-					(contouredMassContentsRef->fractureResultsContainerMap[*remainingContouredECBPolyOREsBegin].checkIfFull() == false)
+					(contouredMassContentsRef->fractureResultsContainerMap[*remainingContouredECBPolyOREsBegin].getLodState() != ORELodState::FULL)
 				)
 				{
 					wasECBPolyConsumedByContouredMass = false;
@@ -274,9 +252,6 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 
 			if (wasECBPolyConsumedByContouredMass == true)
 			{
-				//std::cout << "!! ECBPoly with ID " << *currentPersistentSetPolyIDIter << " (generated by persistent mass) was entirely consumed by persistent mass. " << std::endl;
-				//int persistentMassConsumptionWait = 3;
-				//std::cin >> persistentMassConsumptionWait;
 				secondPassUnshatteredECBPolysToErase.insert(*currentPersistentSetPolyIDIter);
 			}
 		}
@@ -288,13 +263,10 @@ ECBPolyReformer::ShatteredResults ECBPolyReformer::produceShatteredResultsForORE
 																				 EnclaveKeyDef::EnclaveKey in_blueprintKey,
 																				 EnclaveKeyDef::EnclaveKey in_oreKey)
 {
-	//std::cout << ">>> calling produceShatteredResultsForORE: " << std::endl;
-	//std::cout << "Blueprint key: " << in_blueprintKey.x << ", " << in_blueprintKey.y << ", " << in_blueprintKey.z << std::endl;
-	//std::cout << "ORE key: " << in_oreKey.x << ", " << in_oreKey.y << ", " << in_oreKey.z << std::endl;
-
 	ShatteredResults returnResults;
 	ShatteredECBPolys producedPolys;
 	ShatteredEnclaveTriangles producedEnclaveTriangles;
+
 
 	auto triangleVectorBegin = in_enclaveTriangleVector.begin();
 	auto triangleVectorEnd = in_enclaveTriangleVector.end();
@@ -306,16 +278,10 @@ ECBPolyReformer::ShatteredResults ECBPolyReformer::produceShatteredResultsForORE
 		ECBPoly convertedPoly = IndependentUtils::buildECBPolyFromEnclaveTriangle(*triangleVectorBegin, 
 																				 in_blueprintKey,
 																				 in_oreKey);
-		//convertedPoly.printLineData();
 
 		producedPolys.insertECBPoly(currentValue, convertedPoly);
 		producedEnclaveTriangles.insertTriangle(currentValue, *triangleVectorBegin);
 	}
-
-	//std::cout << "!! Printing IDs of the produced ECBPolys: " << std::endl;
-	//producedPolys.printPolyIDs();
-	//int waitVal = 3;
-	//std::cin >> waitVal;
 
 	returnResults.shatterResultECBPolys = producedPolys;
 	returnResults.shatteredResultEnclaveTriangles = producedEnclaveTriangles;

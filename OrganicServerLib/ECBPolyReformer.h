@@ -14,6 +14,25 @@
 #include <map>
 #include <unordered_set>
 
+/*
+
+Description: The primary purpose of this class is to take what remains
+of any OrganicTriangle considered to be "shattered" (shattered meaning
+that at least one ORE that makes up part of the OrganicTriangle is going to
+need to have its currentDependencyState set to a value of 
+OREDependencyState::INDEPENDENT. This is done through the triangleTracker,
+which stores all the metadata of this operation (the OrganicTriangleTracker
+class comes from OrganicCoreLib, so don't get tempted to edit it here.)
+
+When "shattered," it is entirely possible -- and common -- for the other OREs
+that made up the OrganicTriangle to remain. Each of these OREs that end up remaining
+need to be made into a new ECBPoly.
+
+This class does all of this bookkeeping, so that the BPMassManagerV2 class can utilize it,
+when it calls it's BPMassManagerV2::updatePersistentBlueprintPolys() function.
+
+*/
+
 class ECBPolyReformer
 {
 	public:
@@ -38,14 +57,22 @@ class ECBPolyReformer
 		void processContouredPolysAgainstPersistentMass(int* in_nextECBPolyIDTrackerRef);
 		void processPersistentPolysAgainstContouredMass(int* in_nextECBPolyIDTrackerRef);
 					
-		EnclaveKeyDef::EnclaveKey reformerBlueprintKey;
-		ECBPolyReformerType reformerType = ECBPolyReformerType::UNDEFINED;	// will be set by constructor
-		OperableIntSet contouredMassShellECBPolyIDs;
-		EnclaveFractureResultsMap* contouredMassContentsRef = nullptr;
-		OperableIntSet persistentMassShellECBPolyIDs;
-		EnclaveFractureResultsMap* persistentMassContentsRef = nullptr;
+		EnclaveKeyDef::EnclaveKey reformerBlueprintKey;	// stores the blueprint key associated with this instance of ECBPolyReformer.
 
-		OrganicTriangleTracker triangleTracker;
+		ECBPolyReformerType reformerType = ECBPolyReformerType::UNDEFINED;	// will be set by constructor
+
+		OperableIntSet contouredMassShellECBPolyIDs;	// contains the IDs of all of the ECBPolys that the contour plan added to the
+														// blueprint associated with this instance of ECBPolyReformer.
+
+		EnclaveFractureResultsMap* contouredMassContentsRef = nullptr;	// a pointer to the EnclaveFractureResultsMap instance utilized by the contour plan.
+																		// Set by constructor. 
+
+		OperableIntSet persistentMassShellECBPolyIDs;	// contains the ids of all the ECBPoly intances that already existed in the associated
+														// blueprint.
+
+		EnclaveFractureResultsMap* persistentMassContentsRef = nullptr;	// a pointer to the presistent EnclaveFractureResultsMap. Set by consstructor.
+
+		OrganicTriangleTracker triangleTracker;	// stores the actual bookkeeping for the shattering of OrganicTriangles.
 
 	private:
 		friend class BlueprintMassManager;
@@ -66,6 +93,7 @@ class ECBPolyReformer
 					std::cout << "ID: " << shatteredEcbPolyMapBegin->first << std::endl;
 				}
 			}
+
 			std::map<int, ECBPoly> shatteredEcbPolyMap;
 		};
 
@@ -76,6 +104,7 @@ class ECBPolyReformer
 			{
 				shatteredTriangleMap[in_triangleID] = in_enclaveTriangle;
 			}
+
 			std::map<int, EnclaveTriangle> shatteredTriangleMap;
 		};
 
@@ -93,17 +122,28 @@ class ECBPolyReformer
 		std::map<int, std::unordered_map<EnclaveKeyDef::EnclaveKey, ShatteredEnclaveTriangles, EnclaveKeyDef::KeyHasher>> firstPassResultingShatteredEnclaveTriangles;
 		std::set<int> firstPassUnshatteredECBPolysToErase;
 		std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> firstPassShatteredORESet;
+		std::set<int> firstPassShatteredPolysSet;	// Keeps track of the IDs of any ECBPoly that was shattered in the first pass.
+													// Used by the function BPMassManagerV2::updatePersistentBlueprintPolys().
 
 		// members needed for second pass (persistent ECBPoyls compared to contoured mass)
 		std::map<int, ShatteredECBPolys> secondPassResultingShatteredECBPolys;
 		std::map<int, std::unordered_map<EnclaveKeyDef::EnclaveKey, ShatteredEnclaveTriangles, EnclaveKeyDef::KeyHasher>> secondPassResultingShatteredEnclaveTriangles;
 		std::set<int> secondPassUnshatteredECBPolysToErase;
 		std::unordered_set<EnclaveKeyDef::EnclaveKey, EnclaveKeyDef::KeyHasher> secondPassShatteredORESet;
+		std::set<int> secondPassShatteredPolysSet;	// Keeps track of the IDs of any ECBPoly that was shattered in the second pass.
+													// Used by the function BPMassManagerV2::updatePersistentBlueprintPolys().
 
 		ShatteredResults produceShatteredResultsForORE(int* in_nextECBPolyIDTrackerRef, 
 													   std::vector<EnclaveTriangle> in_enclaveTriangleVector, 
 													   EnclaveKeyDef::EnclaveKey in_blueprintKey,
 													   EnclaveKeyDef::EnclaveKey in_oreKey);
+
+		// The below functions take in an argument of ShatteredResults, and create a new ECBPoly with an appropriate new ID
+		// from that argument, and puts it into either the firstPassResultingShatteredECBPolys or
+		// secondPassResultingShatteredECBPolys maps. These maps are needed later, during the call to
+		// BPMassManagerV2::updatePersistentBlueprintPolys().
+		void moveShatterResultsIntoFirstPassECBPolys(ShatteredResults in_shatterResults);
+		void moveShatterResultsIntoSecondPassECBPolys(ShatteredResults in_shatterResults);
 
 };
 

@@ -10,19 +10,6 @@ void BPMassManagerV2::buildContouredMass()
 
 void BPMassManagerV2::buildContourMassShell()
 {
-	/*
-	auto blueprintsWithShellsToTransferBegin = contourPlanRef->adherenceData.adherenceOrder.begin();
-	auto blueprintsWithShellsToTransferEnd = contourPlanRef->adherenceData.adherenceOrder.end();
-	for (; blueprintsWithShellsToTransferBegin != blueprintsWithShellsToTransferEnd; blueprintsWithShellsToTransferBegin++)
-	{
-		// find the forged poly set, for the current blueprint we're looking at
-		auto refedContourPlanPolySetRegistryBegin = contourPlanRef->planPolyRegistry.polySetRegistry.find(*blueprintsWithShellsToTransferBegin);
-		EnclaveKeyDef::EnclaveKey currentFirstPassBlueprintKey = refedContourPlanPolySetRegistryBegin->first;		// get the key of the blueprint to check.
-		OperableIntSet firstMassPassContourAddedTriangles = refedContourPlanPolySetRegistryBegin->second.polySet;		// get an OperableIntSet of the OrganicTriangles that the ref'ed ContourPlan
-																														// added to the blueprint.
-		copyMassShellPolysFromServerToMass(currentFirstPassBlueprintKey, firstMassPassContourAddedTriangles);	// transfer the specific OrganicTriangles into this mass
-	}
-	*/
 
 	for (auto& currentRegistry : contourPlanRef->allPolysRegistry.polySetRegistry)
 	{
@@ -49,6 +36,8 @@ void BPMassManagerV2::copyMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveK
 
 		// create the blueprint in massA, if it doesn't exist (it shouldn't, but the check is for safety)
 		contouredPlanMass.insertBlueprintIfNonExistent(in_blueprintKey);
+
+		// get a pointer to the blueprint to copy over to, which should be in the contouredPlanMass already.
 		EnclaveCollectionBlueprint* contouredPlanMassBlueprintRef = contouredPlanMass.getBlueprintRef(in_blueprintKey);
 		currentBlueprintRef->copyExistingECBPolysToOtherBlueprint(in_contourAddedOrganicTrianglesSet, contouredPlanMassBlueprintRef);
 
@@ -102,7 +91,7 @@ void BPMassManagerV2::runMassDriversForIndependentMass()
 			blueprintKey,
 			startingFloorTerminatingSet,
 			massDriverSet);
-
+		
 	}
 }
 
@@ -132,11 +121,11 @@ void BPMassManagerV2::buildPersistentMasses()
 
 		// CASE 1: for REFORM_BY_COLLISION
 		if
-			(
+		(
 			(!contouredPlanAddedTrianglesToCurrentBlueprint.intSet.empty())
-				&&
-				(!persistentBlueprintAllTriangles.intSet.empty())
-				)
+			&&
+			(!persistentBlueprintAllTriangles.intSet.empty())
+		)
 		{
 			std::cout << "Notice! persistent addition will be required into the persistentMass, as a REFORM_BY_COLLISION Key:(" << contouredBlueprintsBegin->first.x << ", "
 				<< contouredBlueprintsBegin->first.y << ", "
@@ -196,11 +185,11 @@ void BPMassManagerV2::buildPersistentMasses()
 		// AND
 		// --there are existing (persistent) ECBPolys in the blueprint.
 		else if
-			(
+		(
 			(contouredPlanAddedTrianglesToCurrentBlueprint.intSet.empty())
-				&&
-				(!persistentBlueprintAllTriangles.intSet.empty())
-				)
+			&&
+			(!persistentBlueprintAllTriangles.intSet.empty())
+		)
 		{
 			std::cout << "Notice! persistent addition will be required into the persistentMass, as a REFORM_BY_OVERWRITE Key:(" << contouredBlueprintsBegin->first.x << ", "
 				<< contouredBlueprintsBegin->first.y << ", "
@@ -253,6 +242,12 @@ void BPMassManagerV2::buildPersistentMasses()
 
 void BPMassManagerV2::scanForDissolvableTriangles()
 {
+	// This function should only be called, after the buildContouredMass() and buildPersistentMasses()
+	// functions have been called for a contour plan. How and when that is done, is up to the contour plan,
+	// but it usually should be done in the runMassDrivers or similiarly-named function (see the definition of 
+	// of functions like that one for how it is used). All the OrganicTriangle instances
+	// to compare against need to be loaded appropriately in the reformerTracker member before this is called.
+
 	// Step 1: cycle through each ORE tracker, and call determineOrganicTrianglesToDissolve();
 	// in other words, if two triangles share an ORE, they are both dissolvable.
 	auto dissolveCallsBegin = reformerTracker.begin();
@@ -268,59 +263,20 @@ void BPMassManagerV2::scanForDissolvableTriangles()
 	auto ecbPolyReformerTrackerEnd = reformerTracker.end();
 	for (; ecbPolyReformerTrackerBegin != ecbPolyReformerTrackerEnd; ecbPolyReformerTrackerBegin++)
 	{
-		// only bother getting an instance of an ECBPolyReformer if it is set to have a ECBPolyReformerType of REFORM_BY_OVERWRITE or REFORM_BY_COLLISION
+		// only bother getting an instance of an ECBPolyReformer if it is set to have a ECBPolyReformerType of REFORM_BY_OVERWRITE or REFORM_BY_COLLISION		
 		if
-			(
+		(
 			(ecbPolyReformerTrackerBegin->second.reformerType == ECBPolyReformerType::REFORM_BY_COLLISION)
-				||
-				(ecbPolyReformerTrackerBegin->second.reformerType == ECBPolyReformerType::REFORM_BY_OVERWRITE)
-				)
-		{
+			||
+			(ecbPolyReformerTrackerBegin->second.reformerType == ECBPolyReformerType::REFORM_BY_OVERWRITE)
+		)
+		{		
 			std::cout << "....Analyzing reformer for blueprint key (" << ecbPolyReformerTrackerBegin->first.x << ", " << ecbPolyReformerTrackerBegin->first.y << ", " << ecbPolyReformerTrackerBegin->first.z << ") " << std::endl;
 			std::cout << "..Contoured ECBPoly stats are: " << std::endl;
 
 			// need to get the ID that would be used for the next ECBPoly; this value would be from the persistent blueprint. 
 			int nextECBPolyIDForCurrentBlueprint = managerEcbMapRef->getBlueprintRef(ecbPolyReformerTrackerBegin->first)->fetchNextECBPolyKeyID();
 
-			/*
-			std::cout << ". Old set size: " << ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.size() << std::endl;
-			std::cout << ". New set size: " << ecbPolyReformerTrackerBegin->second.persistentMassShellECBPolyIDs.intSet.size() << std::endl;
-			std::cout << ". Next ECBPoly key ID: " << nextECBPolyIDForCurrentBlueprint << std::endl;
-
-			std::cout << ". Size of modified ore set: " << ecbPolyReformerTrackerBegin->second.reformerTracker.modifiedORESet.size() << std::endl;
-			std::cout << ". Size of dissolved erased: " << ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.size() << std::endl;
-			std::cout << ". Size of dissolved remaining: " << ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs.size() << std::endl;
-
-			// First pass: build new ECBPolys from dissolved ECBPolys, for the ECBPolys that are in the contour plan.
-			auto contouredSetBegin = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.begin();
-			auto contouredSetEnd = ecbPolyReformerTrackerBegin->second.contouredMassShellECBPolyIDs.intSet.end();
-			for (; contouredSetBegin != contouredSetEnd; contouredSetBegin++)
-			{
-				auto wasCurrentECBPolyIDErased = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.find(*contouredSetBegin);	// attempt to find an entry indicating some OREs were erased was found.
-				if (wasCurrentECBPolyIDErased != ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleErasedOREs.end())	// it was found
-				{
-					std::cout << ".Contoured Set ECBPoly with ID " << *contouredSetBegin << " was dissolved, stats are: " << std::endl;
-					std::cout << ".Erased Ore keys: " << std::endl;
-					auto erasedKeysBegin = wasCurrentECBPolyIDErased->second.begin();
-					auto erasedKeysEnd = wasCurrentECBPolyIDErased->second.end();
-					for (; erasedKeysBegin != erasedKeysEnd; erasedKeysBegin++)
-					{
-						std::cout << "(" << erasedKeysBegin->x << ", " << erasedKeysBegin->y << ", " << erasedKeysBegin->z << ") " << std::endl;
-					}
-
-					std::cout << ".Remaining Ore keys: " << std::endl;
-					auto remainingOresBegin = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs[*contouredSetBegin].begin();
-					auto remainingOresEnd = ecbPolyReformerTrackerBegin->second.reformerTracker.shatteredTriangleRemainingOREs[*contouredSetBegin].end();
-					for (; remainingOresBegin != remainingOresEnd; remainingOresBegin++)
-					{
-						std::cout << "(" << remainingOresBegin->x << ", " << remainingOresBegin->y << ", " << remainingOresBegin->z << ") " << std::endl;
-					}
-
-					int dissolvedWait = 3;
-					std::cin >> dissolvedWait;
-				}
-			}
-			*/
 			ecbPolyReformerTrackerBegin->second.processContouredPolysAgainstPersistentMass(&nextECBPolyIDForCurrentBlueprint);
 			ecbPolyReformerTrackerBegin->second.processPersistentPolysAgainstContouredMass(&nextECBPolyIDForCurrentBlueprint);
 		}
@@ -350,36 +306,21 @@ void BPMassManagerV2::updatePersistentBlueprintPolys()
 		for (; currentReformerContouredSetBegin != currentReformerContouredSetEnd; currentReformerContouredSetBegin++)
 		{
 			// first check: check for any shattered contoured ECBPolys that were spawned for the original contoured ECBPoly ID.
-
-			auto currentPolyShatteredCheck = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.find(*currentReformerContouredSetBegin);
-			if (currentPolyShatteredCheck != ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.end())
+			auto wasPolyShattered = ecbPolyReformerTrackerBegin->second.firstPassShatteredPolysSet.find(*currentReformerContouredSetBegin);		
+			if (wasPolyShattered != ecbPolyReformerTrackerBegin->second.firstPassShatteredPolysSet.end())
 			{
-				// now, take each produced contoured (shattered) ECBPoly from the corresponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
-				auto currentShatteredPolysBegin = currentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
-				auto currentShatteredPolysEnd = currentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
-				//std::cout << "Origin ECBPoly ID is: " << currentPolyShatteredCheck->first << std::endl;
-				for (; currentShatteredPolysBegin != currentShatteredPolysEnd; currentShatteredPolysBegin++)
+				auto currentShatteredPolyGroupBegin = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.begin();
+				auto currentShatteredPolyGroupEnd = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.end();
+				for (; currentShatteredPolyGroupBegin != currentShatteredPolyGroupEnd; currentShatteredPolyGroupBegin++)
 				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentShatteredPolysBegin->first, currentShatteredPolysBegin->second);
+					for (auto& currentPolyInGroup : currentShatteredPolyGroupBegin->second.shatteredEcbPolyMap)
+					{
+						ecbPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPolyInGroup.first, currentPolyInGroup.second);
+					}
 				}
-
+				
 				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPolyShatteredCheck->first);
-
-				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
-				// as being INDEPENDENT.
-				auto firstPassShatteredOreSetBegin = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.begin();
-				auto firstPassShatteredOreSetEnd = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.end();
-				for (; firstPassShatteredOreSetBegin != firstPassShatteredOreSetEnd; firstPassShatteredOreSetBegin++)
-				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*firstPassShatteredOreSetBegin].setOREasIndependent();
-				}
-			}
-
-			auto currentPolyDeleteCheck = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.find(*currentReformerContouredSetBegin);
-			if (currentPolyDeleteCheck != ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end())
-			{
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentReformerContouredSetBegin);
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*wasPolyShattered);
 			}
 		}
 
@@ -405,31 +346,22 @@ void BPMassManagerV2::updatePersistentBlueprintPolys()
 		for (; currentReformerPersistentSetBegin != currentReformerPersistentSetEnd; currentReformerPersistentSetBegin++)
 		{
 			// first check: check for any shattered persistent ECBPolys that were spawned for the original contoured ECBPoly ID.
-
-			auto currentPersistentPolyShatteredCheck = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.find(*currentReformerPersistentSetBegin);
-			if (currentPersistentPolyShatteredCheck != secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.end())
+			auto wasPolyShattered = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredPolysSet.find(*currentReformerPersistentSetBegin);
+			if (wasPolyShattered != secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredPolysSet.end())
 			{
-				// now,  take each produced persistent (shatered) ECBPoly from the corressponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
-
-				auto currentPersistentShatteredPolysBegin = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
-				auto currentPersistentShatteredPolysEnd = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
-				for (; currentPersistentShatteredPolysBegin != currentPersistentShatteredPolysEnd; currentPersistentShatteredPolysBegin++)
+				auto currentShatteredPolyGroupBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.begin();
+				auto currentShatteredPolyGroupEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.end();
+				for (; currentShatteredPolyGroupBegin != currentShatteredPolyGroupEnd; currentShatteredPolyGroupBegin++)
 				{
-					// need to figure out why the below line was commented out before 8/27/2021...(perhaps a mistake?)
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPersistentShatteredPolysBegin->first, currentPersistentShatteredPolysBegin->second);
+					for (auto& currentPolyInGroup : currentShatteredPolyGroupBegin->second.shatteredEcbPolyMap)
+					{
+						secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPolyInGroup.first, currentPolyInGroup.second);
+					}
 				}
 
-				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPersistentPolyShatteredCheck->first);
+				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
+				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*wasPolyShattered);
 
-				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
-				// as being INDEPENDENT.
-				auto secondPassShatteredOreSetBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.begin();
-				auto secondPassShatteredOreSetEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.end();
-				for (; secondPassShatteredOreSetBegin != secondPassShatteredOreSetEnd; secondPassShatteredOreSetBegin++)
-				{
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*secondPassShatteredOreSetBegin].setOREasIndependent();
-				}
 
 			}
 
@@ -441,6 +373,21 @@ void BPMassManagerV2::updatePersistentBlueprintPolys()
 		for (; currentPersistentErasePolyCheckBegin != currentPersistentErasePolyCheckEnd; currentPersistentErasePolyCheckBegin++)
 		{
 			secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentPersistentErasePolyCheckBegin);
+		}
+	}
+}
+
+void BPMassManagerV2::updatedAffectedORESAsIndependent()
+{
+	for (auto& currentReformer : reformerTracker)
+	{
+		// Grab the modified OREs for the current tracker.
+		auto setToUse = currentReformer.second.triangleTracker.modifiedORESet;
+
+		// Now, update each ORE in the selected reformer's serverBlueprintRef.
+		for (auto& currentOREToUpdate : setToUse)
+		{
+			currentReformer.second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[currentOREToUpdate].setOREasIndependent();
 		}
 	}
 }

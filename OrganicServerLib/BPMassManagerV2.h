@@ -18,6 +18,45 @@ Description:
 This class is functionally the same as BlueprintMassManager, save for the fact that it is designed to work with ContourPlanV2Base instances,
 and not ContourBase instances.
 
+An overview of how this class operates is as follows:
+
+	1.) After the BPMassManagerV2 class is initalized via its non-default constructor (which should really only be done after the contour plan has done it's run
+		and added it's ECBPolys to whatever blueprints it touched), the function buildContouredMass() is called. This function iterates through each blueprint the plan 
+		touched, gets the set of polys it produced in each of them, and calls the copyMassShellPolysFromServerToMass to pass the key and associated set of polys produced.
+		The copyMassShellPolysFromServerToMass uses these values to copy those specific ECBPoly instances having the IDs specified in each set over to the contour plan's
+		corresponding blueprint (via a call to contouredPlanMass.getBlueprintRef).
+
+	2.) Next, the same call to BPMassManagerV2::buildContouredMass() then produces the OREs for the contoured plan mass, so that mass driving can begin, which is called 
+		next in the same call.
+
+	3.) The next call that needs to be done immediately after buildContouredMass() completes, is buildPersistentMasses(). This builds a separate copy of blueprints,
+		using the persistent (i.e, already existing ECBPoly IDs) that were in the blueprint before the contour plan was run. Only blueprints that were affected or
+		"touched" by the ContourPlan's run actually need to be copied.
+
+	4.) (**NOTE: this step may need a bit of tuning/review, but it works for now) For each ECBPolyReformer in this class instance (contained in reformerTracker),
+		we must get the current the OrganicTriangleTracker of it and load more data into it. The following OrganicSystem functions need to be called, in this order:
+
+		produceRawEnclavesForPolySetWithTracking (adds OREs from the contour plan)
+		produceTrackedORESForOrganicTriangleIDs  (adds OREs that already existed prior to the plan running) 
+		spawnAndAppendEnclaveTriangleSkeletonsToBlueprint (pretty self explanatory)
+
+	5.) Mass driving operations are then applied to the persistent mass, via a call to generateAndRunMassDriversForBlueprint, for each blueprint that
+		contained an ECBPoly that was flagged for mass driving.
+
+	6.) At this point, the persistent blueprint that has been the target of these updates should have all relevant ECBPolys and mass-driving data done.
+		The next step is to check for triangles to "dissolve." (via  call to scanForDissolvableTriangles()). Remember, any triangles that is "dissolved" 
+		essentially means that it one or more of the OREs pertaining to that triangle will need to be flagged as having their currentDependencyState set to
+		OREDependencyState::INDEPENDENT, via a call to OrganicRawEnclave::setOREasIndependent(). If at least one ORE that is part of the OrganicTriangle in 
+		the corresponding blueprint is set to INDEPENDENT, it must be dissolved. When dissolved, each EnclaveTriangle of each remaining ORE of the OrganicTriangle
+		becomes its own ECBPoly. If the dissolved OrganicTriangle has no remaining OREs, it gets removed entirely.
+
+	7.) Then, we must call updatePersistentBlueprintPolys. This is what actually copies over any ECBPoly's produced from a dissolved OrganicTriangle, and removes
+		old ECBPolys, in the persistent mass.
+
+	8.) Finally, any OREs that were marked as needing to have their currentDependencyState set to OREDependencyState::INDEPENDENT, are actually updated,
+		via a call to updatedAffectedORESAsIndependent().
+
+
 */
 
 class BPMassManagerV2
@@ -41,9 +80,13 @@ class BPMassManagerV2
 																									// in the reformerTracker map of this class; this is needed to track OREs that are modified, when 
 																									// calling the virtual runMassDrivers function on a ContourPlanV2Base instance.
 		void scanForDissolvableTriangles();		// scans for OrganicTriangles to dissolve in the underlying reformerTracker, by determine OREs 
-												// that are touched by OrganicTriangles in BOTH the persistened and contoured masses.
+												// that are touched by OrganicTriangles in BOTH the persistened and contoured masses. This function should only be 
+												// called once, after the buildContouredMass() and buildPersistentMasses() have been called for a contour plan. 
+												// See function definition for more notes.
 
-		void updatePersistentBlueprintPolys();	// updates the persistent mass with new ECBPolys, and deletes old ones that need to be deleted because they were dissolved.
+		void updatePersistentBlueprintPolys();		// updates the persistent mass with new ECBPolys, and deletes old ones that need to be deleted because they were dissolved.
+		void updatedAffectedORESAsIndependent();	// Set's all ORE instances in the persistent blueprint maps to be marked as INDENDENT; 
+													// this should only ever be called after updatePersistentBlueprintPolys(), when a ContourPlan does it's thing.
 	private:
 		ECBMap* managerEcbMapRef = nullptr;		// a reference to the calling instance of OrganicServer's ECBMap.
 

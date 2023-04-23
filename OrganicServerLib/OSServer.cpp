@@ -550,18 +550,47 @@ void OSServer::constructSingleMountTest()
 
 void OSServer::runSingleMountainV2()
 {
+	int numberOfLayers = 5;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
+
+
+	// second mountain
+
+	//summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
+					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
+					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
+	//summit2.y = 16;
+	//summit2.z = 16;
+
+	DoublePoint summit2(3.33, 16, 16);
+	addPlanV2("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	auto summit2Ref = getPlanV2Ref("summit2");
+	summit2Ref->amplifyAllContourLinePoints();
+	summit2Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	summit2Ref->buildContouredTriangles();
+	executePlanV2("summit2");
+
+	
 	DoublePoint summit1(28.0, 16.0, 16.0);
-	int numberOfLayers = 5;
 	addPlanV2("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 31.82, 9);
 	auto currentPlanRef = getPlanV2Ref("summit1");
 	currentPlanRef->amplifyAllContourLinePoints();
 	currentPlanRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	currentPlanRef->buildContouredTriangles();
 	executePlanV2("summit1");
+	
+	DoublePoint summit3(80.0, 16.0, 25.0);
+	addPlanV2("summit3", OSTerrainFormation::MOUNTAIN, summit3, 3, 4.81, 16.82, 7);
+	auto summit3Ref = getPlanV2Ref("summit3");
+	summit3Ref->amplifyAllContourLinePoints();
+	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	summit3Ref->buildContouredTriangles();
+	executePlanV2("summit3");
+	
 
 	int doneValue = 3;
 	std::cout << "Plan V2 test done. Enter key to continue (or just end). " << std::endl;
 	std::cin >> doneValue;
+	
 }
 
 
