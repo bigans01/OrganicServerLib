@@ -31,12 +31,6 @@
     <Filter Include="Source Files\Jobs\SJ">
       <UniqueIdentifier>{3c034cd5-411c-4f97-977d-7263a6ffe66a}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Jobs\SPJ\ContouredPlans">
-      <UniqueIdentifier>{a23bb4f1-4c5c-4db8-a45b-93a2276fbe0d}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Jobs\SPJ\ContouredPlans\Mountain">
-      <UniqueIdentifier>{116e5774-6b5a-46b2-b2b8-0f2f881758d7}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Jobs\SPJ\WorldDirection">
       <UniqueIdentifier>{c7e8bf62-f419-4837-885c-2461856ca4f7}</UniqueIdentifier>
     </Filter>
@@ -69,6 +63,27 @@
     </Filter>
     <Filter Include="Source Files\ContouredPlanV2">
       <UniqueIdentifier>{32d5473d-daa9-4cbf-bfc4-794e519ff29b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ContouredPlans">
+      <UniqueIdentifier>{a23bb4f1-4c5c-4db8-a45b-93a2276fbe0d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ContouredPlans\Mountain">
+      <UniqueIdentifier>{116e5774-6b5a-46b2-b2b8-0f2f881758d7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\SPJ\ContourPlans">
+      <UniqueIdentifier>{b828031a-3725-43e2-92a1-282788838445}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContourPlans">
+      <UniqueIdentifier>{53e5749d-9ba3-429e-9ad3-290fc71d6a9a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\SPJ\ContourPlans\Mountain">
+      <UniqueIdentifier>{bf4731e6-9bf3-4b83-8f28-7b0def0b1739}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ContouredPlanV2\Mountain">
+      <UniqueIdentifier>{4156beb0-0975-4277-b7a1-531aac5d585a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContouredPlanV2\Mountain">
+      <UniqueIdentifier>{2eb94259-4a8e-4ba6-84ad-7f0c610076e6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -214,7 +229,7 @@
       <Filter>Header Files\Jobs\SPJ\WorldDirection</Filter>
     </ClInclude>
     <ClInclude Include="ContouredMountain.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+      <Filter>Header Files\ContouredPlans\Mountain</Filter>
     </ClInclude>
     <ClInclude Include="ServerJobRunVerdict.h">
       <Filter>Header Files\Jobs\ServerJobManager</Filter>
@@ -251,12 +266,6 @@
     </ClInclude>
     <ClInclude Include="SJRunContourPlanFracturingAndMassDriving.h">
       <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
-    </ClInclude>
-    <ClInclude Include="SJPrepCPMountainRun.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClInclude>
-    <ClInclude Include="SPJBuildCPMountain.h">
-      <Filter>Header Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClInclude>
     <ClInclude Include="ServerJobProxy.h">
       <Filter>Header Files\Jobs</Filter>
@@ -297,9 +306,6 @@
     <ClInclude Include="ContouredTriangleV2.h">
       <Filter>Header Files\ContouredPlanV2</Filter>
     </ClInclude>
-    <ClInclude Include="CPV2Mountain.h">
-      <Filter>Header Files\ContouredPlanV2</Filter>
-    </ClInclude>
     <ClInclude Include="ContouredDoublePoint.h">
       <Filter>Header Files\ContouredPlanV2</Filter>
     </ClInclude>
@@ -311,6 +317,18 @@
     </ClInclude>
     <ClInclude Include="BPMassManagerV2.h">
       <Filter>Header Files\ContouredPlanV2</Filter>
+    </ClInclude>
+    <ClInclude Include="ContouredPlanUtils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SJPrepCPMountainRun.h">
+      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJBuildCPMountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="CPV2Mountain.h">
+      <Filter>Header Files\ContouredPlanV2\Mountain</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -392,9 +410,6 @@
     <ClCompile Include="ServerPhasedJobBase.cpp">
       <Filter>Source Files\Jobs\SPJ</Filter>
     </ClCompile>
-    <ClCompile Include="ContouredMountain.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
     <ClCompile Include="SPJSendWorldDirectionToClient.cpp">
       <Filter>Source Files\Jobs\SPJ\WorldDirection</Filter>
     </ClCompile>
@@ -446,9 +461,6 @@
     <ClCompile Include="ContouredTriangleV2.cpp">
       <Filter>Source Files\ContouredPlanV2</Filter>
     </ClCompile>
-    <ClCompile Include="CPV2Mountain.cpp">
-      <Filter>Source Files\ContouredPlanV2</Filter>
-    </ClCompile>
     <ClCompile Include="ContouredCircuit.cpp">
       <Filter>Source Files\ContouredPlanV2</Filter>
     </ClCompile>
@@ -457,6 +469,15 @@
     </ClCompile>
     <ClCompile Include="BPMassManagerV2.cpp">
       <Filter>Source Files\ContouredPlanV2</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredPlanUtils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ContouredMountain.cpp">
+      <Filter>Source Files\ContourPlans</Filter>
+    </ClCompile>
+    <ClCompile Include="CPV2Mountain.cpp">
+      <Filter>Source Files\ContouredPlanV2\Mountain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

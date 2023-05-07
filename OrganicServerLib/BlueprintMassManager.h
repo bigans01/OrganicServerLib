@@ -33,13 +33,17 @@ class BlueprintMassManager
 		OrganicTriangleTracker* getReformerTrackerRef(EnclaveKeyDef::EnclaveKey in_blueprintKey);
 		void scanForDissolvableTriangles();
 		void updatePersistentBlueprintPolys();
+
+		void checkStateOfSpecificOre(EnclaveKeyDef::EnclaveKey in_blueprintKeyToCheck,
+			EnclaveKeyDef::EnclaveKey in_oreKeyToCheck);
+
+		ECBMap contouredPlanMass;
 	private:
 		ECBMap* managerEcbMapRef = nullptr;
 
 		ContourBase* contourPlanRef = nullptr;
 		OrganicClient* organicClientRef = nullptr;
 
-		ECBMap contouredPlanMass;
 		ForgedPolyRegistry contouredPlanEntireShellRegistry;
 		ForgedPolyRegistry contouredPlanMassDriverRegistry;
 		std::unordered_map<EnclaveKeyDef::EnclaveKey, OperableIntSet, EnclaveKeyDef::KeyHasher> contouredPlanShellBlueprintKeyAndSetPairs;

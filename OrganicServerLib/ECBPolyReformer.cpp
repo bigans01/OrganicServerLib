@@ -181,38 +181,38 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 					processableKeys.insert(*remainingOresBegin);
 				}
 			}
-
+		
 			// if there are processable Keys post-shattering, run them here.
 			if (!processableKeys.empty())
 			{
-				// For each ORE in the processableList for the current shattered ECBPoly, we must create a new ECBPoly for each ORE.
-				// We can do this by calling retriveAllEnclaveTrianglesForSupergroup, assuming that the supergroup ID related to the ECBPoly 
-				// being shattered is still contained within the ORE. If not, this will produce strange OpenGL artifacts.
-				auto currentProcessableOREKey = processableKeys.begin();
-				auto processablePrintEnd = processableKeys.end();
-				for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
-				{
+					// For each ORE in the processableList for the current shattered ECBPoly, we must create a new ECBPoly for each ORE.
+					// We can do this by calling retriveAllEnclaveTrianglesForSupergroup, assuming that the supergroup ID related to the ECBPoly 
+					// being shattered is still contained within the ORE. If not, this will produce strange OpenGL artifacts.
+					auto currentProcessableOREKey = processableKeys.begin();
+					auto processablePrintEnd = processableKeys.end();
+					for (; currentProcessableOREKey != processablePrintEnd; currentProcessableOREKey++)
+					{
 
-					// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
-					OrganicRawEnclave* currentProcessableKeyedORERef = &persistentMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
-					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentPersistentSetPolyIDIter);
-					
-					// Create new ECBPolys from the current ORE, and assign those ECBPoly instances appropriate IDs via the in_nextECBPolyIDTrackerRef.
-					ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
-						fetchedEnclaveTriangleVector,
-						reformerBlueprintKey,
-						*currentProcessableOREKey);
-					
-					// Take the current shattered results, and move them into the appropriate map. Also, 
-					// be sure to insert the ID of this ECBPoly being shattered.
-					moveShatterResultsIntoSecondPassECBPolys(currentShatterResults);
-					secondPassShatteredPolysSet.insert(*currentPersistentSetPolyIDIter);
+						// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
+						OrganicRawEnclave* currentProcessableKeyedORERef = &persistentMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
+						auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentPersistentSetPolyIDIter);
 
-					(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
-					
-					// the below call will be deprecated in the near future; but needs to be done to be friendly with the old version of the mass manager 
-					// (BlueprintMassManager), until it is deleted/removed.
-					secondPassShatteredORESet.insert(*currentProcessableOREKey);
+						// Create new ECBPolys from the current ORE, and assign those ECBPoly instances appropriate IDs via the in_nextECBPolyIDTrackerRef.
+						ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
+							fetchedEnclaveTriangleVector,
+							reformerBlueprintKey,
+							*currentProcessableOREKey);
+
+						// Take the current shattered results, and move them into the appropriate map. Also, 
+						// be sure to insert the ID of this ECBPoly being shattered
+						moveShatterResultsIntoSecondPassECBPolys(currentShatterResults);
+						secondPassShatteredPolysSet.insert(*currentPersistentSetPolyIDIter);
+
+						(secondPassResultingShatteredEnclaveTriangles[*currentPersistentSetPolyIDIter])[*currentProcessableOREKey] = currentShatterResults.shatteredResultEnclaveTriangles;
+
+						// the below call will be deprecated in the near future; but needs to be done to be friendly with the old version of the mass manager 
+						// (BlueprintMassManager), until it is deleted/removed.
+						secondPassShatteredORESet.insert(*currentProcessableOREKey);			
 				}
 			}
 
@@ -221,7 +221,7 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 			// since that function only deletes old ECBPolys that were shattered and had entries in the processableKeys. 
 			else if (processableKeys.empty())
 			{
-				secondPassUnshatteredECBPolysToErase.insert(*currentPersistentSetPolyIDIter);
+					secondPassUnshatteredECBPolysToErase.insert(*currentPersistentSetPolyIDIter);
 			}
 		}
 

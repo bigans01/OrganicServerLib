@@ -9,6 +9,7 @@
 #include "CTV2Strip.h"
 #include "ECBMap.h"
 #include "OrganicTriangleTracker.h"
+#include "ContouredPlanUtils.h"
 
 class ContouredPlanV2Base
 {

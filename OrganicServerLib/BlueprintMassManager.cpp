@@ -32,6 +32,84 @@ void BlueprintMassManager::buildContourMassShell()
 	}
 }
 
+void BlueprintMassManager::checkStateOfSpecificOre(EnclaveKeyDef::EnclaveKey in_blueprintKeyToCheck,
+	EnclaveKeyDef::EnclaveKey in_oreKeyToCheck)
+{
+	std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): Checking the status of the ORE at: Blueprint ";
+	in_blueprintKeyToCheck.printKey();
+	std::cout << " | ORE: ";
+	in_oreKeyToCheck.printKey();
+	std::cout << std::endl;
+
+	// Check the persistent mass.
+	std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): -> checking for the ORE in PERSISTENT mass. " << std::endl;
+	bool persistentBlueprintFinder = persistentMass.checkIfBlueprintExists(in_blueprintKeyToCheck);
+	if (persistentBlueprintFinder == true)
+	{
+		std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): -> Found Blueprint of the ORE. " << std::endl;
+		auto checkIfOREIsInPersistentMass = persistentMass.checkIfBlueprintContainsSpecificOre(in_blueprintKeyToCheck, in_oreKeyToCheck);
+		if (checkIfOREIsInPersistentMass == true)
+		{
+			std::cout << "!!! Found ORE in persistent mass. " << std::endl;
+			ORELodState currentLodState = persistentMass.getOrganicRawEnclaveRef(in_blueprintKeyToCheck, in_oreKeyToCheck)->getLodState();
+			std::string lodStatePrefix = "(BlueprintMassManager::checkStateOfSpecificOre): LOD state of ORE (PERSISTENT) is: ";
+			switch (currentLodState)
+			{
+				case ORELodState::LOD_ENCLAVE_SMATTER: { lodStatePrefix += "LOD_ENCLAVE_SMATTER"; break; }
+				case ORELodState::LOD_ENCLAVE_RMATTER: { lodStatePrefix += "LOD_ENCLAVE_RMATTER"; break; }
+				case ORELodState::LOD_BLOCK: { lodStatePrefix += "LOD_BLOCK"; break; }
+				case ORELodState::FULL: { lodStatePrefix += "FULL"; break; }
+			}
+			std::cout << lodStatePrefix << std::endl;
+
+		}
+		else
+		{
+			std::cout << "Blueprint exists in PERSISTENT mass, but did not find ORE. " << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "Did not find Blueprint for the ORE in PERSISTENT mass." << std::endl;
+	}
+
+	// Check the contoured mass.
+	std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): -> checking for the ORE in CONTOURED mass. " << std::endl;
+	bool contouredBlueprintFinder = contouredPlanMass.checkIfBlueprintExists(in_blueprintKeyToCheck);
+	if (contouredBlueprintFinder == true)
+	{
+		std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): -> Found Blueprint of the ORE. " << std::endl;
+		auto checkIfOREIsInContouredMass = contouredPlanMass.checkIfBlueprintContainsSpecificOre(in_blueprintKeyToCheck, in_oreKeyToCheck);
+		if (checkIfOREIsInContouredMass == true)
+		{
+			std::cout << "!!! Found ORE in persistent mass. " << std::endl;
+			ORELodState currentLodState = contouredPlanMass.getOrganicRawEnclaveRef(in_blueprintKeyToCheck, in_oreKeyToCheck)->getLodState();
+			std::string lodStatePrefix = "(BlueprintMassManager::checkStateOfSpecificOre): LOD state of ORE (CONTOURED) is: ";
+			switch (currentLodState)
+			{
+				case ORELodState::LOD_ENCLAVE_SMATTER: { lodStatePrefix += "LOD_ENCLAVE_SMATTER"; break; }
+				case ORELodState::LOD_ENCLAVE_RMATTER: { lodStatePrefix += "LOD_ENCLAVE_RMATTER"; break; }
+				case ORELodState::LOD_BLOCK: { lodStatePrefix += "LOD_BLOCK"; break; }
+				case ORELodState::FULL: { lodStatePrefix += "FULL"; break; }
+			}
+			std::cout << lodStatePrefix << std::endl;
+
+		}
+		else
+		{
+			std::cout << "Blueprint exists in CONTOURED mass, but did not find ORE. " << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "Did not find Blueprint for the ORE in CONTOURED mass." << std::endl;
+	}
+
+	std::cout << "Done with call of (BlueprintMassManager::checkStateOfSpecificOre); enter key to continue." << std::endl;
+	int doneSearch = 3;
+	std::cin >> doneSearch;
+}
+
 void BlueprintMassManager::copyMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveKey in_blueprintKey, OperableIntSet in_contourAddedOrganicTrianglesSet)
 {
 	EnclaveCollectionBlueprint* currentBlueprintRef = managerEcbMapRef->getBlueprintRef(in_blueprintKey);
@@ -350,36 +428,21 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 		for (; currentReformerContouredSetBegin != currentReformerContouredSetEnd; currentReformerContouredSetBegin++)
 		{
 			// first check: check for any shattered contoured ECBPolys that were spawned for the original contoured ECBPoly ID.
-			
-			auto currentPolyShatteredCheck = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.find(*currentReformerContouredSetBegin);
-			if (currentPolyShatteredCheck != ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.end())
+			auto wasPolyShattered = ecbPolyReformerTrackerBegin->second.firstPassShatteredPolysSet.find(*currentReformerContouredSetBegin);
+			if (wasPolyShattered != ecbPolyReformerTrackerBegin->second.firstPassShatteredPolysSet.end())
 			{
-				// now, take each produced contoured (shattered) ECBPoly from the corresponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
-				auto currentShatteredPolysBegin = currentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
-				auto currentShatteredPolysEnd = currentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
-				//std::cout << "Origin ECBPoly ID is: " << currentPolyShatteredCheck->first << std::endl;
-				for (; currentShatteredPolysBegin != currentShatteredPolysEnd; currentShatteredPolysBegin++)
+				auto currentShatteredPolyGroupBegin = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.begin();
+				auto currentShatteredPolyGroupEnd = ecbPolyReformerTrackerBegin->second.firstPassResultingShatteredECBPolys.end();
+				for (; currentShatteredPolyGroupBegin != currentShatteredPolyGroupEnd; currentShatteredPolyGroupBegin++)
 				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentShatteredPolysBegin->first, currentShatteredPolysBegin->second);
+					for (auto& currentPolyInGroup : currentShatteredPolyGroupBegin->second.shatteredEcbPolyMap)
+					{
+						ecbPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPolyInGroup.first, currentPolyInGroup.second);
+					}
 				}
 
 				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPolyShatteredCheck->first);
-
-				// lastly, for each entry in the current reformer's firstPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
-				// as being INDEPENDENT.
-				auto firstPassShatteredOreSetBegin = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.begin();
-				auto firstPassShatteredOreSetEnd = ecbPolyReformerTrackerBegin->second.firstPassShatteredORESet.end();
-				for (; firstPassShatteredOreSetBegin != firstPassShatteredOreSetEnd; firstPassShatteredOreSetBegin++)
-				{
-					ecbPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*firstPassShatteredOreSetBegin].setOREasIndependent();
-				}
-			}
-			
-			auto currentPolyDeleteCheck = ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.find(*currentReformerContouredSetBegin);
-			if (currentPolyDeleteCheck != ecbPolyReformerTrackerBegin->second.firstPassUnshatteredECBPolysToErase.end())
-			{
-				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentReformerContouredSetBegin);
+				ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*wasPolyShattered);
 			}
 		}
 
@@ -390,7 +453,7 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 		{
 			ecbPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*currentErasePolyCheckBegin);
 		}
-		
+
 	}
 
 	// Second pass: persistent ECBPolys.
@@ -399,40 +462,31 @@ void BlueprintMassManager::updatePersistentBlueprintPolys()
 	auto secondPassECBPolyReformerTrackerEnd = reformerTracker.end();
 	for (; secondPassECBPolyReformerTrackerBegin != secondPassECBPolyReformerTrackerEnd; secondPassECBPolyReformerTrackerBegin++)
 	{
-		
+
 		auto currentReformerPersistentSetBegin = secondPassECBPolyReformerTrackerBegin->second.persistentMassShellECBPolyIDs.intSet.begin();
 		auto currentReformerPersistentSetEnd = secondPassECBPolyReformerTrackerBegin->second.persistentMassShellECBPolyIDs.intSet.end();
 		for (; currentReformerPersistentSetBegin != currentReformerPersistentSetEnd; currentReformerPersistentSetBegin++)
 		{
 			// first check: check for any shattered persistent ECBPolys that were spawned for the original contoured ECBPoly ID.
-			
-			auto currentPersistentPolyShatteredCheck = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.find(*currentReformerPersistentSetBegin);
-			if (currentPersistentPolyShatteredCheck != secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.end())
+			auto wasPolyShattered = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredPolysSet.find(*currentReformerPersistentSetBegin);
+			if (wasPolyShattered != secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredPolysSet.end())
 			{
-				// now,  take each produced persistent (shatered) ECBPoly from the corressponding ShatteredECBPolys instance, and add it to the persistent blueprint's ECBPolys.
-				
-				auto currentPersistentShatteredPolysBegin = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.begin();
-				auto currentPersistentShatteredPolysEnd = currentPersistentPolyShatteredCheck->second.shatteredEcbPolyMap.end();
-				for (; currentPersistentShatteredPolysBegin != currentPersistentShatteredPolysEnd; currentPersistentShatteredPolysBegin++)
+				auto currentShatteredPolyGroupBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.begin();
+				auto currentShatteredPolyGroupEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassResultingShatteredECBPolys.end();
+				for (; currentShatteredPolyGroupBegin != currentShatteredPolyGroupEnd; currentShatteredPolyGroupBegin++)
 				{
-					// need to figure out why the below line was commented out before 8/27/2021...(perhaps a mistake?)
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPersistentShatteredPolysBegin->first, currentPersistentShatteredPolysBegin->second);
+					for (auto& currentPolyInGroup : currentShatteredPolyGroupBegin->second.shatteredEcbPolyMap)
+					{
+						secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->insertPolyWithKeyValue(currentPolyInGroup.first, currentPolyInGroup.second);
+					}
 				}
-				
-				// remove the ECBPoly that these persistent (shattered) ECBPoly(s) were spawned from, in the persistent map.
-				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(currentPersistentPolyShatteredCheck->first);
 
-				// lastly, for each entry in the current reformer's secondPassShatteredOreSet, update that corresponding ORE having the same key in the server (persistent) blueprint,
-				// as being INDEPENDENT.
-				auto secondPassShatteredOreSetBegin = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.begin();
-				auto secondPassShatteredOreSetEnd = secondPassECBPolyReformerTrackerBegin->second.secondPassShatteredORESet.end();
-				for (; secondPassShatteredOreSetBegin != secondPassShatteredOreSetEnd; secondPassShatteredOreSetBegin++)
-				{
-					secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->fractureResults.fractureResultsContainerMap[*secondPassShatteredOreSetBegin].setOREasIndependent();
-				}
+				// remove the ECBPoly that these contoured (shattered) ECBPoly(s) were spawned from, in the persistent map.
+				secondPassECBPolyReformerTrackerBegin->second.serverBlueprintRef->deletePoly(*wasPolyShattered);
+
 
 			}
-			
+
 		}
 
 		// second check: check for any persistent ECBPolys that weren't shattered, but need to be erased.	

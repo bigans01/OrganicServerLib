@@ -283,33 +283,7 @@ void CPV2Mountain::constructTriangle(std::unordered_map<int, CTV2Strip>* in_cont
 void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 	ECBMap* in_ecbMapRef,
 	EnclaveFractureResultsMap* in_fractureResultsMapRef)
-{
-	/*
-	// The below code block is the same as running multiple blank contours; this was just a "smoke test" to stamp out
-	// any initial bugs, and to ensure that the plan V2 logic (i.e, using FTriangles to form ECBPolys) was working.
-	// The logic to fill blueprints will come later.
-	//
-	// It remains as a way to debug/observe a shell that hasn't had mass drivers run on it yet.
-	OrganicTriangleTracker oreTracker;
-	for (auto& planPolyRegistryBegin : allPolysRegistry.polySetRegistry)
-	{
-		EnclaveKeyDef::EnclaveKey blueprintKey = planPolyRegistryBegin.first;					// get the key of the blueprint to check.
-		int foundGroupID = planPolyRegistryBegin.second.groupID;									// grab the group ID we'll be working with.
-		std::cout << "Found poly set " << foundGroupID << "in key: (" << blueprintKey.x << ", " << blueprintKey.y << ", " << blueprintKey.z << std::endl;
-		EnclaveCollectionBlueprint* blueprintToCheck = in_ecbMapRef->getBlueprintRef(blueprintKey);	// get a ref to the blueprint that exists SERVER side (not on the client), using the blueprintKey
-		auto forgedPolySetBegin = planPolyRegistryBegin.second.polySet.begin();
-		auto forgedPolySetEnd = planPolyRegistryBegin.second.polySet.end();
-
-		ForgedPolySet originalSet = allPolysRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
-
-		std::cout << "!! Size of the originalSet to be used in this blueprint: " << originalSet.polySet.size() << std::endl;
-
-		EnclaveFractureResultsMap tempMap;
-		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// first, generate the OrganicRawEnclaves that would be produced by this set; keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-collision check)
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck, &oreTracker);
-	}
-	*/
-	
+{	
 	// #############################################################################################################################
 	// STEP 1 OVERVIEW: use all the values from each ForgedPolySet -- which represent the IDs of ECBPolys that this ContourPlan added -- for each blueprint, and 
 	// then spawn the resulting EnclaveTriangles in the OREs (OrganicRawEnclaves) into the tempMap. When this is done, add the results to the containerMapMap.
@@ -350,18 +324,19 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 		// 3. The produced EnclaveTriangles in each ORE of steps #1 and #2 are used in the call to spawnAndAppendEnclaveTriangleSkeletonsToBlueprint; at this point,
 		//	  see the note S1 below
 
-		EnclaveFractureResultsMap tempMap;
-		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, oreTrackerRef);		// 1.) Generate the OrganicRawEnclaves that would be produced by this set; load the tracked OREs of the OrganicTriangles that were added by the plan
-		in_clientRef->OS->produceTrackedORESForOrganicTriangleIDs(&tempMap, blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, oreTrackerRef);			// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
+		// 1.) Get the tracked OREs of ECBPolys that WERE added by this contour plan
+		ContouredPlanUtils::calculateTrackedOREsForAddedContourPolys(blueprintKey, currentServerBlueprintRef, currentPlanAddedOrganicTriangles.intSet, &in_ecbMapRef->blueprintMapMutex, oreTrackerRef);
 
-		// Use the ORE and EnclaveTriangle data that is stored in the tempMap, to apply OREMatterCollider operations -- and/or similiar ones -- if need be, for this
+		// 2.) Get the tracked OREs of ECBPolys that were NOT added by this contour plan
+		ContouredPlanUtils::calculateTrackedOREsForAddedContourPolys(blueprintKey, currentServerBlueprintRef, existingCurrentBlueprintPolyIDs.intSet, &in_ecbMapRef->blueprintMapMutex, oreTrackerRef);
+
+		// Use the ORE and EnclaveTriangle data that is stored in the planMassManager.contouredPlanMass, to apply collider operations with the selected collider class -- and/or similiar ones -- if need be, for this
 		// blueprint that the ContourPlan affects/generated.
 		//
-		// NOTE S1: The call to spawnAndAppendEnclaveTriangleSkeletonsToBlueprint will also call the appropriate function based on whether or note the ORE exists:
-		// --if the ORE doesn't exist, a new ORE is created (it's appended state is NONE)
-		// --if the ORE already exists, it's current appended state is iterated (to SINGLE_APPEND or MULTIPLE_APPEND).
-
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, currentServerBlueprintRef, oreTrackerRef);
+		// NOTE S1: The call to appendContourPlanEnclaveTriangleSkeletons will also call the appropriate function based on whether or note the ORE exists:
+		// --if the ORE doesn't exist, a new ORE is created, and it gets appended exactly once (so it's appended state becomes SINGLE_APPEND)
+		// --if the ORE already exists, it's current appended state is iterated. (to MULTIPLE_APPEND).
+		ContouredPlanUtils::appendContourPlanEnclaveTriangleSkeletons(blueprintKey, &planMassManager.contouredPlanMass, in_ecbMapRef, oreTrackerRef);
 	}
 
 	// Step 2) In this step, we must now apply the ContourPlans MassDriving to the persistent blueprints. Remember, the previous MassDriving operation was for 

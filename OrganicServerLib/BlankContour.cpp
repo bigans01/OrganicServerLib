@@ -41,8 +41,13 @@ void BlankContour::runMassDrivers(OrganicClient* in_clientRef,
 
 		ForgedPolySet originalSet = planPolyRegistry.polySetRegistry[blueprintKey];	// get the original, unaltered set
 		EnclaveFractureResultsMap tempMap;
-		in_clientRef->OS->produceRawEnclavesForPolySetWithTracking(&tempMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);		// first, generate the OrganicRawEnclaves that would be produced by this set; keep track of each ORE that an individual OrganicTriangle touches (needed for SPoly post-collision check)
-		in_clientRef->OS->spawnAndAppendEnclaveTriangleSkeletonsToBlueprint(blueprintKey, &tempMap, blueprintToCheck, &oreTracker);					// second, spawn the EnclaveTriangleSkeletonContainers for the current EnclaveFractureResultsMap; then append the results to the target blueprint to update.
+		ECBMap tempECBMap;
+		
+		// We don't have a BlueprintMassManager / BPMassManager here, so we'll have to put the OREs into a temp map.
+		ContouredPlanUtils::produceRawEnclavesForTempMap(&tempECBMap, blueprintKey, blueprintToCheck, originalSet.polySet, &oreTracker);
+
+		// Now, load the EnclaveTriangleSkeletonContainers from the tempMap into the persisent mass (in_ecbMapRef)
+		ContouredPlanUtils::appendContourPlanEnclaveTriangleSkeletons(blueprintKey, &tempECBMap, in_ecbMapRef, &oreTracker);
 	}
 }
 

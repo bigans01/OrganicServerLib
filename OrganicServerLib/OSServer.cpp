@@ -606,7 +606,8 @@ void OSServer::constructMultiMountTestWithElevator()
 	AdjacentFinder testFinder(&serverBlueprints);
 
 	
-	// first mountain
+	
+	// first mountain (the BIG GRASS mountain)
 	summit1.x = 28;
 	summit1.y = 16;
 	summit1.z = 16;
@@ -616,33 +617,8 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit1Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit1");
-
-	auto existingOREFinder = serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.find(serverBlueprintOREKey);
-
-	// tests for AdjacentFinder
-	EnclaveKeyDef::EnclaveKey adjacentBeginBlueprintKey(0, 0, 0);
-	std::cout << "!!! Findind adjacents for: "; adjacentBeginBlueprintKey.printKey(); std::cout << std::endl;
-	auto neighboringBlueprints = testFinder.findAdjacentBlueprints(adjacentBeginBlueprintKey);
-	auto foundNeighborsBegin = neighboringBlueprints.begin();
-	auto foundNeighborsEnd = neighboringBlueprints.end();
-	for (; foundNeighborsBegin != foundNeighborsEnd; foundNeighborsBegin++)
-	{
-		std::cout << "!! Found neighbor at: "; foundNeighborsBegin->second.blueprintKey.printKey(); std::cout << std::endl;
-	}
-
-
-	if (existingOREFinder != serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.end())
-	{
-		std::cout << "::::::: metadata fetch #1 " << std::endl;
-		existingOREFinder->second.printMetadata();
-	}
-	int metadataWait = 3;
 	
-	std::cin >> metadataWait;
-	
-	
-	// second mountain
-	
+	// second mountain (the DIRT mountain)	
 	summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
 					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
 					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
@@ -653,58 +629,9 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit2Ref->amplifyAllContourLinePoints();
 	summit2Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit2");
-
-	// debug block test
-	EnclaveKeyDef::EnclaveKey targetBlueprintDebug(0, -1, 0);
-	EnclaveKeyDef::EnclaveKey targetOREDebug(4, 6, 4);
-	//serverBlueprints.getFractureResultsMapRef(targetBlueprintDebug)->fractureResultsContainerMap[targetOREDebug].simulateBlockProduction();
-	//serverBlueprints.getFractureResultsMapRef(targetBlueprintDebug)->fractureResultsContainerMap[targetOREDebug].printEnclaveTriangleContainers(true);
-
-
-
-	// for debugging test only.
-	//EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, -1, 1);
-	//EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(5, 7, 0);
 	
-	//EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, 0, 0);
-	//EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(3, 1, 3);
 
-
-
-	auto existingOREFinder2 = serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.find(serverBlueprintOREKey);
-
-	if (existingOREFinder2 != serverBlueprints.getFractureResultsMapRef(serverBlueprintKey)->fractureResultsContainerMap.end())
-	{
-		std::cout << "::::::: metadata fetch #2 " << std::endl;
-		existingOREFinder2->second.printMetadata();
-	}
-	int metadataWait2 = 3;
-	std::cin >> metadataWait2;
-
-
-	/*
-	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
-	{
-		existingOREFinder->second.printTriangleMetadata();
-	}
-	else
-	{
-		std::cout << "!!! ORE not found. " << std::endl;
-	}
-
-	std::cout << "!!!! Finished print test #1...." << std::endl;
-	int printWait1 = 3;
-	std::cin >> printWait1;
-	*/
-
-
-
-	//organicSystemPtr->disableColliderOldAppend(EnclaveKeyDef::EnclaveKey(3, 1, 3));
-	//organicSystemPtr->disableColliderNewAppend(EnclaveKeyDef::EnclaveKey(2, 2, 4));
-	//organicSystemPtr->disableColliderOldAppend(EnclaveKeyDef::EnclaveKey(2, 2, 4));
-
-
-
+	
 	// third mountain -- diagonal to other two
 	summit3.x = 14.00f;
 	summit3.y = 16;
@@ -715,78 +642,9 @@ void OSServer::constructMultiMountTestWithElevator()
 	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
 	executeDerivedContourPlan("summit3");
-
-	/*
-	auto existingOREFinder3 = blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.find(serverBlueprintOREKey);
-	if (existingOREFinder3 != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
-	{
-		std::cout << "::::::: metadata fetch #3 " << std::endl;
-		existingOREFinder3->second.printMetadata();
-	}
-	int metadataWait3 = 3;
-	std::cin >> metadataWait3;
-	*/
-
-	/*
-	if (existingOREFinder != blueprintMap[serverBlueprintKey].fractureResults.fractureResultsContainerMap.end())
-	{
-		existingOREFinder->second.printTriangleMetadata();
-	}
-	std::cout << "!!!! Finished print test #2...." << std::endl;
-	int printWait2 = 3;
-	std::cin >> printWait2;
-	*/
-
-	// test, convert an ORE's lod to block.
-	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -2, -1);
-	EnclaveKeyDef::EnclaveKey blockReformOREKey(3, 3, 7);
-	EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
 	
-	//auto blockReformTarget = serverBlueprints.getFractureResultsMapRef(blockReformBlueprintKey)->fractureResultsContainerMap.find(blockReformOREKey);
-	//blockReformTarget->second.morphLodToBlock(&serverReadWrite, blockReformOREKey);
 
-	//auto targetBlueprintRef = serverBlueprints.getBlueprintRef(blockReformBlueprintKey);
-	//organicSystemPtr->applyOREMorphLodToBlockRippleEffect(&serverBlueprints, blockReformBlueprintKey, blockReformOREKey);
-
-	/*
-	serverBlueprints.rebuildBlueprintCatalog(blockReformBlueprintKey);	// this must be called on the same blueprint that contains the ORE we are about to morph, before
-																		// the actual morphing occurs.
-
-	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, blockReformBlueprintKey, blockReformOREKey);
-	EnclaveKeyDef::EnclaveKey otherReformKey(2, 3, 7);
-	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, blockReformBlueprintKey, otherReformKey);
-	std::cout << "(OrganicServer): Done with calls for rebuildBlueprintCatalog and attemptOREMorphLodToBlock; enter number to continue " << std::endl;
-	int done = 3;
-	std::cin >> done;
-	*/
-
-	//organicSystemPtr->comboJobEraseBlockInOre(blockReformBlueprintKey, blockReformOREKey, blockKey);
-
-	/*
-	EnclaveKeyDef::EnclaveKey debugCollection(-1, 0, 0);
-	EnclaveKeyDef::EnclaveKey debugORE(5, 1, 2);
-
-	serverBlueprints.rebuildBlueprintCatalog(debugCollection);	// this must be called on the same blueprint that contains the ORE we are about to morph, before
-																		// the actual morphing occurs.
-	organicSystemPtr->attemptOREMorphLodToBlock(&serverBlueprints, debugCollection, debugORE);
-
-	std::cout << "(OrganicServer): Done with DEBUG calls for rebuildBlueprintCatalog and attemptOREMorphLodToBlock; enter number to continue " << std::endl;
-	int done = 3;
-	std::cin >> done;
-	*/
-
-	//organicSystemPtr->comboJobEraseBlockInOre(blockReformBlueprintKey, blockReformOREKey, blockKey);
-
-
-
-	//blockReformTarget->second.eraseBlock(&serverReadWrite, blockKey);
-
-	// test, show block composition of ORE at 0,0,0 6,2,5
-	EnclaveKeyDef::EnclaveKey compositionOneBlueprint(0, 0, 0);
-	EnclaveKeyDef::EnclaveKey compositionOneORE(6,2,5);
-	auto compositionTarget = serverBlueprints.getFractureResultsMapRef(compositionOneBlueprint)->fractureResultsContainerMap.find(compositionOneORE);
-	compositionTarget->second.printBlockCategorizations();
-	std::cout << "*************************** Done printing categorizations. Enter number to continue. " << std::endl;
+	std::cout << "*************************** Done with run of constructMultiMountTestWithElevator(), enter a number to continue. " << std::endl;
 	int compVal = 3;
 	std::cin >> compVal;
 }

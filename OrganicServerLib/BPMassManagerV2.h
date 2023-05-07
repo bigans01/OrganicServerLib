@@ -34,11 +34,11 @@ An overview of how this class operates is as follows:
 		"touched" by the ContourPlan's run actually need to be copied.
 
 	4.) (**NOTE: this step may need a bit of tuning/review, but it works for now) For each ECBPolyReformer in this class instance (contained in reformerTracker),
-		we must get the current the OrganicTriangleTracker of it and load more data into it. The following OrganicSystem functions need to be called, in this order:
+		we must get the current the OrganicTriangleTracker of it and load more data into it. The following ContouredPlanUtils functions need to be called, in this order:
 
-		produceRawEnclavesForPolySetWithTracking (adds OREs from the contour plan)
-		produceTrackedORESForOrganicTriangleIDs  (adds OREs that already existed prior to the plan running) 
-		spawnAndAppendEnclaveTriangleSkeletonsToBlueprint (pretty self explanatory)
+		calculateTrackedOREsForAddedContourPolys (for tracking OREs of ECBPoly instances from the contour plan)
+		calculateTrackedOREsForAddedContourPolys (for tracking OREs of ECBPoly instances that already exist/are persisent)
+		appendContourPlanEnclaveTriangleSkeletons (inserts OREs from the contour plan, or appends these OREs to existing persistent ones)
 
 	5.) Mass driving operations are then applied to the persistent mass, via a call to generateAndRunMassDriversForBlueprint, for each blueprint that
 		contained an ECBPoly that was flagged for mass driving.
@@ -87,13 +87,17 @@ class BPMassManagerV2
 		void updatePersistentBlueprintPolys();		// updates the persistent mass with new ECBPolys, and deletes old ones that need to be deleted because they were dissolved.
 		void updatedAffectedORESAsIndependent();	// Set's all ORE instances in the persistent blueprint maps to be marked as INDENDENT; 
 													// this should only ever be called after updatePersistentBlueprintPolys(), when a ContourPlan does it's thing.
+
+		void checkStateOfSpecificOre(EnclaveKeyDef::EnclaveKey in_blueprintKeyToCheck,
+									EnclaveKeyDef::EnclaveKey in_oreKeyToCheck);
+
+		ECBMap contouredPlanMass;	
 	private:
 		ECBMap* managerEcbMapRef = nullptr;		// a reference to the calling instance of OrganicServer's ECBMap.
 
 		ContouredPlanV2Base* contourPlanRef = nullptr;	// a reference to the ContourPlanV2Base that this instance will interact with; must be set by constructor.
 		OrganicClient* organicClientRef = nullptr;		// a reference to an instance of OrganicClient, so that this instance may interface with an underlying OrganicSystem.
 
-		ECBMap contouredPlanMass;	
 		ForgedPolyRegistry contouredPlanEntireShellRegistry;	// all ECBPoly instances need to be stored here; this required for ORE production, which is needed before any mass driving is attempted.
 		ForgedPolyRegistry contouredPlanMassDriverRegistry;		// any ECBPoly that has an ECBPolyType::SHELL_MASSDRIVER needs to go here.
 

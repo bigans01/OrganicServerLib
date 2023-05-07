@@ -19,6 +19,7 @@
 #include "OrganicTriangleTracker.h"
 #include "OperableIntSet.h"
 #include "ECBMap.h"
+#include "ContouredPlanUtils.h"
 
 
 // base class for all future contour plans (will eventually replace old contour plan)

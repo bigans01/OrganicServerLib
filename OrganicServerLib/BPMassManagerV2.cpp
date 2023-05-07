@@ -19,6 +19,76 @@ void BPMassManagerV2::buildContourMassShell()
 	}
 }
 
+void BPMassManagerV2::checkStateOfSpecificOre(EnclaveKeyDef::EnclaveKey in_blueprintKeyToCheck,
+	EnclaveKeyDef::EnclaveKey in_oreKeyToCheck)
+{
+	std::cout << "(BPMassManagerV2::checkStateOfSpecificOre): Checking the status of the ORE at: Blueprint ";
+	in_blueprintKeyToCheck.printKey();
+	std::cout << " | ORE: ";
+	in_oreKeyToCheck.printKey();
+	std::cout << std::endl;
+
+	// Check the persistent mass.
+	std::cout << "(BPMassManagerV2::checkStateOfSpecificOre): -> checking for the ORE in PERSISTENT mass. " << std::endl;
+	bool persistentBlueprintFinder = persistentMass.checkIfBlueprintExists(in_blueprintKeyToCheck);
+	if (persistentBlueprintFinder == true)
+	{
+		std::cout << "(BlueprintMassManager::checkStateOfSpecificOre): -> Found Blueprint of the ORE. " << std::endl;
+		auto checkIfOREIsInPersistentMass = persistentMass.checkIfBlueprintContainsSpecificOre(in_blueprintKeyToCheck, in_oreKeyToCheck);
+		if (checkIfOREIsInPersistentMass == true)
+		{
+			std::cout << "!!! Found ORE in persistent mass. " << std::endl;
+			ORELodState currentLodState = persistentMass.getOrganicRawEnclaveRef(in_blueprintKeyToCheck, in_oreKeyToCheck)->getLodState();
+			std::string lodStatePrefix = "(BPMassManagerV2::checkStateOfSpecificOre): LOD state of ORE (PERSISTENT) is: ";
+			switch (currentLodState)
+			{
+				case ORELodState::LOD_ENCLAVE_SMATTER: { lodStatePrefix += "LOD_ENCLAVE_SMATTER"; break; }
+				case ORELodState::LOD_ENCLAVE_RMATTER: { lodStatePrefix += "LOD_ENCLAVE_RMATTER"; break; }
+				case ORELodState::LOD_BLOCK: { lodStatePrefix += "LOD_BLOCK"; break; }
+				case ORELodState::FULL: { lodStatePrefix += "FULL"; break; }
+			}
+			std::cout << lodStatePrefix << std::endl;
+			
+		}
+	}
+
+	// Check the contoured mass.
+	std::cout << "(BPMassManagerV2::checkStateOfSpecificOre): -> checking for the ORE in CONTOURED mass. " << std::endl;
+	bool contouredBlueprintFinder = contouredPlanMass.checkIfBlueprintExists(in_blueprintKeyToCheck);
+	if (contouredBlueprintFinder == true)
+	{
+		std::cout << "(BPMassManagerV2::checkStateOfSpecificOre): -> Found Blueprint of the ORE. " << std::endl;
+		auto checkIfOREIsInContouredMass = contouredPlanMass.checkIfBlueprintContainsSpecificOre(in_blueprintKeyToCheck, in_oreKeyToCheck);
+		if (checkIfOREIsInContouredMass == true)
+		{
+			std::cout << "!!! Found ORE in persistent mass. " << std::endl;
+			ORELodState currentLodState = contouredPlanMass.getOrganicRawEnclaveRef(in_blueprintKeyToCheck, in_oreKeyToCheck)->getLodState();
+			std::string lodStatePrefix = "(BPMassManagerV2::checkStateOfSpecificOre): LOD state of ORE (CONTOURED) is: ";
+			switch (currentLodState)
+			{
+			case ORELodState::LOD_ENCLAVE_SMATTER: { lodStatePrefix += "LOD_ENCLAVE_SMATTER"; break; }
+			case ORELodState::LOD_ENCLAVE_RMATTER: { lodStatePrefix += "LOD_ENCLAVE_RMATTER"; break; }
+			case ORELodState::LOD_BLOCK: { lodStatePrefix += "LOD_BLOCK"; break; }
+			case ORELodState::FULL: { lodStatePrefix += "FULL"; break; }
+			}
+			std::cout << lodStatePrefix << std::endl;
+
+		}
+		else
+		{
+			std::cout << "Blueprint exists in CONTOURED mass, but did not find ORE. " << std::endl;
+		}
+	}
+	else
+	{
+		std::cout << "Did not find Blueprint for the ORE in CONTOURED mass." << std::endl;
+	}
+
+	std::cout << "Done with call of (BPMassManagerV2::checkStateOfSpecificOre); enter key to continue." << std::endl;
+	int doneSearch = 3;
+	std::cin >> doneSearch;
+}
+
 void BPMassManagerV2::copyMassShellPolysFromServerToMass(EnclaveKeyDef::EnclaveKey in_blueprintKey, OperableIntSet in_contourAddedOrganicTrianglesSet)
 {
 	EnclaveCollectionBlueprint* currentBlueprintRef = managerEcbMapRef->getBlueprintRef(in_blueprintKey);
