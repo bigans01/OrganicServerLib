@@ -14,7 +14,6 @@
 #include "OSContourPlanDirections.h"
 #include "EnclaveKeyDef.h"
 #include "ECBBorderLineList.h"
-#include "ECBCarvePointArray.h"
 #include "ECBPoly.h"
 #include "ECBPolyLine.h"
 #include "ECBPolyPointTri.h"
@@ -109,8 +108,8 @@ private:
 									// used to restore blueprints in the event that a ContourPlan run fails; regardless of success or failure of the CP run,
 									// this always needs to be emptied at the end.
 
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
-	std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
+	//std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointArray, EnclaveKeyDef::KeyHasher> carvePointArrayMap;		// stores all corresponding ECBCarvePointArrays for blueprints
+	//std::unordered_map<EnclaveKeyDef::EnclaveKey, ECBCarvePointList, EnclaveKeyDef::KeyHasher> carvePointListMap;		// stores all corresponding carvePointLists for blueprints
 	ContourPlanStateContainer planStateContainer;
 
 	ContourBase* getDerivedContourPlan(string in_string);

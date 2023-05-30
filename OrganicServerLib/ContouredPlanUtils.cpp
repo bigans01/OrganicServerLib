@@ -191,16 +191,7 @@ void ContouredPlanUtils::calculateTrackedOREsForAddedContourPolys(EnclaveKeyDef:
 		dummyMap[currentPoly->first] = translatedPoly;
 		auto translatedPolyIter = dummyMap.find(currentPoly->first);
 
-		PrimaryLineT1Array forwardArray;
-		PrimaryLineT1Array reverseArray;
-
-		OrganicSystemUtils::preparePrimaryLineArray(translatedPolyIter, &forwardArray, &blueprintBorderValues, &borderLineList, in_blueprintKey, PolyRunDirection::NORMAL);
-		OrganicSystemUtils::preparePrimaryLineArray(translatedPolyIter, &reverseArray, &blueprintBorderValues, &borderLineList, in_blueprintKey, PolyRunDirection::REVERSE);
-
-		BorderDataMap borderData;
-		BlockBorderLineList builtBorderLineList;
-
-		OrganicTriangle testTriangle(&translatedPolyIter->second, forwardArray, reverseArray, in_blueprintKey, &borderData, &builtBorderLineList, translatedPolyIter->first);
+		OrganicTriangle testTriangle(&translatedPolyIter->second, translatedPolyIter->first);
 		in_organicTriangleTrackerRef->transferTrackedOREs(translatedPolyIter->first, &testTriangle);
 
 	}
@@ -236,17 +227,7 @@ void ContouredPlanUtils::produceRawEnclavesForTempMap(ECBMap* in_tempECBMapRef,
 		dummyMap[currentPoly->first] = translatedPoly;
 		auto translatedPolyIter = dummyMap.find(currentPoly->first);
 
-
-		PrimaryLineT1Array forwardArray;
-		PrimaryLineT1Array reverseArray;
-
-		OrganicSystemUtils::preparePrimaryLineArray(translatedPolyIter, &forwardArray, &blueprintBorderValues, &borderLineList, in_blueprintKey, PolyRunDirection::NORMAL);
-		OrganicSystemUtils::preparePrimaryLineArray(translatedPolyIter, &reverseArray, &blueprintBorderValues, &borderLineList, in_blueprintKey, PolyRunDirection::REVERSE);
-
-		BorderDataMap borderData;
-		BlockBorderLineList builtBorderLineList;
-
-		OrganicTriangle testTriangle(&translatedPolyIter->second, forwardArray, reverseArray, in_blueprintKey, &borderData, &builtBorderLineList, translatedPolyIter->first);
+		OrganicTriangle testTriangle(&translatedPolyIter->second, translatedPolyIter->first);
 		in_organicTriangleTrackerRef->transferTrackedOREs(translatedPolyIter->first, &testTriangle);
 
 		auto targetFractureResultsMapRef = in_tempECBMapRef->getFractureResultsMapRef(in_blueprintKey);
