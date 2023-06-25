@@ -9,8 +9,8 @@ void ServerJobManager::initialize(OSServer* in_serverPtr)
 	spjHierarchy.setServerPtr(server);
 	designations.initialize(&server->OSCManager);
 	designations.buildInitialUndesignatedPool();
-	designations.designateCommandLineThread(0);							// thread 0 from the pool should be the command line thread.
-	designations.designateTerrainThread(1);								// thread 1 from the pool should be the the terrain thread.
+	designations.designateCommandLineThread(1);							// thread 1 from the pool should be the command line thread.
+	designations.designateTerrainThread(2);								// thread 2 from the pool should be the the terrain thread.
 	// rest of threads come here...when developed appropriately in time.
 }
 
