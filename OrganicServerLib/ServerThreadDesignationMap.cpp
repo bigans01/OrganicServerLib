@@ -8,8 +8,8 @@ void ServerThreadDesignationMap::initialize(OrganicStemcellManager* in_organicSt
 
 void ServerThreadDesignationMap::buildInitialUndesignatedPool()
 {
-	auto stemcellsBegin = organicStemcellManagerRef->stemcellMap.begin();
-	auto stemcellsEnd = organicStemcellManagerRef->stemcellMap.end();
+	auto stemcellsBegin = organicStemcellManagerRef->freeCellMap.begin();
+	auto stemcellsEnd = organicStemcellManagerRef->freeCellMap.end();
 	for (; stemcellsBegin != stemcellsEnd; stemcellsBegin++)
 	{
 		ServerThreadWorkloadMonitor newMonitor(stemcellsBegin->second.threadPtr.get());
@@ -76,13 +76,13 @@ AcquiredServerThread ServerThreadDesignationMap::fetchDesignatedThread(std::stri
 	if (in_designationString == "ANY")
 	{
 		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
-		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->stemcellMap[terrainFinder->second].threadPtr.get());
+		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->freeCellMap[terrainFinder->second].threadPtr.get());
 		returnThread = acquisition;
 	}
 	else if (in_designationString == "TERRAIN")
 	{
 		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
-		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->stemcellMap[terrainFinder->second].threadPtr.get());
+		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->freeCellMap[terrainFinder->second].threadPtr.get());
 		returnThread = acquisition;
 	}
 	return returnThread;
@@ -91,7 +91,7 @@ AcquiredServerThread ServerThreadDesignationMap::fetchDesignatedThread(std::stri
 OrganicThread* ServerThreadDesignationMap::getCommandLineThread()
 {
 	int keyToLookup = designations[ServerThreadDesignation::COMMAND_LINE];	// fetch the key that uses the command line
-	return organicStemcellManagerRef->stemcellMap[keyToLookup].threadPtr.get();	// fetch the thread, return it
+	return organicStemcellManagerRef->freeCellMap[keyToLookup].threadPtr.get();	// fetch the thread, return it
 }
 
 AcquiredServerThread ServerThreadDesignationMap::getFirstAvailableThread()		// for testing, name may change soon.
@@ -99,10 +99,10 @@ AcquiredServerThread ServerThreadDesignationMap::getFirstAvailableThread()		// f
 	auto firstUndesignated = unDesignatedPool.begin();
 	std::cout << "Retrieved thread ID: " << firstUndesignated->first << std::endl;
 
-	AcquiredServerThread acquisition(firstUndesignated->first, organicStemcellManagerRef->stemcellMap[firstUndesignated->first].threadPtr.get());
+	AcquiredServerThread acquisition(firstUndesignated->first, organicStemcellManagerRef->freeCellMap[firstUndesignated->first].threadPtr.get());
 	return acquisition;
 
-	//return organicStemcellManagerRef->stemcellMap[firstUndesignated->first].threadPtr.get();	// fetch the thread, return it
+	//return organicStemcellManagerRef->freeCellMap[firstUndesignated->first].threadPtr.get();	// fetch the thread, return it
 }
 
 void ServerThreadDesignationMap::incrementWorkload(int in_monitorID, float in_workload)
