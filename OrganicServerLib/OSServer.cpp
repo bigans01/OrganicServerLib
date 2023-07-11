@@ -585,7 +585,23 @@ void OSServer::runSingleMountainV2()
 	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
 	executePlanV2("summit3");
-	
+
+	/*
+	// --------------- Experimental, optional: print the BDM message for the skeleton super group manager of an ORE.
+
+	//EnclaveKeyDef::EnclaveKey testBPKey(-1, 0, 0);
+	//EnclaveKeyDef::EnclaveKey testOREKey(7, 1, 7);
+
+	// Below: an ORE that doesn't exist, shouldn't do anything when printBDMForORESkeletonSGM is called.
+	EnclaveKeyDef::EnclaveKey testBPKey(7, 3, 6);
+	EnclaveKeyDef::EnclaveKey testOREKey(0, 3, 0);
+
+	//EnclaveKeyDef::EnclaveKey testBPKey(-1, -2, 1);
+	//EnclaveKeyDef::EnclaveKey testOREKey(7, 3, 6);
+
+	auto testBPRef = serverBlueprints.getBlueprintRef(testBPKey);
+	testBPRef->printBDMForORESkeletonSGM(testBPKey, testOREKey);
+	*/
 
 	int doneValue = 3;
 	std::cout << "Plan V2 test done. Enter key to continue (or just end). " << std::endl;
