@@ -353,8 +353,8 @@ PrimaryLineT1 BlueprintFillerRunner::constructFillerPrimaryInitial(PrimaryLineT1
 	}
 	else if (currentBeginOrientation.otype == ECBPPOrientations::LINE)		// ...get the linked faces for the line
 	{
-		tempStorage.tempFaceList.faceList[0] = borderDataMapRef->lineMap[currentBeginOrientation.osubtype].linkedFaces[0];
-		tempStorage.tempFaceList.faceList[1] = borderDataMapRef->lineMap[currentBeginOrientation.osubtype].linkedFaces[1];
+		tempStorage.tempFaceList.faceList[0] = borderDataMapRef->bdLinesMap[currentBeginOrientation.osubtype].linkedFaces[0];
+		tempStorage.tempFaceList.faceList[1] = borderDataMapRef->bdLinesMap[currentBeginOrientation.osubtype].linkedFaces[1];
 		tempStorage.numberOfIntercepts = 2;
 	}
 	else if (currentBeginOrientation.otype == ECBPPOrientations::CORNER)	// ...get the linked faces for the corner
