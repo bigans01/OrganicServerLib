@@ -42,6 +42,9 @@
 #include "ContouredPlanV2Base.h"
 #include "CPV2Mountain.h"
 
+// Below: temporary header files; just for testing BDM
+#include "ReconstitutionManager.h"
+
 
 class OSServer
 {

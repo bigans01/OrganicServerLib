@@ -603,6 +603,23 @@ void OSServer::runSingleMountainV2()
 	testBPRef->printBDMForORESkeletonSGM(testBPKey, testOREKey);
 	*/
 
+	// Experimental: BDM logic tests.
+	std::cout << "++++ Starting basic BDM diagnostic tests. " << std::endl;
+	int bdmWait = 3;
+	EnclaveKeyDef::EnclaveKey bdmBlueprintTestKey(0, -1, 1);
+	
+	//EnclaveKeyDef::EnclaveKey bdmORETestKey(1, 5, 2);
+	//serverBlueprints.getOrganicRawEnclaveRef(bdmBlueprintTestKey, bdmORETestKey)->printMapData();
+
+	MessageContainer fetchedBDMData = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey)->convertBlueprintTOBDMFormat(bdmBlueprintTestKey);
+	ReconstitutionManager testRecon;
+	testRecon.insertMessageContainerForProcessing(fetchedBDMData);
+	testRecon.executeContainerProcessing();
+	testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
+
+	std::cout << "++++ DONE with basic BDM diagnostic tests. Enter integer to continue. " << std::endl;
+	std::cin >> bdmWait;
+
 	int doneValue = 3;
 	std::cout << "Plan V2 test done. Enter key to continue (or just end). " << std::endl;
 	std::cin >> doneValue;
