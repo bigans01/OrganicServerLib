@@ -617,6 +617,64 @@ void OSServer::runSingleMountainV2()
 	testRecon.executeContainerProcessing();
 	testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 
+
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	// BEGIN TEST CASE 1: replace an already-existing ORE in a LOD_BLOCK state with a reconstituted version of that ORE
+	// the following ORE should be an LOD_BLOCK.
+	testRecon.runOREReconstitutionSpecific(bdmBlueprintTestKey, EnclaveKeyDef::EnclaveKey(2, 4, 5));
+	OrganicRawEnclave fetchedORE = testRecon.fetchReconstitutedORE(bdmBlueprintTestKey, EnclaveKeyDef::EnclaveKey(2, 4, 5));
+	std::cout << "-----> printing fetched ORE data: " << std::endl;
+	fetchedORE.printTrianglesPerBlock();
+
+	// Below: test if the fetchedORE (LOD_BLOCK) works correctly, when it's inserted into serverBlueprints.
+	auto testBPRef = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey);
+
+	bool doesOREExist= serverBlueprints.checkIfBlueprintContainsSpecificOre(bdmBlueprintTestKey, EnclaveKeyDef::EnclaveKey(2, 4, 5));
+	if (doesOREExist)
+	{
+		std::cout << "!!! NOTICE: target ORE to replace with reconstituted ORE already exists. " << std::endl;
+	}
+
+	testBPRef->fractureResults.fractureResultsContainerMap[EnclaveKeyDef::EnclaveKey(2, 4, 5)] = fetchedORE;
+
+	// END TEST CASE 1
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
+
+
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	// BEGIN TEST CASE 2: Setting up and replacing an LOD_FULL ORE with a reconstituted one.
+	EnclaveKeyDef::EnclaveKey fullKey(3, 3, 3);
+	testRecon.runOREReconstitutionSpecific(bdmBlueprintTestKey, fullKey);
+	OrganicRawEnclave fetchedFullORE = testRecon.fetchReconstitutedORE(bdmBlueprintTestKey, fullKey);
+	auto testBPRefForFullORE = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey);
+	std::cout << "----> moving fetched FULL ORE into associated blueprint..." << std::endl;
+	testBPRefForFullORE->fractureResults.fractureResultsContainerMap[fullKey] = fetchedFullORE;
+	// END TEST CASE 2:
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+
+
+	
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	// BEGIN TEST CASE 3: Setting up a LOD_ENCLAVE_SMATTER ORE (not doing anything with it yet)
+	std::cout << "Printing container stats for the target LOD_ENCLAVE_SMATTER ORE..." << std::endl;
+	EnclaveKeyDef::EnclaveKey smatterKey(4, 2, 7); 
+	serverBlueprints.getOrganicRawEnclaveRef(bdmBlueprintTestKey, smatterKey)->printContainerStats();
+	std::cout << "Done printing stats for the target LOD_ENCLAVE_SMATTER ORE." << std::endl;
+
+	std::cout << "Running reconstitution of the SMATTER ORE..." << std::endl;
+	testRecon.runOREReconstitutionSpecific(bdmBlueprintTestKey, smatterKey);
+	OrganicRawEnclave fetchedSMatterORE = testRecon.fetchReconstitutedORE(bdmBlueprintTestKey, smatterKey);
+	auto testBPRefForSMatterORE = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey);
+	testBPRefForSMatterORE->fractureResults.fractureResultsContainerMap[smatterKey] = fetchedSMatterORE;
+
+	// END TEST CASE 3
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	
+
 	std::cout << "++++ DONE with basic BDM diagnostic tests. Enter integer to continue. " << std::endl;
 	std::cin >> bdmWait;
 
