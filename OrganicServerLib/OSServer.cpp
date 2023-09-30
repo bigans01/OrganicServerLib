@@ -618,6 +618,7 @@ void OSServer::runSingleMountainV2()
 	testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 
 
+	/*
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	// BEGIN TEST CASE 1: replace an already-existing ORE in a LOD_BLOCK state with a reconstituted version of that ORE
 	// the following ORE should be an LOD_BLOCK.
@@ -673,7 +674,21 @@ void OSServer::runSingleMountainV2()
 
 	// END TEST CASE 3
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-	
+	*/
+
+	/*
+	// BEGIN TEST CASE 4: Full reconstitution. Don't use with other test cases.
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+	testRecon.attemptFullReconstitution(bdmBlueprintTestKey);
+	EnclaveCollectionBlueprint fetchedBlueprint = testRecon.fetchReconstitutedBlueprint(bdmBlueprintTestKey);
+	std::cout << "!!! Size of datain fetched blueprint: " << fetchedBlueprint.fractureResults.fractureResultsContainerMap.size() << std::endl;
+	serverBlueprints.addBlueprintViaCopy(bdmBlueprintTestKey, fetchedBlueprint);
+
+	//testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
+	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+	// END TEST CASE 4
+	*/
 
 	std::cout << "++++ DONE with basic BDM diagnostic tests. Enter integer to continue. " << std::endl;
 	std::cin >> bdmWait;
