@@ -548,6 +548,28 @@ void OSServer::constructSingleMountTest()
 	executeDerivedContourPlan("summit1");
 }
 
+void OSServer::runSingleMountainV2SPJ(std::string in_planName)
+{
+	int numberOfLayers = 5;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
+
+
+	// second mountain
+
+	//summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
+					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
+					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
+	//summit2.y = 16;
+	//summit2.z = 16;
+
+	DoublePoint summit2(3.33, 16, 16);
+	addPlanV2(in_planName, OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
+	auto summit2Ref = getPlanV2Ref(in_planName);
+	summit2Ref->amplifyAllContourLinePoints();
+	summit2Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	summit2Ref->buildContouredTriangles();
+	executePlanV2NoInput(in_planName);
+}
+
 void OSServer::runSingleMountainV2()
 {
 	int numberOfLayers = 5;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
@@ -614,8 +636,8 @@ void OSServer::runSingleMountainV2()
 	MessageContainer fetchedBDMData = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey)->convertBlueprintTOBDMFormat(bdmBlueprintTestKey);
 	ReconstitutionManager testRecon;
 	testRecon.insertMessageContainerForProcessing(fetchedBDMData);
-	testRecon.executeContainerProcessing();
-	testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
+	//testRecon.executeContainerProcessing();
+	//testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 
 
 	/*
@@ -676,19 +698,30 @@ void OSServer::runSingleMountainV2()
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	*/
 
-	/*
+	
 	// BEGIN TEST CASE 4: Full reconstitution. Don't use with other test cases.
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
-	testRecon.attemptFullReconstitution(bdmBlueprintTestKey);
+	//testRecon.attemptFullReconstitution(bdmBlueprintTestKey);
+	testRecon.processMessageContainersAndCheckForReconstitutables();	// remember, this processes all Messsage containers, AND attempts to reconstitute any blueprint, 
+																		// whenever it is called.
+
+
 	EnclaveCollectionBlueprint fetchedBlueprint = testRecon.fetchReconstitutedBlueprint(bdmBlueprintTestKey);
 	std::cout << "!!! Size of datain fetched blueprint: " << fetchedBlueprint.fractureResults.fractureResultsContainerMap.size() << std::endl;
-	serverBlueprints.addBlueprintViaCopy(bdmBlueprintTestKey, fetchedBlueprint);
+
+	auto copyStart = std::chrono::high_resolution_clock::now();
+	//serverBlueprints.addBlueprintViaCopy(bdmBlueprintTestKey, fetchedBlueprint);
+	serverBlueprints.addBlueprintViaRef(bdmBlueprintTestKey, &fetchedBlueprint);
+	auto copyEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> copyElapsed = copyEnd - copyStart;
+
+	std::cout << "********** Copy of reconstituted blueprint into server blueprints time: " << copyElapsed.count() << std::endl;
 
 	//testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	// END TEST CASE 4
-	*/
+	
 
 	std::cout << "++++ DONE with basic BDM diagnostic tests. Enter integer to continue. " << std::endl;
 	std::cin >> bdmWait;
@@ -770,7 +803,8 @@ void OSServer::prepCPMountain(Message in_metadataMessage)
 	// Part 1: Set up the plan, give it's necessary parmaters, etc.
 	ECBPolyPoint summit1(mountainLocationX, mountainLocationY, mountainLocationZ);
 	int numberOfLayers = mountainLayers;
-	addDerivedContourPlan(planName, OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, distBetweenLayers, startRadius, expansionValue);	// create the points in all contour lines
+	//addDerivedContourPlan(planName, OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, distBetweenLayers, startRadius, expansionValue);	// create the points in all contour lines
+	addPlanV2(planName, OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, distBetweenLayers, startRadius, expansionValue);	// create the points in all contour lines
 
 	// Part 2: run point amplification, insert materials, and build the actual triangles. Note that at this point, no actual blueprints are affected;
 	// we are just constructing the triangles of the plan.
@@ -788,6 +822,33 @@ void OSServer::prepCPMountain(Message in_metadataMessage)
 
 	//buildContourPlanAffectedBlueprints(planName);		// Part 3: build affected blueprints.
 	//runContourPlanFracturingAndMassDriving(planName);	// Part 4: run fracturing and mass driving.
+}
+
+
+void OSServer::runContourPlanWorldTracing(std::string in_string)
+{
+	OSWinAdapter::clearWorldFolder(currentWorld);
+
+	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
+	ContourBase* planPtr = newContourMap[in_string].get();
+
+	auto traceStart = std::chrono::high_resolution_clock::now();
+
+	// 1. ) Execute all processable OSContouredTriangles in the plan.
+	auto processableList = planPtr->getProcessableContouredTriangles();
+	auto processableListBegin = processableList.begin();
+	auto processableListEnd = processableList.end();
+	for (; processableListBegin != processableListEnd; processableListBegin++)
+	{
+		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
+	}
+
+	auto traceEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> traceElapsed = traceEnd - traceStart;
+
+	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
+
+	std::cout << "######### Plan execution complete; " << std::endl;
 }
 
 void OSServer::constructBigMountTestNoInput()
@@ -944,6 +1005,31 @@ void OSServer::executePlanV2(std::string in_planNameToExecute)
 	std::cin >> continueVal;
 }
 
+void OSServer::executePlanV2NoInput(std::string in_planNameToExecute)
+{
+	OSWinAdapter::clearWorldFolder(currentWorld);
+	auto planV2Ptr = getPlanV2Ref(in_planNameToExecute);
+	auto processableCTV2s = planV2Ptr->getProcessableContouredTriangles();
+
+	std::cout << "Size of processableCTV2s: " << processableCTV2s.size() << std::endl;
+
+	// 1.) Make backup copies of the pre-determined blueprints that we think will be affected, then copy the data
+	// from the FTriangle fracturing operation directly into the server blueprints.
+	planV2Ptr->copyOverForSPJ(processableCTV2s, &serverBlueprints, &cpRunBackupBlueprints, &currentPlanAffectedBlueprints);
+
+	// 2.) run the mass driver for the plan. (if the plan allows for it)
+	EnclaveFractureResultsMap tempMap;
+	planV2Ptr->runMassDriversV2(&client, &serverBlueprints, &tempMap);
+
+	// 3. ) If everything was successful from the plan running, we can now clear out the backup blueprints.
+	//	The criteria for what makes a run successful is still TBD, but this would be the point in time to do it.
+	
+
+	std::cout << ">>>>>>>>>>>>> Done with test of MassDriving, for executePlanV2. Enter number to continue. " << std::endl;
+	//int continueVal = 3;
+	//std::cin >> continueVal;
+}
+
 void OSServer::executeDerivedContourPlanNoInput(std::string in_string)
 {
 	OSWinAdapter::clearWorldFolder(currentWorld);
@@ -985,31 +1071,6 @@ void OSServer::executeDerivedContourPlanNoInput(std::string in_string)
 	std::cout << "SERVER: completed contour plan run." << std::endl;
 }
 
-void OSServer::runContourPlanWorldTracing(std::string in_string)
-{
-	OSWinAdapter::clearWorldFolder(currentWorld);
-
-	std::cout << "SERVER: Executing derived contour plan. " << std::endl;
-	ContourBase* planPtr = newContourMap[in_string].get();
-
-	auto traceStart = std::chrono::high_resolution_clock::now();
-
-	// 1. ) Execute all processable OSContouredTriangles in the plan.
-	auto processableList = planPtr->getProcessableContouredTriangles();
-	auto processableListBegin = processableList.begin();
-	auto processableListEnd = processableList.end();
-	for (; processableListBegin != processableListEnd; processableListBegin++)
-	{
-		traceTriangleThroughBlueprints(*processableListBegin, planPtr->planDirections, &planPtr->adherenceData);
-	}
-
-	auto traceEnd = std::chrono::high_resolution_clock::now();
-	std::chrono::duration<double> traceElapsed = traceEnd - traceStart;
-
-	std::cout << "********** Finished tracing this contoured plan's OSContoured triangles; time was: " << traceElapsed.count() << std::endl;
-
-	std::cout << "######### Plan execution complete; " << std::endl;
-}
 
 void OSServer::generateBlueprintBackups(std::string in_planName)
 {

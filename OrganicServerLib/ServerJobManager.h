@@ -7,7 +7,10 @@
 #include <map>
 #include <mutex>
 #include "ServerPhasedJobBase.h"
+
 #include "SPJBuildCPMountain.h"
+#include "SPJBuildCPV2Mountain.h"
+
 #include "SPJSendWorldDirectionToClient.h"
 
 #include "ServerJobsIntContainer.h"
@@ -78,7 +81,10 @@ class ServerJobManager
 		void deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate);
 
 		// job insertion calls
-		void insertPhasedJobRunSingleMountTest(Message in_message);		// the TRUE test function.
+		void insertPhasedJobRunSingleMountTest(Message in_message);		// DEPRECATED -- do NOT use; 
+																		// this has been replaced/superseded by insertPhasedJobRunCPV2Test.
+
+		void insertPhasedJobRunCPV2Test(Message in_message);		// the TRUE test function.
 		void insertPhasedJobSetWorldDirection(Message in_message);
 
 		// phase checking

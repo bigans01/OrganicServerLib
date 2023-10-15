@@ -81,6 +81,7 @@ public:
 	void testFunction();
 
 	void runSingleMountainV2();
+	void runSingleMountainV2SPJ(std::string in_planName);	// used by SPJBuildCPV2Mountain
 private:
 	ServerMessageInterpreter messageInterpreter;
 	MessageCable serverMessages;
@@ -132,6 +133,8 @@ private:
 					float in_expansionValue);
 	ContouredPlanV2Base* getPlanV2Ref(std::string in_planNameToGet);
 	void executePlanV2(std::string in_planNameToExecute);
+	void executePlanV2NoInput(std::string in_planNameToExecute);	// needs to be capped whenever a CPV2 must be run
+																	// by a SPJ.
 
 
 
@@ -147,6 +150,7 @@ private:
 	// Generic ContourPlan run functions
 	void executeDerivedContourPlanNoInput(std::string in_string);	// run the plan without waiting for input afterwards.
 	void generateBlueprintBackups(std::string in_string);	// will generate backups for blueprints affected by a CP; the message should just cotn
+	//void generateBlueprintBackupsV2(std::string in_string);	// will generate backups for blueprints affected by a CP; the message should just cotn
 	void runContourPlanWorldTracing(std::string in_string);
 	void buildContourPlanAffectedBlueprints(std::string in_string);
 	void runContourPlanFracturingAndMassDriving(std::string in_string);

@@ -22,6 +22,11 @@ void ServerJobProxy::callServerRunContourPlanFracturingAndMassDriving(OSServer* 
 	in_serverRef->runContourPlanFracturingAndMassDriving(in_contourPlanName);
 }
 
+void ServerJobProxy::callServerRunCPV2(OSServer* in_serverRef, std::string in_contourPlanName)
+{
+	in_serverRef->runSingleMountainV2SPJ(in_contourPlanName);
+}
+
 void ServerJobProxy::callServerJobRunBigMountTest(OSServer* in_serverRef)
 {
 	in_serverRef->constructBigMountTestNoInput();

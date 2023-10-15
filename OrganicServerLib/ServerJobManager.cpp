@@ -42,6 +42,12 @@ void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		//
 	spjHierarchy.insertJob(1, &job, std::move(in_message));	
 }
 
+void ServerJobManager::insertPhasedJobRunCPV2Test(Message in_message)		// the TRUE test function
+{
+	std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPV2Mountain));
+	spjHierarchy.insertJob(1, &job, std::move(in_message));
+}
+
 void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
 {
 	std::cout << "############# Inserted set direction job..." << std::endl;
@@ -254,7 +260,9 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 			// Mountains
 			case int(OSTerrainFormation::MOUNTAIN):	// I have no idea why I need to cast to int for this, but not MessageType?
 			{
-				insertPhasedJobRunSingleMountTest(std::move(planSpecificData));									// move the message into the job.	
+				// Below: insertPhasedJobRunSingleMountTest is DEPRECATED -- do not use, it is only here for reference. 
+				//insertPhasedJobRunSingleMountTest(std::move(planSpecificData));									// move the message into the job.	
+				insertPhasedJobRunCPV2Test(std::move(planSpecificData));									// move the message into the job.	
 				server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
 				break;
 			}

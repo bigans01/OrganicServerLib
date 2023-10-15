@@ -330,6 +330,12 @@
     <ClInclude Include="CPV2Mountain.h">
       <Filter>Header Files\ContouredPlanV2\Mountain</Filter>
     </ClInclude>
+    <ClInclude Include="SPJBuildCPV2Mountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunCPV2.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -478,6 +484,12 @@
     </ClCompile>
     <ClCompile Include="CPV2Mountain.cpp">
       <Filter>Source Files\ContouredPlanV2\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJBuildCPV2Mountain.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunCPV2.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

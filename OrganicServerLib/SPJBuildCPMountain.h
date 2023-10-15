@@ -1,3 +1,15 @@
+/*
+
+NOTICE: THIS CLASS IS DEPRECATED, AND WILL BE DELETED SOMETIME IN THE FUTURE
+
+This class will remain intact but inactive, until the transition to SPJs that use the new CPV2 model 
+(such as SJRunCPV2) have been thoroughly tested and evaluated. At the time of this writing, executing this SPJ
+will not produce a valid ContourPlan, due to the old method of producing ContourPlan (see ContourPlanBase)
+
+
+
+*/
+
 #pragma once
 
 #ifndef SPJBuildCPMountain_H
