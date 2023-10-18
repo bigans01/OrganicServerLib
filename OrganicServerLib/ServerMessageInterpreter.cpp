@@ -32,13 +32,20 @@ void ServerMessageInterpreter::interpretIncomingMessagesFromClient()	// for inte
 		}
 		messageCableRef->popIncomingQueue();
 	}
+
+	while (!messageCableRef->isIncomingContainerQueueEmpty())
+	{
+		MessageContainer* currentContainer = messageCableRef->getIncomingMessageContainerRefFromFront();
+
+		messageCableRef->popIncomingContainerQueue();
+	}
 }
 
 void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
 {
 	while (!messageCableRef->isOutgoingQueueEmpty())
 	{
-		std::cout << "############### Interpreting outbound messages... " << std::endl;
+		std::cout << "(ServerMessageInterpreter): ############### Interpreting outbound messages... " << std::endl;
 		Message* currentMessage = messageCableRef->getOutgoingMessageRefFromFront();
 		currentMessage->open();
 		switch (currentMessage->messageType)
@@ -47,6 +54,23 @@ void ServerMessageInterpreter::interpretOutgoingMessagesToClient()
 			case MessageType::REQUEST_FROM_SERVER_SEND_BLUEPRINTS_FOR_OGLMBUFFERMANAGER:	{ handleRequestToClientSendCurrentClientOGLMRMC(std::move(*currentMessage)); break; }
 		}
 		messageCableRef->popOutgoingQueue();
+	}
+
+	while (!messageCableRef->isOutgoingContainerQueueEmpty())
+	{
+		std::cout << "(ServerMessageInterpreter): ############### Interpreting outbound Container messages... " << std::endl;
+
+		MessageContainer* currentContainer = messageCableRef->getOutgoingMessageContainerRefFromFront();
+		switch (currentContainer->containerType)
+		{
+			case MessageContainerType::MC_BDM: 
+			{ 
+				std::cout << "Inserting BDM message back to client." << std::endl;
+				serverPtr->client.insertResponseContainer(std::move(*currentContainer)); 
+				break;
+			}
+		}
+		messageCableRef->popOutgoingContainerQueue();
 	}
 }
 
@@ -180,6 +204,11 @@ void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Messa
 				{
 					std::cout << "Key to send was found: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
 					serverPtr->sendAndRenderBlueprintToLocalOS(currentKey);		// toggle on/off for testing as needed (9/24/2020)
+
+					// NEW: send data to the OrganicSystem's dedicated bluerpint processing thread,
+					// (this won't do anything if it isn't running)
+					auto bdmFormat = serverPtr->serverBlueprints.getBlueprintRef(currentKey)->convertBlueprintTOBDMFormat(currentKey);
+					messageCableRef->insertOutgoingContainer(bdmFormat);
 				}
 			}
 
