@@ -203,6 +203,8 @@ void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Messa
 				if (blueprintFinder != serverPtr->serverBlueprints.getBlueprintEndIter())	// it was found, so it needs to be sent over.
 				{
 					std::cout << "Key to send was found: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
+
+					// Apply BDM_TEST: comment below when attempting to use the new methodology of reconstitution messages.
 					serverPtr->sendAndRenderBlueprintToLocalOS(currentKey);		// toggle on/off for testing as needed (9/24/2020)
 
 					// NEW: send data to the OrganicSystem's dedicated bluerpint processing thread,
@@ -213,6 +215,7 @@ void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Messa
 			}
 
 			// now, tell the client to render everything in the list.
+			// Apply BDM_TEST: comment below (to both lines) when attempting to use the new methodology of reconstitution messages.
 			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
 			serverPtr->client.insertResponseMessage(responseMessage);
 
