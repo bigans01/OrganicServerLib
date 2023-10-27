@@ -550,7 +550,7 @@ void OSServer::constructSingleMountTest()
 
 void OSServer::runSingleMountainV2SPJ(std::string in_planName)
 {
-	int numberOfLayers = 5;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
+	int numberOfLayers = 7;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
 
 
 	// second mountain
@@ -592,6 +592,7 @@ void OSServer::runSingleMountainV2()
 	executePlanV2("summit2");
 
 	
+
 	DoublePoint summit1(28.0, 16.0, 16.0);
 	addPlanV2("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 31.82, 9);
 	auto currentPlanRef = getPlanV2Ref("summit1");
@@ -1225,7 +1226,6 @@ void OSServer::sendAndRenderBlueprintToLocalOS(EnclaveKeyDef::EnclaveKey in_key)
 	transferBlueprintToLocalOS(in_key);
 
 	//std::cout  << "----> Sending blueprint to OrganicSystem: " << in_key.x << ", " << in_key.y << ", " << in_key.z << std::endl;
-	//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(in_key);
 	organicSystemPtr->addKeyToRenderList(in_key);
 }
 
@@ -1250,7 +1250,6 @@ void OSServer::sendAndRenderAllBlueprintsToLocalOS()
 		//std::cout << "Skeleton container size: " << blueprintBegin->second.fractureResults.ske.size() << std::endl;
 
 		transferBlueprintToLocalOS(currentKey);
-		//organicSystemPtr->SetupFutureCollectionForFullBlueprintRun(currentKey);
 		organicSystemPtr->addKeyToRenderList(currentKey);
 	}
 
