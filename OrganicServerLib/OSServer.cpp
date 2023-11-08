@@ -703,6 +703,12 @@ void OSServer::runSingleMountainV2()
 	// BEGIN TEST CASE 4: Full reconstitution. Don't use with other test cases.
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 
+	std::string originalHash = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey)->getBlueprintHash();
+	std::cout << "=============== hash of initial blueprint (non-constitution): " << originalHash << std::endl;
+	int originalCheck = 3;
+	std::cin >> originalCheck;
+
+
 	//testRecon.attemptFullReconstitution(bdmBlueprintTestKey);
 	testRecon.processMessageContainersAndCheckForReconstitutables();	// remember, this processes all Messsage containers, AND attempts to reconstitute any blueprint, 
 																		// whenever it is called.
@@ -710,6 +716,19 @@ void OSServer::runSingleMountainV2()
 
 	EnclaveCollectionBlueprint fetchedBlueprint = testRecon.fetchReconstitutedBlueprint(bdmBlueprintTestKey);
 	std::cout << "!!! Size of datain fetched blueprint: " << fetchedBlueprint.fractureResults.fractureResultsContainerMap.size() << std::endl;
+
+	std::string reconstructedHash = fetchedBlueprint.getBlueprintHash();
+	std::cout << "============== hash of reconstituted blueprint: " << reconstructedHash << std::endl;
+	int reconstitutedCheck = 4;
+	std::cin >> reconstitutedCheck;
+
+	if (originalHash == reconstructedHash)
+	{
+		std::cout << "Hash match detected!" << std::endl;
+	}
+	std::cout << "original: " << originalHash << std::endl;
+	std::cout << "reconstituted: " << reconstructedHash << std::endl;
+
 
 	auto copyStart = std::chrono::high_resolution_clock::now();
 	//serverBlueprints.addBlueprintViaCopy(bdmBlueprintTestKey, fetchedBlueprint);
