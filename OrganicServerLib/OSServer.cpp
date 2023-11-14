@@ -591,8 +591,8 @@ void OSServer::runSingleMountainV2()
 	summit2Ref->buildContouredTriangles();
 	executePlanV2("summit2");
 
-	
 
+	
 	DoublePoint summit1(28.0, 16.0, 16.0);
 	addPlanV2("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 31.82, 9);
 	auto currentPlanRef = getPlanV2Ref("summit1");
@@ -608,7 +608,7 @@ void OSServer::runSingleMountainV2()
 	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit3Ref->buildContouredTriangles();
 	executePlanV2("summit3");
-
+	
 	/*
 	// --------------- Experimental, optional: print the BDM message for the skeleton super group manager of an ORE.
 
@@ -702,7 +702,7 @@ void OSServer::runSingleMountainV2()
 	
 	// BEGIN TEST CASE 4: Full reconstitution. Don't use with other test cases.
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
-
+	
 	std::string originalHash = serverBlueprints.getBlueprintRef(bdmBlueprintTestKey)->getBlueprintHash();
 	std::cout << "=============== hash of initial blueprint (non-constitution): " << originalHash << std::endl;
 	int originalCheck = 3;
@@ -737,7 +737,7 @@ void OSServer::runSingleMountainV2()
 	std::chrono::duration<double> copyElapsed = copyEnd - copyStart;
 
 	std::cout << "********** Copy of reconstituted blueprint into server blueprints time: " << copyElapsed.count() << std::endl;
-
+	
 	//testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
 	// END TEST CASE 4

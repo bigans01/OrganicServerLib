@@ -155,7 +155,7 @@ void BPMassManagerV2::runMassDriversForIndependentMass()
 			startingFloorTerminatingSet.polySet.erase(*subtractionBegin);
 		}
 
-
+		
 		organicClientRef->OS->generateAndRunMassDriversForBlueprint(&contouredPlanMass,
 			&contouredPlanEntireShellRegistry.polySetRegistry,
 			blueprintKey,

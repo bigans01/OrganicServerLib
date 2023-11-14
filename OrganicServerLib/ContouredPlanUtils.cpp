@@ -167,9 +167,6 @@ void ContouredPlanUtils::calculateTrackedOREsForAddedContourPolys(EnclaveKeyDef:
 	std::mutex* in_mutexRef,
 	OrganicTriangleTracker* in_organicTriangleTrackerRef)
 {
-	// set up required parameters
-	ECBBorderValues blueprintBorderValues = OrganicUtils::getBlueprintLimits(in_blueprintKey);
-	ECBBorderLineList borderLineList = IndependentUtils::determineBorderLines(in_blueprintKey);		// get the border line list
 
 	// run each organic triangle in the set
 	auto setBegin = in_set.begin();
@@ -178,21 +175,15 @@ void ContouredPlanUtils::calculateTrackedOREsForAddedContourPolys(EnclaveKeyDef:
 	{
 		auto currentPoly = in_blueprintToCheck->getPolyIterFromMap(*setBegin);
 
-		ECBPoly translatedPoly = PolyUtils::produceTranslatedECBPoly(currentPoly->second, in_blueprintKey);
+		//std::map<int, ECBPoly> dummyMap;
 
-		// produce new border values
-		EnclaveKeyDef::EnclaveKey originKey;
-		originKey.x = 0;
-		originKey.y = 0;
-		originKey.z = 0;
-		blueprintBorderValues = OrganicUtils::getBlueprintLimits(originKey);
-		borderLineList = IndependentUtils::determineBorderLines(originKey);
-		std::map<int, ECBPoly> dummyMap;
-		dummyMap[currentPoly->first] = translatedPoly;
-		auto translatedPolyIter = dummyMap.find(currentPoly->first);
+		// ECBPOLY_FIX
+		//ECBPoly translatedPoly = currentPoly->second;
+		//dummyMap[currentPoly->first] = translatedPoly;
+		//auto translatedPolyIter = dummyMap.find(currentPoly->first);
 
-		OrganicTriangle testTriangle(&translatedPolyIter->second, translatedPolyIter->first);
-		in_organicTriangleTrackerRef->transferTrackedOREs(translatedPolyIter->first, &testTriangle);
+		OrganicTriangle testTriangle(&currentPoly->second, currentPoly->first);
+		in_organicTriangleTrackerRef->transferTrackedOREs(currentPoly->first, &testTriangle);
 
 	}
 }
@@ -203,9 +194,6 @@ void ContouredPlanUtils::produceRawEnclavesForTempMap(ECBMap* in_tempECBMapRef,
 	std::set<int> in_set,
 	OrganicTriangleTracker* in_organicTriangleTrackerRef)
 {
-	// set up required parameters
-	ECBBorderValues blueprintBorderValues = OrganicUtils::getBlueprintLimits(in_blueprintKey);
-	ECBBorderLineList borderLineList = IndependentUtils::determineBorderLines(in_blueprintKey);		// get the border line list
 
 	// run each organic triangle in the set
 	auto setBegin = in_set.begin();
@@ -214,24 +202,18 @@ void ContouredPlanUtils::produceRawEnclavesForTempMap(ECBMap* in_tempECBMapRef,
 	{
 		auto currentPoly = in_blueprintToCheck->getPolyIterFromMap(*setBegin);
 
-		ECBPoly translatedPoly = PolyUtils::produceTranslatedECBPoly(currentPoly->second, in_blueprintKey);
+		//std::map<int, ECBPoly> dummyMap;
 
-		// produce new border values
-		EnclaveKeyDef::EnclaveKey originKey;
-		originKey.x = 0;
-		originKey.y = 0;
-		originKey.z = 0;
-		blueprintBorderValues = OrganicUtils::getBlueprintLimits(originKey);
-		borderLineList = IndependentUtils::determineBorderLines(originKey);
-		std::map<int, ECBPoly> dummyMap;
-		dummyMap[currentPoly->first] = translatedPoly;
-		auto translatedPolyIter = dummyMap.find(currentPoly->first);
+		// ECBPOLY_FIX
+		//ECBPoly translatedPoly = currentPoly->second;
+		//dummyMap[currentPoly->first] = translatedPoly;
+		//auto translatedPolyIter = dummyMap.find(currentPoly->first);
 
-		OrganicTriangle testTriangle(&translatedPolyIter->second, translatedPolyIter->first);
-		in_organicTriangleTrackerRef->transferTrackedOREs(translatedPolyIter->first, &testTriangle);
+		OrganicTriangle testTriangle(&currentPoly->second, currentPoly->first);
+		in_organicTriangleTrackerRef->transferTrackedOREs(currentPoly->first, &testTriangle);
 
 		auto targetFractureResultsMapRef = in_tempECBMapRef->getFractureResultsMapRef(in_blueprintKey);
-		targetFractureResultsMapRef->transferEnclaveTrianglesIntoOREs(translatedPolyIter->first, &testTriangle, &in_tempECBMapRef->blueprintMapMutex);
+		targetFractureResultsMapRef->transferEnclaveTrianglesIntoOREs(currentPoly->first, &testTriangle, &in_tempECBMapRef->blueprintMapMutex);
 
 	}
 }
