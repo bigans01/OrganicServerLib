@@ -29,7 +29,8 @@ void ContouredPlanUtils::appendContourPlanEnclaveTriangleSkeletons(EnclaveKeyDef
 				// It is assumed that if the ORE doesn't exist in the blueprint, that it is "fresh" and completely new;
 				// So we will append the contents of the contoured plan's generated ORE to the persistent blueprint 
 				currentPersistentTargetBlueprintRef->fractureResults.fractureResultsContainerMap[currentEnclaveKey].appendSpawnedEnclaveTriangleSkeletonContainers(&in_serverECBMap->blueprintMapMutex,
-					currentRawEnclaveToAppendFrom.second.spawnEnclaveTriangleSkeletonContainers());
+					currentRawEnclaveToAppendFrom.second.spawnEnclaveTriangleSkeletonContainers(),
+					&currentRawEnclaveToAppendFrom.second.oreRTHandler);
 				
 			}
 

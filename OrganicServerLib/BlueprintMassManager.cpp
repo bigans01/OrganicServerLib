@@ -144,13 +144,6 @@ void BlueprintMassManager::produceOREsForShellPolys()
 														contouredPlanMass.getBlueprintRef(contouredPlanShellBegin->first),
 														contouredPlanShellBegin->second.intSet);
 
-		// for the ORE's we just spawned, make sure to load their skeleton containers.
-		auto spawnedOREsBegin = contouredPlanMass.getFractureResultsMapRef(contouredPlanShellBegin->first)->fractureResultsContainerMap.begin();
-		auto spawnedOREsEnd = contouredPlanMass.getFractureResultsMapRef(contouredPlanShellBegin->first)->fractureResultsContainerMap.end();
-		for (; spawnedOREsBegin != spawnedOREsEnd; spawnedOREsBegin++)
-		{
-			spawnedOREsBegin->second.loadSkeletonContainersFromEnclaveContainers();
-		}
 	}
 }
 
