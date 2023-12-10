@@ -627,9 +627,19 @@ void OSServer::runSingleMountainV2()
 	*/
 
 	// Experimental: BDM logic tests.
-	std::cout << "++++ Starting basic BDM diagnostic tests. " << std::endl;
+	//std::cout << "++++ Starting basic BDM diagnostic tests. " << std::endl;
 	int bdmWait = 3;
 	EnclaveKeyDef::EnclaveKey bdmBlueprintTestKey(0, -1, 1);
+
+	EnclaveKeyDef::EnclaveKey oreRTBlueprintKey(-1, -1, 1);
+	EnclaveKeyDef::EnclaveKey oreRTKey(7, 5, 4);
+
+	std::cout << "++++++++ Starting analysis of ORE oRTHandler stats..." << std::endl;
+	std::cout << "Key being analyzed is: "; oreRTKey.printKey(); std::cout << std::endl;
+	serverBlueprints.getOrganicRawEnclaveRef(oreRTBlueprintKey, oreRTKey)->testORTHblocks();
+	int oreRTwait = 3;
+	std::cout << "++++++++ Done with oRTHandler stats...enter number to continue. " << std::endl;
+	std::cin >> oreRTwait;
 	
 	//EnclaveKeyDef::EnclaveKey bdmORETestKey(1, 5, 2);
 	//serverBlueprints.getOrganicRawEnclaveRef(bdmBlueprintTestKey, bdmORETestKey)->printMapData();
