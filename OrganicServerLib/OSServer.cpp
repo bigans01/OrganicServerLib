@@ -740,13 +740,22 @@ void OSServer::runSingleMountainV2()
 	std::cout << "reconstituted: " << reconstructedHash << std::endl;
 
 
+	/*
+
+	// NOTE: Don't add blueprints via reconstitution, until the OT handler transition is complete in OrganicIndependents library).
+	// This is because BDM data doesn't take into account the oreOTHandler in OrganicRawEnclave yet (so oreRTHandler data doesnt ever get produced)
+	// This will result in missing data in the OREs.
+
 	auto copyStart = std::chrono::high_resolution_clock::now();
 	//serverBlueprints.addBlueprintViaCopy(bdmBlueprintTestKey, fetchedBlueprint);
-	serverBlueprints.addBlueprintViaRef(bdmBlueprintTestKey, &fetchedBlueprint);
+	//serverBlueprints.addBlueprintViaRef(bdmBlueprintTestKey, &fetchedBlueprint);
 	auto copyEnd = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> copyElapsed = copyEnd - copyStart;
 
+	
+
 	std::cout << "********** Copy of reconstituted blueprint into server blueprints time: " << copyElapsed.count() << std::endl;
+	*/
 	
 	//testRecon.printReconstitutedBlueprintStats(bdmBlueprintTestKey);
 	// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
