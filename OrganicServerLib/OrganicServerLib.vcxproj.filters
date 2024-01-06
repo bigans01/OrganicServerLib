@@ -165,9 +165,6 @@
     <ClInclude Include="AdherentDataList.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="AdhesiveRunner.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="OrganicRawEnclaveAdhesives.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -390,9 +387,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="PointAdherenceOrder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="AdhesiveRunner.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="AdhesiveResults.cpp">

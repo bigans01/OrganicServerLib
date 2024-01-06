@@ -12,7 +12,6 @@
 #include "PointAdherenceOrder.h"
 #include "NeighboringBlueprints.h"
 #include "AdherentDataList.h"
-#include "AdhesiveRunner.h"
 #include <vector>
 
 class OSServerUtils
@@ -33,10 +32,7 @@ class OSServerUtils
 		static void writeBlueprintToDisk(std::string in_worldName, 
 										EnclaveKeyDef::EnclaveKey in_blueprintKey, 
 										std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveCollectionBlueprint, EnclaveKeyDef::KeyHasher>* in_blueprintMapRef);
-		static void runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, 
-											 EnclaveKeyDef::EnclaveKey in_blueprintKey, 
-											 EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef,
-											 std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveFractureResultsMap, EnclaveKeyDef::KeyHasher>* in_fractureResultsMapMap);
+
 		static std::vector<AdherentDataList> findAdherableBlueprints(PointAdherenceOrder* in_pointAdherenceOrderRef, NeighboringBlueprints in_neighboringBlueprints);
 };
 

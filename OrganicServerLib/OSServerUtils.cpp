@@ -135,15 +135,6 @@ void OSServerUtils::writeBlueprintToDisk(std::string in_worldName,
 	OSWinAdapter::writeBlueprintsToFile(in_worldName, in_blueprintKey, transformRefs);
 }
 
- void OSServerUtils::runAdherenceForBlueprint(PointAdherenceOrder* in_pointAdherenceOrderRef, EnclaveKeyDef::EnclaveKey in_blueprintKey, EnclaveFractureResultsMap* in_enclaveFractureResultsMapRef,
-	 std::unordered_map<EnclaveKeyDef::EnclaveKey, EnclaveFractureResultsMap, EnclaveKeyDef::KeyHasher>* in_fractureResultsMapMap)
-{
-	 // adherence code starts here
-	 NeighboringBlueprints blueprintNeighborsToCheck(in_blueprintKey);																	// 1.) get NeighboringBlueprint list
-	 std::vector<AdherentDataList> candidateBlueprints = findAdherableBlueprints(in_pointAdherenceOrderRef, blueprintNeighborsToCheck);	// 2.) get the blueprints that we will have to check adherence for
-	 AdhesiveRunner adhesive(in_blueprintKey, candidateBlueprints, in_fractureResultsMapMap);											// 3.) start the adhesive runner
-}
-
  std::vector<AdherentDataList> OSServerUtils::findAdherableBlueprints(PointAdherenceOrder* in_pointAdherenceOrderRef, NeighboringBlueprints in_neighboringBlueprints)
  {
 

@@ -205,21 +205,21 @@ void ServerMessageInterpreter::handleRequestFromClientForOGLMRMCBlueprints(Messa
 					std::cout << "Key to send was found: " << currentKey.x << ", " << currentKey.y << ", " << currentKey.z << std::endl;
 
 					// Apply BDM_TEST: comment below when attempting to use the new methodology of reconstitution messages.
-					serverPtr->sendAndRenderBlueprintToLocalOS(currentKey);		// toggle on/off for testing as needed (9/24/2020)
+					//serverPtr->sendAndRenderBlueprintToLocalOS(currentKey);		// toggle on/off for testing as needed (9/24/2020)
 
 					// NEW: send data to the OrganicSystem's dedicated bluerpint processing thread,
 					// (this won't do anything if it isn't running)
 					//
 					// Be sure to uncomment the below two lines when the time to use BDM comes!
-					//auto bdmFormat = serverPtr->serverBlueprints.getBlueprintRef(currentKey)->convertBlueprintTOBDMFormat(currentKey);
-					//messageCableRef->insertOutgoingContainer(bdmFormat);
+					auto bdmFormat = serverPtr->serverBlueprints.getBlueprintRef(currentKey)->convertBlueprintTOBDMFormat(currentKey);
+					messageCableRef->insertOutgoingContainer(bdmFormat);
 				}
 			}
 
 			// now, tell the client to render everything in the list.
 			// Apply BDM_TEST: comment below (to both lines) when attempting to use the new methodology of reconstitution messages.
-			Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
-			serverPtr->client.insertResponseMessage(responseMessage);
+			//Message responseMessage(in_message.messageID, in_message.messageLocality, MessageType::RESPONSE_FROM_SERVER_PROCESS_BLUEPRINT_WHEN_RECEIVED);
+			//serverPtr->client.insertResponseMessage(responseMessage);
 
 			moveResponseToCompleted(in_message.messageID);	// indicate that its done (if we completed, of course)
 			//messageCableRef->incomingMessages.pop();

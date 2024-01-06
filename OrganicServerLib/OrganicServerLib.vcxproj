@@ -153,7 +153,6 @@
     <ClInclude Include="AcquiredServerThread.h" />
     <ClInclude Include="AdherentDataList.h" />
     <ClInclude Include="AdhesiveResults.h" />
-    <ClInclude Include="AdhesiveRunner.h" />
     <ClInclude Include="BlankContour.h" />
     <ClInclude Include="BlueprintFillerRunner.h" />
     <ClInclude Include="BlueprintMassManager.h" />
@@ -235,7 +234,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AdhesiveResults.cpp" />
-    <ClCompile Include="AdhesiveRunner.cpp" />
     <ClCompile Include="BlankContour.cpp" />
     <ClCompile Include="BlueprintFillerRunner.cpp" />
     <ClCompile Include="BlueprintMassManager.cpp" />
