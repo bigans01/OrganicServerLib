@@ -47,7 +47,7 @@ void ECBPolyReformer::processContouredPolysAgainstPersistentMass(int* in_nextECB
 				{
 					// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
 					OrganicRawEnclave* currentProcessableKeyedORERef = &contouredMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
-					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentContouredSetPolyIDIter);
+					auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retrieveHandlerTiledTriangles(*currentContouredSetPolyIDIter);
 
 					
 					// The below code block is temporarily enabled for debugging; it doesn't break the system, it's just here.
@@ -195,7 +195,7 @@ void ECBPolyReformer::processPersistentPolysAgainstContouredMass(int* in_nextECB
 
 						// Retrieve the EnclaveTriangles associated with the supergroup that has an ID matching this ECBPoly we are shattering.
 						OrganicRawEnclave* currentProcessableKeyedORERef = &persistentMassContentsRef->fractureResultsContainerMap[*currentProcessableOREKey];
-						auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retriveAllEnclaveTrianglesForSupergroup(*currentPersistentSetPolyIDIter);
+						auto fetchedEnclaveTriangleVector = currentProcessableKeyedORERef->retrieveHandlerTiledTriangles(*currentPersistentSetPolyIDIter);
 
 						// Create new ECBPolys from the current ORE, and assign those ECBPoly instances appropriate IDs via the in_nextECBPolyIDTrackerRef.
 						ShatteredResults currentShatterResults = produceShatteredResultsForORE(in_nextECBPolyIDTrackerRef,
