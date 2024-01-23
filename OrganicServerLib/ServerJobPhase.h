@@ -24,9 +24,12 @@ class ServerJobPhase
 		JobPhaseState calculateAndReturnPhaseState();
 
 		// job removal
-		void removeDonePhaseSubJobs();
+		void removeDonePhaseSubJobs();	// calls runPostCompleteTasks on any job that has its currentJobState == ServerJobState::COMPLETE, 
+										// and then erases it.
 
-		void loadDonePhaseSubjobs();
+		void loadDonePhaseSubjobs();	// scan for inididual ServerJobBase-derived classes that have been flagged as completed, and have them run their post complete tasks,
+										// by calling runPostCompleteTasks(). The job is then pushed back into the completedVector, marking it for removal.
+
 		void eraseDonePhaseSubJobs();
 };
 

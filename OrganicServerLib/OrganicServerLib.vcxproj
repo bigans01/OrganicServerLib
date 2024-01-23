@@ -165,9 +165,10 @@
     <ClInclude Include="ContouredPlanV2Base.h" />
     <ClInclude Include="ContourPlanState.h" />
     <ClInclude Include="ContourPlanStateContainer.h" />
-    <ClInclude Include="CPAffectedBlueprints.h" />
+    <ClInclude Include="HotBlueprints.h" />
     <ClInclude Include="ContouredCircuit.h" />
     <ClInclude Include="CPV2Mountain.h" />
+    <ClInclude Include="CPV2SingleTriangle.h" />
     <ClInclude Include="CTV2Strip.h" />
     <ClInclude Include="ECBPolyReformer.h" />
     <ClInclude Include="ECBPolyReformerType.h" />
@@ -245,6 +246,7 @@
     <ClCompile Include="ContouredTriangleV2.cpp" />
     <ClCompile Include="ContouredCircuit.cpp" />
     <ClCompile Include="CPV2Mountain.cpp" />
+    <ClCompile Include="CPV2SingleTriangle.cpp" />
     <ClCompile Include="ECBPolyReformer.cpp" />
     <ClCompile Include="OSAmpField.cpp" />
     <ClCompile Include="OSBlueprintTraversalController.cpp" />

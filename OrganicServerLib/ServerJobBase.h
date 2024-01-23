@@ -16,7 +16,9 @@ class ServerJobBase
 	public:
 		virtual void runJob(OrganicThread* in_threadToRunOn) = 0;
 		virtual std::string getJobName() = 0;
-		virtual void runPostCompleteTasks() = 0;
+		virtual void runPostCompleteTasks() = 0;	// any tasks that need to be done after the job completed, and before it is erased;
+													// see it's call in ServerJobPhase::loadDonePhaseSubjobs.
+
 		virtual ServerJobRunVerdict getCurrentVerdict() = 0;
 
 		void setStartMessage(Message in_message);

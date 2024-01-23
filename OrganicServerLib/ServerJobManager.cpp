@@ -31,17 +31,6 @@ void ServerJobManager::insertJobRequestMessage(Message in_message)
 	jobRequestQueue.insertMessage(std::move(in_message));
 }
 
-void ServerJobManager::insertPhasedJobRunSingleMountTest(Message in_message)		// the TRUE test function
-{
-	// Remember, the data for the input message of the call to the function needs to contain:
-	// 
-	// --an int for the OSTerrainFormation
-	// --any additional meta data for that formation, that should be passed into the SPJ.
-
-	std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPMountain));
-	spjHierarchy.insertJob(1, &job, std::move(in_message));	
-}
-
 void ServerJobManager::insertPhasedJobRunCPV2Test(Message in_message)		// the TRUE test function
 {
 	std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPV2Mountain));
@@ -214,7 +203,8 @@ void ServerJobManager::runJobScan()
 
 void ServerJobManager::removeCompletedPhasedJobs()
 {
-	spjHierarchy.cleanupJobsInPhasedJobs();
+	spjHierarchy.cleanupJobsInPhasedJobs();		// scan for ServerJobBase instances to clean up and run post-processing tasks on, in all of the phased jobs that are currently
+												// active. 
 	spjHierarchy.removeCompletedPhasedJobs();
 }
 
@@ -260,8 +250,6 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 			// Mountains
 			case int(OSTerrainFormation::MOUNTAIN):	// I have no idea why I need to cast to int for this, but not MessageType?
 			{
-				// Below: insertPhasedJobRunSingleMountTest is DEPRECATED -- do not use, it is only here for reference. 
-				//insertPhasedJobRunSingleMountTest(std::move(planSpecificData));									// move the message into the job.	
 				insertPhasedJobRunCPV2Test(std::move(planSpecificData));									// move the message into the job.	
 				server->planStateContainer.insertNewState(planName, ContourPlanState::WAITING_TO_RUN);		// insert the state
 				break;

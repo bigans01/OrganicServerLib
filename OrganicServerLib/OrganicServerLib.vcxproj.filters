@@ -55,9 +55,6 @@
     <Filter Include="Source Files\Jobs\SJ\GenericSJs">
       <UniqueIdentifier>{0c2e9c44-42e6-44e1-9b9d-7ec3160f1057}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\CPAffectedBlueprints">
-      <UniqueIdentifier>{8340b184-d0a3-499f-8418-50f4cf02ab30}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\ContouredPlanV2">
       <UniqueIdentifier>{9d5c2ff5-fa1a-4f76-8218-0f946f39c303}</UniqueIdentifier>
     </Filter>
@@ -84,6 +81,15 @@
     </Filter>
     <Filter Include="Source Files\ContouredPlanV2\Mountain">
       <UniqueIdentifier>{2eb94259-4a8e-4ba6-84ad-7f0c610076e6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ContouredPlanV2\SingleTriangle">
+      <UniqueIdentifier>{04d5f45d-1622-417e-aa0a-75eb8f197897}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ContouredPlanV2\SingleTriangle">
+      <UniqueIdentifier>{2bb8e28e-34ed-4c42-bd1f-13834de52256}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\HotBlueprints">
+      <UniqueIdentifier>{8340b184-d0a3-499f-8418-50f4cf02ab30}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -282,9 +288,6 @@
     <ClInclude Include="AcquiredServerThread.h">
       <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
-    <ClInclude Include="CPAffectedBlueprints.h">
-      <Filter>Header Files\CPAffectedBlueprints</Filter>
-    </ClInclude>
     <ClInclude Include="ServerJobRunCounters.h">
       <Filter>Header Files\Jobs\ServerJobManager</Filter>
     </ClInclude>
@@ -321,9 +324,6 @@
     <ClInclude Include="SJPrepCPMountainRun.h">
       <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
     </ClInclude>
-    <ClInclude Include="SPJBuildCPMountain.h">
-      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
-    </ClInclude>
     <ClInclude Include="CPV2Mountain.h">
       <Filter>Header Files\ContouredPlanV2\Mountain</Filter>
     </ClInclude>
@@ -332,6 +332,15 @@
     </ClInclude>
     <ClInclude Include="SJRunCPV2.h">
       <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="CPV2SingleTriangle.h">
+      <Filter>Header Files\ContouredPlanV2\SingleTriangle</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJBuildCPMountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="HotBlueprints.h">
+      <Filter>Header Files\HotBlueprints</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -440,9 +449,6 @@
     <ClCompile Include="SJPrepCPMountainRun.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
-    <ClCompile Include="SPJBuildCPMountain.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
     <ClCompile Include="ServerJobProxy.cpp">
       <Filter>Source Files\Jobs</Filter>
     </ClCompile>
@@ -484,6 +490,12 @@
     </ClCompile>
     <ClCompile Include="SJRunCPV2.cpp">
       <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="CPV2SingleTriangle.cpp">
+      <Filter>Source Files\ContouredPlanV2\SingleTriangle</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJBuildCPMountain.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

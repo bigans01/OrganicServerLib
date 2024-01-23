@@ -20,15 +20,22 @@ void ServerPhasedJobHierarchy::insertJob(int in_layerToInsertTo, std::shared_ptr
 
 void ServerPhasedJobHierarchy::cleanupJobsInPhasedJobs()	
 {
-	// This function will remove any completed ServerJobs that were completed in the SPJ's current phase.
+	// Check for any ServerJobBase instances, in all ServerPhasedJobBase-based jobs,
+	// to see if any have completed; for the ones that have completed, run post-processing tasks 
+	// (i.e, through ServerJobBase::runPostCompleteTasks()) before removing the jobs.
 	auto currentLayerBegin = hierarchy.begin();
 	auto currentLayerEnd = hierarchy.end();
+
+	// Cycle through each layer
 	for (; currentLayerBegin != currentLayerEnd; currentLayerBegin++)
 	{
+		// Go through each ServerPhasedJob in the current layer
 		auto currentPhasedJobBegin = currentLayerBegin->second.begin();
 		auto currentPhasedJobEnd = currentLayerBegin->second.end();
 		for (; currentPhasedJobBegin != currentPhasedJobEnd; currentPhasedJobBegin++)
 		{
+			// run post-processing and removal of any completed ServerJobBase-derived jobs, in the current phase 
+			// we are looking at (if there are any to do, that is)
 			currentPhasedJobBegin->second->removeCompletedPhaseSubJobs();
 		}
 	}

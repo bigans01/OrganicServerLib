@@ -118,7 +118,7 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 	}
 }
 
-void ContouredPlanV2Base::constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, CPAffectedBlueprints* in_trackedBlueprintsRef)
+void ContouredPlanV2Base::constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef)
 {
 	for (auto& currentCTV2 : in_ctv2Vector)
 	{
@@ -128,21 +128,20 @@ void ContouredPlanV2Base::constructEstimatedAffectedBlueprints(std::vector<Conto
 
 		for (auto& currentOutput : *outputsRef)
 		{
-			EnclaveKeyDef::EnclaveKey currentKeyCopy = currentOutput.first;	// this is the key that we will insert into the referenced CPAffectedBlueprints member.
+			EnclaveKeyDef::EnclaveKey currentKeyCopy = currentOutput.first;	// this is the key that we will insert into the referenced HotBlueprints member.
 			in_trackedBlueprintsRef->insertKeyIntoPillar(currentKeyCopy);
 		}
 
 		// When all keys have been inserted, construct.
-		in_trackedBlueprintsRef->produceKeys();
+		in_trackedBlueprintsRef->produceKeysFromPillars();
 	}
 }
 
 void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ctv2Vector, 
 										ECBMap* in_blueprintMapRef, 
 										ECBMap* in_backupBlueprintsMapRef,
-										CPAffectedBlueprints* in_trackedBlueprintsRef)
+										HotBlueprints* in_trackedBlueprintsRef)
 {
-	// Step 1: Produce all estimated affected blueprints.
 	/*
 	for (auto& currentCTV2ForPillar : in_ctv2Vector)
 	{
@@ -152,18 +151,26 @@ void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ct
 
 		for (auto& currentOutput : *outputsRef)
 		{
-			EnclaveKeyDef::EnclaveKey currentKeyCopy = currentOutput.first;	// this is the key that we will insert into the referenced CPAffectedBlueprints member.
+			EnclaveKeyDef::EnclaveKey currentKeyCopy = currentOutput.first;	// this is the key that we will insert into the referenced HotBlueprints member.
 			in_trackedBlueprintsRef->insertKeyIntoPillar(currentKeyCopy);
 		}
 
 		// When all keys have been inserted, construct.
-		in_trackedBlueprintsRef->produceKeys();
+		in_trackedBlueprintsRef->produceKeysFromPillars();
 	}
 	*/
+	// Step 1: Produce all estimated affected blueprints.
+
+	auto estimatedStart = std::chrono::high_resolution_clock::now();
 	constructEstimatedAffectedBlueprints(in_ctv2Vector, in_trackedBlueprintsRef);
+	auto estimatedEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> estimatedElapsed = estimatedEnd - estimatedStart;
+	std::cout << "Time spent to consruct estimated affected blueprints (ms): " << estimatedElapsed.count() << std::endl;
 
 	// Step 2: Created backups of the affected blueprints, if they exist.
-	for (auto& currentAffectedBlueprint : in_trackedBlueprintsRef->producedKeys)
+	auto ecbPolyCopyStart = std::chrono::high_resolution_clock::now();
+
+	for (auto& currentAffectedBlueprint : in_trackedBlueprintsRef->hotKeys)
 	{
 		// Only bother doing a backup if it currently exists
 		if (in_backupBlueprintsMapRef->checkIfBlueprintExists(currentAffectedBlueprint))
@@ -214,7 +221,7 @@ void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ct
 			//std::cout << "Number of triangles in this container: " << numberOfTrianglesToAdd << std::endl;
 
 			// get a pointer to the blueprint, so that we can get the appropriate IDs of the ECBPolys that we are about to insert;
-			// also, insert the ECBPoly with the corresponding ID into the EnclaveCollectionBlueprint.
+			// for each element in the idSet, we will use tat 
 			auto currentBlueprintPtr = in_blueprintMapRef->getBlueprintRef(currentKeyCopy);
 			auto idSet = currentBlueprintPtr->fetchNextIDs(numberOfTrianglesToAdd);
 			for (auto& currentID : idSet)
@@ -269,4 +276,8 @@ void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ct
 
 		}
 	}
+
+	auto ecbPolyCopyEnd = std::chrono::high_resolution_clock::now();
+	std::chrono::duration<double> ecbPolyCopyElapsed = ecbPolyCopyEnd - ecbPolyCopyStart;
+	std::cout << "Time spent to copy over affected blueprint ECBPolys (ms): " << ecbPolyCopyElapsed.count() << std::endl;
 }

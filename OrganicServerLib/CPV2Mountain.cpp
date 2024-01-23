@@ -399,6 +399,10 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 
 	planMassManager.updatedAffectedORESAsIndependent();
 
+	/*
+
+	Don't bother calling updateOREAsRMass, if using the ORELightweightCollider for collision operations; 
+
 	// Step 4) Update any OREs that need to be set to RMass mode;
 	//			The iterator will be for the keyed-found forged poly set, for the current blueprint we're looking at.
 	//			The key of the iterator will be used as the blueprintKey to use.
@@ -412,6 +416,7 @@ void CPV2Mountain::runMassDriversV2(OrganicClient* in_clientRef,
 			in_clientRef->OS->updateOREAsRMass(currentServerBlueprintRef, skeletonClearBegin);	// update the ORE, move over any pending solid blocks
 		}
 	}
+	*/
 
 	//std::cout << "### End of mass driver run. Time spent:" << organicelapsed.count() << std::endl;
 	std::cout << "### ContouredMountain summit was:  "; startPoint.printPointCoords(); std::cout << std::endl;

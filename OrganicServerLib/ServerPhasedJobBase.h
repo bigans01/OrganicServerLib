@@ -47,7 +47,11 @@ class ServerPhasedJobBase
 		std::string requiredThreadDesignation = "";	// must be set for all descendants of this base class, in that specific class.
 
 		JobPhaseState getCurrentPhaseState();									// should be called every time we are checking the job, before anything else
-		void removeCompletedPhaseSubJobs();
+
+		void removeCompletedPhaseSubJobs();		// For the current phase, this takes proper steps to remove any completed ServerJobBase-derived classes, 
+												// and then flags the current phase as being complete. If it is last phase of the derived ServerPhasedJobBase class,
+												// the jobState of this class wil lbe set to ServerJobState::COMPLETE.												
+
 		void insertNewPhase(std::shared_ptr<ServerJobPhase> in_phasePtr);
 		void insertNewPhases(int in_phaseCount);
 		bool checkIfCurrentPhaseIsInProgress();

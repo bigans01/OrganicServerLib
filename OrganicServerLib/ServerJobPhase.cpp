@@ -34,6 +34,9 @@ void ServerJobPhase::loadDonePhaseSubjobs()
 		if (jobsBegin->second->currentJobState == ServerJobState::COMPLETE)		// if its complete, push it back into the completed vector.
 		{
 			//std::cout << "######### Found job to remove. " << std::endl;
+			jobsBegin->second->runPostCompleteTasks();		// run any post complete tasks on the job, (i.e, logging, server flag updates) 
+															// before we erase it.
+
 			completedVector.push_back(jobsBegin->first);	// push back the element
 		}
 	}

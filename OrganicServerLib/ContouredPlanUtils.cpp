@@ -53,15 +53,34 @@ void ContouredPlanUtils::appendContourPlanEnclaveTriangleSkeletons(EnclaveKeyDef
 					// so make sure the check below is commented out if you wish to use the OREMatterCollider. Furthermore,
 					// if wishing to use OREMatterCollider, ensure that the commented out line of currentLodState = ORELodState::LOD_ENCLAVE_RMATTER 
 					// is being used in OrganicRawEnclave::updateOREForRMass() (see OrganicIndependents library).
+					//
+					// Logic for working out what happens when a ORELightweightCollider is instantiated/working against an ORE that is already in a ORELodState::LOD_ENCLAVE_SMATTER
+					// needs to be added.
 
 
 					||
 					(selectedORELodState == ORELodState::LOD_BLOCK)			
 				)
 				{
-					// the below will line will append from the other ORE, therefore calling updateCurrentAppendedState() in the ORE, and setting it to SINGLE_APPEND or MULTIPLE_APPEND.
-					GroupSetPair oreAppendedData = currentPersistentTargetBlueprintRef->fractureResults.fractureResultsContainerMap[currentEnclaveKey].appendEnclaveTrianglesFromOtherORE(&in_serverECBMap->blueprintMapMutex,
-						&currentRawEnclaveToAppendFrom.second);
+					// The below line will append from the oreRTHandler entries from the other ORE, but only if the persistent ORE being appended to 
+					// is NOT in a LOD_BLOCK lod state. An ORE in this state technically shouldn't contain any entries in its oreRTHandler object, as it will 
+					// lead to data inconsistencies. For example, if appendEnclaveTrianglesFromOtherORE is called on an ORE in a LOD_BLOCK lod state, the currentAppendedState
+					// of the ORE gets updated from NONE to SINGLE_APPEND, which isn't what we want. This would also cause the call to in_clientRef->OS->updateOREAsRMass in CPV2Mountain
+					// to delete the block skeletons when it detects the SINGLE_APPEND, due to the data inconsistency.
+					//
+					// For that reason, we will not bother calling appendEnclaveTrianglesFromOtherORE
+					// below under this condition, as the whole point of needing to do that in the first place was to call morphLodToBlock on the target ORE that is in 
+					// an ORELodState::LOD_ENCLAVE_SMATTER lod, before the ORELightweightCollider::setupCollider function does its modifications (see OrganicCoreLib)
+					//
+					// therefore calling updateCurrentAppendedState() in the ORE, and setting it to SINGLE_APPEND or MULTIPLE_APPEND.
+					// This needs to be done so that we have data in the oreRTHandler before we call morphLodToBlock() on the ORE.
+					//
+					// We do NOT need to do this if the current state of the selected ORE is LOD_BLOCK, because it shouldn't technically contain any oreRTHandlers when in that state.
+					if (selectedORELodState != ORELodState::LOD_BLOCK)
+					{
+						GroupSetPair oreAppendedData = currentPersistentTargetBlueprintRef->fractureResults.fractureResultsContainerMap[currentEnclaveKey].appendEnclaveTrianglesFromOtherORE(&in_serverECBMap->blueprintMapMutex,
+							&currentRawEnclaveToAppendFrom.second);
+					}
 
 					// testing only:
 					EnclaveKeyDef::EnclaveKey testKey;

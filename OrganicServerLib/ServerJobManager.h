@@ -67,7 +67,9 @@ class ServerJobManager
 
 		// STEP 2: insert jobs based into the appropraite containers, based on the message.
 		void checkForUpdateMessages();		// 1: check for messages that would be updates to existing jobs.
-		void removeCompletedPhasedJobs();   // 2: remove jobs flagged as completed in the phases they are in; remove ServerPhasedJobs that have been completed
+		void removeCompletedPhasedJobs();   // 2: remove jobs flagged as completed in the phases they are in (this should also call the runPostCompleteTasks for 
+											//	  each instance of ServerJobBase that is about to erased; this should be done through a series of function calls that ultimately results in a call to
+											//	  runPostCompleteTaks for each job that is being removed.); remove ServerPhasedJobs that have been completed
 		void checkForMessages();			// 3: check the messages that would spawn new jobs.
 		void runJobScan();					// 4: look for jobs to execute.
 
@@ -81,9 +83,6 @@ class ServerJobManager
 		void deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate);
 
 		// job insertion calls
-		void insertPhasedJobRunSingleMountTest(Message in_message);		// DEPRECATED -- do NOT use; 
-																		// this has been replaced/superseded by insertPhasedJobRunCPV2Test.
-
 		void insertPhasedJobRunCPV2Test(Message in_message);		// the TRUE test function.
 		void insertPhasedJobSetWorldDirection(Message in_message);
 

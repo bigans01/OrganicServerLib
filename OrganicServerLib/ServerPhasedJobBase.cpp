@@ -34,7 +34,7 @@ JobPhaseState ServerPhasedJobBase::getCurrentPhaseState()
 
 void ServerPhasedJobBase::removeCompletedPhaseSubJobs()
 {
-	currentPhaseIter->second->removeDonePhaseSubJobs();	// remove the completed jobs.
+	currentPhaseIter->second->removeDonePhaseSubJobs();	// run post-processing tasks for ServerJobBase instances that have completed, and then flag/remove those jobs.
 	auto phaseEnd = phaseMap.rbegin();					// get the last phase in the map.
 	int foundFlag = 0;
 	currentPhaseIter->second->calculateAndReturnPhaseState();

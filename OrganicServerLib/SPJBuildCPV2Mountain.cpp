@@ -16,7 +16,8 @@ void SPJBuildCPV2Mountain::interpretMessage(Message in_message)
 	int jobID = currentMessage.readInt();
 
 	// mark individual jobs as complete, as needed
-	phaseMap[phaseID]->jobMap[jobID]->currentJobState = ServerJobState::COMPLETE;
+	phaseMap[phaseID]->jobMap[jobID]->currentJobState = ServerJobState::COMPLETE;	// set as complete, so that the call to ServerJobPhase::loadDonePhaseSubjobs
+																					// can manage and remove this correctly. 
 	phaseMap[phaseID]->currentJobsCompleted = 1;		// should just be 1.
 }
 
@@ -54,7 +55,7 @@ void SPJBuildCPV2Mountain::initializeCurrentPhase()
 		for this flag to be available (which would indicate another ContourPlan is running).
 
 		*/
-		std::cout << "(SPJBuildCPV2Mountain) Phase 0 - Prepping ContouredMountain plan... " << std::endl;
+		std::cout << "(SPJBuildCPV2Mountain) Phase 0 - Prepping contoured mountain plan... " << std::endl;
 		int currentJobMapKey = 0;
 
 		Message completionMessage = buildCompletionMessageForSJ(currentPhaseIndex, currentJobMapKey);			// Required: completion message must be built.

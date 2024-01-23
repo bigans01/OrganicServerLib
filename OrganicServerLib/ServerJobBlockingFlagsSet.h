@@ -7,6 +7,12 @@
 #include <mutex>
 #include "ServerJobBlockingFlags.h"
 
+/*
+
+Description: A simple, thread-safe flag management class that is designed for the ServerJobManager class
+
+*/
+
 class ServerJobBlockingFlagsSet
 {
 	public:

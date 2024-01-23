@@ -77,475 +77,11 @@ void OSServer::addPlanV2(std::string in_planName,
 		plansV2Map[in_planName].reset(new CPV2Mountain());
 		plansV2Map[in_planName].get()->initialize(in_polyPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);		// call the initialization function (common to all ContourBase derivatives)
 	}
-}
 
-void OSServer::constructSingleOrganicTest()
-{
-	std::cout << "||||||| constructing single poly for OrganicTriangle testing (version 1)...." << std::endl;
-
-	ECBPolyPoint startPoint, mrPoint;
-	startPoint.x = -85.0f;
-	startPoint.y = 80.0f;
-	startPoint.z = 90.0f;
-	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
-	ContourBase* planRef = getDerivedContourPlan("plan");
-
-	ECBPolyPoint testPoint_0;
-	ECBPolyPoint testPoint_1;
-	ECBPolyPoint testPoint_2;
-	ECBPolyPoint testPoint_3;
-
-	/*
-	testPoint_0.x = 48.0f;
-	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 48.2f;
-
-	testPoint_1.x = 64.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 48.2f;
-
-	testPoint_2.x = 63.5f;
-	testPoint_2.y = 15.5f;
-	testPoint_2.z = 48.2f;
-	
-	testPoint_3.x = 48.0f;
-	testPoint_3.y = 15.5f;
-	testPoint_3.z = 48.2f;
-	*/
-	
-	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
-
-	
-	testPoint_0.x = 0.0f;
-	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 0.0f;
-
-	testPoint_1.x = 32.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 32.0f;
-
-	testPoint_2.x = 32.0f;
-	testPoint_2.y = 32.0f;
-	testPoint_2.z = 32.0f;
-
-	testPoint_3.x = 0.0f;
-	testPoint_3.y = 32.0f;
-	testPoint_3.z = 0.0f;
-
-	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
-
-	/*
-	testPoint_0.x = 0.0f;
-	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 0.0f;
-
-	testPoint_1.x = 64.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 64.0f;
-
-	testPoint_2.x = 64.0f;
-	testPoint_2.y = 64.0f;
-	testPoint_2.z = 64.0f;
-
-	testPoint_3.x = 0.0f;
-	testPoint_3.y = 64.0f;
-	testPoint_3.z = 0.0f;
-	*/
-	
-	
-
-	
-	// !!!!!!!!!!!!!!!! OK, WITH TWO TRIANGLES	(7/14/2020)
-	/*
-	testPoint_0.x = 0.0f;
-	testPoint_0.y = 0.0f;
-	testPoint_0.z = 0.0f;
-
-	testPoint_1.x = 32.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 0.0f;
-
-	testPoint_2.x = 32.0f;
-	testPoint_2.y = 32.0f;
-	testPoint_2.z = 32.0f;
-
-	testPoint_3.x = 0.0f;
-	testPoint_3.y = 32.0f;
-	testPoint_3.z = 32.0f;
-	
-	
-	// |||||||||||||||| Needs testing refinement. (7/14/2020)
-	
-	testPoint_0.x = 32.0f;
-	testPoint_0.y = 32.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 32.0f;
-
-	testPoint_1.x = 64.0f;
-	testPoint_1.y = 32.0f;
-	testPoint_1.z = 64.0f;
-
-	testPoint_2.x = 64.0f;
-	testPoint_2.y = 64.0f;
-	testPoint_2.z = 64.0f;
-
-	testPoint_3.x = 32.0f;
-	testPoint_3.y = 64.0f;
-	testPoint_3.z = 32.0f;
-	*/
-
-
-	// needs fixing/work; related to the border values used when tracing.
-	/*
-	testPoint_0.x = 64.0f;
-	testPoint_0.y = 64.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 64.0f;
-
-	testPoint_1.x = 96.0f;
-	testPoint_1.y = 32.0f;
-	testPoint_1.z = 96.0f;
-
-	testPoint_2.x = 96.0f;
-	testPoint_2.y = 94.0f;
-	testPoint_2.z = 96.0f;
-	*/
-	
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	executeDerivedContourPlan("plan");
-
-}
-
-void OSServer::constructOrganicRawTest()
-{
-	std::cout << "!!! Running RAW test! " << std::endl;
-
-	ECBPolyPoint startPoint, mrPoint;
-	startPoint.x = -85.0f;
-	startPoint.y = 80.0f;
-	startPoint.z = 90.0f;
-	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
-	ContourBase* planRef = getDerivedContourPlan("plan");
-
-	ECBPolyPoint testPoint_0;
-	ECBPolyPoint testPoint_1;
-	ECBPolyPoint testPoint_2;
-	ECBPolyPoint testPoint_3;
-
-	/*
-	testPoint_0.x = 16.0f;
-	testPoint_0.y = 0.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 16.0f;
-
-	testPoint_1.x = 20.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 16.0f;
-
-	testPoint_2.x = 20.0f;
-	testPoint_2.y = 4.0f;
-	testPoint_2.z = 16.0f;
-	*/
-
-	// a journey into the bizarre below (7/18/2020)
-	
-	
-	testPoint_0.x = 54.0f;
-	testPoint_0.y = 16.0f;
-	testPoint_0.z = 49.0f;
-
-	testPoint_1.x = 50.0f;
-	testPoint_1.y = 16.0f;
-	testPoint_1.z = 49.0f;
-
-	testPoint_2.x = 50.0f;
-	testPoint_2.y = 12.0f;
-	testPoint_2.z = 49.0f;
-
-	testPoint_3.x = 54.0f;
-	testPoint_3.y = 12.0f;
-	testPoint_3.z = 49.0f;
-	
-	
-	
-	/*
-	testPoint_0.x = 49.0f;
-	testPoint_0.y = 13.0f;
-	testPoint_0.z = 49.0f;
-
-	testPoint_1.x = 48.0f;
-	testPoint_1.y = 13.0f;
-	testPoint_1.z = 49.0f;
-
-	testPoint_2.x = 48.0f;
-	testPoint_2.y = 12.0f;
-	testPoint_2.z = 49.0f;
-
-	testPoint_3.x = 50.0f;
-	testPoint_3.y = 12.0f;
-	testPoint_3.z = 49.0f;
-	*/
-
-	/*
-	testPoint_0.x = 50.0f;
-	testPoint_0.y = 16.0f;
-	testPoint_0.z = 49.2f;
-
-	testPoint_1.x = 48.0f;
-	testPoint_1.y = 16.0f;
-	testPoint_1.z = 49.2f;
-
-	testPoint_2.x = 48.0f;
-	testPoint_2.y = 12.0f;
-	testPoint_2.z = 49.2f;
-
-	testPoint_3.x = 50.0f;
-	testPoint_3.y = 12.0f;
-	testPoint_3.z = 49.2f;
-	*/
-	
-
-	/*
-	testPoint_0.x = 52.0f;
-	testPoint_0.y = 16.0f;
-	testPoint_0.z = 49.2f;
-
-	testPoint_1.x = 48.0f;
-	testPoint_1.y = 16.0f;
-	testPoint_1.z = 49.2f;
-
-	testPoint_2.x = 48.0f;
-	testPoint_2.y = 12.0f;
-	testPoint_2.z = 49.2f;
-
-	testPoint_3.x = 54.0f;
-	testPoint_3.y = 12.0f;
-	testPoint_3.z = 49.2f;
-	*/
-
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	executeDerivedContourPlan("plan");
-}
-
-void OSServer::constructBlueprintFillTest()
-{
-
-	std::cout << "||||||| Constructing blueprint fill test (version 1)...." << std::endl;
-	ECBPolyPoint startPoint, mrPoint;
-	startPoint.x = 0.0f;
-	startPoint.y = 20.0f;
-	startPoint.z = 0.0f;
-	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
-	ContourBase* planRef = getDerivedContourPlan("plan");
-
-	ECBPolyPoint testPoint_0;
-	ECBPolyPoint testPoint_1;
-	ECBPolyPoint testPoint_2;
-
-	testPoint_0.x = 16.0f;
-	testPoint_0.y = -8.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	testPoint_0.z = 4.5f;
-
-	testPoint_1.x = -4.0f;
-	testPoint_1.y = -8.0f;
-	testPoint_1.z = -16.0f;
-
-	testPoint_2.x = -4.0f;
-	testPoint_2.y = 16.0f;
-	testPoint_2.z = 4.5f;
-
-	//testPoint_0.x = 16.0f;
-	//testPoint_0.y = 16.0f;		// try: 2.2, 2.2, 2.5, 2.6 (9/16/2018); 2.2 = needs mending; 2.4 = axis searching length too short
-	//testPoint_0.z = 4.5f;
-
-	//testPoint_1.x = 0.0f;
-	//testPoint_1.y = 16.0f;
-	//testPoint_1.z = 4.5f;
-
-	//testPoint_2.x = 8.0f;
-	//testPoint_2.y = 12.0f;
-	//testPoint_2.z = -4.5f;
-
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	executeDerivedContourPlan("plan");
-}
-
-
-void OSServer::constructSingleDebug()
-{
-	std::cout << "!!! SINGLE debug test. " << std::endl;
-
-	ECBPolyPoint startPoint, mrPoint;
-	startPoint.x = -85.0f;
-	startPoint.y = 80.0f;
-	startPoint.z = 90.0f;
-	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
-	ContourBase* planRef = getDerivedContourPlan("plan");
-
-	ECBPolyPoint testPoint_0;
-	ECBPolyPoint testPoint_1;
-	ECBPolyPoint testPoint_2;
-	ECBPolyPoint testPoint_3;
-
-	/*
-	testPoint_0.x = 0.0f;
-	testPoint_0.y = 0.0f;
-	testPoint_0.z = 0.0f;
-
-	testPoint_1.x = 32.0f;
-	testPoint_1.y = 0.0f;
-	testPoint_1.z = 0.0f;
-
-	testPoint_2.x = 0.00f;
-	testPoint_2.y = 0.0f;
-	testPoint_2.z = 32.00f;
-	*/
-
-	
-	/*
-	testPoint_0.x = 32.0f;
-	testPoint_0.y = 32.0f;
-	testPoint_0.z = 32.0f;
-
-	testPoint_1.x = 41.0f;
-	testPoint_1.y = 32.0f;
-	testPoint_1.z = 32.0f;
-
-	testPoint_2.x = 32.00f;
-	testPoint_2.y = 32.0f;
-	testPoint_2.z = 41.00f;
-	*/
-
-	// for strange behavior detected  on 3/11/2021
-	testPoint_0.x = 1;
-	testPoint_0.y = 3.57;
-	testPoint_0.z = 4;
-
-	testPoint_1.x = 1.75;
-	testPoint_1.y = 3.57;
-	testPoint_1.z = 1.19;
-
-	testPoint_2.x = 0.8f;
-	testPoint_2.y = 3.57;
-	testPoint_2.z = 0;
-	
-
-	// for reddit question
-	/*
-	testPoint_0.x = 2.0f;
-	testPoint_0.y = 0.0f;
-	testPoint_0.z = 0.0f;
-
-	testPoint_1.x = 0.0f;
-	testPoint_1.y = 2.0f;
-	testPoint_1.z = 0.0f;
-
-	testPoint_2.x = 0.0f;
-	testPoint_2.y = 0.0f;
-	testPoint_2.z = 2.0f;
-	*/
-
-	// caused bug on 8/20/2020, at ~32000.12, 32000.3, 32000.73.
-	// fails when edgeThreshold = .0001 (8/21/2020)
-
-	/*
-	testPoint_0.x = 0;
-	testPoint_0.y = 1.61;
-	testPoint_0.z = 3.06;
-
-	testPoint_1.x = 4;
-	testPoint_1.y = 1.54;
-	testPoint_1.z = 4;
-
-	testPoint_2.x = 4;
-	testPoint_2.y = 0.8;
-	testPoint_2.z = 2.98;
-	*/
-
-	// fails when edgeThreshold = .00015 (8/21/2020)
-	
-	/*
-	testPoint_0.x = 3.42;
-	testPoint_0.y = 0.59;
-	testPoint_0.z = 0;
-
-	testPoint_1.x = 0.88;
-	testPoint_1.y = 4;
-	testPoint_1.z = 4;
-
-	testPoint_2.x = 0;
-	testPoint_2.y = 4;
-	testPoint_2.z = 2.83;
-	*/
-
-	/*
-	testPoint_0.x = 0.0f;
-	testPoint_0.y = 3.79f;
-	testPoint_0.z = 4;
-
-
-	testPoint_1.x = 0;
-	testPoint_1.y = 2.21;
-	testPoint_1.z = 0;
-
-	testPoint_2.x = 4;
-	testPoint_2.y = 1.15;
-	testPoint_2.z = 4;
-	*/
-
-	/*
-	testPoint_0.x = 64.0f;
-	testPoint_0.y = 64.0f;
-	testPoint_0.z = 64.0f;
-
-	testPoint_1.x = 73.0f;
-	testPoint_1.y = 64.0f;
-	testPoint_1.z = 64.0f;
-
-	testPoint_2.x = 64.00f;
-	testPoint_2.y = 64.0f;
-	testPoint_2.z = 73.00f;
-	*/
-
-	planRef->constructSingleContouredTriangle(testPoint_0, testPoint_1, testPoint_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	//planRef->constructSingleContouredTriangle(testPoint_0, testPoint_2, testPoint_3, mrPoint, 0, 2);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	executeDerivedContourPlan("plan");
-}
-
-void OSServer::constructMountainAtPoint(float in_summitX, float in_summitY, float in_summitZ, int in_numberOfLayers)
-{
-	std::cout << "||||||| Constructing Mountain at point, with " << in_numberOfLayers << " layers. " << std::endl;
-	ECBPolyPoint mountainSummit;
-	mountainSummit.x = in_summitX;
-	mountainSummit.y = in_summitY;
-	mountainSummit.z = in_summitZ;
-	int numberOfLayers = in_numberOfLayers;
-	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* planRef = getDerivedContourPlan("mountain");
-	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	planRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT); // set materials for mountain
-	planRef->buildContouredTriangles();
-	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
-	executeDerivedContourPlan("mountain");
-}
-
-void OSServer::constructSingleMountTest()
-{
-	ECBPolyPoint summit1;
-	int numberOfLayers = 3;
-
-	// first mountain
-	summit1.x = 48;
-	summit1.y = 16;
-	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, numberOfLayers, 12.81, 13.22, 9);	// create the points in all contour lines
-	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
-	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT); // set materials for mountain
-	summit1Ref->buildContouredTriangles();
-	std::cout << "!!!!!!!!! --------------> top strips: " << summit1Ref->triangleStripMap.size() << std::endl;
-	std::cout << "!!!!!!!!! --------------> bottom strips: " << summit1Ref->bottomTriangleStripMap.size() << std::endl;
-
-	executeDerivedContourPlan("summit1");
+	if (in_Formation == OSTerrainFormation::NOVAL)
+	{
+		plansV2Map[in_planName].reset(new CPV2SingleTriangle());
+	}
 }
 
 void OSServer::runSingleMountainV2SPJ(std::string in_planName)
@@ -568,6 +104,18 @@ void OSServer::runSingleMountainV2SPJ(std::string in_planName)
 	summit2Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit2Ref->buildContouredTriangles();
 	executePlanV2NoInput(in_planName);
+}
+
+
+void OSServer::constructCPV2SingleTriangle()
+{
+	DoublePoint naPoint;
+	addPlanV2("singleTriangle", OSTerrainFormation::NOVAL, naPoint, 0, 0, 0, 0);
+	auto singleTriangleRef = getPlanV2Ref("singleTriangle");
+
+	singleTriangleRef->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	singleTriangleRef->buildContouredTriangles();	// build the single contoured triangle, so that we may process it
+	executePlanV2("singleTriangle");
 }
 
 void OSServer::runSingleMountainV2()
@@ -601,7 +149,7 @@ void OSServer::runSingleMountainV2()
 	currentPlanRef->buildContouredTriangles();
 	executePlanV2("summit1");
 	
-	DoublePoint summit3(80.0, 16.0, 25.0);
+	DoublePoint summit3(40.0, 16.0, 25.0);
 	addPlanV2("summit3", OSTerrainFormation::MOUNTAIN, summit3, 3, 4.81, 16.82, 7);
 	auto summit3Ref = getPlanV2Ref("summit3");
 	summit3Ref->amplifyAllContourLinePoints();
@@ -609,6 +157,16 @@ void OSServer::runSingleMountainV2()
 	summit3Ref->buildContouredTriangles();
 	executePlanV2("summit3");
 	
+	/*
+	EnclaveKeyDef::EnclaveKey debugBPKey(0, 0, 0);
+	EnclaveKeyDef::EnclaveKey debugOREKey(3, 1, 6);
+	auto debug2BP = serverBlueprints.getBlueprintRef(debugBPKey);
+	int debugBlockCount = debug2BP->fractureResults.fractureResultsContainerMap[debugOREKey].getTotalUnexposedBlocks();
+	std::cout << "+++++++++++ DEBUG: total unexposed block count is: " << debugBlockCount << std::endl;
+	int debugCountWait = 3;
+	debug2BP->fractureResults.fractureResultsContainerMap[debugOREKey].printContainerStats();
+	std::cin >> debugCountWait;
+	*/
 	
 	// --------------- Experimental, optional: print the BDM message for the skeleton super group manager of an ORE.
 
@@ -770,63 +328,6 @@ void OSServer::runSingleMountainV2()
 	std::cin >> doneValue;
 	
 }
-
-
-
-void OSServer::constructMultiMountTestWithElevator()
-{
-	ECBPolyPoint summit1, summit2, summit3;
-	int numberOfLayers = 3;
-
-	EnclaveKeyDef::EnclaveKey serverBlueprintKey(0, 0, 0);
-	EnclaveKeyDef::EnclaveKey serverBlueprintOREKey(2, 2, 4);
-
-	AdjacentFinder testFinder(&serverBlueprints);
-
-	
-	
-	// first mountain (the BIG GRASS mountain)
-	summit1.x = 28;
-	summit1.y = 16;
-	summit1.z = 16;
-	addDerivedContourPlan("summit1", OSTerrainFormation::MOUNTAIN, summit1, 5, 12.81, 31.82, 9);	// create the points in all contour lines
-	ContourBase* summit1Ref = getDerivedContourPlan("summit1");
-	summit1Ref->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	summit1Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
-	summit1Ref->buildContouredTriangles();
-	executeDerivedContourPlan("summit1");
-	
-	// second mountain (the DIRT mountain)	
-	summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
-					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
-					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
-	summit2.y = 16;
-	summit2.z = 16;
-	addDerivedContourPlan("summit2", OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* summit2Ref = getDerivedContourPlan("summit2");
-	summit2Ref->amplifyAllContourLinePoints();
-	summit2Ref->buildContouredTriangles();
-	executeDerivedContourPlan("summit2");
-	
-
-	
-	// third mountain -- diagonal to other two
-	summit3.x = 14.00f;
-	summit3.y = 16;
-	summit3.z = 28;
-	addDerivedContourPlan("summit3", OSTerrainFormation::MOUNTAIN, summit3, numberOfLayers, 6.81, 9, 9);
-	ContourBase* summit3Ref = getDerivedContourPlan("summit3");
-	summit3Ref->amplifyAllContourLinePoints();
-	summit3Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
-	summit3Ref->buildContouredTriangles();
-	executeDerivedContourPlan("summit3");
-	
-
-	std::cout << "*************************** Done with run of constructMultiMountTestWithElevator(), enter a number to continue. " << std::endl;
-	int compVal = 3;
-	std::cin >> compVal;
-}
-
 void OSServer::prepCPMountain(Message in_metadataMessage)
 {
 	in_metadataMessage.open();
@@ -862,8 +363,6 @@ void OSServer::prepCPMountain(Message in_metadataMessage)
 	//buildContourPlanAffectedBlueprints(planName);		// Part 3: build affected blueprints.
 	//runContourPlanFracturingAndMassDriving(planName);	// Part 4: run fracturing and mass driving.
 }
-
-
 void OSServer::runContourPlanWorldTracing(std::string in_string)
 {
 	OSWinAdapter::clearWorldFolder(currentWorld);
@@ -921,61 +420,6 @@ void OSServer::constructBigMountTestNoInput()
 
 	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
 	executeDerivedContourPlanNoInput("mountain");
-}
-
-
-
-void OSServer::constructMissingFillBlueprint3()
-{
-	/*
-	std::cout << "||||||| constructing 'Missing fill' for blueprints (version 3)...." << std::endl;
-	ECBPolyPoint mountainSummit;
-	// 2, 10, 2 = error (1/15/2019)
-	mountainSummit.y = 7;
-	mountainSummit.x = 2;
-	mountainSummit.z = 2;
-
-	mountainSummit.y = 7.73;		// error fixed. see notes for roundNearestBlockLineOrCorner on 1/19/2019
-	mountainSummit.x = 1002.45;
-	mountainSummit.z = 2.61;
-
-	int numberOfLayers = 35;		// current is 17 (max at 35, no issues) // Fatal error at layer 14 when going 1000+x
-	addDerivedContourPlan("mountain", OSTerrainFormation::MOUNTAIN, mountainSummit, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	ContourBase* planRef = getDerivedContourPlan("mountain");
-	planRef->amplifyAllContourLinePoints();						// amplify the points in all contour lines
-	for (int x = 29; x < 30; x++)
-	{
-		planRef->constructStripTriangles(x, 2);	// construct an individual layer
-	}
-	std::cout << "!!!!!!!!! --------------> Number of strips that will be executed is: " << planRef->triangleStripMap.size() << std::endl;
-	executeDerivedContourPlan("mountain");
-	*/
-
-	std::cout << "||||||| constructing blueprints (version 2)...." << std::endl;
-	ECBPolyPoint startPoint;
-	startPoint.x = -85.0f;
-	startPoint.y = -80.0f;
-	startPoint.z = 90.0f;
-	addDerivedContourPlan("plan", OSTerrainFormation::NOVAL, startPoint, 1, 0, 0, 0);
-	ContourBase* planRef = getDerivedContourPlan("plan");
-
-	ECBPolyPoint otherTriangle_0, otherTriangle_1, otherTriangle_2;
-	otherTriangle_0.x = 867.89f;
-	otherTriangle_0.y = -189.76f;
-	otherTriangle_0.z = -221.03f;
-
-	otherTriangle_1.x = 855.4f;
-	otherTriangle_1.y = -196.57f;
-	otherTriangle_1.z = -223.83f;
-
-	otherTriangle_2.x = 867.45f;
-	otherTriangle_2.y = -196.57f;
-	otherTriangle_2.z = -231.22f;
-
-
-	ECBPolyPoint mrPoint;
-	planRef->constructSingleContouredTriangle(otherTriangle_0, otherTriangle_1, otherTriangle_2, mrPoint, 0, TriangleMaterial::GRASS);	// this call may need some work; will add a new triangle to the specified strip (fourth argument)
-	executeDerivedContourPlan("plan");
 }
 
 void OSServer::executeDerivedContourPlan(string in_string)
@@ -1054,9 +498,12 @@ void OSServer::executePlanV2NoInput(std::string in_planNameToExecute)
 
 	// 1.) Make backup copies of the pre-determined blueprints that we think will be affected, then copy the data
 	// from the FTriangle fracturing operation directly into the server blueprints.
-	planV2Ptr->copyOverForSPJ(processableCTV2s, &serverBlueprints, &cpRunBackupBlueprints, &currentPlanAffectedBlueprints);
+	planV2Ptr->copyOverForSPJ(processableCTV2s, &serverBlueprints, &cpRunBackupBlueprints, &hotBPManager);
 
 	// 2.) run the mass driver for the plan. (if the plan allows for it)
+	std::cout << "Done copying over data. " << std::endl;
+
+
 	EnclaveFractureResultsMap tempMap;
 	planV2Ptr->runMassDriversV2(&client, &serverBlueprints, &tempMap);
 
@@ -1151,8 +598,8 @@ void OSServer::generateBlueprintBackups(std::string in_planName)
 	// the affected blueprints should already have been built; cycle through each CP affected blueprint key, and only insert that blueprint
 	// if it wasn't already in the polySetRegistry we analyzed above. A 1:1 to copy should occur for these, but obviously only if there is
 	// an existing blueprint with that key.
-	auto currentPlanAffectedBegin = currentPlanAffectedBlueprints.producedKeys.begin();
-	auto currentPlanAffectedEnd = currentPlanAffectedBlueprints.producedKeys.end();
+	auto currentPlanAffectedBegin = hotBPManager.hotKeys.begin();
+	auto currentPlanAffectedEnd = hotBPManager.hotKeys.end();
 	for (; currentPlanAffectedBegin != currentPlanAffectedEnd; currentPlanAffectedBegin++)
 	{
 		auto processedMatch = affectedBlueprints.find(*currentPlanAffectedBegin);
@@ -1183,13 +630,13 @@ void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
 	// add each key into the affected blueprints.
 	for (; keysBegin != keysEnd; keysBegin++)
 	{
-		currentPlanAffectedBlueprints.insertKeyIntoPillar(*keysBegin);
+		hotBPManager.insertKeyIntoPillar(*keysBegin);
 	}
 
 	// build the affected set
-	currentPlanAffectedBlueprints.produceKeys();
+	hotBPManager.produceKeysFromPillars();
 
-	std::cout << "!! Total number of potentially affected blueprint keys for the current ContourPlan is: " << currentPlanAffectedBlueprints.getProducedKeySize() << std::endl;
+	std::cout << "!! Total number of potentially affected blueprint keys for the current ContourPlan is: " << hotBPManager.gethotKeysize() << std::endl;
 
 
 	// Remember, when everything is done, the ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATIONS flag needs to be unset.
@@ -1320,32 +767,6 @@ void OSServer::setWorldDirectionInClient(float in_directionX, float in_direction
 	serverJobManager.insertJobRequestMessage(std::move(newMessage));
 }
 
-void OSServer::testFunction()
-{
-	// testingonly
-	EnclaveKeyDef::EnclaveKey blockReformBlueprintKey(0, -1, 0);
-	EnclaveKeyDef::EnclaveKey blockReformOREKey(4, 6, 4);
-	EnclaveKeyDef::EnclaveKey blockKey(2, 3, 2);
-	int currentTotalTriangles = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getTotalTriangles();
-	auto currentLodState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getLodState();
-	auto currentAppendedState = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].getAppendedState();
-	int currentNumberOfBlocks = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].blockMap.size();
-	//int currentEraseCount = organicSystemPtr->getBlueprintPtr(blockReformBlueprintKey.x, blockReformBlueprintKey.y, blockReformBlueprintKey.z)->fractureResults.fractureResultsContainerMap[blockReformOREKey].eraseCounter;
-	std::string state = "";
-	std::string appendedState = "";
-	if (currentLodState == ORELodState::LOD_BLOCK)
-	{
-		state = "LOD_BLOCK";
-	}
-
-	if (currentAppendedState == OREAppendedState::NONE)
-	{
-		appendedState = "NONE";
-	}
-
-	std::cout << ":: (TEST FUNCTION) Hard TEST: currentTotalTriangles for debugging ORE: " << currentTotalTriangles << "; state is: " << state << "; appendedState is: " << appendedState << "; number of blocks: " << currentNumberOfBlocks << std::endl;
-}
-
 void OSServer::traceTriangleThroughBlueprints(OSContouredTriangle* in_Triangle, OSContourPlanDirections in_Directions, PointAdherenceOrder* in_orderRef)
 {
 	OSContouredTriangleRunner runner(in_Triangle, in_Directions, &serverBlueprints, in_Triangle->forgedPolyRegistryRef, in_orderRef);
@@ -1445,7 +866,9 @@ void OSServer::runServer()
 															// such as inserting new ServerJobBase-derived classes  (aka, "atomic" server jobs) into the current job phase -- 
 															// to existing jobs, from the previous tick
 
-			serverJobManager.removeCompletedPhasedJobs();	// 2.2: with the updates applied, check to see if there are any jobs to remove.
+			serverJobManager.removeCompletedPhasedJobs();	// 2.2: with the updates applied, check to see if there are any jobs to remove. Post-processing will need to be called 
+															// (ServerJobBase::runPostCompleteTasks) on any ServreJobBase-derived classes before they are erased.
+
 			serverJobManager.checkForMessages();			// 2.3: check the messages that would spawn new jobs.
 			serverJobManager.runJobScan();					// 2.4: look for jobs to execute.
 			//serverJobManager.removeCompletedPhasedJobs();

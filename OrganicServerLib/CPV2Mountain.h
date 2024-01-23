@@ -7,18 +7,39 @@
 #include "ContouredCircuit.h"
 #include "BPMassManagerV2.h"
 
+/*
+
+Description: not really a "mountain", but a CPV2 that starts at a summit, and creates more layers of the mountain, going downward;
+the bottom of the mountain is float. Essentially mimics a cone.
+
+*/
+
 class CPV2Mountain : public ContouredPlanV2Base
 {
 	public:
-		void initialize(DoublePoint in_startPoint,			// Step 1: initializer function that must be called once the derived class is instantiated.
+		// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+		// ||||||||||||| Public virtual functions from ContouredPlanV2Base.
+		// ||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||
+
+		// Below, Step 1: set up the contour points that will be later amplified (by the call to amplifyAllContourLinePoints),
+		// add the mass reference points (MRP), and set the number of layers for the "mountain." Must be called in addPlanV2.
+		void initialize(DoublePoint in_startPoint,			
 						int in_numberOfLayers,
 						float in_distanceBetweenLayers,
 						float in_startRadius,
 						float in_expansionValue);
 
-		void amplifyAllContourLinePoints();
-		void buildContouredTriangles();
-		std::vector<ContouredTriangleV2*> getProcessableContouredTriangles();
+		void amplifyAllContourLinePoints(); // Step 2: assuming the plan was added and initialized via a call to addPlanV2, amplify the points. "Amplify," in this context,
+											// really means to multiply each circuit point by an amount of radians, to have the points in a circuit form a circle.									
+
+		void buildContouredTriangles();		// Step 3: build the individual ContouredTriangleV2 instances for the top and bottom strips, now that the points have been amplified.
+
+		std::vector<ContouredTriangleV2*> getProcessableContouredTriangles();	// Step 4: Used in the call to executePlanV2, retrieve a vector of ContouredTriangleV2 pointers that refer to the produced
+																				// ContouredTriangleV2 instances from the triangle strips.
+
+		// Below, Step 5: the CPV2Mountain mesh will be used to created contoured mass; the contoured mass will then have mass-driving ops run against it, and 
+		// then be compared against the persistent mass. This function will also add EnclaveTriangle data produced from the contoured mesh, into the appropriate OREs
+		// of the target blueprint map.
 		void runMassDriversV2(OrganicClient* in_clientRef,
 								ECBMap* in_ecbMapRef,
 								EnclaveFractureResultsMap* in_fractureResultsMapRef);

@@ -10,7 +10,7 @@
 #include "ECBMap.h"
 #include "OrganicTriangleTracker.h"
 #include "ContouredPlanUtils.h"
-#include "CPAffectedBlueprints.h"
+#include "HotBlueprints.h"
 
 class ContouredPlanV2Base
 {
@@ -35,13 +35,13 @@ class ContouredPlanV2Base
 
 		// Below: functions the same ascopyOverProducedECBPolys, 
 		// with the exception that backups of blueprints are made from a set of blueprints
-		// that we think will be affected (this is done using the referenced CPAffectedBlueprints object).
+		// that we think will be affected (this is done using the referenced HotBlueprints object).
 		// Should be used when a server phased job is used to build and run a contour plan,
 		// instead of copyOverProducedECBPolys.
 		void copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ctv2Vector,	
 							ECBMap* in_blueprintMapRef,
 							ECBMap* in_backupBlueprintsMapRef,
-							CPAffectedBlueprints* in_trackedBlueprintsRef);
+							HotBlueprints* in_trackedBlueprintsRef);
 
 		// public virtual functions
 		virtual void initialize(DoublePoint in_startPoint,			// Step 1: initializer function that must be called once the derived class is instantiated.
@@ -78,11 +78,11 @@ class ContouredPlanV2Base
 
 		// Below: cycles through all ContouredTriangleV2 instances of the plan, fractures the FTriangle
 		// equivalent of those instancse, and fetches the unique blueprint keys produced by them, in order
-		// to feed them into the referenced CPAffectedBlueprints. A call is then made to produceKeys() on that object,
+		// to feed them into the referenced HotBlueprints. A call is then made to produceKeysFromPillars() on that object,
 		// to determine the estimated affected blueprints. Used by the function copyOverForSPJ, in order
 		// to facilitate the creation of backup copies of blueprints that are about to be modified, when an SPJ
 		// that builds/executes a contour plan runs.
-		void constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, CPAffectedBlueprints* in_trackedBlueprintsRef);
+		void constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef);
 
 
 
