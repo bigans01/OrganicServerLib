@@ -73,7 +73,9 @@ void OSServer::addPlanV2(std::string in_planName,
 	std::cout << "Adding new, plan V2..." << std::endl;
 	if (in_Formation == OSTerrainFormation::MOUNTAIN)
 	{
-		
+		std::cout << "!! Attempting add of CPV2Mountain..." << std::endl;
+		std::cout << "!! Number of layers: " << in_numberOfLayers << std::endl;
+
 		plansV2Map[in_planName].reset(new CPV2Mountain());
 		plansV2Map[in_planName].get()->initialize(in_polyPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);		// call the initialization function (common to all ContourBase derivatives)
 	}
@@ -84,28 +86,120 @@ void OSServer::addPlanV2(std::string in_planName,
 	}
 }
 
-void OSServer::runSingleMountainV2SPJ(std::string in_planName)
+
+void OSServer::runCPV2SPJ(Message in_metadataMessage)
 {
-	int numberOfLayers = 7;	// (Noted on (1/31/2023) Switch to 1,2,3 separately when testing "OPTION 2" EnclaveTriangle production logic (see OrganicPolyOperationsLib)
+	// Open the Message
+	in_metadataMessage.open();
 
 
-	// second mountain
+	// (CPV2C-1) First int: Read the OSTerrainFormation value, and pop it off (1 int)
+	OSTerrainFormation selectedFormation = OSTerrainFormation(in_metadataMessage.readInt());
+	in_metadataMessage.removeIntsFromFrontAndResetIter(1);
 
-	//summit2.x = 3.33;	// 3.43 = crash? (4/3/2021) --> fixed on 4/5/2021, improved on 4/7/2021, reviewed on 4/8/2021 for smoothness (i.e., removal of hangnails
-					// 3.36 = caused a PARTIAL_BOUND to be constructed as a NON_BOUND, due to s/t threshold incorrectly being < 0.000f when it should be < -0.001f, in
-					// FusionCandidateProducer::determineRayRelationShipToTriangle (OrganicGLWinLib).
-	//summit2.y = 16;
-	//summit2.z = 16;
+	// First string: the plan name, needed to add the plan, and pop it off
+	std::string planName = in_metadataMessage.readString();
+	in_metadataMessage.removeStringsFromFrontAndResetIter(1);
 
-	DoublePoint summit2(3.33, 16, 16);
-	addPlanV2(in_planName, OSTerrainFormation::MOUNTAIN, summit2, numberOfLayers, 6.81, 9, 9);	// create the points in all contour lines
-	auto summit2Ref = getPlanV2Ref(in_planName);
+	// Construct the passdown Message, which is the original value of in_metadataMessage, MINUS the OSTerrainFormation enum and the planName string.
+	Message passDownMessage = in_metadataMessage;
+
+	// add the plan, initializizing it via Message. 
+	addAndInitializePlanFromMessage(planName, selectedFormation, passDownMessage);
+
+	// once the plan is added and initialized with its relevant data, amplify the points, insert materials, and build the contoured triangles.
+	auto summit2Ref = getPlanV2Ref(planName);
 	summit2Ref->amplifyAllContourLinePoints();
 	summit2Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
 	summit2Ref->buildContouredTriangles();
-	executePlanV2NoInput(in_planName);
+
+	// Now, execute the plan with no inputs.
+	executePlanV2NoInput(planName);
 }
 
+void OSServer::addAndBuildCPV2MeshForSPJ(Message in_metadataMessage)
+{
+	// Open the Message
+	in_metadataMessage.open();
+
+	std::cout << "OSServer::addAndBuildCPV2MeshForSPJ: beginning. " << std::endl;
+
+
+	// (CPV2C-1) First int: Read the OSTerrainFormation value, and pop it off (1 int)
+	OSTerrainFormation selectedFormation = OSTerrainFormation(in_metadataMessage.readInt());
+	in_metadataMessage.removeIntsFromFrontAndResetIter(1);
+
+	// First string: the plan name, needed to add the plan, and pop it off
+	std::string planName = in_metadataMessage.readString();
+	in_metadataMessage.removeStringsFromFrontAndResetIter(1);
+
+	// Construct the passdown Message, which is the original value of in_metadataMessage, MINUS the OSTerrainFormation enum and the planName string.
+	Message passDownMessage = in_metadataMessage;
+
+	// add the plan, initializizing it via Message. 
+	addAndInitializePlanFromMessage(planName, selectedFormation, passDownMessage);
+
+	// once the plan is added and initialized with its relevant data, amplify the points, insert materials, and build the contoured triangles.
+	auto summit2Ref = getPlanV2Ref(planName);
+	summit2Ref->amplifyAllContourLinePoints();
+	summit2Ref->insertMaterials(TriangleMaterial::GRASS, TriangleMaterial::DIRT);
+	summit2Ref->buildContouredTriangles();
+
+	std::cout << "OSServer::addAndBuildCPV2MeshForSPJ: ending. " << std::endl;
+}
+
+void OSServer::determineAffectedBlueprintsForCPV2(std::string in_cpv2PlanName)
+{
+	// WARNING: Remember, this function DOES not check if the plan already exists.
+	auto targetPlan = getPlanV2Ref(in_cpv2PlanName);
+	auto trianglesToProcess = targetPlan->getProcessableContouredTriangles();
+	targetPlan->determineEstimatedAffectedBlueprints(trianglesToProcess, &hotBPManager);
+}
+
+void OSServer::runMassDriversForCPV2(std::string in_cpv2PlanName)
+{
+	auto targetPlan = getPlanV2Ref(in_cpv2PlanName);
+	EnclaveFractureResultsMap tempMap;
+	targetPlan->runMassDriversV2(&client, &serverBlueprints, &tempMap);
+}
+
+void OSServer::cleanupCPV2(std::string in_planName)
+{
+	// Part 1: If the CPV2 ran successfully, clear out the backups;
+	//		   Use the passed-in string parameter to check the plan to see if it was considered "successful"
+	//		
+	//	If the plan was NOT successful, we will probably need to use backups to restore the blueprints that were
+	//	affected by the CPV2 run.
+	auto cpv2Ref = getPlanV2Ref(in_planName);
+	if (cpv2Ref->wasPlanSuccessful())
+	{
+		cpRunBackupBlueprints.clearAllBlueprints();
+	}
+
+	// Part 2: unload the pillar keys
+	hotBPManager.unloadCPV2KeysFromHotkeys();
+
+	// Part 3: release the necessary flags, that were raised.
+	serverJobManager.deactivateBlockingFlag(ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN);
+}
+
+void OSServer::addAndInitializePlanFromMessage(std::string in_planName,
+	OSTerrainFormation in_formation,
+	Message in_planData)
+{
+	std::cout << "Adding new plan, initialized from Message..." << std::endl;
+	switch (in_formation)
+	{
+		case OSTerrainFormation::MOUNTAIN:
+		{
+			plansV2Map[in_planName].reset(new CPV2Mountain());
+			break;
+		}
+	}
+
+	// once the plan object has been set up, send it the plan data Message. Remember, it is up to the CPV2 to interpret this Message!
+	plansV2Map[in_planName].get()->initializeFromMessage(in_planData);
+}
 
 void OSServer::constructCPV2SingleTriangle()
 {
@@ -488,6 +582,13 @@ void OSServer::executePlanV2(std::string in_planNameToExecute)
 	std::cin >> continueVal;
 }
 
+void OSServer::copyOverCPV2ECBPolys(std::string in_planNameToExecute)
+{
+	auto planV2Ptr = getPlanV2Ref(in_planNameToExecute);
+	auto processableCTV2s = planV2Ptr->getProcessableContouredTriangles();
+	planV2Ptr->copyOverProducedECBPolys(processableCTV2s, &serverBlueprints);
+}
+
 void OSServer::executePlanV2NoInput(std::string in_planNameToExecute)
 {
 	OSWinAdapter::clearWorldFolder(currentWorld);
@@ -598,11 +699,11 @@ void OSServer::generateBlueprintBackups(std::string in_planName)
 	// the affected blueprints should already have been built; cycle through each CP affected blueprint key, and only insert that blueprint
 	// if it wasn't already in the polySetRegistry we analyzed above. A 1:1 to copy should occur for these, but obviously only if there is
 	// an existing blueprint with that key.
-	auto currentPlanAffectedBegin = hotBPManager.hotKeys.begin();
-	auto currentPlanAffectedEnd = hotBPManager.hotKeys.end();
-	for (; currentPlanAffectedBegin != currentPlanAffectedEnd; currentPlanAffectedBegin++)
+
+	for (auto& currentPlanAffectedBegin : hotBPManager.fetchHotKeys())
 	{
-		auto processedMatch = affectedBlueprints.find(*currentPlanAffectedBegin);
+
+		auto processedMatch = affectedBlueprints.find(currentPlanAffectedBegin);
 		if (processedMatch == affectedBlueprints.end())	// if the key wasn't found in the above poly registry (from "Part 1" above), then that key wasn't affected
 														// but still needs to be copied -- but only if it exists.
 		{
@@ -615,10 +716,28 @@ void OSServer::generateBlueprintBackups(std::string in_planName)
 	}
 }
 
+void OSServer::generateBlueprintBackupsForCPV2SPJ()
+{
+	auto fetchedPillarKeys = hotBPManager.fetchPillarKeys();
+	for (auto& currentKey : fetchedPillarKeys)
+	{
+		// Only bother doing backups, if a copy of the blueprint already exists. 
+		if (serverBlueprints.checkIfBlueprintExists(currentKey))
+		{
+			cpRunBackupBlueprints.addBlueprintViaCopy(currentKey, *serverBlueprints.getBlueprintRef(currentKey));
+		}
+	}
+}
+
 void OSServer::checkContourPlanSuccess(std::string in_string)
 {
 	// backup blueprint map must always be cleared at the end of the run
 	cpRunBackupBlueprints.clearAllBlueprints();
+}
+
+bool OSServer::attemptCPV2KeyLoadIntoHotKeys()
+{
+	return hotBPManager.attemptLoadOfCPV2KeysIntoHotKeys();
 }
 
 void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
@@ -634,7 +753,8 @@ void OSServer::buildContourPlanAffectedBlueprints(std::string in_string)
 	}
 
 	// build the affected set
-	hotBPManager.produceKeysFromPillars();
+	hotBPManager.buildRequiredCPV2Keys();
+	hotBPManager.appendPillarKeysToHotkeys();
 
 	std::cout << "!! Total number of potentially affected blueprint keys for the current ContourPlan is: " << hotBPManager.gethotKeysize() << std::endl;
 

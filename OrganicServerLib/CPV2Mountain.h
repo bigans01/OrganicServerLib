@@ -29,6 +29,19 @@ class CPV2Mountain : public ContouredPlanV2Base
 						float in_startRadius,
 						float in_expansionValue);
 
+		void initializeFromMessage(Message in_messageToInitFrom);	// NOTE: remember, the plan name (string) and OSTerrainFormation enum (int) shouldn't be in this Message!
+																	// Expects a Message that is formatted in the following manner and order:
+																	//
+																	// int:
+																	//	1.	Number of layers for the mountain
+																	//
+																	// float:
+																	//	1.	Summit point (3 floats, use readPoint)
+																	//	2.	distance between layers (1 float)
+																	//	3.	start radius (1 float)
+																	//	4.	expansion value (1 float)
+
+
 		void amplifyAllContourLinePoints(); // Step 2: assuming the plan was added and initialized via a call to addPlanV2, amplify the points. "Amplify," in this context,
 											// really means to multiply each circuit point by an amount of radians, to have the points in a circuit form a circle.									
 

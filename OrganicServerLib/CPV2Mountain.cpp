@@ -13,6 +13,29 @@ void CPV2Mountain::initialize(DoublePoint in_startPoint,
 	setMountainLowerLayersContourPoints(bottomStartPoint, in_numberOfLayers, in_distanceBetweenLayers, in_startRadius, in_expansionValue);
 }
 
+void CPV2Mountain::initializeFromMessage(Message in_messageToInitFrom)
+{
+	// REMEMBER: the OSTerrainFormation (int) and planName (std::string) values 
+	// must have been stripped from this message before getting here (see examples in OSServer::runCPV2SPJ)
+	in_messageToInitFrom.open();
+
+	// First int: the number of layers of the mountain to spawn.
+	numberOfLayers = in_messageToInitFrom.readInt();
+
+	// Next: read the point data from 3 floats.
+	ECBPolyPoint summitPoint = in_messageToInitFrom.readPoint();
+
+	// Next 3 floats: distanceBetweenLayers, startRadius, and expansionValue.
+	float temp_distanceBetweenLayers = in_messageToInitFrom.readFloat();
+	float temp_startRadius = in_messageToInitFrom.readFloat();
+	float temp_expansionValue = in_messageToInitFrom.readFloat();
+
+	// Setup the layers. At the end of this function call, the points that make up the mesh should all be properly organized, etc.
+	setMountainUpperLayersContourPoints(summitPoint, numberOfLayers, temp_distanceBetweenLayers, temp_startRadius, temp_expansionValue);
+	setMRPsForBottomLayers();
+	setMountainLowerLayersContourPoints(bottomStartPoint, numberOfLayers, temp_distanceBetweenLayers, temp_startRadius, temp_expansionValue);
+}
+
 void CPV2Mountain::amplifyAllContourLinePoints()
 {
 	// we could use either the upperContourLineCircuits or bottomContourLineCircuits for this, as

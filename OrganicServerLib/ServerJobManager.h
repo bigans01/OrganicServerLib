@@ -10,6 +10,7 @@
 
 #include "SPJBuildCPMountain.h"
 #include "SPJBuildCPV2Mountain.h"
+#include "SPJAdvBuildCPV2Mountain.h"
 
 #include "SPJSendWorldDirectionToClient.h"
 
@@ -81,6 +82,9 @@ class ServerJobManager
 		bool doesFlagExist(ServerJobBlockingFlags in_flagToCheck);	// checks if exactly one flag exists.
 		void activateBlockingFlag(ServerJobBlockingFlags in_flagToActivate);
 		void deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate);
+
+		// flag raising attempt functions
+		bool getAttemptedFlagRaiseResult(ServerJobBlockingFlags in_flagToCheck);
 
 		// job insertion calls
 		void insertPhasedJobRunCPV2Test(Message in_message);		// the TRUE test function.

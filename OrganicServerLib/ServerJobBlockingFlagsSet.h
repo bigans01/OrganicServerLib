@@ -40,6 +40,24 @@ class ServerJobBlockingFlagsSet
 			return returnValue;
 		}
 
+		bool attemptFlagRaise(ServerJobBlockingFlags in_flag)
+		{
+			std::lock_guard<std::mutex> lock(flagsGuard);
+
+			bool wasRaiseSuccessful = false;
+
+			// check that the flag DOESN'T exist; if it doesn't, 
+			// raise/insert it 
+			auto flagFinder = flags.find(in_flag);
+			if (flagFinder == flags.end())
+			{
+				flags.insert(in_flag);
+				wasRaiseSuccessful = true;
+			}
+
+			return wasRaiseSuccessful;
+		}
+
 
 	private:
 		std::mutex flagsGuard;

@@ -23,12 +23,6 @@ class ContouredPlanV2Base
 		}
 		void insertMaterials() {};
 
-		virtual std::vector<ContouredTriangleV2*> getProcessableContouredTriangles() = 0;	// Step 4:	fetch a vector of all produced triangles,
-																				//			and process them one-by-one; the fracture()
-																				//			function will have to be called on each instance,
-																				//			and then the fetchOutputContainerRef() will need to be called.
-																				//			The return value of that function should contain the map of 
-																				//			FTriangleOutput instances that would contain the ECBPolys to use.
 
 
 		void copyOverProducedECBPolys(std::vector<ContouredTriangleV2*> in_ctv2Vector, ECBMap* in_blueprintMapRef);	// produce the estimated affected blueprints that this plan will affect.
@@ -43,19 +37,47 @@ class ContouredPlanV2Base
 							ECBMap* in_backupBlueprintsMapRef,
 							HotBlueprints* in_trackedBlueprintsRef);
 
-		// public virtual functions
+		// Below: cycles through all ContouredTriangleV2 instances of the plan, fractures the FTriangle
+		// equivalent of those instancse, and fetches the unique blueprint keys produced by them, in order
+		// to feed them into the referenced HotBlueprints. A call is then made to buildRequiredCPV2Keys and appendPillarKeysToHotkeys() on that object,
+		// to determine the estimated affected blueprints, and flag them as "hot". Used by the function copyOverForSPJ, in order
+		// to facilitate the creation of backup copies of blueprints that are about to be modified, when an SPJ
+		// that builds/executes a contour plan runs.
+		void constructHotEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef);
+
+		// Below: functions identically to constructHotEstimatedAffectedBlueprints, with the exception that appendPillarKeysToHotkeys is not called.
+		// Utilized by OSServer::determineAffectedBlueprintsForCPV2, and ultimately called through the SJ, SJDetermineAffectedBlueprints -- which
+		// calls callDetermineAffectedBlueprintsForCPV2.
+		void determineEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef);
+
+		bool wasPlanSuccessful();
+
+		// |||||||||||||||||||||||||||| public virtual functions
 		virtual void initialize(DoublePoint in_startPoint,			// Step 1: initializer function that must be called once the derived class is instantiated.
 								int in_numberOfLayers,
 								float in_distanceBetweenLayers,
 								float in_startRadius, 
 								float in_expansionValue) = 0;
+
+		virtual void initializeFromMessage(Message in_messageToInitFrom) = 0;	// Allows each derived class of the base class to use a Message object
+																				// to store data needed for the specific derived-object to run. (i.e, number of mountain layers for a CPV2 mountain, disttance between layers, etc)
+
 		virtual void amplifyAllContourLinePoints() = 0;				// Step 2: amplification function 
 		virtual void buildContouredTriangles() = 0;					// Step 3: build out the contoured triangles.
+
+		virtual std::vector<ContouredTriangleV2*> getProcessableContouredTriangles() = 0;	// Step 4:	fetch a vector of all produced triangles,
+																				//			and process them one-by-one; the fracture()
+																				//			function will have to be called on each instance,
+																				//			and then the fetchOutputContainerRef() will need to be called.
+																				//			The return value of that function should contain the map of 
+																				//			FTriangleOutput instances that would contain the ECBPolys to use.
 
 		virtual void runMassDriversV2(OrganicClient* in_clientRef,
 			ECBMap* in_ecbMapRef,
 			EnclaveFractureResultsMap* in_fractureResultsMapRef) = 0;	// Step 5:	Once the child plan has applied the resulting ECBPolys of the FTriangleOutput instances 
 																		//			to their respective blueprints, we can attempt mass driving.
+
+
 		ForgedPolyRegistry allPolysRegistry;		// all produced ECBPolys from ContouredTriangleV2 instances initially get a pointer to this set.
 														// and will need to register with it.
 
@@ -76,13 +98,9 @@ class ContouredPlanV2Base
 		void insertPreferredMaterial(TriangleMaterial in_materialID);
 		TriangleMaterial getPreferredMaterialAtIndex(int in_indexToLookup);
 
-		// Below: cycles through all ContouredTriangleV2 instances of the plan, fractures the FTriangle
-		// equivalent of those instancse, and fetches the unique blueprint keys produced by them, in order
-		// to feed them into the referenced HotBlueprints. A call is then made to produceKeysFromPillars() on that object,
-		// to determine the estimated affected blueprints. Used by the function copyOverForSPJ, in order
-		// to facilitate the creation of backup copies of blueprints that are about to be modified, when an SPJ
-		// that builds/executes a contour plan runs.
-		void constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef);
+		// plan validity members
+		bool wasRunSuccessful = true;	// a boolean to indicate whether or not the plan was succsesful;
+										// what determines a plan to be successful is handled on a per-CPV2 basis.
 
 
 

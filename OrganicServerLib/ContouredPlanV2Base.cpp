@@ -118,7 +118,7 @@ void ContouredPlanV2Base::copyOverProducedECBPolys(std::vector<ContouredTriangle
 	}
 }
 
-void ContouredPlanV2Base::constructEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef)
+void ContouredPlanV2Base::constructHotEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef)
 {
 	for (auto& currentCTV2 : in_ctv2Vector)
 	{
@@ -133,7 +133,32 @@ void ContouredPlanV2Base::constructEstimatedAffectedBlueprints(std::vector<Conto
 		}
 
 		// When all keys have been inserted, construct.
-		in_trackedBlueprintsRef->produceKeysFromPillars();
+		in_trackedBlueprintsRef->buildRequiredCPV2Keys();
+		in_trackedBlueprintsRef->appendPillarKeysToHotkeys();
+	}
+}
+
+bool ContouredPlanV2Base::wasPlanSuccessful()
+{
+	return wasRunSuccessful;
+}
+
+void ContouredPlanV2Base::determineEstimatedAffectedBlueprints(std::vector<ContouredTriangleV2*> in_ctv2Vector, HotBlueprints* in_trackedBlueprintsRef)
+{
+	for (auto& currentCTV2 : in_ctv2Vector)
+	{
+		auto producedFTriangle = currentCTV2->produceEquivalentFTriangle();	// generate the FTriangle that we will be producing results from.
+		producedFTriangle.fracture();
+		auto outputsRef = producedFTriangle.fetchOutputContainerRef();
+
+		for (auto& currentOutput : *outputsRef)
+		{
+			EnclaveKeyDef::EnclaveKey currentKeyCopy = currentOutput.first;	// this is the key that we will insert into the referenced HotBlueprints member.
+			in_trackedBlueprintsRef->insertKeyIntoPillar(currentKeyCopy);
+		}
+
+		// Build the required CPV2 keys, BUT don't flag them as "hot"
+		in_trackedBlueprintsRef->buildRequiredCPV2Keys();
 	}
 }
 
@@ -156,13 +181,13 @@ void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ct
 		}
 
 		// When all keys have been inserted, construct.
-		in_trackedBlueprintsRef->produceKeysFromPillars();
+		in_trackedBlueprintsRef->appendPillarKeysToHotkeys();
 	}
 	*/
 	// Step 1: Produce all estimated affected blueprints.
 
 	auto estimatedStart = std::chrono::high_resolution_clock::now();
-	constructEstimatedAffectedBlueprints(in_ctv2Vector, in_trackedBlueprintsRef);
+	constructHotEstimatedAffectedBlueprints(in_ctv2Vector, in_trackedBlueprintsRef);
 	auto estimatedEnd = std::chrono::high_resolution_clock::now();
 	std::chrono::duration<double> estimatedElapsed = estimatedEnd - estimatedStart;
 	std::cout << "Time spent to consruct estimated affected blueprints (ms): " << estimatedElapsed.count() << std::endl;
@@ -170,7 +195,8 @@ void ContouredPlanV2Base::copyOverForSPJ(std::vector<ContouredTriangleV2*> in_ct
 	// Step 2: Created backups of the affected blueprints, if they exist.
 	auto ecbPolyCopyStart = std::chrono::high_resolution_clock::now();
 
-	for (auto& currentAffectedBlueprint : in_trackedBlueprintsRef->hotKeys)
+
+	for (auto& currentAffectedBlueprint : in_trackedBlueprintsRef->fetchHotKeys())
 	{
 		// Only bother doing a backup if it currently exists
 		if (in_backupBlueprintsMapRef->checkIfBlueprintExists(currentAffectedBlueprint))

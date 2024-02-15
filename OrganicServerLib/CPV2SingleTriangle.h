@@ -25,6 +25,8 @@ class CPV2SingleTriangle : public ContouredPlanV2Base
 			float in_startRadius,
 			float in_expansionValue);
 
+		void initializeFromMessage(Message in_messageToInitFrom);	// unused, but required
+
 		void amplifyAllContourLinePoints();					// does nothing
 		void buildContouredTriangles();						// will construct the single triangle, spawnedTriangle
 		std::vector<ContouredTriangleV2*> getProcessableContouredTriangles();	// will retrieve the single triangle, spawnedTriangle

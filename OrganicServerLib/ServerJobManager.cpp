@@ -33,8 +33,9 @@ void ServerJobManager::insertJobRequestMessage(Message in_message)
 
 void ServerJobManager::insertPhasedJobRunCPV2Test(Message in_message)		// the TRUE test function
 {
-	std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPV2Mountain));
-	spjHierarchy.insertJob(1, &job, std::move(in_message));
+	//std::shared_ptr<ServerPhasedJobBase> job(new (SPJBuildCPV2Mountain));
+	std::shared_ptr<ServerPhasedJobBase> job(new (SPJAdvBuildCPV2Mountain));
+	spjHierarchy.insertSPJ(1, &job, std::move(in_message));
 }
 
 void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
@@ -44,7 +45,7 @@ void ServerJobManager::insertPhasedJobSetWorldDirection(Message in_message)
 	Message directionMessage = in_message;
 	job->insertStringedMessage("direction", directionMessage);
 
-	spjHierarchy.insertJob(2, &job, std::move(in_message));	
+	spjHierarchy.insertSPJ(2, &job, std::move(in_message));	
 	std::cout << ">> Finished inserting set direction job..." << std::endl;
 }
 
@@ -239,7 +240,11 @@ void ServerJobManager::handleContourPlanRequest(Message in_message)
 	// as that logic hasn't been implemented yet; the "logic" being the metadata specific to the Mountain, that the client (OrganicCoreLib) would have to 
 	// insert into the message (see the function, CoreMessageInterpreter::sendMessageRequestContourPlanRun in OrganicCoreLib)
 	Message planSpecificData = in_message;
-	planSpecificData.removeIntsFromFrontAndResetIter(1);	// remove the OSTerrainFormation enum from the message, prior to opening it.
+
+	// CPV2C-2: Comment out below line; we actually want to pass down the OSTerrainFormation value, all the way into the SPJ.
+	//planSpecificData.removeIntsFromFrontAndResetIter(1);	// remove the OSTerrainFormation enum from the message, prior to opening it.
+
+
 	planSpecificData.open();	// set all the iters.
 
 	bool wasContouredPlanFound = server->planStateContainer.checkIfStateExistsForPlan(planName);	// check if the plan has a state; if it does, we won't run this plan (because of the rule: a single contour plan may only run once.)
@@ -280,6 +285,11 @@ bool ServerJobManager::doesFlagExist(ServerJobBlockingFlags in_flagToCheck)
 void ServerJobManager::activateBlockingFlag(ServerJobBlockingFlags in_flagToActivate)
 {
 	jobBlockingFlags.insertFlag(in_flagToActivate);
+}
+
+bool ServerJobManager::getAttemptedFlagRaiseResult(ServerJobBlockingFlags in_flagToActivate)
+{
+	return jobBlockingFlags.attemptFlagRaise(in_flagToActivate);
 }
 
 void ServerJobManager::deactivateBlockingFlag(ServerJobBlockingFlags in_flagToDeactivate)

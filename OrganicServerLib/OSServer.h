@@ -73,7 +73,6 @@ class OSServer
 		// blueprint testing functions for ContouredPlanV2Base
 		void constructCPV2SingleTriangle();
 		void runSingleMountainV2();
-		void runSingleMountainV2SPJ(std::string in_planName);	// used by SPJBuildCPV2Mountain
 
 	private:
 		ServerMessageInterpreter messageInterpreter;
@@ -122,8 +121,52 @@ class OSServer
 						float in_distanceBetweenLayers, 
 						float in_startRadius, 
 						float in_expansionValue);
+		
+		// For below: creates a new plan, and then initializes it via Message; 
+		// the name of the plan will be the value of in_planNAme, and the in_formation value will determine
+		// which plan gets used.
+		void addAndInitializePlanFromMessage(std::string in_planName,
+											OSTerrainFormation in_formation,
+											Message in_planData);
+
+		bool attemptCPV2KeyLoadIntoHotKeys();	// attempts to load the needed keys of a CPV2 that is about to execute, into the hotKeys, of the hotBPManager.
+												// The attempt will fail if any of the CPV2 needed keys are already in the hotKeys (which indicates that another job/work is using them)										
+												//
+												// Utilized by the SJ, SJGenerateBackupsForCPV2, to determine a valid verdict that allows the SJ to continue.
+
+												
+
+		void runCPV2SPJ(Message in_metadataMessage);	// Does the following: 
+														// 1.	initialze a plan with a call to addAndInitializePlanFromMessage (also in this class),
+														// 2.	call amplifyContourPoints, insertMaterials, buildContouredTriangles on the plan
+														// 3.	execute the plan, no-input style.
+
+		void addAndBuildCPV2MeshForSPJ(Message in_metadataMessage);	// Does the following: 
+																		// 1.	initialze a plan with a call to addAndInitializePlanFromMessage (also in this class),
+																		// 2.	call amplifyContourPoints, insertMaterials, buildContouredTriangles on the plan
+																		//
+																		// Ultimately called by SJAddCPV2AndPrepareMeshPoints, via ServerJobProxy.
+
+		void determineAffectedBlueprintsForCPV2(std::string in_cpv2PlanName);	// Determines what blueprints a CPV2 would potentially need to be used, in the HotBlueprints
+																				// member, but does not actually move them to be "hot" (i.e, appendPillarKeysToHotkeys).
+																				//
+																				// Ultimately called by SJDetermineAffectedBlueprints, via ServerJobProxy.
+
+		void runMassDriversForCPV2(std::string in_cpv2PlanName);	// run the mass drivers for a given CPV2; does no special checks to ensure all the data is there, it
+																	// simply calls for the mass drivers to run; so use carefully!
+																	//
+																	// Ultimately called by SJRunMassDriversForCPV2, via ServerJobProxy.
+
+		void cleanupCPV2(std::string in_planName);		// cleans up the hotBPManager, and deactivates blocking flags as necessary, after a CPV2 has been run via SPJ.
+														// The plan name passed into this function is used to determine whether or not the CPV2 that was run was "successful",
+														// by checking the CPV2 for that data; If successful, the backups made for the CPV2 may be erased. However, if not successful,
+														// backups will probably need to be restored.
+														//
+														// Ultimately called by SJCleanupCPV2, via ServerJobProxy.
+
 		ContouredPlanV2Base* getPlanV2Ref(std::string in_planNameToGet);
 		void executePlanV2(std::string in_planNameToExecute);
+		void copyOverCPV2ECBPolys(std::string in_planNameToExecute);
 		void executePlanV2NoInput(std::string in_planNameToExecute);	// needs to be capped whenever a CPV2 must be run
 																		// by a SPJ.
 
@@ -140,7 +183,10 @@ class OSServer
 
 		// Generic ContourPlan run functions
 		void executeDerivedContourPlanNoInput(std::string in_string);	// run the plan without waiting for input afterwards.
+
 		void generateBlueprintBackups(std::string in_string);	// will generate backups for blueprints affected by a CP; the message should just cotn
+		void generateBlueprintBackupsForCPV2SPJ();	// looks into the pillarCPV2Keys of hotBPManager, to determine blueprints to backup.
+
 		//void generateBlueprintBackupsV2(std::string in_string);	// will generate backups for blueprints affected by a CP; the message should just cotn
 		void runContourPlanWorldTracing(std::string in_string);
 		void buildContourPlanAffectedBlueprints(std::string in_string);

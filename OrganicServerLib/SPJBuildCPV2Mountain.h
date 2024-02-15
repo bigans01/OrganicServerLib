@@ -16,7 +16,7 @@ ServerJobBlockingFlags::HALT_FUTURE_COLLECTION_MODIFICATION flags, which likely 
 NEW Proposed logic, 1/17/2024:
 --------------------------------------------------
 
-Phase 1 - issue a SJ <name?> that simply continues when a verdict is met; the verdict should return true if a call to
+Phase 1 - issue a SJ <SJRequestContourPlanLock> that simply continues when a verdict is met; the verdict should return true if a call to
 		  ServerJobProxy::checkIfServerJobBlockingFlagExists(server, ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN) returns false, 
 		  --AND-- the verdict is able to acquire the flag through a call to 
 		  ServerJobProxy::activateServerJobBlockingFlag(server, ServerJobBlockingFlags::SERVER_RUNNING_CONTOUR_PLAN).
@@ -24,11 +24,13 @@ Phase 1 - issue a SJ <name?> that simply continues when a verdict is met; the ve
 		  NOTE: we will likely need some improvement on the acquisition of flags, where the attempted activation, and result of 
 		  said activation, is done in a single function call.
 			
-Phase 2 - issue a job <name?> that will call amplifyAllContourLinePoints, insertMaterials, and buildContouredTriangles on the plan.
+Phase 2 - issue a job <name?> that will add the plan, initialize it, and then call amplifyAllContourLinePoints, insertMaterials, and buildContouredTriangles on the plan, 
+		  all in that order.
+
 		  NOTE: the addition of the plan will be hardcoded into this job for the time being, but this is not meant to be permanent.
 
 Phase 3 - issue a job <name?> that determines the estimated blueprints to run, which can be done by issuing a call to getProcessableContouredTriangles(),
-		  and using those results AND a reference to the OSServer's HotBlueprints member (hotBPManager), in a call to constructEstimatedAffectedBlueprints.
+		  and using those results AND a reference to the OSServer's HotBlueprints member (hotBPManager), in a call to constructHotEstimatedAffectedBlueprints.
 		  A new flag (ServerJobBlockingFlags::AFFECTED_BLUEPRINTS_ACQUIRED?) will need to be set as well.
 
 		  At this point, the following should be set:
@@ -74,6 +76,7 @@ Phase 7 - cleanup job <name?> that removes affected blueprints utilized by the p
 
 class SPJBuildCPV2Mountain : public ServerPhasedJobBase
 {
+	public:
 		void interpretMessage(Message in_message);
 		void initializeAndSetOptionalSPJMetadata(Message in_message);	// initialization steps are always dependent on whether or not the message locality is LOCAL or REMOTE.
 		void initializeCurrentPhase();

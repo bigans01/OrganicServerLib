@@ -44,10 +44,8 @@ class HotBlueprints
 			return hotKeys.size();
 		}
 
-		// Below: produce the keys from pillars, and insert them into the hotKeys. Should be called before a CPV2 does its run,
-		// so that other activities running on the server that would be using the CPV2's potential affected blueprints 
-		// can determine whether they must wait/cancel themselves.
-		void produceKeysFromPillars()
+		void buildRequiredCPV2Keys()	// determines and inserts the estimated key values a CPV2 will attempt to use,
+										// and loads them into the pillarCPV2Keys set.
 		{
 			std::lock_guard<std::mutex> lock(hotGuard);
 
@@ -63,7 +61,7 @@ class HotBlueprints
 					auto pillarKey = pillarsBegin->first;	// get the X and Z values
 					int yValueToUse = *(pillarsBegin->second).begin();
 					EnclaveKeyDef::EnclaveKey newKey(pillarKey.a, yValueToUse, pillarKey.b);
-					hotKeys += newKey;
+					pillarCPV2Keys += newKey;
 				}
 				else
 				{
@@ -77,47 +75,67 @@ class HotBlueprints
 						auto pillarKey = pillarsBegin->first;	// get the X and Z values
 						int yValueToUse = x;
 						EnclaveKeyDef::EnclaveKey newKey(pillarKey.a, yValueToUse, pillarKey.b);
-						hotKeys += newKey;
+						pillarCPV2Keys += newKey;
 					}
 				}
 			}
 		}
 
-		// Below: produce the keys from pillars, but delete them from the hotkeys. Should be called when a CPV2 is done
-		// doing its run, so that the keys can be modified by other activity in the OrganicServer.
+		bool attemptLoadOfCPV2KeysIntoHotKeys()	// assuming it contains data, move the contents of pillarCPV2Keys into hotKeys,
+												// to signal that the CPV2 keys are now flagged as "hot"
+		{
+			// Must lock while attempting to do this, since we will both check if the keys the CPV2 needs
+			// are available, and then lock them if so.
+			std::lock_guard<std::mutex> lock(hotGuard);
+
+			// Set to true if the 
+			bool loadSucceeded = false;
+
+			// Check if any of the pillar keys are currently in the hotKeys;
+			// if any are found, return false
+			for (auto& currentPillarKey : pillarCPV2Keys)
+			{
+				auto keySearchResult = hotKeys.find(currentPillarKey);
+
+				// if, at any point, an estimated key for the CPV2 is already found in hotkeys, 
+				// it means some other job/work is utilizing it, and therefore the load attempt should fail.
+				if (keySearchResult != hotKeys.end())
+				{
+					loadSucceeded = true;
+					return loadSucceeded;
+				}
+			}
+
+			// If we got here, we haven't found any CPV2 keys in hotkeys. So, go ahead and load the pillarCPV2Keys into the
+			// hotKeys.
+			hotKeys += pillarCPV2Keys;
+
+			return loadSucceeded;
+		}
+
+		void unloadCPV2KeysFromHotkeys()
+		{
+			// Must lock while attempting to unload.
+			std::lock_guard<std::mutex> lock(hotGuard);
+			hotKeys -= pillarCPV2Keys;
+		}
+
+		// Below: append the contents from pillarCPV2Keys into hotKeys.
+		// Used by SJs such as SJBuildContourPlanAffectedBlueprints to ensure that the blueprints a CPV2 is about to potentially 
+		// update have been flagged as "hot"
+		void appendPillarKeysToHotkeys()
+		{
+			std::lock_guard<std::mutex> lock(hotGuard);
+			hotKeys += pillarCPV2Keys;
+		}
+
+		// Below: remove the keys found in the pillarCPV2Keys member, from the hotKeys. Should be called when a CPV2 is done
+		// doing its run, so that the keys can be modified by other activity in the OrganicServer. Used by the SJ,
+		// SJCleanupCPV2 through a call to ServerJobProxy.
 		void deletePillarKeysFromHotkeys()
 		{
 			std::lock_guard<std::mutex> lock(hotGuard);
-			// Remember, the current value of pillarsBegin is a 2D key that stores the X (in a) 
-			// and Z (in b) values.
-			auto pillarsBegin = blueprintPillars.begin();
-			auto pillarsEnd = blueprintPillars.end();
-			for (; pillarsBegin != pillarsEnd; pillarsBegin++)
-			{
-				if (pillarsBegin->second.size() == 1)	// if it's just one, that's fine; insert it into the map.
-				{
-					// There would only be one Y-value for the pillar that this key is in.
-					auto pillarKey = pillarsBegin->first;	// get the X and Z values
-					int yValueToUse = *(pillarsBegin->second).begin();
-					EnclaveKeyDef::EnclaveKey newKey(pillarKey.a, yValueToUse, pillarKey.b);
-					hotKeys += newKey;
-				}
-				else
-				{
-					// Need to generate a key for each value; grab the first element via begin, and the last element via rbegin.
-					// Since the std::set is ordered, the number of times to iterate is equal to the (last element - the begin element) + 1.
-					auto yBegin = *(pillarsBegin->second).begin();
-					auto yEnd = *(pillarsBegin->second).rbegin();
-					int totalIterations = yEnd - yBegin;	// remember, std::set is ordered from least to greatest
-					for (int x = yBegin; x < (yEnd + 1); x++)
-					{
-						auto pillarKey = pillarsBegin->first;	// get the X and Z values
-						int yValueToUse = x;
-						EnclaveKeyDef::EnclaveKey newKey(pillarKey.a, yValueToUse, pillarKey.b);
-						hotKeys += newKey;
-					}
-				}
-			}
+			hotKeys -= pillarCPV2Keys;
 		}
 
 		void printPillarKeys()
@@ -163,11 +181,26 @@ class HotBlueprints
 			}
 		}
 
-		Operable3DEnclaveKeySet hotKeys;	// any key that is in this set should be considered "hot", as in, it is currently being read/modified/erased, etc.
+		Operable3DEnclaveKeySet fetchPillarKeys()
+		{
+			std::lock_guard<std::mutex> lock(hotGuard);
+			return pillarCPV2Keys;
+		}
+
+		Operable3DEnclaveKeySet fetchHotKeys()
+		{
+			std::lock_guard<std::mutex> lock(hotGuard);
+			return hotKeys;
+		}
+
 
 	private:
 		std::mutex hotGuard;	// intended for thread-safe operations; should be used in a lock_guard whenever reading/modifying/erasing members of this class.
 		std::unordered_map<EnclaveKeyDef::Enclave2DKey, std::set<int>, EnclaveKeyDef::KeyHasher> blueprintPillars;
+
+		Operable3DEnclaveKeySet hotKeys;	// any key that is in this set should be considered "hot", as in, it is currently being read/modified/erased, etc.
+		Operable3DEnclaveKeySet pillarCPV2Keys;	// any keys that a currently active CPV2 would need during its processing, to guarantee no interference from outside work, 
+												// will go here.
 };
 
 #endif

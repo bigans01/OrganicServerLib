@@ -31,7 +31,7 @@ void SPJBuildCPV2Mountain::initializeAndSetOptionalSPJMetadata(Message in_messag
 	if (locality == MessageLocality::LOCAL)
 	{
 		std::cout << ":::: Inserting new local phases..." << std::endl;
-		insertNewPhases(2);		// insert 7 new phases for this SPJ.
+		insertNewPhases(2);		// insert 2 new phases for this SPJ.
 	}
 	currentPhaseIter = phaseMap.begin();	// Required: set the current iterator to be the very first phase.
 }

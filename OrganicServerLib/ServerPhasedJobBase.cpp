@@ -143,7 +143,25 @@ bool ServerPhasedJobBase::isCurrentJobRunnable(ServerThreadDesignationMap* in_se
 			isRunnable = true;
 			requiredThreadDesignation = currentVerdict.designatedThreadString;
 		}
+
+		/*
+		else
+		{
+			std::cout << "ServerPhasedJobBase::isCurrentJobRunnable: ---> No threads available to run on! " << std::endl;
+			int noneFoundWait = 3;
+			std::cin >> noneFoundWait;
+		}
+		*/
 	}
+
+	/*
+	else
+	{
+		std::cout << "!! Bad verdict found! " << std::endl;
+		int badFound = 3;
+		std::cin >> badFound;
+	}
+	*/
 
 	return isRunnable;
 }

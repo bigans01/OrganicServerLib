@@ -7,7 +7,7 @@ void ServerPhasedJobHierarchy::setServerPtr(OSServer* in_server)
 	server = in_server;
 }
 
-void ServerPhasedJobHierarchy::insertJob(int in_layerToInsertTo, std::shared_ptr<ServerPhasedJobBase>* in_jobRef, Message in_initialMessage)	
+void ServerPhasedJobHierarchy::insertSPJ(int in_layerToInsertTo, std::shared_ptr<ServerPhasedJobBase>* in_jobRef, Message in_initialMessage)	
 {
 	std::cout << "!! Insert job into int container, at index: " << in_layerToInsertTo << std::endl;
 	int targetLayerJobID = hierarchy[in_layerToInsertTo].getNextAvailableKey();		// Get the unique ID of the job, that it will need for when it is inserted into the layer

@@ -16,7 +16,7 @@ class ServerPhasedJobHierarchy
 	private:
 		friend class ServerJobManager;	// required friend declaration, as the ServerJobManager is heavily integrated with this class.
 		void setServerPtr(OSServer* in_server);	// used by ServerJobManager to set the OSServer ptr.
-		void insertJob(int in_layerToInsertTo, std::shared_ptr<ServerPhasedJobBase>* in_jobRef, Message in_initialMessage);	
+		void insertSPJ(int in_layerToInsertTo, std::shared_ptr<ServerPhasedJobBase>* in_jobRef, Message in_initialMessage);	
 
 		void cleanupJobsInPhasedJobs(); 	// needs to be called every server tick; ultimately calls runPostCompleteTasks for completed SJs in a SPJ, before flagging those SJs for removal,
 											// and erasing them. Additionally, ServerPhasedJobs with their last phase completted will have their jobState set to ServerJobState::COMPLETE;

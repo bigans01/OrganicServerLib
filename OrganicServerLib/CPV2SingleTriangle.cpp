@@ -10,6 +10,11 @@ void CPV2SingleTriangle::initialize(DoublePoint in_startPoint,			// Step 1: init
 
 }
 
+void CPV2SingleTriangle::initializeFromMessage(Message in_messageToInitFrom)
+{
+
+}
+
 void CPV2SingleTriangle::amplifyAllContourLinePoints()
 {
 

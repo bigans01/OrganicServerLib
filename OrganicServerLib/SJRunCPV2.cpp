@@ -5,10 +5,12 @@ void SJRunCPV2::runJob(OrganicThread* in_threadToRunOn)
 {
 	currentJobState = ServerJobState::RUNNING;	// set as running before we submit to the thread.
 
-	// fetch the string value from the start message, that has the contour plan.
+	// fetch the string value from the start message, that has the contour plan;
+	// we will also pass this same message down in the call to callServerRunCPV2 below.
+
 	startMessage.open();
 	std::string planName = startMessage.readString();
-	in_threadToRunOn->submit(&ServerJobProxy::callServerRunCPV2, server, planName);	// run fracturing and mass driving
+	in_threadToRunOn->submit(&ServerJobProxy::callServerRunCPV2, server, startMessage);	// run fracturing and mass driving
 	in_threadToRunOn->submit(&ServerJobProxy::callServerJobSendUpdateMessageToJobManager, server, completionMessage);	// required: job completion message
 }
 

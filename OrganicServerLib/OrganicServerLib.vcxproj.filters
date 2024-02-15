@@ -91,6 +91,18 @@
     <Filter Include="Header Files\HotBlueprints">
       <UniqueIdentifier>{8340b184-d0a3-499f-8418-50f4cf02ab30}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Jobs\SJ\CPV2">
+      <UniqueIdentifier>{af75eec9-41e5-4ffb-95f9-6dd63f2ed776}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SJ\CPV2">
+      <UniqueIdentifier>{82d554f7-91e0-47ce-8a97-30b1bfeb8a52}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Jobs\SJ\CP">
+      <UniqueIdentifier>{74e26a9e-6056-466e-b80c-1eea0b62ec1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Jobs\SJ\CP">
+      <UniqueIdentifier>{15be19da-cebd-49b6-80e1-d550864fc027}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -321,17 +333,11 @@
     <ClInclude Include="ContouredPlanUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SJPrepCPMountainRun.h">
-      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
-    </ClInclude>
     <ClInclude Include="CPV2Mountain.h">
       <Filter>Header Files\ContouredPlanV2\Mountain</Filter>
     </ClInclude>
     <ClInclude Include="SPJBuildCPV2Mountain.h">
       <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
-    </ClInclude>
-    <ClInclude Include="SJRunCPV2.h">
-      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
     </ClInclude>
     <ClInclude Include="CPV2SingleTriangle.h">
       <Filter>Header Files\ContouredPlanV2\SingleTriangle</Filter>
@@ -341,6 +347,36 @@
     </ClInclude>
     <ClInclude Include="HotBlueprints.h">
       <Filter>Header Files\HotBlueprints</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunCPV2.h">
+      <Filter>Header Files\Jobs\SJ\CPV2</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRequestContourPlanLock.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJPrepCPMountainRun.h">
+      <Filter>Header Files\Jobs\SJ\CP</Filter>
+    </ClInclude>
+    <ClInclude Include="SPJAdvBuildCPV2Mountain.h">
+      <Filter>Header Files\Jobs\SPJ\ContourPlans\Mountain</Filter>
+    </ClInclude>
+    <ClInclude Include="SJAddCPV2AndPrepareMeshPoints.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJDetermineAffectedBlueprints.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJGenerateBackupsForCPV2.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJAppendCPV2TrianglesToServerBlueprints.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJRunMassDriversForCPV2.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
+    </ClInclude>
+    <ClInclude Include="SJCleanupCPV2.h">
+      <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -446,9 +482,6 @@
     <ClCompile Include="SJRunContourPlanFracturingAndMassDriving.cpp">
       <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
     </ClCompile>
-    <ClCompile Include="SJPrepCPMountainRun.cpp">
-      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
-    </ClCompile>
     <ClCompile Include="ServerJobProxy.cpp">
       <Filter>Source Files\Jobs</Filter>
     </ClCompile>
@@ -488,14 +521,41 @@
     <ClCompile Include="SPJBuildCPV2Mountain.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
     </ClCompile>
-    <ClCompile Include="SJRunCPV2.cpp">
-      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
-    </ClCompile>
     <ClCompile Include="CPV2SingleTriangle.cpp">
       <Filter>Source Files\ContouredPlanV2\SingleTriangle</Filter>
     </ClCompile>
     <ClCompile Include="SPJBuildCPMountain.cpp">
       <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunCPV2.cpp">
+      <Filter>Source Files\Jobs\SJ\CPV2</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRequestContourPlanLock.cpp">
+      <Filter>Source Files\Jobs\SJ\CPV2</Filter>
+    </ClCompile>
+    <ClCompile Include="SJPrepCPMountainRun.cpp">
+      <Filter>Source Files\Jobs\SJ\CP</Filter>
+    </ClCompile>
+    <ClCompile Include="SPJAdvBuildCPV2Mountain.cpp">
+      <Filter>Source Files\Jobs\SPJ\ContouredPlans\Mountain</Filter>
+    </ClCompile>
+    <ClCompile Include="SJAddCPV2AndPrepareMeshPoints.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJDetermineAffectedBlueprints.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJGenerateBackupsForCPV2.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJAppendCPV2TrianglesToServerBlueprints.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJRunMassDriversForCPV2.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="SJCleanupCPV2.cpp">
+      <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
