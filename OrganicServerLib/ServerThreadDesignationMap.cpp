@@ -4,15 +4,17 @@
 void ServerThreadDesignationMap::initialize(OrganicStemcellManager* in_organicStemcellManagerRef)
 {
 	organicStemcellManagerRef = in_organicStemcellManagerRef;
+	designateCommandLineThread();
+	designateTerrainThread();
 }
 
 void ServerThreadDesignationMap::buildInitialUndesignatedPool()
 {
-	auto stemcellsBegin = organicStemcellManagerRef->freeCellMap.begin();
-	auto stemcellsEnd = organicStemcellManagerRef->freeCellMap.end();
+	auto stemcellsBegin = organicStemcellManagerRef->getPrimaryIndexerRef()->jobEngineThreadDataMap.begin();
+	auto stemcellsEnd = organicStemcellManagerRef->getPrimaryIndexerRef()->jobEngineThreadDataMap.end();
 	for (; stemcellsBegin != stemcellsEnd; stemcellsBegin++)
 	{
-		ServerThreadWorkloadMonitor newMonitor(stemcellsBegin->second.threadPtr.get());
+		ServerThreadWorkloadMonitor newMonitor(stemcellsBegin->second->getTargetThreadPtr());
 		unDesignatedPool[stemcellsBegin->first] = newMonitor;
 	}
 }
@@ -22,16 +24,14 @@ void ServerThreadDesignationMap::removeFromUndesignatedPool(int in_key)
 	unDesignatedPool.erase(in_key);
 }
 
-void ServerThreadDesignationMap::designateCommandLineThread(int in_key)
+void ServerThreadDesignationMap::designateCommandLineThread()
 {
-	designations[ServerThreadDesignation::COMMAND_LINE] = in_key;	// add the designation key for the command line thread.
-	removeFromUndesignatedPool(in_key); // remove from the unDesignatedPool
+	designations[ServerThreadDesignation::COMMAND_LINE] = organicStemcellManagerRef->getServerCommandLineThreadID();	// add the designation key for the command line thread.
 }
 
-void ServerThreadDesignationMap::designateTerrainThread(int in_key)
+void ServerThreadDesignationMap::designateTerrainThread()
 {
-	designations[ServerThreadDesignation::TERRAIN] = in_key;
-	removeFromUndesignatedPool(in_key);
+	designations[ServerThreadDesignation::TERRAIN] = organicStemcellManagerRef->getServerTerrainThreadID();
 }
 
 bool ServerThreadDesignationMap::doesDesignatedThreadExist(std::string in_designationString)
@@ -75,14 +75,12 @@ AcquiredServerThread ServerThreadDesignationMap::fetchDesignatedThread(std::stri
 	AcquiredServerThread returnThread;
 	if (in_designationString == "ANY")
 	{
-		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
-		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->freeCellMap[terrainFinder->second].threadPtr.get());
+		AcquiredServerThread acquisition(organicStemcellManagerRef->getServerTerrainThreadID(), organicStemcellManagerRef->getServerTerrainThread());
 		returnThread = acquisition;
 	}
 	else if (in_designationString == "TERRAIN")
 	{
-		auto terrainFinder = designations.find(ServerThreadDesignation::TERRAIN);
-		AcquiredServerThread acquisition(terrainFinder->second, organicStemcellManagerRef->freeCellMap[terrainFinder->second].threadPtr.get());
+		AcquiredServerThread acquisition(organicStemcellManagerRef->getServerTerrainThreadID(), organicStemcellManagerRef->getServerTerrainThread());
 		returnThread = acquisition;
 	}
 	return returnThread;
@@ -90,19 +88,7 @@ AcquiredServerThread ServerThreadDesignationMap::fetchDesignatedThread(std::stri
 
 OrganicThread* ServerThreadDesignationMap::getCommandLineThread()
 {
-	int keyToLookup = designations[ServerThreadDesignation::COMMAND_LINE];	// fetch the key that uses the command line
-	return organicStemcellManagerRef->freeCellMap[keyToLookup].threadPtr.get();	// fetch the thread, return it
-}
-
-AcquiredServerThread ServerThreadDesignationMap::getFirstAvailableThread()		// for testing, name may change soon.
-{
-	auto firstUndesignated = unDesignatedPool.begin();
-	std::cout << "Retrieved thread ID: " << firstUndesignated->first << std::endl;
-
-	AcquiredServerThread acquisition(firstUndesignated->first, organicStemcellManagerRef->freeCellMap[firstUndesignated->first].threadPtr.get());
-	return acquisition;
-
-	//return organicStemcellManagerRef->freeCellMap[firstUndesignated->first].threadPtr.get();	// fetch the thread, return it
+	return organicStemcellManagerRef->getServerCommandLineThread();
 }
 
 void ServerThreadDesignationMap::incrementWorkload(int in_monitorID, float in_workload)

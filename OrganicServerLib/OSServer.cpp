@@ -1120,12 +1120,12 @@ void OSServer::setServerStatus(mutex& in_serverReadWrite, int in_valueToSet, int
 	else if (in_valueToSet == 10)	// "stop" the test thread"
 	{
 		//threadController.signalStop();
-		OSCManager.freeCellMap[1].signalStop();		// halt the test thread
+		//OSCManager.freeCellMap[1].signalStop();		// halt the test thread
 	}
 	else if (in_valueToSet == 11)
 	{
 		//threadController.signalStart();
-		OSCManager.freeCellMap[1].signalStart();	// resume the test thread
+		//OSCManager.freeCellMap[1].signalStart();	// resume the test thread
 	}
 	else if (in_valueToSet == 12)
 	{
