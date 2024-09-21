@@ -45,6 +45,7 @@
 
 // Below: temporary header files; just for testing BDM
 #include "ReconstitutionManager.h"
+#include "OSCMThreadMode.h"
 
 
 class OSServer

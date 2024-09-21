@@ -12,7 +12,7 @@ OSServer::OSServer(int numberOfFactories, int T1_bufferCubeSize, int T2_bufferCu
 	serverRunMode = serverMode;		// set the run mode (0, 1, 2, 3) etc
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
-	OSCManager.initializeOSC(1, serverSlaves, organicSystemPtr->getMasterFactory());			// signal for server mode, 2 threads
+	OSCManager.initializeOSC(OSCMThreadMode::SERVER_THREADS, serverSlaves, organicSystemPtr->getMasterFactory());			// signal for server mode, 2 threads
 	serverJobManager.initialize(this);
 	OSdirector.initialize(this);
 	messageInterpreter.initialize(this, &serverMessages);
@@ -35,7 +35,7 @@ OSServer::OSServer()
 	serverRunMode = serverProperties.runMode;		// set the run mode (0, 1, 2, 3) etc
 	OSWinAdapter::checkServerFolders();		// ensure that the world folder is created
 	setCurrentWorld("test");	// test world folder
-	OSCManager.initializeOSC(1, serverProperties.serverSlaves, organicSystemPtr->getMasterFactory());			// signal for server mode, 2 threads
+	OSCManager.initializeOSC(OSCMThreadMode::SERVER_THREADS, serverProperties.serverSlaves, organicSystemPtr->getMasterFactory());			// signal for server mode, 2 threads
 	serverJobManager.initialize(this);
 	OSdirector.initialize(this);
 	messageInterpreter.initialize(this, &serverMessages);
