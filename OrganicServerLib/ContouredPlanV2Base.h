@@ -11,6 +11,7 @@
 #include "OrganicTriangleTracker.h"
 #include "ContouredPlanUtils.h"
 #include "HotBlueprints.h"
+#include "OSTriangleMaterialLookup.h"
 
 class ContouredPlanV2Base
 {
