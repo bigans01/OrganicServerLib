@@ -33,6 +33,44 @@ ContouredTriangleV2::ContouredTriangleV2(DoublePoint in_point0,
 
 	//ECBPolyPoint normalPoint = determineLocalizedEmptyNormal();
 	//PerfectClampEnum clampValue = determinePerfectClampValue();
+
+	/*
+	if (ctv2PolyType == ECBPolyType::SHELL)
+	{
+		ECBPolyPoint determinedEmptyNormal = determineLocalizedEmptyNormal();
+		if (determinedEmptyNormal.y < 0.0f)
+		{
+			std::cout << "#####################################" << std::endl;
+			std::cout << "!!!! ##### NOTICE -> found ECBPolyType::SHELL with negative y in empty normal, in ContouredTriangleV2::ContouredTriangleV2!!! " << std::endl;
+			std::cout << "#####################################" << std::endl;
+
+			std::cout << "Points: " << std::endl;
+			for (int x = 0; x < 3; x++)
+			{
+				std::cout << x << " -> ";
+				points[x].printPointCoords();
+				std::cout << std::endl;
+			}
+
+			std::cout << "Mass reference point: " << std::endl;
+			ctv2ReferencePoint.printPointCoords();
+			std::cout << std::endl;
+
+			std::cout << "Determined empty normal:" << std::endl;
+			determinedEmptyNormal.printPointCoords();
+			std::cout << std::endl;
+
+
+
+			std::cout << "----------------------Debug empty normal----------------------" << std::endl;
+			determineLocalizedEmptyNormalV2Debug();
+
+			std::cout << "Enter number to continue..." << std::endl;
+			int polyDebugWait = 3;
+			std::cin >> polyDebugWait;
+		}
+	}
+	*/
 }
 
 FTriangle ContouredTriangleV2::produceEquivalentFTriangle()
@@ -47,16 +85,16 @@ FTriangle ContouredTriangleV2::produceEquivalentFTriangle()
 					points[1],
 					points[2],
 					FTriangleType::WORLD,
+					//determineLocalizedEmptyNormal(),
 					determineLocalizedEmptyNormal(),
 					BoundaryOrientation::NONE,
 					determinePerfectClampValue(),
 					contouredMaterial);
 }
 
-ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
+
+ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormalV2Debug()
 {
-	// first, determine the best way to translate by.
-	// Use the function WorldFracturingMachine::translateTriangleByBlueprintKeys as a model for how to translate (see OrganicIndependents lib)
 
 	std::set<double> xRanges;
 	std::set<double> yRanges;
@@ -91,25 +129,43 @@ ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
 	}
 	DoublePoint adjustedMRP = ctv2ReferencePoint + translationValue;
 
-	// create glm::vec3's from these values, then use an EmptyNormalFinder;
-	// because of the adjusted points, all the points of the triangle and the MRP should be well within an acceptable float range.
-	glm::vec3 convertedPoints[3];
-	for (int x = 0; x < 3; x++)
-	{
-		convertedPoints[x] = glm::vec3(float(adjustedPoints[x].x), float(adjustedPoints[x].y), float(adjustedPoints[x].z));
-		//std::cout << "Converted point at index " << x << " is: ";
-		//std::cout << convertedPoints[x].x << ", " << convertedPoints[x].y << ", " << convertedPoints[x].z << std::endl;
-	}
+	std::cout << "!! DEBUG: translationValue is: ";
+	translationValue.printPointCoords(); 
+	std::cout << std::endl;
 
-	glm::vec3 convertedMRP = glm::vec3(float(adjustedMRP.x), float(adjustedMRP.y), float(adjustedMRP.z));
-	EmptyNormalFinder normalFinder(convertedPoints[0], convertedPoints[1], convertedPoints[2], convertedMRP);
-	ECBPolyPoint determinedNormal = normalFinder.calculatedNormal;
+	
+	
+	DoublePoint determinedCentroid = IndependentUtils::determineTriangleCentroid(adjustedPoints[0], adjustedPoints[1], adjustedPoints[2]);
 
-	//std::cout << "Calculated normal is: "; 
-	//determinedNormal.printPointCoords(); 
-	//std::cout << endl;
+	std::cout << "!! DEBUG: centroid, post-translation is: ";
+	determinedCentroid.printPointCoords(); 
+	std::cout << std::endl;
 
-	return determinedNormal;
+	std::cout << "!! DEBUG: MRP, post-translation is: ";
+	adjustedMRP.printPointCoords();
+	std::cout << std::endl;
+
+	std::cout << "!! DEBUG: centorid - MRP is: ";
+	DoublePoint diff = determinedCentroid - adjustedMRP;
+	diff.printPointCoords();
+	std::cout << std::endl;
+
+	glm::vec3 diffToNormalize(diff.x, diff.y, diff.z);
+	diffToNormalize = glm::normalize(diffToNormalize);
+
+	std::cout << "!! DEBUG: diffToNormalize final value is: " << std::endl;
+	std::cout << diffToNormalize.x << ", " << diffToNormalize.y << ", " << diffToNormalize.z << std::endl;
+
+
+
+	return ECBPolyPoint(diffToNormalize.x, diffToNormalize.y, diffToNormalize.z);
+
+}
+
+ECBPolyPoint ContouredTriangleV2::determineLocalizedEmptyNormal()
+{
+	EmptyNormalFinder finder(points[0], points[1], points[2], ctv2ReferencePoint);
+	return ECBPolyPoint(finder.getFinderCalculatedNormal());
 }
 
 PerfectClampEnum ContouredTriangleV2::determinePerfectClampValue()

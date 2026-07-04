@@ -41,8 +41,10 @@ class ContouredTriangleV2
 		TriangleMaterial contouredMaterial = TriangleMaterial::NOVAL;
 		DoublePoint ctv2ReferencePoint;		// a reference point reflecting the side of the ContouredTriangleV2's plane in which mass will reside.
 
-		ECBPolyPoint determineLocalizedEmptyNormal();	// uses a localized version of the ctv2ReferencePoint 
-														// to determine the empty normal value that will be needed by an FTriangle.
+		ECBPolyPoint determineLocalizedEmptyNormal();	// Uses an EmptyNormalFinder to handle the discovery of the correct empty normal to use.
+
+		ECBPolyPoint determineLocalizedEmptyNormalV2Debug();	// debug version of determineLocalizedEmptyNormal, for edge case handling ContouredTriangleV2 
+
 		PerfectClampEnum determinePerfectClampValue();	// analyzes the points of this instance of ContouredTriangleV2 to determine if its perfectly clamped.
 };
 

@@ -51,10 +51,11 @@ OSContouredTriangle::OSContouredTriangle(ECBPolyPoint in_point0, ECBPolyPoint in
 	glmMRP.z = massReferencePoint.z;
 
 	EmptyNormalFinder normalFinder(glmPoint0, glmPoint1, glmPoint2, glmMRP);
+	glm::vec3 fetchedNormal = normalFinder.getFinderCalculatedNormal();
 
-	contouredEmptyNormal.x = normalFinder.calculatedNormal.x;
-	contouredEmptyNormal.y = normalFinder.calculatedNormal.y;
-	contouredEmptyNormal.z = normalFinder.calculatedNormal.z;
+	contouredEmptyNormal.x = fetchedNormal.x;
+	contouredEmptyNormal.y = fetchedNormal.y;
+	contouredEmptyNormal.z = fetchedNormal.z;
 
 	determineLineSlopes();				// determine the X/Y/Z slopes for each TriangleLine
 	determineCentroid();				// find centroid of the contoured triangle
