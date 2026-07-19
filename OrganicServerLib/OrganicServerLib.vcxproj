@@ -177,6 +177,7 @@
     <ClInclude Include="OSBlueprintTraversalController.h" />
     <ClInclude Include="OSCommandDirector.h" />
     <ClInclude Include="OSContouredTriangleRunner.h" />
+    <ClInclude Include="OSectorManager.h" />
     <ClInclude Include="OSPDir.h" />
     <ClInclude Include="OSAmpField.h" />
     <ClInclude Include="OSContouredTriangle.h" />
@@ -263,6 +264,7 @@
     <ClCompile Include="OSContouredTriangleRunner.cpp" />
     <ClCompile Include="OSContourLine.cpp" />
     <ClCompile Include="OSContourPoint.cpp" />
+    <ClCompile Include="OSectorManager.cpp" />
     <ClCompile Include="OSServer.cpp" />
     <ClCompile Include="OSServerUtils.cpp" />
     <ClCompile Include="OSTriangleLineTraverser.cpp" />

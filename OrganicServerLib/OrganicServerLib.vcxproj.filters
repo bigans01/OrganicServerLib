@@ -103,6 +103,12 @@
     <Filter Include="Source Files\Jobs\SJ\CP">
       <UniqueIdentifier>{15be19da-cebd-49b6-80e1-d550864fc027}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\OSectorManager">
+      <UniqueIdentifier>{0f0f9956-cd33-4a08-9fae-98ddbe6ebda4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\OSectorManager">
+      <UniqueIdentifier>{8695a240-bf84-41a4-9fd9-1ddbd2c5b377}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -378,6 +384,9 @@
     <ClInclude Include="SJCleanupCPV2.h">
       <Filter>Header Files\Jobs\SJ\GenericSJs</Filter>
     </ClInclude>
+    <ClInclude Include="OSectorManager.h">
+      <Filter>Header Files\OSectorManager</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -556,6 +565,9 @@
     </ClCompile>
     <ClCompile Include="SJCleanupCPV2.cpp">
       <Filter>Source Files\Jobs\SJ\GenericSJs</Filter>
+    </ClCompile>
+    <ClCompile Include="OSectorManager.cpp">
+      <Filter>Source Files\OSectorManager</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
