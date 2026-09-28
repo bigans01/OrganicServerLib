@@ -124,6 +124,8 @@ void OSectorManager::checkProcessingColumnTest(DoublePoint in_processingPoint)
 		// Get the phaseOneResults of the current grid we're looking at.
 		std::vector<PerlinClusterGenResult> phaseOneResults = osmFactory.populateSectorInGrid(currentGrid.second, targetSectorKey.a, targetSectorKey.b);
 
+		std::cout << "!! Size of phaseOneResults: " << phaseOneResults.size() << std::endl;
+
 		// All of the phaseOneResult should share the same origin key; use the first element in this to determine if we already did the work for this grid.
 		bool continueWithGeneration = false;
 		EnclaveKeyDef::EnclaveKey gridCheck3DKey;
@@ -142,7 +144,9 @@ void OSectorManager::checkProcessingColumnTest(DoublePoint in_processingPoint)
 			}
 			else
 			{
-				std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~ GRID COMPLETION IN A PREVIOUS PASS ~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
+				std::cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~ Grid " + currentGrid.second + " has already received a processing pass in sector at ";
+				gridCheck3DKey.printKey();
+				std::cout << " ~~~~~~~~~~~~~~~~~~~~~~~~~~~" << std::endl;
 			}
 		}
 
@@ -400,6 +404,9 @@ void OSectorManager::checkProcessingColumn(DoublePoint in_processingPoint)
 			// TODO: will probably need to verify/possibly alter the logic of osmFactory.populateSectorInGrid, to avoid repopulating a sector that has already been done,
 			// but still return the results.
 			std::vector<PerlinClusterGenResult> phaseOneResults = osmFactory.populateSectorInGrid(currentGrid.second, targetSectorKey.a, targetSectorKey.b);
+
+			std::cout << "######################### Size of phaseOneResults --> " << phaseOneResults.size() << std::endl;
+
 			for (auto& currentResult : phaseOneResults)
 			{
 				std::string currentClusterHash = currentResult.getClusterPtr()->produceHash();
@@ -413,7 +420,23 @@ void OSectorManager::checkProcessingColumn(DoublePoint in_processingPoint)
 				auto currentClusterState = currentResult.getClusterPtr()->fetchClusterState();
 				if (currentClusterState == PerlinClusterGenerationState::PERLIN_BASE)
 				{
+					std::cout << "Calling generate..." << std::endl;
+
 					PerlinClusterGeneratorEnum fetchedGridEnum = osmFactory.getGridGenerationType(currentGrid.second);
+
+					if (fetchedGridEnum == PerlinClusterGeneratorEnum::PERLIN_NOGENVAL)
+					{
+						std::cout << "!!! Warning: PERLIN_NOGENVAL detected...possible crash inbound!" << std::endl;
+					}
+					else
+					{
+						std::cout << "!!! Did not find PERLIN_NOGENVAL..." << std::endl;
+					}
+
+					// Before attempting generation, ensure that generateTileToSectorMappingsAndSamplingFields gets called
+					// to properly create the sampling fields.
+					currentResult.getClusterPtr()->generateTileToSectorMappingsAndSamplingFields();
+
 					currentResult.getClusterPtr()->generate(fetchedGridEnum);
 				}
 
