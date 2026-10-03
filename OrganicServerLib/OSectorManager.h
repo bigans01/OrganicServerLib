@@ -7,6 +7,7 @@
 #include "OSector.h"
 #include <windows.h>
 #include <filesystem>
+#include "ECBMap.h"
 
 /*
 
@@ -20,13 +21,21 @@ data for that noise grid is generated via a call to osmFactory.populateSectorInG
 map, which contains entries for each OSector for how and if it should write corresponding OSector data to file. See the checkProcessingColumnTest
 and checkProcessingColumn functions for more details on how this works.
 
+As of 9/29/2026, this class contains an ECBMap used to store blueprint output data; this object is referenced in the PerlinFactory, PerlinCluster,
+and PerlinClusterOutputBase-derived classes, but will potentially be replaced by a direct reference to the ECBMap object that sits in the OrganicServer
+class.
+
 */
 
 class OSectorManager
 {
 	public:	
 		OSectorManager();
-		void setup(int in_processingColumnBounds);	// call this first before anything else, obviously.
+		void setup(int in_processingColumnBounds);	// call this first before anything else, obviously; this will setup the bounds,
+													// and also appropriately set the ECBMap ref in the osmFactory, via a call to setBlueprintStoragePtr.
+													//
+													// NOTE: for the time being, the ECBMap ref being used is what sits locally in this class (osmLocalECBMap),
+													// but this can be changed at a later date.
 
 
 		// Below: setup a new grid.
@@ -156,6 +165,12 @@ class OSectorManager
 				std::unordered_map<EnclaveKeyDef::EnclaveKey, PerlinHashUpdateMode, EnclaveKeyDef::KeyHasher> updateMap;
 
 		};
+
+		ECBMap osmLocalECBMap;	// the ECBMap that will be referenced by the underlying PerlinFactory, it's PerlinCluster objects, and ultimately 
+								// the selected PerlinClusterOutputBase-derived class of the PerlinCluster objects during their generate() call.
+								//
+								// NOTE: this will probably be superseded by a reference to the ECBMap that sits in OrganicServer, but this is
+								// fine for now.
 
 		// The factory contains the grids we can use and operate on.
 		PerlinFactory osmFactory;

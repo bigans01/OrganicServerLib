@@ -36,6 +36,8 @@ void OSectorManager::checkForOSectorFolder()
 void OSectorManager::setup(int in_processingColumnBounds)
 {
 	processingColumnBounds = in_processingColumnBounds;
+	osmFactory.setBlueprintStoragePtr(&osmLocalECBMap);	// IMPORTANT: make sure this is set before building any PerlinCluster objects in the factory!
+														// (the PerlinCluster objects built by a PerlinFactory need to pass this ref down to the PerlinClusterOutputBase-derived child)
 }
 
 void OSectorManager::setupGridForFactory(std::string in_gridName, short in_tileDim, short in_gSectorSize, double in_gridStartY, float in_thresholdValue, int in_seedValue,
@@ -378,9 +380,6 @@ void OSectorManager::checkProcessingColumn(DoublePoint in_processingPoint)
 	std::cout << "!!! targetSectorKey: ";
 	targetSectorKey.printKey();
 	std::cout << std::endl;
-
-	
-
 
 	// Step 2: fetch the processing order from the osmFactory, to determine the order to process;
 	// process each one in order.
