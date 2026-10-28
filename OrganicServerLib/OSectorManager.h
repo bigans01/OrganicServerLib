@@ -199,7 +199,7 @@ class OSectorManager
 
 		bool searchForOSectorFile(std::string in_oSectorFileName);	// search for an OSector file in the oSectorFullPath directory; make sure that oSectorFullPath
 																	// is set before calling!
-		bool doesHashExistInSector(std::string in_oSectorFileName, std::string in_hashToSearch);
+		bool doesHashExistInSector(EnclaveKeyDef::EnclaveKey in_sectorKey, std::string in_hashToSearch);
 
 		PerlinHashUpdateMap generateUpdateMap(std::unordered_map<EnclaveKeyDef::EnclaveKey, PerlinClusterHashMeta, EnclaveKeyDef::KeyHasher>* in_metaRef,
 											std::string in_hashToSearch,

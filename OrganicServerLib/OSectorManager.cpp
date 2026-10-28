@@ -277,7 +277,7 @@ void OSectorManager::checkProcessingColumnTest(DoublePoint in_processingPoint)
 								{
 									// Creaet an OSector object that signifies that we're doing a new OSector file 
 									// (OSectorMode::MEMORY_NEW), then insert the hash meta and write it out.
-									OSector newOSector(oSectorFileFullPath.string(), OSectorMode::MEMORY_NEW);
+									OSector newOSector(oSectorFullPath, oSectorFileFullPath.string(), currentClusterEntry.first, OSectorMode::MEMORY_NEW);
 									oSectorMap[currentClusterEntry.first] = newOSector;
 
 									// Because we are doing an insert regardless of REFERENCED / PROCESSED, we can just call
@@ -309,7 +309,7 @@ void OSectorManager::checkProcessingColumnTest(DoublePoint in_processingPoint)
 								if (existingSectorFinder == oSectorMap.end())
 								{
 									std::filesystem::path oSectorFileFullPath = oSectorFullPath / currentOSectorFileName;
-									OSector newOSector(oSectorFileFullPath.string(), OSectorMode::DISK);
+									OSector newOSector(oSectorFullPath, oSectorFileFullPath.string(), currentClusterEntry.first, OSectorMode::DISK);
 									oSectorMap[currentClusterEntry.first] = std::move(newOSector);
 									std::cout << "!!! Done inserting a new OSector, started in OSectorMode::DISK, into map." << std::endl;
 									
@@ -464,7 +464,9 @@ void OSectorManager::checkProcessingColumn(DoublePoint in_processingPoint)
 				std::unordered_map<EnclaveKeyDef::EnclaveKey, PerlinClusterHashMeta, EnclaveKeyDef::KeyHasher> fetchedHashMeta;
 
 				// Remember, currentClusterOutputs should be keyed by the target OSector to update/write to, and valued by all of
-				// the blueprints that are associated with that sector.
+				// the blueprints that are associated with that sector. Each PerlinClusterSectorOutput value in the map returned by getClusterOutputs() should contain the
+				// state of sector it is referencing (found in PerlinClusterSectorState3D), which should have already been set by a call to PerlinClusterSectorOutput::setSectorOutputState.
+				// the PerlinClusterSectorState3D can then be retrieved by getSectorOutputState() to generate the generateClusterHashMeta, using the current grid's string.
 				auto currentClusterOutputs = currentResult.getClusterPtr()->getClusterOutputs();
 				for (auto& currentOutput : *currentClusterOutputs)
 				{
@@ -486,8 +488,11 @@ void OSectorManager::checkProcessingColumn(DoublePoint in_processingPoint)
 				// need to have new data loaded into them. Iterate through each key, and use each iteration to acquire the generated
 				// data for that corresponding sector. The generated data needs to contain actual blueprint data that will go into the OSector file
 				//
-				// So, for each currentSectorHashUpdateEntry below, we must acquire those blueprints of the sector we are looking at, write them to the disk,
-				// and then remove them from memory (unless we intend to use them)
+				// So, for each currentSectorHashUpdateEntry below, we must acquire those blueprints of the sector we are looking at, 
+				// and then send them to the component in each OSector that manages blueprints (these will go in memory initially, but can be written to disk).
+				// Writing to disk for every grid that gets completed in a sector may proved to be I/O intensive; testing will need to be done on this to evaluate.
+				// However, writing to the disk from the class managing the blueprints in the OSector class will allow it to safely be cleared from memory.
+				// (unless we intend to use them)
 
 				// Iterate through each cluster produced.
 				for (auto& currentSectorHashUpdateEntry : currentClusterUpdateMap.fetchMapCopy())
@@ -561,7 +566,7 @@ OSectorManager::PerlinHashUpdateMap OSectorManager::generateUpdateMap(std::unord
 		if (searchForOSectorFile(currentOSectorFileName))
 		{
 			std::filesystem::path currentOSectorFilePath = oSectorFullPath / currentOSectorFileName;
-			OSector newOSector(currentOSectorFilePath.string(), OSectorMode::QUICK_READ);
+			OSector newOSector(oSectorFullPath, currentOSectorFilePath.string(), currentCluster.first, OSectorMode::QUICK_READ);
 
 
 			// The sector file existed, but the hash did not. Enter it as INSERT_AS_PROCESSED
@@ -648,7 +653,7 @@ bool OSectorManager::doesGridCompletionExistInSector(std::string in_completionTo
 	if (searchForOSectorFile(currentOSectorFileName))
 	{
 		std::filesystem::path currentOSectorFilePath = oSectorFullPath / currentOSectorFileName;
-		OSector newOSector(currentOSectorFilePath.string(), OSectorMode::QUICK_READ);
+		OSector newOSector(oSectorFullPath, currentOSectorFilePath.string(), in_originKey, OSectorMode::QUICK_READ);
 		if (newOSector.doesCompletedGridStringExist(in_completionToSearch))
 		{
 			completionExists = true;
@@ -688,13 +693,14 @@ void OSectorManager::updateGridAsCompleted(std::string in_completionToInsert, En
 	}
 }
 
-bool OSectorManager::doesHashExistInSector(std::string in_oSectorFileName, std::string in_hashToSearch)
+bool OSectorManager::doesHashExistInSector(EnclaveKeyDef::EnclaveKey in_sectorKey, std::string in_hashToSearch)
 {
 	bool hashExists = false;
 
 	// Create a temporary OSector object so we can read the file
-	std::filesystem::path oSectorFileFullPath = oSectorFullPath / in_oSectorFileName;
-	OSector newOSector(oSectorFileFullPath.string(), OSectorMode::QUICK_READ);
+	std::string currentOSectorName = generateOSectorFileName(in_sectorKey);
+	std::filesystem::path oSectorFileFullPath = oSectorFullPath / currentOSectorName;
+	OSector newOSector(oSectorFullPath, oSectorFileFullPath.string(), in_sectorKey, OSectorMode::QUICK_READ);
 
 
 
